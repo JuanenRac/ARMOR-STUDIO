@@ -1,0 +1,24 @@
+.config-tabs{display:flex;gap:.45rem;flex-wrap:wrap;margin:1rem 0;border-bottom:1px solid #285363;padding-bottom:.65rem}.config-tabs button{border:1px solid #315e6b;border-radius:8px;padding:.55rem .8rem;background:#0b202a;color:#c5e8ed;font-size:.75rem}.config-tabs button.active{background:linear-gradient(115deg,#2d8f94,#286a92);border-color:#71eee0;color:#fff;box-shadow:0 0 0 1px rgba(113,238,224,.18)}.camera-settings{display:grid;grid-template-columns:minmax(175px,.4fr) minmax(0,1fr);gap:1rem}.camera-picker{display:grid;align-content:start;gap:.45rem;padding:.8rem;border:1px solid #234c5a;border-radius:10px;background:#071923}.camera-picker button{border:1px solid #315e6b;border-radius:7px;padding:.6rem;background:#0b202a;color:#d8f7fa;text-align:left}.camera-picker button.active{border-color:#6ae8dc;background:#174451}.camera-picker b,.camera-picker small{display:block}.camera-picker small{margin-top:.18rem;color:#91abb4;font-size:.66rem}.camera-form{grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem .8rem}.camera-form h3,.camera-form .camera-form-actions,.camera-form .notice{grid-column:1/-1}.camera-field{display:flex;min-width:0;flex-direction:column;justify-content:flex-start}.camera-field-wide{grid-column:1/-1}.camera-field label{display:grid;gap:.32rem;color:#a7c4cc;font-size:.7rem}.camera-field label>span{display:inline-flex;align-items:center;min-height:1.65rem;width:max-content;max-width:100%;padding:.23rem .48rem;border:1px solid #315e6b;border-radius:999px;background:#0b202a;color:#c7edf0;font:500 .62rem "DM Mono",monospace;letter-spacing:.025em;line-height:1.1}.camera-form input,.camera-form select{width:100%;min-height:2.35rem;border:1px solid #356573;border-radius:7px;background:#071921;color:#ecffff;padding:.5rem}.camera-form input:focus,.camera-form select:focus{outline:0;border-color:#6be4d7;box-shadow:0 0 0 2px rgba(79,208,201,.14)}.field-help{min-height:1.75rem;margin:.32rem 0 0;color:#809da8;font-size:.63rem;line-height:1.35}.camera-form-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding-top:.1rem}.discovery-results{display:grid;gap:.45rem;margin-top:.2rem}.discovery-results button{justify-content:flex-start;text-align:left}.video-integration{max-width:720px}.ptz-grid{display:grid;grid-template-columns:repeat(3,minmax(100px,1fr));gap:.55rem}.ptz-grid button{min-height:42px}@media(max-width:760px){.camera-settings{grid-template-columns:1fr}.camera-form{grid-template-columns:1fr}.camera-field-wide{grid-column:auto}.ptz-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* Users */
+.users-panel { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); align-items: start; }
+.users-card h3 { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.user-chip { padding: .1rem .5rem; border: 1px solid #2d7583; border-radius: 999px; color: #9bd8e0; font: 600 .62rem "DM Mono", ui-monospace, monospace; letter-spacing: .06em; }
+.users-form, .users-edit { display: grid; gap: .6rem; }
+.users-form label, .users-edit label { display: grid; gap: .25rem; font-size: .72rem; color: #a9d0d6; }
+.users-actions { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: flex-end; }
+.users-list ul { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; gap: .5rem; }
+.users-list li { display: grid; gap: .35rem; padding: .7rem .8rem; border: 1px solid #234b59; border-radius: 10px; background: rgba(6, 20, 29, .6); }
+.users-list li.current { border-color: #3f9a99; }
+.user-main { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.role-badge { margin-left: auto; padding: .1rem .5rem; border-radius: 6px; font: 700 .58rem "DM Mono", ui-monospace, monospace; letter-spacing: .1em; text-transform: uppercase; background: #0d3a44; color: #8fe9f4; }
+.role-badge.admin { background: #4a3210; color: #ffcf7d; }
+.users-notice { grid-column: 1 / -1; }
+.users-notice.bad { color: #ffb4bd; border-color: #8a3a44; }
+.users-card p.muted { margin: .1rem 0 .3rem; }
+.users-card h3 { margin-bottom: .2rem; }
+
+/* The mode badge in the top bar is a button: it arms and disarms. */
+.top-status .mode-button { cursor: pointer; padding: .35rem .75rem; border-radius: 8px; font: 800 .68rem "DM Mono", ui-monospace, monospace; letter-spacing: .12em; border: 1px solid transparent; }
+.top-status .mode-button.armed { background: rgba(255, 77, 94, .16); border-color: #ff4d5e; color: #ffd3d8; } .top-status .mode-button.disarmed { background: rgba(0, 229, 255, .1); border-color: #2d7583; color: #b9f4ff; }
+.top-status .mode-button:hover:not(:disabled) { filter: brightness(1.25); } .top-status .mode-button:disabled { opacity: .5; cursor: default; }

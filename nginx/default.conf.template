@@ -1,0 +1,53 @@
+# ARMOR-STUDIO static host for the container image.
+# Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
+#
+# The nginx image renders this template at start (${ARMOR_PUBLIC_ORIGIN} and
+# ${ARMOR_SERVER_UPSTREAM} come from the environment). The browser talks only to
+# this origin: /api/ is proxied to ARMOR-SERVER, so the session cookie is
+# same-origin and no CORS opening is needed.
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "no-referrer" always;
+    add_header Cross-Origin-Opener-Policy "same-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'" always;
+
+    # Tells Studio which server to start with: this very origin.
+    location = /armor-config.json {
+        default_type application/json;
+        add_header Cache-Control "no-store" always;
+        return 200 '{"serverOrigin":"${ARMOR_PUBLIC_ORIGIN}"}';
+    }
+
+    location = /healthz {
+        default_type application/json;
+        return 200 '{"ok":true,"service":"armor-studio"}';
+    }
+
+    location /api/ {
+        proxy_pass http://${ARMOR_SERVER_UPSTREAM};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        # Live video and recordings are long-lived streams.
+        proxy_buffering off;
+        proxy_read_timeout 1h;
+    }
+
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable" always;
+        try_files $uri =404;
+    }
+
+    location / {
+        add_header Cache-Control "no-cache" always;
+        try_files $uri /index.html;
+    }
+}

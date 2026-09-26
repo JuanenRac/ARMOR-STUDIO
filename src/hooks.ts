@@ -1,0 +1,145 @@
+/**
+ * Studio data hooks: everything that talks to ARMOR-SERVER on a timer.
+ * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
+ */
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { createCameraStreamUrl, listCameraStatus, listCameraViews, listConfiguredCameras, readInfo, readStatus, type Reachability, type ServerInfo } from "./api";
+import { mergeServerCameras } from "./cameras";
+import { DEMO_STATE, type Camera } from "./domain";
+import type { SystemState } from "./types";
+
+export type Connection = "synced" | "demo";
+
+/** Poll the server status every three seconds; fall back to labelled demo data when it cannot be reached. */
+/** Whether the page is fullscreen, and a button action that goes in when it is not and out when it is. */
+export function useFullscreen(onFailure: () => void): { active: boolean; toggle: () => void } {
+  const [active, setActive] = useState(() => Boolean(document.fullscreenElement));
+  useEffect(() => {
+    const update = () => setActive(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", update);
+    return () => document.removeEventListener("fullscreenchange", update);
+  }, []);
+  const toggle = () => {
+    if (document.fullscreenElement) void document.exitFullscreen?.().catch(onFailure);
+    else void document.documentElement.requestFullscreen?.().catch(onFailure);
+  };
+  return { active, toggle };
+}
+
+export function useServerStatus(origin: string): { state: SystemState; connection: Connection; latencyMs: number | null; apply: (state: SystemState) => void } {
+  const [state, setState] = useState<SystemState>(DEMO_STATE);
+  const [connection, setConnection] = useState<Connection>("demo");
+  const [latencyMs, setLatencyMs] = useState<number | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    const refresh = async () => {
+      const started = performance.now();
+      try { const next = await readStatus(origin); if (!cancelled) { setState(next); setConnection("synced"); setLatencyMs(Math.round(performance.now() - started)); } }
+      catch { if (!cancelled) { setConnection("demo"); setLatencyMs(null); } }
+    };
+    void refresh();
+    const timer = window.setInterval(() => void refresh(), 3000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, [origin]);
+  return { state, connection, latencyMs, apply: setState };
+}
+
+/** One short-lived stream address per live camera, renewed when the set of live cameras changes. */
+export function useStreamUrls(origin: string, cameras: readonly Camera[]): Record<string, string> {
+  const [urls, setUrls] = useState<Record<string, string>>({});
+  useEffect(() => {
+    let cancelled = false;
+    const live = cameras.filter(camera => camera.enabled && camera.liveVideoAvailable);
+    void Promise.all(live.map(async camera => [camera.id, await createCameraStreamUrl(origin, camera.id)] as const))
+      .then(entries => { if (!cancelled) setUrls(Object.fromEntries(entries)); })
+      .catch(() => { if (!cancelled) setUrls({}); });
+    return () => { cancelled = true; };
+  }, [origin, cameras]);
+  return urls;
+}
+
+/**
+ * Keep the camera list in step with the server: the read-only view first, then
+ * the operator list once the session allows it (retried every minute).
+ * Returns whether the operator list could be read.
+ */
+export function useServerCameras(origin: string, setCameras: Dispatch<SetStateAction<Camera[]>>): boolean {
+  const [operatorUnlocked, setOperatorUnlocked] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    void listCameraViews(origin)
+      .then(reported => { if (!cancelled) setCameras(current => mergeServerCameras(current, reported)); })
+      .catch(() => { /* The server may not be running while Studio starts. */ });
+    const restore = async () => {
+      try {
+        const configured = await listConfiguredCameras(origin);
+        if (cancelled) return;
+        setOperatorUnlocked(true);
+        setCameras(current => mergeServerCameras(current, configured));
+      } catch { if (!cancelled) setOperatorUnlocked(false); }
+    };
+    void restore();
+    const retry = window.setInterval(() => void restore(), 60_000);
+    return () => { cancelled = true; window.clearInterval(retry); };
+  }, [origin, setCameras]);
+  return operatorUnlocked;
+}
+
+/** How reachable each camera is, as seen by the server's watchdog (refreshed every ten seconds). */
+export function useCameraReachability(origin: string): Record<string, Reachability> {
+  const [status, setStatus] = useState<Record<string, Reachability>>({});
+  useEffect(() => {
+    let cancelled = false;
+    const refresh = async () => {
+      try { const list = await listCameraStatus(origin); if (!cancelled) setStatus(Object.fromEntries(list.map(item => [item.id, item.status]))); }
+      catch { if (!cancelled) setStatus({}); }
+    };
+    void refresh();
+    const timer = window.setInterval(() => void refresh(), 10_000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, [origin]);
+  return status;
+}
+
+/** The server's version, uptime and capabilities, refreshed every fifteen seconds (null while it cannot be read). */
+export function useServerInfo(origin: string): ServerInfo | null {
+  const [info, setInfo] = useState<ServerInfo | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    const refresh = async () => {
+      try { const next = await readInfo(origin); if (!cancelled) setInfo(next); }
+      catch { if (!cancelled) setInfo(null); }
+    };
+    void refresh();
+    const timer = window.setInterval(() => void refresh(), 15_000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, [origin]);
+  return info;
+}
+
+/** The current time, ticking once a second. */
+export function useClock(): Date {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => { const timer = window.setInterval(() => setNow(new Date()), 1000); return () => window.clearInterval(timer); }, []);
+  return now;
+}
+
+/** Something read from the server again and again while it is shown; `reload` asks for it right now (after a change). */
+export function usePolled<T>(load: () => Promise<T>, everyMs: number, key: unknown): { data: T | null; reload: () => void; failed: boolean } {
+  const [data, setData] = useState<T | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    let cancelled = false, busy = false;
+    const pull = async () => {
+      if (busy) return;
+      busy = true;
+      try { const next = await load(); if (!cancelled) { setData(next); setFailed(false); } } catch { if (!cancelled) setFailed(true); }
+      busy = false;
+    };
+    void pull();
+    const timer = window.setInterval(() => void pull(), everyMs);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, [key, everyMs, tick]);   // eslint-disable-line react-hooks/exhaustive-deps
+  return { data, reload: () => setTick(value => value + 1), failed };
+}

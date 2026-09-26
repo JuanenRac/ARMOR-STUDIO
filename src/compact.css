@@ -1,0 +1,141 @@
+/*
+ * The compact layout, for a 1920x1080 screen: the frame of every menu reaches the sidebar and the right edge with a few pixels
+ * between them, the headings that repeat the title in the top bar are gone, and the panels use the height instead of scrolling
+ * the page. Loaded after every other stylesheet on purpose; only things that grow the layout are undone here.
+ */
+@media (min-width: 1100px) {
+  /* ---- the frame ---- */
+  .studio-frame .studio-shell { grid-template-columns: 200px minmax(0, 1fr); }
+  .studio-frame .studio-shell.sidebar-collapsed { grid-template-columns: 66px minmax(0, 1fr); }
+  .studio-frame .sidebar { padding: .55rem .45rem; gap: .4rem; }
+  .studio-frame .sidebar .brand { gap: .55rem; } .studio-frame .brand-mark { width: 34px; height: 34px; border-radius: 11px; font-size: 1.2rem; }
+  .studio-frame .sidebar nav { gap: .5rem; }
+  .studio-frame .nav-group { gap: .08rem; } .studio-frame .nav-group-title { padding: 0 .55rem .1rem; font-size: .5rem; }
+  .studio-frame nav button { padding: .38rem .55rem; font-size: .8rem; gap: .65rem; }
+  .studio-frame .sidebar-foot { padding: .5rem .2rem; font-size: .66rem; }
+
+  .studio-frame .main-stage { max-width: none; width: 100%; margin: 0; padding: 4px 6px 4px 4px; }
+  .studio-frame .topbar { padding: 0 0 4px; margin: 0 0 4px; min-height: 36px; align-items: center; border-bottom: 1px solid #16323d; }
+  .studio-frame .topbar .eyebrow { display: none; }
+  .studio-frame .topbar h1 { font-size: 1.15rem; letter-spacing: -.01em; }
+  .studio-frame .icon-button { width: 28px; height: 28px; border-radius: 8px; font-size: .9rem; }
+  .studio-frame .top-status { gap: .5rem; font-size: .62rem; }
+  .studio-frame .mode-button { padding: .32rem .6rem; }
+  .studio-frame .main-stage > section, .studio-frame .main-stage > article { margin-top: 0; }
+  .studio-frame .status-bar { flex-basis: 34px; height: 34px; }
+
+  /* ---- headings that repeat the title in the top bar: a single line of text is enough ---- */
+  .studio-frame .devices-head, .studio-frame .alarm-hero, .studio-frame .sys-head { gap: .6rem; }
+  .studio-frame .devices-head h2, .studio-frame .devices-head .eyebrow { display: none; }
+  .studio-frame .devices-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 0; padding: 0; }
+  .studio-frame .devices-head .muted { margin: 0; font-size: .74rem; max-width: 60%; }
+  .studio-frame .devices-stats span { padding: .25rem .6rem; } .studio-frame .devices-stats b { font-size: 1rem; }
+  .studio-frame .devices-view, .studio-frame .alarms-view, .studio-frame .automations-view, .studio-frame .system-view, .studio-frame .radar-view, .studio-frame .overview { margin-top: 0; gap: 4px; }
+
+  /* ---- the site designer: a single toolbar row, the viewer as large as it can be, the inspector narrow ---- */
+  .studio-frame .unified-site-designer { padding: 4px; border-radius: 12px; }
+  .studio-frame .unified-designer-heading { display: flex; align-items: center; gap: .6rem; padding: 0; }
+  .studio-frame .unified-designer-heading > div:first-child { display: none; }
+  .studio-frame .designer-heading-actions { display: flex; flex-direction: row; align-items: center; justify-content: space-between; width: 100%; gap: .6rem; justify-items: unset; }
+  .studio-frame .designer-view-actions { order: 1; } .studio-frame .designer-status { order: 2; margin-left: auto; }
+  .studio-frame .unified-site-designer .site-designer-grid { grid-template-columns: minmax(0, 1fr) 320px; gap: 4px; margin-top: 4px; }
+  .studio-frame .designer-canvas.pro-canvas { min-height: 0; border-radius: 10px; }
+  .studio-frame .building-inspector { padding: .5rem .6rem; border-radius: 10px; }
+  .inspector-tabs { display: flex; gap: 2px; padding: 2px; margin-bottom: .45rem; border: 1px solid #1d4b56; border-radius: 9px; background: #06131a; position: sticky; top: -.5rem; z-index: 2; }
+  .inspector-tabs button { flex: 1; padding: .4rem .5rem; border: 0; border-radius: 7px; background: transparent; color: #9bc4cb; font: 700 .62rem "DM Mono", ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
+  .inspector-tabs button.active { background: #0f4a55; color: #f0feff; box-shadow: inset 0 0 0 1px #2a8f9c; }
+  .studio-frame .building-inspector > header { margin-bottom: .3rem; } .studio-frame .building-inspector > header h3 { font-size: 1rem; margin: 0; }
+}
+
+/* ---- tabs of a menu (radar, history) ---- */
+.view-tabs { display: flex; gap: 2px; padding: 2px; border: 1px solid #1d4b56; border-radius: 9px; background: #06131a; align-self: start; width: fit-content; max-width: 100%; }
+.view-tabs button { padding: .38rem .9rem; border: 0; border-radius: 7px; background: transparent; color: #9bc4cb; font: 700 .62rem "DM Mono", ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; white-space: nowrap; }
+.view-tabs button.active { background: #0f4a55; color: #f0feff; box-shadow: inset 0 0 0 1px #2a8f9c; }
+
+@media (min-width: 1100px) {
+  /* ---- overview: everything on one screen ---- */
+  .studio-frame .overview { flex: 1 1 0; min-height: 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 4px; }
+  .ov-hero { padding: .5rem 1rem; border-radius: 16px; flex-wrap: nowrap; gap: 1rem; }
+  .ov-hero .eyebrow { display: none; } .ov-hero h2 { font-size: 1.3rem; margin: 0; } .ov-hero .muted { margin: 0; font-size: .7rem; max-width: 60ch; }
+  .ov-hero-state { padding: .35rem .8rem; gap: .8rem; } .ov-hero-state strong { font-size: 1.05rem; } .ov-hero-state small { font-size: .5rem; }
+  .ov-tiles { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; }
+  .ov-tile { padding: .45rem .65rem; border-radius: 14px; grid-template-columns: auto minmax(0, 1fr); column-gap: .5rem; align-items: center; }
+  .ov-tile > strong, .ov-tile > small { grid-column: 1 / -1; }
+  .ov-tile-icon { width: 24px; height: 24px; border-radius: 8px; font-size: .85rem; } .ov-tile-label { margin: 0; font-size: .5rem; letter-spacing: .2em; }
+  .ov-tile strong { font-size: 1.5rem; line-height: 1.05; } .ov-tile small { font-size: .62rem; }
+  .ov-main { grid-template-columns: minmax(0, 1fr) 360px; gap: 4px; min-height: 0; }
+  .ov-card { padding: .5rem .65rem; border-radius: 14px; gap: .35rem; }
+  .ov-map { min-height: 0; } .ov-map .site-map { min-height: 0; height: 100%; }
+  .ov-side { min-height: 0; overflow: auto; gap: 4px; }
+  .ov-list li { padding: .35rem .55rem; } .ov-quick button { padding: .35rem .6rem; }
+  .ov-feed { max-height: 120px; } .ov-feed ul { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1rem; max-height: 76px; overflow: hidden; } .ov-feed li { padding: .18rem .2rem; }
+
+  /* ---- radar: the map takes the screen, the side panel has two tabs ---- */
+  .studio-frame .radar-view { flex: 1 1 0; min-height: 0; grid-template-columns: minmax(0, 1fr) 400px; gap: 4px; }
+  .studio-frame .radar-map-card { min-height: 0; display: flex; flex-direction: column; padding: .5rem .6rem; border-radius: 14px; }
+  .studio-frame .radar-map-card > header { flex: 0 0 auto; } .studio-frame .radar-map-card > header .eyebrow, .studio-frame .radar-map-card > header h2 { display: none; }
+  .studio-frame .radar-map-card > p.muted { margin: .1rem 0 .3rem; font-size: .68rem; }
+  .studio-frame .radar-map { flex: 1 1 0; min-height: 0; height: auto; }
+  .studio-frame .radar-side { min-height: 0; overflow: auto; align-content: start; gap: 4px; }
+  .studio-frame .radar-side .stack-card { padding: .55rem .65rem; }
+
+  /* ---- history: one panel at a time, the log fills the screen ---- */
+  .studio-frame .history-workspace { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; gap: 4px; margin-top: 0; }
+  .studio-frame .history-card { padding: .55rem .7rem; border-radius: 14px; flex: 1 1 0; min-height: 0; overflow: auto; }
+  .studio-frame .history-events { display: flex; flex-direction: column; overflow: hidden; }
+  .studio-frame .history-head .eyebrow, .studio-frame .history-head h2 { display: none; }
+  .studio-frame .history-head .muted { margin: 0; font-size: .7rem; }
+  .studio-frame .history-list { flex: 1 1 0; min-height: 0; max-height: none; margin-top: .4rem; }
+  .studio-frame .history-row { padding: .3rem .6rem; }
+  .studio-frame .history-stats { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; margin-top: .3rem; }
+  .studio-frame .history-stat { padding: .3rem .6rem; }
+
+  /* ---- system ---- */
+  .studio-frame .system-view { flex: 1 1 0; min-height: 0; display: grid; grid-template-rows: auto auto auto minmax(0, 1fr); gap: 4px; }
+  .studio-frame .sys-hero { gap: 4px; } .studio-frame .sys-hero > div { padding: .45rem .8rem; border-radius: 14px; } .studio-frame .sys-hero strong { font-size: 1.25rem; }
+  .studio-frame .sys-grid { gap: 4px; } .studio-frame .sys-grid .stack-card { padding: .55rem .7rem; }
+  .studio-frame .audit-card { min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: .55rem .7rem; }
+  .studio-frame .audit-card .audit-table { flex: 1 1 0; max-height: none; min-height: 0; }
+
+  /* ---- alarms, devices, automations ---- */
+  .studio-frame .alarm-hero { padding: .5rem .9rem; border-radius: 14px; } .studio-frame .alarm-hero h2 { font-size: 1.2rem; }
+  .studio-frame .devices-view, .studio-frame .automations-view { flex: 1 1 0; min-height: 0; overflow: auto; align-content: start; }
+  .studio-frame .alarms-view { flex: 1 1 0; min-height: 0; overflow: auto; align-content: start; }
+  .studio-frame .device-card { padding: .55rem .7rem; }
+}
+@media (min-width: 1100px) {
+  .studio-frame .radar-view { grid-template-rows: minmax(0, 1fr); }
+  .studio-frame .radar-map-card > p.muted.small { margin: .2rem 0 0; font-size: .62rem; }
+  .studio-frame .stack-card h3 { font-size: .95rem; margin: 0 0 .2rem; }
+  .studio-frame .system-view .devices-head { display: none; }
+  .studio-frame .audit-card p.muted { margin: .1rem 0 .3rem; font-size: .72rem; }
+  .studio-frame .sys-counts div { padding: .35rem .6rem; } .studio-frame .sys-counts strong { font-size: 1.15rem; }
+}
+@media (min-width: 1100px) { .studio-frame .radar-view { align-items: stretch; } .studio-frame .radar-map-card { height: 100%; } }
+@media (min-width: 1100px) {
+  /* history: the two panels are full width, and the rows keep their own height */
+  .studio-frame .history-workspace { align-items: stretch; } .studio-frame .history-workspace > .view-tabs { align-self: flex-start; }
+  .studio-frame .history-list { align-content: start; grid-auto-rows: min-content; }
+  .studio-frame .history-filters { margin-top: .3rem; }
+
+  /* cameras, configuration and evidence: no heading that repeats the top bar, the frame reaches both edges */
+  .studio-frame .camera-workspace, .studio-frame .configuration, .studio-frame .media-workspace { margin: 0; padding: .4rem .5rem; border-radius: 14px; }
+  .studio-frame .camera-workspace .panel-heading { display: flex; justify-content: flex-start; flex: 0 0 auto; }
+  .studio-frame .camera-workspace .panel-heading > div:first-child, .studio-frame .configuration > .panel-heading { display: none; }
+  .studio-frame .camera-workspace .grid-picker button { padding: .3rem .6rem; font-size: .7rem; }
+  .studio-frame .camera-workspace .camera-grid, .studio-frame .camera-workspace .camera-frame { margin-top: .3rem; }
+  .studio-frame .camera-workspace .notice { margin: .2rem 0 0; font-size: .68rem; }
+  .studio-frame .configuration .config-tabs { margin-top: 0; }
+  .studio-frame .media-heading .eyebrow, .studio-frame .media-heading h2 { display: none; }
+  .studio-frame .media-heading .muted { margin: 0; font-size: .7rem; }
+}
+
+/* The link from a radar node to its own web panel. */
+.node-row .panel-link { padding: .3rem .55rem; border: 1px solid #315e6b; border-radius: 8px; background: #0b202a; color: #9df3ea; font-size: .68rem; text-decoration: none; white-space: nowrap; }
+.node-row .panel-link:hover { border-color: #69d9d6; background: #133541; }
+
+/* Every button answers the press: it sinks a little and brightens while a finger or the mouse is on it, and the keyboard's place is always visible. */
+button, a.panel-link { transition: transform .08s ease, filter .08s ease, box-shadow .12s ease, background-color .15s, border-color .15s; }
+button:not(:disabled):active, a.panel-link:active { transform: translateY(1px) scale(.96) !important; filter: brightness(1.4) saturate(1.15); box-shadow: inset 0 2px 8px rgba(0, 0, 0, .55), 0 0 0 2px rgba(114, 233, 219, .3) !important; }
+button:focus-visible, a.panel-link:focus-visible { outline: 2px solid #72e9db; outline-offset: 2px; }
+button:disabled { filter: grayscale(.4); }
