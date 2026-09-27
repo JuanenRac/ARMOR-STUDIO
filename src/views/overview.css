@@ -1,0 +1,36 @@
+/* The overview: deep slate cards, a glow of their own colour, big rounded corners. */
+.overview { margin-top: .85rem; display: grid; gap: 1.1rem; }
+.ov-hero { display: flex; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; align-items: center; padding: 1.6rem 1.8rem; border-radius: 28px; border: 2px solid #1f6b8a;
+  background: radial-gradient(circle at 0 0, rgba(56, 189, 248, .22), transparent 50%), radial-gradient(circle at 100% 100%, rgba(52, 211, 153, .12), transparent 45%), linear-gradient(155deg, #0c2636, #071620); box-shadow: 0 25px 60px rgba(0, 0, 0, .4); }
+.ov-hero.armed { border-color: #a3202d; background: radial-gradient(circle at 0 0, rgba(255, 77, 94, .25), transparent 50%), radial-gradient(circle at 100% 100%, rgba(251, 146, 60, .12), transparent 45%), linear-gradient(155deg, #2a1119, #14090d); }
+.ov-hero.critical { animation: ov-critical 1.3s ease-in-out infinite; } @keyframes ov-critical { 0%, 100% { box-shadow: 0 25px 60px rgba(0, 0, 0, .4); } 50% { box-shadow: 0 0 44px rgba(255, 77, 94, .55); } } @media (prefers-reduced-motion: reduce) { .ov-hero.critical { animation: none; } }
+.ov-hero h2 { margin: .1rem 0 .3rem; font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 900; text-transform: uppercase; letter-spacing: -.03em; font-style: italic; }
+.ov-hero-state { display: flex; align-items: center; gap: 1.2rem; padding: .9rem 1.2rem; border-radius: 22px; background: rgba(0, 0, 0, .35); border: 1px solid rgba(255, 255, 255, .06); }
+.ov-hero-state small { display: block; color: #86a8b3; font: 700 .58rem "DM Mono", ui-monospace, monospace; letter-spacing: .3em; text-transform: uppercase; } .ov-hero-state strong { display: block; font-size: 1.5rem; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
+.ov-pulse { width: 14px; height: 14px; border-radius: 50%; background: #34d399; box-shadow: 0 0 14px #10b981; animation: ov-blink 1.8s ease-in-out infinite; } .ov-pulse.armed { background: #ff4d5e; box-shadow: 0 0 14px #e11d48; } @keyframes ov-blink { 50% { opacity: .35; } } @media (prefers-reduced-motion: reduce) { .ov-pulse { animation: none; } }
+.ov-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; }
+.ov-tile { --accent: #38bdf8; position: relative; display: grid; gap: .1rem; text-align: left; padding: 1.1rem 1.2rem 1rem; border-radius: 26px; border: 2px solid color-mix(in srgb, var(--accent) 45%, #1a2c36); overflow: hidden; cursor: pointer; color: #eafcff;
+  background: radial-gradient(circle at 100% 0, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%), linear-gradient(160deg, #0f2330, #08151d); box-shadow: 0 18px 40px rgba(0, 0, 0, .35), 0 0 22px color-mix(in srgb, var(--accent) 12%, transparent); transition: transform .2s, box-shadow .2s; }
+.ov-tile:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 22px 46px rgba(0, 0, 0, .4), 0 0 30px color-mix(in srgb, var(--accent) 30%, transparent); }
+.ov-tile-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 12px; font-size: 1.1rem; font-weight: 900; color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, #06121a); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+.ov-tile-label { margin-top: .5rem; color: color-mix(in srgb, var(--accent) 75%, #9bb4c0); font: 800 .6rem "DM Mono", ui-monospace, monospace; letter-spacing: .28em; text-transform: uppercase; }
+.ov-tile strong { font-size: 2.2rem; font-weight: 900; letter-spacing: -.03em; line-height: 1.1; color: #fff; text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent); } .ov-tile small { color: #93afba; font-size: .72rem; }
+.ov-tile.alert { animation: ov-tile-alert 1.2s ease-in-out infinite; } @keyframes ov-tile-alert { 50% { box-shadow: 0 0 34px color-mix(in srgb, var(--accent) 60%, transparent); } } @media (prefers-reduced-motion: reduce) { .ov-tile.alert { animation: none; } }
+.ov-main { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(300px, .8fr); gap: 1rem; align-items: stretch; }
+.ov-card { display: grid; gap: .7rem; align-content: start; padding: 1.1rem 1.2rem; border-radius: 24px; border: 1px solid #1d4250; background: linear-gradient(160deg, #0d2029, #08141b); box-shadow: 0 16px 36px rgba(0, 0, 0, .3); }
+.ov-card header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; } .ov-card h3 { margin: 0; font: 800 .68rem "DM Mono", ui-monospace, monospace; letter-spacing: .3em; text-transform: uppercase; color: #7ea6ae; }
+.ov-map { grid-template-rows: auto 1fr; } .ov-map .site-map { min-height: 380px; } .ov-side { display: grid; gap: 1rem; align-content: start; }
+.ov-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; } .ov-list li { display: flex; align-items: center; gap: .7rem; padding: .55rem .7rem; border-radius: 14px; background: rgba(0, 0, 0, .28); border: 1px solid #1d3b48; cursor: default; } .ov-list li.critical { border-color: #ff4d5e; } .ov-list li.warning, .ov-list li.high { border-color: #b07c14; cursor: pointer; }
+.ov-list strong { display: block; font-size: .84rem; } .ov-list small { color: #86a8b3; font-size: .68rem; } .ov-kind { color: #ffb020; display: inline-grid; }
+.ov-ok { margin: 0; color: #5df0c4; font-size: .82rem; }
+.ov-quick div { display: flex; gap: .5rem; flex-wrap: wrap; } .ov-quick button { padding: .5rem .8rem; border-radius: 12px; border: 1px solid #2d5c69; background: #0a202a; color: #cfeff4; font-size: .74rem; cursor: pointer; } .ov-quick button:hover { border-color: #63e6f2; background: #0d3a44; }
+.ov-feed ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .2rem; } .ov-feed li { display: grid; grid-template-columns: 26px 1fr auto; gap: .6rem; align-items: center; padding: .4rem .3rem; border-bottom: 1px solid #14303b; font-size: .78rem; }
+.ov-event-icon { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px; background: #0b2530; color: #63e6f2; font-weight: 900; font-size: .8rem; } .ev-alarm .ov-event-icon { background: rgba(255, 77, 94, .2); color: #ff8e99; } .ev-device .ov-event-icon { color: #5df0c4; } .ev-alert .ov-event-icon { color: #ffb020; } .ev-mode .ov-event-icon { color: #c084fc; }
+.ov-feed small { color: #6f97a0; font: 500 .62rem "DM Mono", ui-monospace, monospace; }
+@media (max-width: 1100px) { .ov-main { grid-template-columns: 1fr; } }
+.overview, .overview > *, .ov-main > *, .ov-side > * { min-width: 0; max-width: 100%; }
+@media (max-width: 700px) {
+  .ov-hero { padding: 1.1rem; border-radius: 22px; } .ov-hero-state { width: 100%; flex-wrap: wrap; gap: .8rem; } .ov-hero-state .mode-big { flex: 1 1 100%; }
+  .ov-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; } .ov-tile { padding: .8rem .9rem; border-radius: 20px; } .ov-tile strong { font-size: 1.7rem; }
+  .ov-map .site-map { min-height: 300px; }
+}

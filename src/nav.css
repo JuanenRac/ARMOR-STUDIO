@@ -1,0 +1,8 @@
+/* The sidebar in groups, and the badge of alarms waiting. */
+.nav-group { display: grid; gap: .3rem; } .sidebar nav { gap: 1rem; }
+.nav-group-title { padding: 0 .8rem; color: #5d8590; font: 700 .55rem "DM Mono", ui-monospace, monospace; letter-spacing: .26em; text-transform: uppercase; }
+nav button { position: relative; } .nav-badge { margin-left: auto; min-width: 20px; padding: .1rem .38rem; border-radius: 999px; background: #e11d48; color: #fff; font-size: .62rem; text-align: center; animation: nav-blink 1.3s ease-in-out infinite; }
+@keyframes nav-blink { 50% { opacity: .55; } } @media (prefers-reduced-motion: reduce) { .nav-badge { animation: none; } }
+.sidebar-collapsed .nav-group-title { display: none; } .sidebar-collapsed .nav-badge { position: absolute; top: 2px; right: 6px; min-width: 16px; padding: 0 .25rem; }
+@media (max-width: 800px) { .sidebar nav { display: flex; overflow-x: auto; gap: .6rem; } .nav-group { display: flex; gap: .3rem; align-items: center; } .nav-group-title { display: none; } }
+.site-sync { padding: .35rem .5rem; border-radius: 8px; border: 1px solid #285a66; color: #7ee7ff; } .site-sync.saving { color: #ffcf7d; border-color: #7a5a1c; } .site-sync.offline { color: #ff8e99; border-color: #974b55; }

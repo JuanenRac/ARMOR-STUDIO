@@ -1,0 +1,31 @@
+/* The radar view: the site design with the live targets, and the nodes beside it. */
+.radar-view { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(280px, .75fr); gap: 1rem; margin-top: .85rem; align-items: start; }
+.radar-map-card { padding: 1.1rem; border: 1px solid #214858; border-radius: 14px; background: linear-gradient(155deg, rgba(16, 40, 51, .94), rgba(7, 23, 32, .94)); min-width: 0; }
+.radar-map-card header { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
+.radar-map-card h2 { margin: .1rem 0 0; }
+.radar-map-stats { display: flex; gap: 1rem; color: #9bc4c9; font: 600 .68rem "DM Mono", ui-monospace, monospace; } .radar-map-stats b { color: #00e5ff; font-size: 1.1rem; margin-right: .2rem; }
+.radar-map { position: relative; height: min(66vh, 640px); min-height: 380px; margin-top: .7rem; overflow: hidden; border: 1px solid #1d4b56; border-radius: 12px; background: #060d13; touch-action: none; cursor: grab; user-select: none; }
+.radar-map:active { cursor: grabbing; } .radar-map svg { display: block; }
+.rm-terrain { fill: rgba(23, 65, 77, .6); stroke: #4fe0d0; stroke-width: 1.5; stroke-dasharray: 8 4; }
+.rm-road { fill: #1a2329; stroke: #33454e; } .rm-path { fill: #4a6871; opacity: .8; }
+.rm-building { fill: #c7dce2; stroke: #eaf8fb; } .rm-building-in { fill: rgba(9, 24, 32, .82); stroke: none; }
+.rm-name { fill: #d7eef2; font: 600 11px "DM Mono", ui-monospace, monospace; paint-order: stroke; stroke: #060d13; stroke-width: 3px; pointer-events: none; }
+.rm-label { fill: #9bd8e0; font: 600 10px "DM Mono", ui-monospace, monospace; paint-order: stroke; stroke: #060d13; stroke-width: 3px; pointer-events: none; }
+.rm-sector { fill: rgba(0, 229, 255, .09); stroke: #00b8cc; stroke-opacity: .6; stroke-dasharray: 6 4; } .rm-unwired .rm-sector { fill: rgba(139, 155, 161, .07); stroke: #6d7f86; }
+.rm-ring { fill: none; stroke: #1f7f8e; opacity: .55; } .rm-sensor { fill: #0c3540; stroke: #00e5ff; stroke-width: 2; } .rm-unwired .rm-sensor { stroke: #8b9ba1; }
+.rm-fov { fill: rgba(255, 176, 32, .05); stroke: #b07c14; stroke-opacity: .3; stroke-dasharray: 3 5; } .rm-camera { fill: #ffb020; stroke: #0b1418; stroke-width: 1.5; } .rm-off .rm-camera { fill: #7d8a90; }
+.rm-zone { fill: url(#zone-hatch); stroke: #ff4d5e; stroke-width: 1.2; stroke-dasharray: 4 3; }
+.rm-trail { fill: none; stroke: #00e5ff; stroke-width: 2; opacity: .45; stroke-linecap: round; stroke-linejoin: round; }
+.rm-target-label { fill: #ecffff; font: 700 10px "DM Mono", ui-monospace, monospace; paint-order: stroke; stroke: #060d13; stroke-width: 3px; pointer-events: none; }
+.rm-pulse { animation: rm-pulse 1.6s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes rm-pulse { 0% { transform: scale(.6); opacity: .35; } 100% { transform: scale(1.5); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .rm-pulse { animation: none; } }
+.radar-map-controls { position: absolute; right: 10px; top: 10px; display: grid; gap: .25rem; }
+.radar-map-controls button { width: 32px; height: 32px; padding: 0; border: 1px solid #285a66; border-radius: 8px; background: rgba(4, 18, 25, .9); color: #d7eef2; font-size: 1rem; cursor: pointer; } .radar-map-controls button:hover { background: #123541; border-color: #3f9a99; }
+.radar-legend { position: absolute; left: 10px; bottom: 10px; display: grid; gap: .15rem; margin: 0; padding: .45rem .6rem; list-style: none; border: 1px solid #285a66; border-radius: 9px; background: rgba(4, 18, 25, .88); color: #c9e5ea; font: 500 .6rem "DM Mono", ui-monospace, monospace; }
+.radar-legend li { display: flex; align-items: center; gap: .4rem; } .radar-legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 2px solid #00e5ff; background: #00e5ff; }
+.radar-legend .dot.ignored { border-color: #8b9ba1; background: transparent; } .radar-legend .dot.outside { border: 2px dashed #ffb020; background: transparent; } .radar-legend .dot.zone { border-radius: 2px; border-color: #ff4d5e; background: repeating-linear-gradient(45deg, rgba(255, 77, 94, .6) 0 2px, transparent 2px 4px); }
+.radar-side { display: grid; gap: 1rem; min-width: 0; }
+.warn-line { color: #ffcf7d; }
+.check-line { display: flex; align-items: center; gap: .5rem; }
+@media (max-width: 1100px) { .radar-view { grid-template-columns: 1fr; } }

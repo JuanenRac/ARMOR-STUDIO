@@ -1,0 +1,54 @@
+/**
+ * Interface text of the user management (Configuration > Users), one row per phrase in the seven languages.
+ * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
+ */
+import { cataloguesFromRows, type Row } from "./catalogueRows";
+
+const ROWS: Record<string, Row> = {
+  tabUsers: ["Users", "Usuarios", "Benutzer", "Utilisateurs", "Utenti", "ユーザー", "用户"],
+  usersTitle: ["Users", "Usuarios", "Benutzer", "Utilisateurs", "Utenti", "ユーザー", "用户"],
+  usersHelp: ["Who can sign in to Studio. Administrators also manage users; operators do everything else.", "Quién puede entrar en Studio. Los administradores también gestionan usuarios; los operadores hacen todo lo demás.", "Wer sich in Studio anmelden darf. Administratoren verwalten auch Benutzer; Operatoren erledigen alles andere.", "Qui peut se connecter à Studio. Les administrateurs gèrent aussi les utilisateurs ; les opérateurs font le reste.", "Chi può accedere a Studio. Gli amministratori gestiscono anche gli utenti; gli operatori fanno tutto il resto.", "Studio にサインインできる人。管理者はユーザー管理も行い、オペレーターはそれ以外を行います。", "谁可以登录 Studio。管理员还可管理用户，操作员负责其余操作。"],
+  myAccount: ["My account", "Mi cuenta", "Mein Konto", "Mon compte", "Il mio account", "自分のアカウント", "我的账户"],
+  accountHelp: ["Change your own user name or password. Your current password is required.", "Cambia tu nombre de usuario o contraseña. Hace falta tu contraseña actual.", "Eigenen Benutzernamen oder das Passwort ändern. Das aktuelle Passwort ist erforderlich.", "Modifiez votre nom d'utilisateur ou mot de passe. Le mot de passe actuel est requis.", "Cambia il tuo nome utente o la password. Serve la password attuale.", "ユーザー名またはパスワードを変更します。現在のパスワードが必要です。", "修改自己的用户名或密码，需要输入当前密码。"],
+  userName: ["User name", "Nombre de usuario", "Benutzername", "Nom d'utilisateur", "Nome utente", "ユーザー名", "用户名"],
+  currentPassword: ["Current password", "Contraseña actual", "Aktuelles Passwort", "Mot de passe actuel", "Password attuale", "現在のパスワード", "当前密码"],
+  newPassword: ["New password", "Contraseña nueva", "Neues Passwort", "Nouveau mot de passe", "Nuova password", "新しいパスワード", "新密码"],
+  confirmPassword: ["Repeat the new password", "Repite la contraseña nueva", "Neues Passwort wiederholen", "Répétez le nouveau mot de passe", "Ripeti la nuova password", "新しいパスワードを再入力", "重复新密码"],
+  passwordsDontMatch: ["The two passwords are not the same.", "Las dos contraseñas no coinciden.", "Die beiden Passwörter stimmen nicht überein.", "Les deux mots de passe ne correspondent pas.", "Le due password non coincidono.", "2 つのパスワードが一致しません。", "两次输入的密码不一致。"],
+  keepPassword: ["Leave empty to keep the password", "Déjalo vacío para conservar la contraseña", "Leer lassen, um das Passwort zu behalten", "Laissez vide pour garder le mot de passe", "Lascia vuoto per mantenere la password", "空欄のままならパスワードは変更されません", "留空则保持原密码"],
+  saveAccount: ["Save my account", "Guardar mi cuenta", "Mein Konto speichern", "Enregistrer mon compte", "Salva il mio account", "アカウントを保存", "保存我的账户"],
+  accountSaved: ["Account updated. Your other sessions were signed out.", "Cuenta actualizada. Tus otras sesiones se han cerrado.", "Konto aktualisiert. Ihre anderen Sitzungen wurden abgemeldet.", "Compte mis à jour. Vos autres sessions ont été fermées.", "Account aggiornato. Le altre sessioni sono state chiuse.", "アカウントを更新しました。他のセッションはサインアウトされました。", "账户已更新，你的其他会话已退出。"],
+  usersAdminOnly: ["Only an administrator can manage users.", "Solo un administrador puede gestionar usuarios.", "Nur ein Administrator kann Benutzer verwalten.", "Seul un administrateur peut gérer les utilisateurs.", "Solo un amministratore può gestire gli utenti.", "ユーザー管理は管理者のみ可能です。", "只有管理员可以管理用户。"],
+  role: ["Role", "Rol", "Rolle", "Rôle", "Ruolo", "役割", "角色"],
+  roleAdmin: ["Administrator", "Administrador", "Administrator", "Administrateur", "Amministratore", "管理者", "管理员"],
+  roleOperator: ["Operator", "Operador", "Operator", "Opérateur", "Operatore", "オペレーター", "操作员"],
+  addUser: ["Add a user", "Añadir un usuario", "Benutzer hinzufügen", "Ajouter un utilisateur", "Aggiungi un utente", "ユーザーを追加", "添加用户"],
+  createUser: ["Create user", "Crear usuario", "Benutzer erstellen", "Créer l'utilisateur", "Crea utente", "ユーザーを作成", "创建用户"],
+  userCreated: ["User created.", "Usuario creado.", "Benutzer erstellt.", "Utilisateur créé.", "Utente creato.", "ユーザーを作成しました。", "用户已创建。"],
+  userUpdated: ["User updated.", "Usuario actualizado.", "Benutzer aktualisiert.", "Utilisateur mis à jour.", "Utente aggiornato.", "ユーザーを更新しました。", "用户已更新。"],
+  userDeleted: ["User deleted.", "Usuario eliminado.", "Benutzer gelöscht.", "Utilisateur supprimé.", "Utente eliminato.", "ユーザーを削除しました。", "用户已删除。"],
+  editUser: ["Edit", "Editar", "Bearbeiten", "Modifier", "Modifica", "編集", "编辑"],
+  saveUser: ["Save", "Guardar", "Speichern", "Enregistrer", "Salva", "保存", "保存"],
+  cancel: ["Cancel", "Cancelar", "Abbrechen", "Annuler", "Annulla", "キャンセル", "取消"],
+  deleteUser: ["Delete", "Eliminar", "Löschen", "Supprimer", "Elimina", "削除", "删除"],
+  confirmDeleteUser: ["Delete this user? They will be signed out.", "¿Eliminar este usuario? Se cerrará su sesión.", "Diesen Benutzer löschen? Er wird abgemeldet.", "Supprimer cet utilisateur ? Il sera déconnecté.", "Eliminare questo utente? Verrà disconnesso.", "このユーザーを削除しますか？サインアウトされます。", "删除此用户？该用户将被退出登录。"],
+  youLabel: ["you", "tú", "du", "vous", "tu", "あなた", "你"],
+  passwordMinimum: ["Passwords need at least", "Las contraseñas necesitan al menos", "Passwörter brauchen mindestens", "Les mots de passe font au moins", "Le password hanno almeno", "パスワードは最低", "密码至少需要"],
+  charactersWord: ["characters", "caracteres", "Zeichen", "caractères", "caratteri", "文字", "个字符"],
+  userNameRule: ["3 to 40 letters, digits, dots, dashes, underscores or @", "de 3 a 40 letras, cifras, puntos, guiones, guiones bajos o @", "3 bis 40 Buchstaben, Ziffern, Punkte, Bindestriche, Unterstriche oder @", "3 à 40 lettres, chiffres, points, tirets, tirets bas ou @", "da 3 a 40 lettere, cifre, punti, trattini, trattini bassi o @", "3〜40 文字の英数字、ドット、ハイフン、アンダースコア、@", "3 至 40 个字母、数字、点、连字符、下划线或 @"],
+  createdOn: ["created", "creado", "erstellt", "créé", "creato", "作成", "创建于"],
+  userErr_invalid_username: ["That user name is not valid: 3 to 40 letters, digits, dots, dashes, underscores or @.", "Ese nombre no es válido: de 3 a 40 letras, cifras, puntos, guiones, guiones bajos o @.", "Dieser Benutzername ist ungültig: 3 bis 40 Buchstaben, Ziffern, Punkte, Bindestriche, Unterstriche oder @.", "Ce nom n'est pas valide : 3 à 40 lettres, chiffres, points, tirets, tirets bas ou @.", "Questo nome non è valido: da 3 a 40 lettere, cifre, punti, trattini, trattini bassi o @.", "ユーザー名が無効です（3〜40 文字の英数字、ドット、ハイフン、アンダースコア、@）。", "用户名无效：3 至 40 个字母、数字、点、连字符、下划线或 @。"],
+  userErr_username_taken: ["That user name is already in use.", "Ese nombre de usuario ya está en uso.", "Dieser Benutzername ist bereits vergeben.", "Ce nom d'utilisateur est déjà utilisé.", "Questo nome utente è già in uso.", "そのユーザー名は既に使われています。", "该用户名已被使用。"],
+  userErr_weak_password: ["The password is too short.", "La contraseña es demasiado corta.", "Das Passwort ist zu kurz.", "Le mot de passe est trop court.", "La password è troppo corta.", "パスワードが短すぎます。", "密码太短。"],
+  userErr_invalid_password: ["The password is not valid.", "La contraseña no es válida.", "Das Passwort ist ungültig.", "Le mot de passe n'est pas valide.", "La password non è valida.", "パスワードが無効です。", "密码无效。"],
+  userErr_invalid_role: ["That role does not exist.", "Ese rol no existe.", "Diese Rolle gibt es nicht.", "Ce rôle n'existe pas.", "Questo ruolo non esiste.", "その役割は存在しません。", "该角色不存在。"],
+  userErr_last_admin: ["There must always be at least one administrator.", "Siempre tiene que haber al menos un administrador.", "Es muss immer mindestens einen Administrator geben.", "Il doit toujours y avoir au moins un administrateur.", "Deve esserci sempre almeno un amministratore.", "管理者は常に 1 人以上必要です。", "必须始终至少有一名管理员。"],
+  userErr_self_delete: ["You cannot delete the user you are signed in as.", "No puedes eliminar el usuario con el que has entrado.", "Sie können den Benutzer, mit dem Sie angemeldet sind, nicht löschen.", "Vous ne pouvez pas supprimer l'utilisateur connecté.", "Non puoi eliminare l'utente con cui hai effettuato l'accesso.", "サインイン中のユーザーは削除できません。", "不能删除当前登录的用户。"],
+  userErr_wrong_password: ["The current password is not right.", "La contraseña actual no es correcta.", "Das aktuelle Passwort ist nicht richtig.", "Le mot de passe actuel n'est pas correct.", "La password attuale non è corretta.", "現在のパスワードが正しくありません。", "当前密码不正确。"],
+  userErr_too_many_users: ["The limit of users has been reached.", "Se ha alcanzado el límite de usuarios.", "Das Benutzerlimit ist erreicht.", "La limite d'utilisateurs est atteinte.", "Raggiunto il limite di utenti.", "ユーザー数の上限に達しました。", "已达到用户数量上限。"],
+  userErr_nothing_to_change: ["There is nothing to change.", "No hay nada que cambiar.", "Es gibt nichts zu ändern.", "Il n'y a rien à modifier.", "Non c'è nulla da modificare.", "変更する内容がありません。", "没有可更改的内容。"],
+  userErr_forbidden: ["You need to be an administrator for that.", "Necesitas ser administrador para eso.", "Dafür sind Administratorrechte nötig.", "Il faut être administrateur pour cela.", "Serve essere amministratore per farlo.", "管理者権限が必要です。", "需要管理员权限。"],
+  userErr_generic: ["That could not be done.", "No se ha podido hacer.", "Das ließ sich nicht ausführen.", "Cela n'a pas pu être fait.", "Non è stato possibile.", "実行できませんでした。", "无法完成该操作。"],
+};
+
+export const usersCatalogues = cataloguesFromRows(ROWS);

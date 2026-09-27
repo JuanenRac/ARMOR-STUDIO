@@ -1,0 +1,37 @@
+/* The Devices menu: cards coloured by kind, in the family look. */
+.devices-view { margin-top: .85rem; display: grid; gap: 1rem; }
+.devices-head { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; align-items: flex-end; }
+.devices-head h2 { margin: .1rem 0 .3rem; }
+.devices-stats { display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; }
+.devices-stats span { display: grid; padding: .35rem .8rem; border: 1px solid #234b59; border-radius: 10px; background: rgba(8, 24, 33, .8); color: #93afba; font: 600 .6rem "DM Mono", ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; }
+.devices-stats span b { font-size: 1.35rem; color: #f2feff; letter-spacing: 0; } .devices-stats span.ok b { color: #5df0c4; } .devices-stats span.bad b { color: #ff7a85; }
+.devices-filters { display: flex; gap: .4rem; flex-wrap: wrap; align-items: center; }
+.devices-filters button { padding: .45rem .8rem; border: 1px solid #2d5c69; border-radius: 999px; background: #0a1e28; color: #bfe0e6; font-size: .72rem; cursor: pointer; } .devices-filters button.on { background: #0d4b57; border-color: #00e5ff; color: #ecffff; }
+.devices-filters input { margin-left: auto; min-width: 240px; padding: .45rem .7rem; border: 1px solid #2d5c69; border-radius: 8px; background: #071921; color: #ecffff; }
+.devices-notice.bad { color: #ffb4bd; border-color: #8a3a44; }
+.device-form { gap: .8rem; } .device-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .7rem; }
+.device-form-grid label { display: grid; gap: .25rem; font-size: .72rem; color: #a9d0d6; } .device-form-grid .wide { grid-column: 1 / -1; }
+.device-form-grid textarea, .device-form-grid input, .device-form-grid select { width: 100%; } .device-form-grid textarea { font: 500 .72rem "DM Mono", ui-monospace, monospace; }
+.device-form-grid .check { display: flex; align-items: center; gap: .5rem; } .device-form-grid.advanced { padding: .8rem; border: 1px dashed #2d5c69; border-radius: 10px; }
+.link-button { justify-self: start; background: transparent; border: 0; color: #63e6f2; cursor: pointer; padding: 0; font-size: .74rem; }
+.devices-empty { display: grid; justify-items: center; gap: .6rem; padding: 3rem 1rem; border: 1px dashed #2d5c69; border-radius: 14px; color: #6fb9c4; text-align: center; }
+.device-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1rem; }
+.device-card { --kind: #00e5ff; position: relative; display: grid; gap: .7rem; padding: 1rem; border: 1px solid color-mix(in srgb, var(--kind) 40%, #1d3b48); border-radius: 18px; overflow: hidden;
+  background: radial-gradient(circle at 100% 0, color-mix(in srgb, var(--kind) 14%, transparent), transparent 55%), linear-gradient(155deg, #0e2531, #08161f); box-shadow: 0 14px 34px rgba(0, 0, 0, .3), inset 0 0 0 1px rgba(255, 255, 255, .02); }
+.device-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--kind); box-shadow: 0 0 14px var(--kind); }
+.device-card.offline { filter: saturate(.35); opacity: .8; }
+.device-card.triggered { border-color: #ff4d5e; animation: device-alarm 1.1s ease-in-out infinite; }
+.device-card.tamper, .device-card.battery, .device-card.offline { border-color: #b07c14; }
+@keyframes device-alarm { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 77, 94, .0), 0 14px 34px rgba(0, 0, 0, .3); } 50% { box-shadow: 0 0 26px 2px rgba(255, 77, 94, .55), 0 14px 34px rgba(0, 0, 0, .3); } }
+@media (prefers-reduced-motion: reduce) { .device-card.triggered { animation: none; } }
+.device-top { display: flex; align-items: center; gap: .7rem; } .device-titles { flex: 1; min-width: 0; } .device-titles strong { display: block; font-size: .98rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #f5feff; } .device-titles small { color: #86a8b3; font-size: .68rem; }
+.device-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 14px; color: var(--kind); background: color-mix(in srgb, var(--kind) 16%, #06121a); border: 1px solid color-mix(in srgb, var(--kind) 45%, transparent); }
+.device-state { display: flex; gap: .4rem; flex-wrap: wrap; }
+.pill { padding: .2rem .6rem; border-radius: 999px; font: 700 .64rem "DM Mono", ui-monospace, monospace; letter-spacing: .05em; background: #0d2b36; color: #cfeff4; border: 1px solid #245565; }
+.pill.on { background: rgba(52, 211, 153, .15); border-color: #34d399; color: #a6f5d4; } .pill.alarm, .pill.problem.triggered { background: rgba(255, 77, 94, .2); border-color: #ff4d5e; color: #ffd0d5; }
+.pill.problem { background: rgba(255, 176, 32, .15); border-color: #b07c14; color: #ffd98a; } .pill.battery.low { border-color: #ff4d5e; color: #ffb4bd; } .pill.quiet { opacity: .5; }
+.device-meta { display: flex; justify-content: space-between; color: #6f97a0; font: 500 .62rem "DM Mono", ui-monospace, monospace; }
+.device-commands { display: flex; gap: .4rem; } .device-commands button { flex: 1; padding: .5rem; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--kind) 50%, #245565); background: color-mix(in srgb, var(--kind) 12%, #0a1e28); color: #eafcff; font-weight: 700; cursor: pointer; } .device-commands button:hover { background: color-mix(in srgb, var(--kind) 28%, #0a1e28); }
+.device-actions { display: flex; gap: .35rem; flex-wrap: wrap; } .device-actions button { padding: .35rem .6rem; border-radius: 8px; border: 1px solid #285a66; background: #0a202a; color: #bfe0e6; font-size: .66rem; cursor: pointer; } .device-actions button:hover { border-color: #63e6f2; }
+.devices-kinds { text-align: right; }
+@media (max-width: 700px) { .devices-filters input { margin-left: 0; min-width: 0; width: 100%; } }
