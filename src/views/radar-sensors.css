@@ -1,0 +1,12 @@
+/* The radar sensor configuration list. */
+.radar-sensors { gap: .7rem; } .rs-head { display: flex; justify-content: space-between; align-items: flex-start; gap: .8rem; } .rs-head h3 { margin: 0; }
+.rs-card { border: 1px solid #1f4a57; border-radius: 14px; background: #071b24; overflow: hidden; } .rs-card.open { border-color: #3aa6b8; background: linear-gradient(160deg, #0b2530, #071a22); }
+.stack-card .rs-summary { display: grid; grid-template-columns: auto 1fr auto auto; gap: .7rem; align-items: center; width: 100%; padding: .7rem .8rem; border: 0; border-radius: 0; background: transparent; text-align: left; color: #e9fbff; }
+.rs-title strong, .rs-title small { display: block; } .rs-title small { color: #86a8b3; font-size: .68rem; margin-top: .1rem; } .rs-meta { color: #63e6f2; font: 600 .62rem "DM Mono", ui-monospace, monospace; } .rs-chevron { color: #86a8b3; }
+.rs-dot { width: 10px; height: 10px; border-radius: 50%; background: #6b7c84; } .rs-dot.online { background: #34d399; box-shadow: 0 0 10px #10b981; } .rs-dot.stale { background: #ffb020; } .rs-dot.offline { background: #ff6f79; } .rs-dot.unwired { background: #6b7c84; }
+.rs-body { display: grid; gap: .7rem; padding: 0 .9rem .9rem; } .rs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: .6rem; }
+.rs-field { display: grid; gap: .25rem; color: #a7c4cc; font-size: .66rem; } .rs-field.wide { grid-column: 1 / -1; }
+.rs-field input, .rs-field select { width: 100%; border: 1px solid #356573; border-radius: 6px; background: #071921; color: #ecffff; padding: .45rem; } .rs-field span { position: relative; display: block; } .rs-field em { position: absolute; right: .5rem; top: 50%; transform: translateY(-50%); color: #6f97a0; font-style: normal; font-size: .66rem; pointer-events: none; }
+.rs-check { grid-column: 1 / -1; display: flex; gap: .5rem; align-items: center; color: #a7c4cc; font-size: .72rem; }
+.rs-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.rs-head-actions { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: flex-end; }

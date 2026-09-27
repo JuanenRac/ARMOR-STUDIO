@@ -1,0 +1,71 @@
+/* The animations of the sidebar shield and of the small logo of every menu. They stop under prefers-reduced-motion. */
+.menu-title { display: flex; align-items: center; gap: .85rem; min-width: 0; }
+.menu-title-text { min-width: 0; }
+.ml { flex: 0 0 auto; filter: drop-shadow(0 0 6px rgba(0, 229, 255, .35)); overflow: visible; }
+
+/* the shield of the sidebar */
+html[data-armor-theme] .brand-mark.armor-mark { background: none; border: 0; box-shadow: none; padding: 0; width: 40px; height: 40px; }
+.am-mark { display: block; overflow: visible; filter: drop-shadow(0 0 7px rgba(0, 229, 255, .45)); }
+.am-sweep { animation: am-turn 4.8s linear infinite; }
+.am-ring { transform-origin: 0 0; animation: am-ring 4.8s ease-out infinite; opacity: 0; }
+.am-blip { animation: am-blip 4.8s ease-in-out infinite; }
+.am-shield { animation: am-glow 3.6s ease-in-out infinite; }
+@keyframes am-turn { to { transform: rotate(360deg); } }
+@keyframes am-ring { 0% { transform: scale(1); opacity: .7; } 70%, 100% { transform: scale(1.45); opacity: 0; } }
+@keyframes am-blip { 0%, 30% { opacity: 0; } 40% { opacity: 1; } 80%, 100% { opacity: 0; } }
+@keyframes am-glow { 50% { stroke: #7ff4ff; } }
+
+/* the logos of the menus */
+.ml-ping { transform-origin: 32px 14px; opacity: 0; animation: ml-ping 2.6s ease-out infinite; } .ml-ping.b { animation-delay: 1.3s; }
+@keyframes ml-ping { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(2.8); opacity: 0; } }
+.ml-pulse { transform-origin: 32px 32px; animation: ml-pulse 3s ease-in-out infinite; }
+.ml-draw { stroke-dasharray: 60; stroke-dashoffset: 60; animation: ml-draw 3.2s ease-in-out infinite; }
+.ml-swing { transform-origin: 32px 12px; animation: ml-swing 2.4s ease-in-out infinite; }
+.ml-wave { transform-origin: 32px 34px; animation: ml-wave 2.4s ease-out infinite; opacity: 0; }
+.ml-wave.late { animation-delay: 1.2s; }
+.ml-iris { transform-origin: 26px 32px; animation: ml-iris 4s ease-in-out infinite; }
+.ml-rec { animation: ml-blink 1.4s steps(2, end) infinite; }
+.ml-turn { transform-origin: 32px 32px; animation: ml-turn 4s linear infinite; }
+.ml-blip { animation: ml-blip 4s ease-in-out infinite; } .ml-blip.late { animation-delay: 2s; }
+.ml-dot { animation: ml-blink 2.2s ease-in-out infinite; } .ml-dot.b { animation-delay: 1.1s; }
+.ml-bolt { transform-origin: 32px 32px; animation: ml-bolt 2.6s ease-in-out infinite; }
+.ml-gear-small { transform-origin: 48px 16px; animation: ml-turn 6s linear infinite; }
+.ml-gear { transform-origin: 32px 32px; animation: ml-turn 12s linear infinite; }
+.ml-play { transform-origin: 34px 29px; animation: ml-pulse 2.4s ease-in-out infinite; }
+.ml-progress { stroke-dasharray: 48; stroke-dashoffset: 48; animation: ml-progress 5s linear infinite; }
+.ml-hand { transform-origin: 32px 32px; animation: ml-turn 6s linear infinite; } .ml-hand.slow { animation-duration: 36s; }
+.ml-led { animation: ml-blink 1.8s ease-in-out infinite; } .ml-led.b { animation-delay: .6s; } .ml-led.c { animation-delay: 1.2s; }
+.ml-beat { stroke-dasharray: 8 6; animation: ml-run 1.6s linear infinite; }
+
+@keyframes ml-pulse { 50% { transform: scale(1.07); opacity: .85; } }
+@keyframes ml-draw { 0% { stroke-dashoffset: 60; } 40%, 80% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -60; } }
+@keyframes ml-swing { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } }
+@keyframes ml-wave { 0% { transform: scale(.7); opacity: .8; } 100% { transform: scale(1.7); opacity: 0; } }
+@keyframes ml-iris { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.22); } }
+@keyframes ml-blink { 50% { opacity: .2; } }
+@keyframes ml-turn { to { transform: rotate(360deg); } }
+@keyframes ml-blip { 0%, 40% { opacity: 0; } 50% { opacity: 1; } 90%, 100% { opacity: 0; } }
+@keyframes ml-bolt { 0%, 100% { filter: none; } 50% { filter: drop-shadow(0 0 6px #FFB020); transform: scale(1.06); } }
+@keyframes ml-progress { to { stroke-dashoffset: 0; } }
+@keyframes ml-run { to { stroke-dashoffset: -28; } }
+
+/* the alarm hero, the overview hero and the cards of the menus breathe a little */
+.alarm-hero-mark { animation: ml-pulse 2.6s ease-in-out infinite; }
+.alarm-hero.clear .alarm-hero-mark { animation: none; }
+.stack-card, .ov-tile { transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.stack-card:hover, .ov-tile:hover { box-shadow: 0 0 22px rgba(0, 229, 255, .12); }
+.studio-shell main > section, .studio-shell main > div { animation: view-in .35s ease-out both; }
+@keyframes view-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .am-sweep, .am-ring, .am-blip, .am-shield, .ml *, .alarm-hero-mark, .studio-shell main > section, .studio-shell main > div { animation: none !important; }
+  .ml-draw { stroke-dashoffset: 0; } .ml-progress { stroke-dashoffset: 0; } .am-ring { opacity: 0; }
+}
+
+.ov-hero-text { position: relative; padding-left: 74px; }
+.ov-hero-text > .ml { position: absolute; left: 0; top: 2px; }
+
+/* the icon of the open menu breathes; the small headers of the compact layout get a smaller logo */
+nav button.active > span { animation: ml-pulse 2.6s ease-in-out infinite; }
+.studio-frame .devices-head .ml, .studio-frame .history-head .ml { width: 32px; height: 32px; }
+@media (prefers-reduced-motion: reduce) { nav button.active > span { animation: none !important; } }

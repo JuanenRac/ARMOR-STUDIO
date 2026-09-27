@@ -1,0 +1,109 @@
+/* Camera monitor: preserve every operational control at 1080p, including
+   compact 4/8-view layouts. The grid itself scrolls before a tile can clip
+   its metadata or its Power / Snapshot / Record controls. */
+/* The monitor fills its frame: the tiles are sized in script (cameraGrid.ts) so that every one is 16:9 and the whole matrix
+   is visible. The frame itself is what takes the remaining height; on a phone it scrolls instead. */
+.camera-workspace { display: flex; flex-direction: column; min-height: 0; }
+.camera-frame { flex: 1 1 0; min-height: 260px; margin-top: .8rem; overflow: hidden; }
+.camera-frame.scrolls { overflow: auto; }
+.camera-frame .camera-grid { display: grid; margin: 0; min-height: 100%; justify-content: center; align-content: center; grid-template-rows: none; }
+.camera-frame.scrolls .camera-grid { align-content: start; }
+
+.camera-frame .camera-tile { position: relative; display: block; width: 100%; height: 100%; min-height: 0; container-type: inline-size; background: #000; }
+.camera-frame .camera-tile .camera-image { position: absolute; inset: 0; min-height: 0; aspect-ratio: auto; background-color: #000; }
+.camera-frame .camera-tile .camera-image img { object-fit: contain; background: #000; }
+.camera-frame .camera-tile .camera-meta { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; min-height: 0; padding: .9rem .7rem .4rem; background: linear-gradient(transparent, rgba(2, 8, 12, .82)); pointer-events: none; }
+.camera-frame .camera-tile .camera-meta strong { font-size: clamp(.62rem, 2.8cqw, .95rem); }
+.camera-frame .camera-tile .camera-meta small { font-size: clamp(.5rem, 2cqw, .72rem); }
+@container (max-width: 330px) {
+  .camera-frame .camera-tile .camera-meta small { display: none; }
+  .camera-frame .camera-tile .camera-meta { padding: .5rem .5rem .25rem; }
+  .camera-frame .camera-tile .camera-overlay-actions { top: .25rem; right: .25rem; gap: .14rem; padding: .14rem; }
+  .camera-frame .camera-tile .camera-overlay-actions button { width: 20px; height: 20px; font-size: .62rem; }
+  .camera-frame .camera-tile .camera-overlay-actions .ptz-toggle { padding: 0 .28rem; font-size: .5rem; }
+  .camera-frame .camera-tile .live-chip { transform: scale(.82); transform-origin: top left; }
+}
+@container (max-width: 210px) {
+  .camera-frame .camera-tile .camera-overlay-actions button:not(.camera-expand) { display: none; }
+}
+
+.camera-meta {
+  min-height: 58px;
+}
+
+.camera-actions {
+  flex-shrink: 0;
+}
+
+.camera-actions button {
+  white-space: nowrap;
+}
+
+.camera-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Tile commands live inside the video frame so their visibility does not
+   depend on the number of monitor rows selected by the operator. */
+.camera-overlay-actions {
+  position: absolute;
+  z-index: 4;
+  top: .48rem;
+  right: .48rem;
+  display: flex;
+  align-items: center;
+  gap: .26rem;
+  padding: .24rem;
+  border: 1px solid rgba(63, 126, 137, .82);
+  border-radius: 8px;
+  background: rgba(4, 18, 25, .88);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, .34);
+  backdrop-filter: blur(8px);
+}
+
+.camera-overlay-actions button {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #356e7b;
+  border-radius: 5px;
+  background: #0a2630;
+  color: #d9ffff;
+  font-size: .82rem;
+  line-height: 1;
+}
+
+.camera-overlay-actions button:hover:not(:disabled) {
+  border-color: #72e7dc;
+  background: #19525e;
+}
+
+.camera-overlay-actions button.power-off { color: #9db2b8; }
+.camera-overlay-actions .recording-button { border-color: #e36a78; background: #632832; color: #ffe8ea; }
+.camera-overlay-actions .camera-expand { position: static; opacity: 1; transition: none; }
+
+@media (max-width: 1050px) {
+  .camera-overlay-actions { gap: .18rem; padding: .18rem; }
+  .camera-overlay-actions button { width: 24px; height: 24px; font-size: .72rem; }
+}
+
+/* PTZ: a toggle among the tile's own commands, and the pad it shows over the picture. */
+.camera-overlay-actions .ptz-toggle { width: auto; padding: 0 .42rem; font: 700 .58rem "DM Mono", "Cascadia Mono", ui-monospace, Consolas, monospace; letter-spacing: .08em; }
+.camera-overlay-actions .ptz-toggle.active, .ptz-toggle.active { border-color: #00e5ff; background: #0d4b57; color: #ecffff; box-shadow: 0 0 10px rgba(0, 229, 255, .3); }
+.icon-button.ptz-toggle { width: auto; padding: 0 .6rem; font: 700 .62rem "DM Mono", "Cascadia Mono", ui-monospace, Consolas, monospace; letter-spacing: .08em; }
+.ptz-overlay { position: absolute; z-index: 4; right: .6rem; bottom: .6rem; padding: .5rem; border: 1px solid rgba(63, 126, 137, .82); border-radius: 10px; background: rgba(4, 18, 25, .86); box-shadow: 0 8px 22px rgba(0, 0, 0, .4); backdrop-filter: blur(8px); }
+.ptz-overlay.big { bottom: 1.2rem; right: 1.2rem; padding: .7rem; }
+.ptz-overlay .camera-ptz { display: grid; gap: .45rem; justify-items: center; }
+.ptz-overlay .ptz-pad { grid-template-columns: repeat(3, 30px); }
+.ptz-overlay .ptz-zoom { display: flex; gap: .3rem; }
+.ptz-overlay .ptz-zoom button { min-width: 44px; padding: .3rem .5rem; font-size: .9rem; }
+.ptz-overlay button { touch-action: none; user-select: none; -webkit-user-select: none; cursor: pointer; }
+.ptz-overlay button:active:not(:disabled) { background: #00b8cc; color: #031217; }
+.ptz-problem { max-width: 190px; margin: 0; color: #ffbec2; font: 600 .58rem "DM Mono", "Cascadia Mono", ui-monospace, Consolas, monospace; text-align: center; line-height: 1.35; }
