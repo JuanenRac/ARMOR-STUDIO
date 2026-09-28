@@ -61,6 +61,7 @@ flowchart LR
 * **Le impostazioni salvate sono input non attendibile.** Sono lette valore per valore: un'origine, un tema, una lingua o una forma non validi vengono scartati, le posizioni limitate e le liste contenute.
 * **Nessuna richiesta a terzi.** I caratteri sono locali; l'host statico invia `Content-Security-Policy: default-src 'self'` limitata al server configurato, `frame-ancestors 'none'`, `nosniff` e `no-referrer`.
 * Il video dal vivo si mostra solo tramite un indirizzo di flusso che il server rilascia a un operatore.
+* **TLS facoltativo per questo stesso host statico.** `TLS_CERT_PATH`/`TLS_KEY_PATH` (entrambe, o nessuna) passano `tools/serve.mjs` da HTTP semplice a HTTPS, la stessa convenzione dello stesso ARMOR-SERVER. Necessario non appena Studio viene raggiunto via `https://`: un host statico in HTTP semplice che risponde a una richiesta HTTPS di un browser fallisce del tutto l'handshake TLS (lo stesso `SSL_ERROR_RX_RECORD_TOO_LONG` di Firefox, trovato davvero provando esattamente questo) invece di servire alcunché.
 
 ## 📂 Struttura del repository
 

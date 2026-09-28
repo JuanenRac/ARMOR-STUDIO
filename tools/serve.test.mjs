@@ -1,7 +1,26 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { execFileSync } from "node:child_process";
 import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
+import https from "node:https";
 import os from "node:os";
 import path from "node:path";
+
+/** A real, throwaway self-signed certificate - the exact command README.md's own
+ * "TLS / HTTPS" section documents for local testing, not a fixture committed to
+ * the repo. Mirrors ARMOR-SERVER's own tests/tls.test.ts, including dropping any
+ * inherited OPENSSL_CONF (a developer machine can have one pointing at a config
+ * file belonging to a completely different OpenSSL install - found for real on
+ * Windows with a stray Laragon-set OPENSSL_CONF). */
+async function generateSelfSignedCert(dir) {
+  const certPath = path.join(dir, "cert.pem");
+  const keyPath = path.join(dir, "key.pem");
+  const { OPENSSL_CONF: _unused, ...env } = process.env;
+  execFileSync("openssl", [
+    "req", "-x509", "-newkey", "rsa:2048", "-nodes",
+    "-keyout", keyPath, "-out", certPath, "-days", "1", "-subj", "/CN=localhost",
+  ], { env });
+  return { certPath, keyPath };
+}
 
 let server;
 let base;
@@ -80,5 +99,48 @@ describe("more than one address for the same Studio", () => {
     expect(pickServerOrigin(origins, "192.168.0.180:18081")).toBe("http://192.168.0.180:18080");
     expect(pickServerOrigin(origins, "studio.example:80")).toBe("http://192.168.0.180:18080");
     expect(pickServerOrigin([], "x")).toBeNull();
+  });
+});
+
+describe("wrapWithTls", () => {
+  it("returns the same server unchanged when neither TLS var is set", async () => {
+    const { createStudioServer, wrapWithTls } = await import("./serve.mjs");
+    const plain = createStudioServer();
+    expect(wrapWithTls(plain, {})).toBe(plain);
+  });
+
+  it("refuses to start with only one of TLS_CERT_PATH/TLS_KEY_PATH set", async () => {
+    const { createStudioServer, wrapWithTls } = await import("./serve.mjs");
+    expect(() => wrapWithTls(createStudioServer(), { TLS_CERT_PATH: "/x/cert.pem" })).toThrow();
+    expect(() => wrapWithTls(createStudioServer(), { TLS_KEY_PATH: "/x/key.pem" })).toThrow();
+  });
+
+  it("with both set, really answers over HTTPS with the real handshake", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "armor-studio-tls-"));
+    const { certPath, keyPath } = await generateSelfSignedCert(dir);
+    const { createStudioServer, wrapWithTls } = await import("./serve.mjs");
+    const tlsServer = wrapWithTls(createStudioServer(), { TLS_CERT_PATH: certPath, TLS_KEY_PATH: keyPath });
+    await new Promise(resolve => tlsServer.listen(0, "127.0.0.1", resolve));
+    const port = tlsServer.address().port;
+    try {
+      const body = await new Promise((resolve, reject) => {
+        // A self-signed cert has no real chain of trust - the point of this test
+        // is that the TLS handshake itself succeeds at all (a plain HTTP client
+        // against this same port would fail with a protocol error instead, the
+        // real SSL_ERROR_RX_RECORD_TOO_LONG this fix exists for).
+        const request = https.get(
+          { hostname: "127.0.0.1", port, path: "/armor-config.json", rejectUnauthorized: false },
+          response => {
+            let data = "";
+            response.on("data", chunk => { data += chunk; });
+            response.on("end", () => resolve(data));
+          },
+        );
+        request.on("error", reject);
+      });
+      expect(JSON.parse(body)).toEqual({ serverOrigin: "http://10.0.0.5:18080" });
+    } finally {
+      await new Promise(resolve => tlsServer.close(resolve));
+    }
   });
 });

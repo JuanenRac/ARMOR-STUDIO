@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## [0.3.9] - TLS for this static host itself
+
+- `tools/serve.mjs` can now serve Studio itself over HTTPS: `TLS_CERT_PATH`/`TLS_KEY_PATH` (both, or neither, same convention as ARMOR-SERVER) switch `wrapWithTls()` from plain `http.createServer()` to a real `https.createServer()` around the same request handler. Fixes a real bug: once ARMOR-SERVER's own API moved to HTTPS, opening Studio itself at `https://host:18081` (rather than its API) hit Firefox's `SSL_ERROR_RX_RECORD_TOO_LONG`, because the static host answering that port was still plain HTTP and could not even parse a TLS handshake.
+- Also fixes the drift between `package.json` (still `0.3.7`) and `armor.project.json`/`native_version` (already `0.3.8`) left over from the previous release; both now agree.
+- 3 new tests (244 in all): TLS off by default, refused start-up with only one of the two variables set, and a real HTTPS request against a real self-signed certificate.
+
 ## [0.3.8]
 
 - A GitHub Actions CI baseline (`.github/workflows/ci.yml`): validates the manifest, the version, CHANGELOG.md's heading, the seven README translations' structure and its own local Markdown links, then runs this project's real build/test through `tools/armor_project_tool.py build-test .` (vendored from ARMOR-COMMON, alongside `tools/armor_ci_validate.py` and `tools/_armor_readme_parity.py`, which do the manifest/docs checking).
