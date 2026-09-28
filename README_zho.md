@@ -61,6 +61,7 @@ flowchart LR
 * **保存的设置属于不可信输入。** 它们被逐值解析：无效的源、主题、语言或形状会被丢弃，位置被限制范围，列表被限制大小。
 * **没有第三方请求。** 字体来自本地；静态主机发送限于所配置服务器的 `Content-Security-Policy: default-src 'self'`、`frame-ancestors 'none'`、`nosniff` 和 `no-referrer`。
 * 实时视频只通过服务器发给操作员的视频流地址显示。
+* **此静态主机自身的可选TLS。**`TLS_CERT_PATH`/`TLS_KEY_PATH`(两者都设置,或都不设置)可将 `tools/serve.mjs` 从明文HTTP切换为HTTPS,与ARMOR-SERVER自身相同的约定。一旦Studio通过 `https://` 访问就需要这个:一个明文HTTP的静态主机在回应浏览器的HTTPS请求时,TLS握手本身会直接失败(正是尝试这种情况时真实遇到的Firefox自身的 `SSL_ERROR_RX_RECORD_TOO_LONG`),而不是提供任何内容。
 
 ## 📂 仓库结构
 

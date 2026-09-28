@@ -13,10 +13,15 @@
  *   ARMOR_SERVER_ORIGIN        server Studio should start with, e.g. http://192.168.0.180:18080; a comma-separated list when the
  *                              same Studio is reached by more than one address (the LAN one and a public one): the first is the
  *                              default, and the one that shares its host name with the request is offered to that visitor
+ *   TLS_CERT_PATH/TLS_KEY_PATH set both to serve this static host itself over HTTPS too, same convention as ARMOR-SERVER's own
+ *                              (src/app.ts) - off (today's plain HTTP) unless both are set. A browser given an https:// address
+ *                              for Studio gets a real TLS handshake instead of feeding it a TLS ClientHello a plain HTTP server
+ *                              cannot parse (Firefox's own SSL_ERROR_RX_RECORD_TOO_LONG - found for real trying exactly that).
  */
 import { createServer } from "node:http";
+import { createServer as createHttpsServer } from "node:https";
 import { readFile, stat } from "node:fs/promises";
-import { realpathSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -110,8 +115,25 @@ export function createStudioServer() {
   });
 }
 
+/** Wraps a plain http.Server's own request listener in an https.Server instead,
+ * when both TLS_CERT_PATH and TLS_KEY_PATH are set - same env-var convention
+ * and same all-or-nothing check as ARMOR-SERVER's own (src/app.ts), so a
+ * typo'd variable name is a loud start-up crash, never a silent fallback to
+ * plain HTTP. */
+export function wrapWithTls(server, env = process.env) {
+  const certPath = env.TLS_CERT_PATH?.trim() || "";
+  const keyPath = env.TLS_KEY_PATH?.trim() || "";
+  if (!certPath && !keyPath) return server;
+  if (!certPath || !keyPath) throw new Error("TLS_CERT_PATH and TLS_KEY_PATH must both be set to enable HTTPS, or both left unset to keep plain HTTP");
+  const requestListener = server.listeners("request")[0];
+  return createHttpsServer({ cert: readFileSync(certPath), key: readFileSync(keyPath) }, requestListener);
+}
+
 // Compare real paths: the service starts this file through a `current` symlink.
 const isEntryPoint = () => { try { return Boolean(process.argv[1]) && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } };
 if (isEntryPoint()) {
-  createStudioServer().listen(port, host, () => console.log(`ARMOR_STUDIO=LISTENING address=${host}:${port}`));
+  const tlsEnabled = Boolean(process.env.TLS_CERT_PATH?.trim() && process.env.TLS_KEY_PATH?.trim());
+  const server = wrapWithTls(createStudioServer());
+  if (tlsEnabled) console.log(`ARMOR_STUDIO=TLS_ENABLED cert=${process.env.TLS_CERT_PATH} key=${process.env.TLS_KEY_PATH}`);
+  server.listen(port, host, () => console.log(`ARMOR_STUDIO=LISTENING address=${host}:${port} scheme=${tlsEnabled ? "https" : "http"}`));
 }

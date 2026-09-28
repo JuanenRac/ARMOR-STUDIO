@@ -61,6 +61,7 @@ flowchart LR
 * **保存された設定は信頼できない入力です。** 値ごとに読み取られ、無効なオリジン、テーマ、言語、形は捨てられ、位置は範囲内に収められ、リストは上限が設けられます。
 * **サードパーティへのリクエストはありません。** フォントはローカルのものです。静的ホストは、設定されたサーバーに限定した `Content-Security-Policy: default-src 'self'`、`frame-ancestors 'none'`、`nosniff`、`no-referrer` を送ります。
 * ライブ映像は、サーバーがオペレーターに発行するストリームアドレスを通じてのみ表示されます。
+* **この静的ホスト自体の任意のTLS。** `TLS_CERT_PATH`/`TLS_KEY_PATH`(両方、またはどちらも設定しない)は、`tools/serve.mjs` を平文HTTPからHTTPSに切り替えます。ARMOR-SERVER自体と同じ規約です。Studioが `https://` 経由でアクセスされるようになったら必要です。平文HTTPの静的ホストがブラウザーからのHTTPSリクエストに応答しようとすると、TLSハンドシェイク自体がそのまま失敗します(まさにこれを試して実際に見つかったFirefox自身の `SSL_ERROR_RX_RECORD_TOO_LONG`)。何かを配信する代わりに。
 
 ## 📂 リポジトリの構成
 
