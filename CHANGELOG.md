@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## [0.5.2] - The Services menu
+
+- **Services** (below System): every program of the system and every field node, running or not, grouped by family (Core, Network, AI and voice, Field nodes) like HYDRA-UMC's services menu - a summary (total, active, not active, failed, not installed or unknown), a search, filters, and a card for each service with its state, its systemd unit, port, process, memory, restarts, whether it starts at boot and how long it has been up (for a field node, when it last reported). Read only. Needs ARMOR-SERVER 0.3.9. Texts in the seven languages.
+- **Tests:** 269.
+
 ## [0.5.1] - The camera wall is the view you chose
 
 - **Camera wall:** it was laid out by the number of cameras that were there, so six places with five cameras stacked into one column. It is now the chosen view: six places are 3 x 2, eight are 4 x 2, nine are 3 x 3, twelve are 4 x 3, sixteen are 4 x 4 (two are side by side, four 2 x 2). Every picture stays 16:9 and whole, with its name and buttons as in the normal view, the cameras touch each other with no gap, and the block fills the screen as far as the pictures' shape allows; a place with no camera stays black. Checked in a real browser with five, six, eight, nine, twelve and sixteen places.

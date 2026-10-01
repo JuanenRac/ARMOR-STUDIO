@@ -6,7 +6,7 @@
 import { useId } from "react";
 import "./anim.css";
 
-export type LogoKind = "overview" | "alarms" | "cameras" | "radar" | "devices" | "automations" | "record" | "history" | "network" | "system" | "configuration";
+export type LogoKind = "overview" | "alarms" | "cameras" | "radar" | "devices" | "automations" | "record" | "history" | "network" | "system" | "services" | "configuration";
 const CYAN = "#00E5FF", AMBER = "#FFB020", GREEN = "#5DF0C4", RED = "#FF6F79";
 
 /** The shield of the sidebar: a radar sweep turns inside it and a ring of light leaves it now and then. */
@@ -86,6 +86,11 @@ const DRAWINGS: Record<LogoKind, React.ReactNode> = {
     <rect x="12" y="8" width="40" height="14" rx="4" /><rect x="12" y="25" width="40" height="14" rx="4" /><rect x="12" y="42" width="40" height="14" rx="4" />
     <circle className="ml-led a" cx="20" cy="15" r="2.4" fill={GREEN} stroke="none" /><circle className="ml-led b" cx="20" cy="32" r="2.4" fill={AMBER} stroke="none" /><circle className="ml-led c" cx="20" cy="49" r="2.4" fill={GREEN} stroke="none" />
     <path className="ml-beat" d="M28 15 h4 l2 -4 l3 8 l2 -4 h5 M28 32 h4 l2 -4 l3 8 l2 -4 h5 M28 49 h4 l2 -4 l3 8 l2 -4 h5" strokeWidth="2" opacity=".8" />
+  </>,
+  services: <>
+    <rect x="9" y="9" width="21" height="21" rx="4" /><rect x="34" y="9" width="21" height="21" rx="4" /><rect x="9" y="34" width="21" height="21" rx="4" /><rect x="34" y="34" width="21" height="21" rx="4" />
+    <circle className="ml-led a" cx="19.5" cy="19.5" r="3.2" fill={GREEN} stroke="none" /><circle className="ml-led b" cx="44.5" cy="19.5" r="3.2" fill={GREEN} stroke="none" /><circle className="ml-led c" cx="19.5" cy="44.5" r="3.2" fill={AMBER} stroke="none" /><circle className="ml-led a" cx="44.5" cy="44.5" r="3.2" fill={RED} stroke="none" />
+    <path d="M15 26 h9 M40 26 h9 M15 51 h9 M40 51 h9" strokeWidth="2" opacity=".6" />
   </>,
   configuration: <>
     <g className="ml-gear"><circle cx="32" cy="32" r="9" /><path d="M32 8 v9 M32 47 v9 M8 32 h9 M47 32 h9 M15 15 l6 6 M43 43 l6 6 M49 15 l-6 6 M21 43 l-6 6" strokeWidth="5" /></g>

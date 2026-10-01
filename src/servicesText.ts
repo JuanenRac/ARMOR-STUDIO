@@ -1,0 +1,57 @@
+/**
+ * The phrases of the Services menu (every program and field node of the system, running or not), in the seven languages.
+ * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
+ */
+import { cataloguesFromRows, type Row } from "./catalogueRows";
+
+const ROWS: Record<string, Row> = {
+  services: ["Services", "Servicios", "Dienste", "Services", "Servizi", "サービス", "服务"],
+  servicesTitle: ["SERVICES", "SERVICIOS", "DIENSTE", "SERVICES", "SERVIZI", "サービス", "服务"],
+  servicesHelp: ["Every program of the system and every field node, running or not: the server, Studio, the MQTT broker, the network node, the AI and voice services and the radars and meters that report.", "Todos los programas del sistema y todos los nodos de campo, activos o no: el servidor, Studio, el broker MQTT, el nodo de red, los servicios de IA y voz y los radares y medidores que reportan.", "Jedes Programm des Systems und jeder Feldknoten, laufend oder nicht: der Server, Studio, der MQTT-Broker, der Netzwerkknoten, die KI- und Sprachdienste sowie die meldenden Radare und Zähler.", "Chaque programme du système et chaque nœud de terrain, actif ou non : le serveur, Studio, le broker MQTT, le nœud réseau, les services d'IA et de voix et les radars et compteurs qui font leur rapport.", "Ogni programma del sistema e ogni nodo di campo, attivo o no: il server, Studio, il broker MQTT, il nodo di rete, i servizi di IA e voce e i radar e i contatori che riferiscono.", "システムのすべてのプログラムとフィールドノードを、稼働中かどうかにかかわらず表示します：サーバー、Studio、MQTT ブローカー、ネットワークノード、AI と音声のサービス、報告するレーダーとメーター。", "系统的每个程序和每个现场节点，无论是否在运行：服务器、Studio、MQTT 代理、网络节点、AI 与语音服务，以及上报数据的雷达和电表。"],
+  svcRefresh: ["Refresh", "Actualizar", "Aktualisieren", "Actualiser", "Aggiorna", "更新", "刷新"],
+  svcTotal: ["Services", "Servicios", "Dienste", "Services", "Servizi", "サービス", "服务"],
+  svcActive: ["Active", "Activos", "Aktiv", "Actifs", "Attivi", "稼働", "运行中"],
+  svcInactive: ["Not active", "No activos", "Nicht aktiv", "Inactifs", "Non attivi", "停止", "未运行"],
+  svcFailed: ["Failed", "Con fallo", "Fehlgeschlagen", "En échec", "Falliti", "失敗", "故障"],
+  svcOther: ["Not installed / unknown", "No instalados / desconocidos", "Nicht installiert / unbekannt", "Non installés / inconnus", "Non installati / sconosciuti", "未インストール／不明", "未安装／未知"],
+  svcFamilies: ["Families", "Familias", "Familien", "Familles", "Famiglie", "ファミリー", "分组"],
+  svcSearch: ["Search a service", "Buscar un servicio", "Dienst suchen", "Chercher un service", "Cerca un servizio", "サービスを検索", "搜索服务"],
+  svcAllFamilies: ["All", "Todas", "Alle", "Toutes", "Tutte", "すべて", "全部"],
+  svcShowAll: ["All", "Todos", "Alle", "Tous", "Tutti", "すべて", "全部"],
+  svcNone: ["No service matches.", "Ningún servicio coincide.", "Kein Dienst passt.", "Aucun service ne correspond.", "Nessun servizio corrisponde.", "該当するサービスがありません。", "没有匹配的服务。"],
+  svcLoadError: ["The server did not answer the list of services.", "El servidor no respondió la lista de servicios.", "Der Server hat die Dienstliste nicht beantwortet.", "Le serveur n'a pas répondu la liste des services.", "Il server non ha risposto con l'elenco dei servizi.", "サーバーがサービス一覧に応答しませんでした。", "服务器没有返回服务列表。"],
+  svcNoSystemd: ["This machine has no systemd, so the state of its programs is not known; the field nodes are still listed.", "Esta máquina no tiene systemd, así que no se conoce el estado de sus programas; los nodos de campo sí se listan.", "Dieser Rechner hat kein systemd, daher ist der Zustand seiner Programme unbekannt; die Feldknoten werden trotzdem aufgelistet.", "Cette machine n'a pas systemd : l'état de ses programmes est inconnu ; les nœuds de terrain sont tout de même listés.", "Questa macchina non ha systemd, quindi lo stato dei suoi programmi non è noto; i nodi di campo sono comunque elencati.", "このマシンには systemd がないため、プログラムの状態は分かりません。フィールドノードは表示されます。", "此机器没有 systemd，因此不知道其程序的状态；现场节点仍会列出。"],
+  svcReadOnly: ["Read only: this list shows what is running; starting and stopping programs is done on the machine.", "Solo lectura: esta lista muestra lo que está en marcha; arrancar y parar programas se hace en la máquina.", "Nur lesen: Diese Liste zeigt, was läuft; Programme werden am Rechner gestartet und gestoppt.", "Lecture seule : cette liste montre ce qui tourne ; démarrer et arrêter les programmes se fait sur la machine.", "Sola lettura: questo elenco mostra cosa è in esecuzione; avviare e fermare i programmi si fa sulla macchina.", "読み取り専用：この一覧は稼働中のものを示します。プログラムの起動と停止はマシン上で行います。", "只读：此列表显示正在运行的内容；程序的启动和停止在机器上进行。"],
+  svcUpdated: ["Updated", "Actualizado", "Aktualisiert", "Mis à jour", "Aggiornato", "更新", "更新于"],
+  svcState_running: ["Running", "En marcha", "Läuft", "En marche", "In esecuzione", "稼働中", "运行中"],
+  svcState_online: ["Online", "En línea", "Online", "En ligne", "Online", "オンライン", "在线"],
+  svcState_stopped: ["Stopped", "Parado", "Gestoppt", "Arrêté", "Fermo", "停止", "已停止"],
+  svcState_offline: ["Offline", "Sin conexión", "Offline", "Hors ligne", "Offline", "オフライン", "离线"],
+  svcState_failed: ["Failed", "Con fallo", "Fehlgeschlagen", "En échec", "Fallito", "失敗", "故障"],
+  svcState_starting: ["Starting", "Arrancando", "Startet", "Démarrage", "In avvio", "起動中", "启动中"],
+  svcState_not_installed: ["Not installed", "No instalado", "Nicht installiert", "Non installé", "Non installato", "未インストール", "未安装"],
+  svcState_unknown: ["Unknown", "Desconocido", "Unbekannt", "Inconnu", "Sconosciuto", "不明", "未知"],
+  svcFamily_Core: ["Core", "Núcleo", "Kern", "Cœur", "Nucleo", "コア", "核心"],
+  svcFamily_Network: ["Network", "Red", "Netzwerk", "Réseau", "Rete", "ネットワーク", "网络"],
+  svcFamily_AI_and_voice: ["AI and voice", "IA y voz", "KI und Sprache", "IA et voix", "IA e voce", "AI と音声", "AI 与语音"],
+  svcFamily_Field_nodes: ["Field nodes", "Nodos de campo", "Feldknoten", "Nœuds de terrain", "Nodi di campo", "フィールドノード", "现场节点"],
+  svcDesc_server: ["Central state, alarms, users, cameras, evidence and the API", "Estado central, alarmas, usuarios, cámaras, evidencias y la API", "Zentraler Zustand, Alarme, Benutzer, Kameras, Beweise und die API", "État central, alarmes, utilisateurs, caméras, preuves et l'API", "Stato centrale, allarmi, utenti, telecamere, prove e l'API", "中央の状態、アラーム、ユーザー、カメラ、証拠、API", "中央状态、报警、用户、摄像头、证据和 API"],
+  svcDesc_studio: ["The web console", "La consola web", "Die Web-Konsole", "La console web", "La console web", "Web コンソール", "网页控制台"],
+  svcDesc_broker: ["Where the field nodes publish what they read", "Donde los nodos de campo publican lo que leen", "Wo die Feldknoten veröffentlichen, was sie lesen", "Où les nœuds de terrain publient ce qu'ils lisent", "Dove i nodi di campo pubblicano ciò che leggono", "フィールドノードが読み取った内容を公開する場所", "现场节点发布其读数的地方"],
+  svcDesc_network: ["Watches the local network: devices, internet and what changes", "Vigila la red local: dispositivos, internet y lo que cambia", "Beobachtet das lokale Netz: Geräte, Internet und was sich ändert", "Surveille le réseau local : appareils, internet et ce qui change", "Sorveglia la rete locale: dispositivi, internet e cosa cambia", "ローカルネットワークを監視：デバイス、インターネット、変化", "监视本地网络：设备、互联网和变化"],
+  svcDesc_server_ai: ["Decides what a camera detection means (day and night, movement first)", "Decide qué significa una detección de cámara (día y noche, movimiento primero)", "Entscheidet, was eine Kameraerkennung bedeutet (Tag und Nacht, Bewegung zuerst)", "Décide ce que signifie une détection de caméra (jour et nuit, mouvement d'abord)", "Decide cosa significa un rilevamento della telecamera (giorno e notte, prima il movimento)", "カメラの検出の意味を判断（昼夜、まず動き）", "判断摄像头检测的含义（昼夜、先看移动）"],
+  svcDesc_voice_ai: ["Spoken commands with a confirmation", "Órdenes por voz con confirmación", "Sprachbefehle mit Bestätigung", "Commandes vocales avec confirmation", "Comandi vocali con conferma", "確認付きの音声コマンド", "带确认的语音指令"],
+  svcDesc_radar: ["Radar node", "Nodo radar", "Radarknoten", "Nœud radar", "Nodo radar", "レーダーノード", "雷达节点"],
+  svcDesc_electrical: ["Electrical node", "Nodo eléctrico", "Elektrischer Knoten", "Nœud électrique", "Nodo elettrico", "電気ノード", "电气节点"],
+  svcUnit: ["Unit", "Unidad", "Einheit", "Unité", "Unità", "ユニット", "单元"],
+  svcPid: ["PID", "PID", "PID", "PID", "PID", "PID", "PID"],
+  svcMemory: ["Memory", "Memoria", "Speicher", "Mémoire", "Memoria", "メモリ", "内存"],
+  svcRestarts: ["Restarts", "Reinicios", "Neustarts", "Redémarrages", "Riavvii", "再起動", "重启次数"],
+  svcSince: ["Up for", "Activo desde hace", "Läuft seit", "Actif depuis", "Attivo da", "稼働時間", "已运行"],
+  svcLastSeen: ["Last heard", "Última señal", "Zuletzt gehört", "Dernier signal", "Ultimo segnale", "最終受信", "最后收到"],
+  svcAtBoot: ["Starts at boot", "Arranca con el equipo", "Startet beim Booten", "Démarre au boot", "Parte all'avvio", "起動時に開始", "开机启动"],
+  svcNotAtBoot: ["Not at boot", "No arranca con el equipo", "Nicht beim Booten", "Pas au boot", "Non all'avvio", "起動時は開始しない", "不开机启动"],
+  svcPort: ["Port", "Puerto", "Port", "Port", "Porta", "ポート", "端口"],
+};
+
+export const servicesCatalogues = cataloguesFromRows(ROWS);
