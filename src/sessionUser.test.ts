@@ -19,10 +19,10 @@ describe("who is signed in", () => {
 
   it("is unknown - never 'not an administrator' - when the server could not be asked", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => { throw new TypeError("network"); }));
-    expect(await sessionUserState("http://x:1")).toEqual({ state: "unknown" });
+    expect(await sessionUserState("http://x:1")).toMatchObject({ state: "unknown", reason: expect.stringContaining("TypeError") });
     vi.stubGlobal("fetch", answer(429));
-    expect(await sessionUserState("http://x:1")).toEqual({ state: "unknown" });
+    expect(await sessionUserState("http://x:1")).toEqual({ state: "unknown", reason: "the server answered 429" });
     vi.stubGlobal("fetch", answer(503));
-    expect(await sessionUserState("http://x:1")).toEqual({ state: "unknown" });
+    expect(await sessionUserState("http://x:1")).toMatchObject({ state: "unknown" });
   });
 });

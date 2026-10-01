@@ -1,6 +1,6 @@
 import type { SolarCatalog, SolarDeviceView, SolarKind, SolarRegistration, SolarSample, SolarTotals } from "./solarModel";
 import type { SystemState } from "./types";
-import type { DeviceNote, NetworkOverview, NetworkSample } from "./networkModel";
+import type { DeviceNote, NetworkOverview, NetworkPort, NetworkSample } from "./networkModel";
 export type DiscoveredCamera = { host: string; ports: number[] };
 export type CameraConnection = { id: string; name: string; host: string; snapshotUrl: string; rtspPath: string; username: string; password: string; onvifPort: number; rtspPort: number };
 export type PublicCameraConnection = Omit<CameraConnection, "password"> & { hasCredentials: boolean; liveVideoAvailable: boolean };
@@ -244,15 +244,15 @@ async function userCall<T>(origin: string, method: string, route: string, body?:
   return parsed;
 }
 /** Who is signed in: the user, nobody (the server said so), or unknown (it could not be asked - never to be taken as "not an administrator"). */
-export type SessionUserState = { state: "user"; user: StudioUser } | { state: "anonymous" } | { state: "unknown" };
+export type SessionUserState = { state: "user"; user: StudioUser } | { state: "anonymous" } | { state: "unknown"; reason: string };
 export async function sessionUserState(origin: string): Promise<SessionUserState> {
   try {
     const response = await fetch(endpoint(origin, "/api/v1/studio/session"), { headers: { Accept: "application/json" }, ...localSession });
     if (response.status === 401) return { state: "anonymous" };
-    if (!response.ok) return { state: "unknown" };
+    if (!response.ok) return { state: "unknown", reason: `the server answered ${response.status}` };
     const body = await response.json() as { authenticated?: boolean; user?: StudioUser };
     return body.authenticated && body.user ? { state: "user", user: body.user } : { state: "anonymous" };
-  } catch { return { state: "unknown" }; }
+  } catch (error) { return { state: "unknown", reason: error instanceof Error && error.name ? `${error.name}: ${error.message}`.slice(0, 120) : "no answer" }; }
 }
 /** Who is signed in (null when nobody is). */
 export async function readSessionUser(origin: string): Promise<StudioUser | null> {
@@ -288,8 +288,10 @@ export type StudioDevice = {
 export type DeviceInput = { id?: string; name?: string; kind?: DeviceKind; protocol?: DeviceProtocol; location?: string; source?: DeviceSource; commands?: DeviceCommandsInput; expected_interval_s?: number };
 export type Severity = "critical" | "high" | "warning";
 export type Alarm = {
-  id: string; key: string; source: { type: "node" | "camera" | "device"; id: string }; severity: Severity; code: string;
+  id: string; key: string; source: { type: "node" | "camera" | "device" | "solar" | "electrical" | "network"; id: string }; severity: Severity; code: string;
   raised_at: string; acknowledged_at?: string; acknowledged_by?: string; cleared_at?: string;
+  /** The facts the server attached (which device, which port, what the numbers were). */
+  detail?: Record<string, string | number | boolean>;
 };
 export type Trigger = { type: "device"; device_id: string; field: string; equals: boolean | number } | { type: "alarm"; severity?: Severity; source_type?: "node" | "camera" | "device"; source_id?: string } | { type: "mode"; mode: "armed" | "disarmed" };
 export type AutomationAction = { type: "device"; device_id: string; command: "on" | "off" | "toggle"; for_s?: number } | { type: "notify" };
@@ -312,6 +314,7 @@ export const setDeviceState = (origin: string, id: string, state: DeviceState) =
 export const listAlarms = (origin: string) => userCall<{ active: Alarm[]; recent: Alarm[] }>(origin, "GET", "/api/v1/alarms");
 export const acknowledgeAlarm = (origin: string, id: string) => userCall<Alarm>(origin, "POST", `/api/v1/alarms/${encodeURIComponent(id)}/acknowledge`);
 export const acknowledgeAllAlarms = (origin: string) => userCall<{ acknowledged: number }>(origin, "POST", "/api/v1/alarms/acknowledge");
+export const deleteAlarm = (origin: string, id: string) => userCall<Alarm>(origin, "DELETE", `/api/v1/alarms/${encodeURIComponent(id)}`);
 export const clearAlarmRecord = (origin: string) => userCall<{ deleted: number }>(origin, "DELETE", "/api/v1/alarms");
 export const listAutomations = (origin: string) => userCall<{ automations: Automation[] }>(origin, "GET", "/api/v1/automations");
 export const createAutomation = (origin: string, input: AutomationInput) => userCall<Automation>(origin, "POST", "/api/v1/automations", input);
@@ -370,10 +373,28 @@ export async function listElectricalReadings(origin: string): Promise<Electrical
 
 // ---- the local network, as the ARMOR-NETWORK nodes see it -------------------------------------------------------------------------------
 export type NetworkDocument = { revision: number; updated_at: string | null; updated_by: string | null; network: Record<string, unknown> | null };
-export const listNetwork = (origin: string) => userCall<NetworkOverview>(origin, "GET", "/api/v1/network");
+export const listNetwork = (origin: string, hidden = false) => userCall<NetworkOverview>(origin, "GET", `/api/v1/network${hidden ? "?hidden=1" : ""}`);
 export const readNetworkHistory = (origin: string, node: string, minutes: number) => userCall<{ node_id: string; minutes: number; samples: NetworkSample[] }>(origin, "GET", `/api/v1/network/history?node=${encodeURIComponent(node)}&minutes=${minutes}`);
 /** Name a device, note something, mark it as known (an administrator's decision) or give it a kind of the operator's own; an empty text removes what was there. */
-export const saveDeviceNote = (origin: string, id: string, note: { name?: string; notes?: string; trusted?: boolean; kind?: string }) => userCall<{ id: string; note: DeviceNote }>(origin, "PUT", `/api/v1/network/devices/${encodeURIComponent(id)}`, note);
+/** How the machine the server runs on is doing (see ARMOR-SERVER's system_metrics.ts). */
+export type MachineMetrics = {
+  at_ms: number;
+  cpu: { percent: number | null; cores: number; load: [number, number, number]; mhz?: number };
+  memory: { total: number; used: number; available: number; swap_total: number; swap_used: number };
+  temperatures: Array<{ name: string; celsius: number }>;
+  disks: Array<{ mount: string; device: string; kind: "sd" | "usb" | "nvme" | "other"; fs: string; total: number; used: number }>;
+  network: Array<{ name: string; up: boolean; rx_bps: number | null; tx_bps: number | null; rx_bytes: number; tx_bytes: number }>;
+  uptime_s: number;
+  history: Array<{ t: number; cpu: number | null; memory: number; swap: number; temperature: number | null; rx_bps: number; tx_bps: number }>;
+};
+export const readMetrics = (origin: string) => userCall<MachineMetrics>(origin, "GET", "/api/v1/system/metrics");
+export type NetworkOrderType = "scan_now" | "ping" | "traceroute" | "wake" | "ports" | "http";
+export type NetworkResultView = { id: string; type: NetworkOrderType; ok: boolean; finished_ms: number; device_id?: string; output?: string; ports?: NetworkPort[]; latency_ms?: number };
+export type NetworkOrderView = { id: string; node_id: string; type: NetworkOrderType; device_id?: string; status: "queued" | "sent" | "done" | "expired"; by: string; created_at: string; result?: NetworkResultView };
+/** Hand the network node a manual order (a sweep now, a ping, a traceroute, a wake-up, the ports or the web page of one device). */
+export const sendNetworkOrder = (origin: string, order: { type: NetworkOrderType; device_id?: string; port?: number }) => userCall<NetworkOrderView>(origin, "POST", "/api/v1/network/commands", order);
+export const readNetworkOrder = (origin: string, id: string) => userCall<NetworkOrderView>(origin, "GET", `/api/v1/network/commands/${encodeURIComponent(id)}`);
+export const saveDeviceNote = (origin: string, id: string, note: { name?: string; notes?: string; trusted?: boolean; kind?: string; hidden?: boolean; watch?: boolean }) => userCall<{ id: string; note: DeviceNote }>(origin, "PUT", `/api/v1/network/devices/${encodeURIComponent(id)}`, note);
 export const forgetDeviceNote = (origin: string, id: string) => userCall<void>(origin, "DELETE", `/api/v1/network/devices/${encodeURIComponent(id)}`);
 export const readNetworkDesign = (origin: string) => userCall<NetworkDocument>(origin, "GET", "/api/v1/network/design");
 /** Save the network drawing. A 409 (someone saved first) comes back as `conflict` with their version. */

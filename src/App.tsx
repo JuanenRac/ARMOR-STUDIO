@@ -8,6 +8,7 @@ import { listAlarms, listAutomations, listDevices, listSolar, listElectricalRead
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
 import { AboutDialog, ConfirmDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
 import { DesignVersionsDialog } from "./DesignVersionsDialog";
+import { SessionUserContext } from "./sessionContext";
 import { CameraFullscreen } from "./components/camera";
 import { ConfigurationPanel } from "./ConfigurationPanel";
 import { DEFAULT_SERVER_ORIGIN, loadDeploymentOrigin } from "./config";
@@ -265,7 +266,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   };
 
   const serverName = (() => { try { return new URL(origin).host; } catch { return origin; } })();
-  return <div className="studio-frame"><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
+  return <SessionUserContext.Provider value={sessionUser}><div className="studio-frame"><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
     <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} connection={connection} alarmBadge={alarmsPending} t={t} />
     <section className="main-stage">
       <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} toggleMode={toggleMode} t={t} />
@@ -283,7 +284,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     camerasReachable={cameras.filter(camera => reachability[camera.id] === "online").length} camerasTotal={cameras.length}
     highAlerts={nodes.filter(node => node.alert_level === "high").length}
     info={serverInfo} latencyMs={latencyMs} revision={state.revision} onSignOut={onSignOut} t={t} />
-  </div>;
+  </div></SessionUserContext.Provider>;
 }
 
 export default function App() {

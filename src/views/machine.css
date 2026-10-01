@@ -1,0 +1,14 @@
+/* The live view of the machine in the System menu. */
+.machine-card { display: grid; gap: .9rem; }
+.machine-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: .8rem; }
+.machine-tiles > div { display: grid; gap: .25rem; padding: .9rem 1rem; border: 1px solid #285a66; border-radius: 16px; background: linear-gradient(160deg, #0e2531, #08161f); }
+.machine-tiles small { color: #86a8b3; font: 600 .6rem "DM Mono", ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; }
+.machine-tiles strong { font-size: 1.7rem; color: #f5feff; line-height: 1.1; } .machine-tiles em { color: #9bc4c9; font-style: normal; font-size: .72rem; }
+.machine-tiles strong.warm, .machine-list b.warm { color: #ffb020; } .machine-tiles strong.hot, .machine-list b.hot { color: #ff6f79; }
+.machine-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: .8rem; }
+.live-chart { margin: 0; display: grid; gap: .25rem; padding: .6rem .8rem; border: 1px solid #1d4b56; border-radius: 12px; background: #06141b; }
+.live-chart figcaption { display: flex; justify-content: space-between; gap: .6rem; font-size: .74rem; color: #a9d0d6; } .live-chart figcaption b { color: #eafcff; }
+.live-chart svg { width: 100%; height: 84px; }
+.machine-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.2rem; } .machine-columns h4 { margin: .2rem 0 .5rem; }
+.machine-list { list-style: none; margin: 0 0 .8rem; padding: 0; display: grid; gap: .3rem; font-size: .8rem; } .machine-list li { display: flex; justify-content: space-between; gap: .6rem; flex-wrap: wrap; } .machine-list small { color: #86a8b3; }
+.meter-bar i.warm { background: linear-gradient(90deg, #b07c14, #ffb020); } .meter-bar i.hot { background: linear-gradient(90deg, #b3303c, #ff6f79); }

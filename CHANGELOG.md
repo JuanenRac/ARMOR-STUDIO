@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+## [0.4.3] - Alarms that say what happened, orders for the network node, the machine live
+
+- **Alarms with their facts.** Each alarm shows what it is about (which device, its address and MAC, the port that opened, the two machines in an address clash), can be deleted one by one, the record can be emptied for good, and the "Internet is slow" warning only appears once the line has stayed degraded for a while.
+- **Network menu: manual orders.** Sweep now, ping, traceroute, wake-up, look at the ports or the web page of one device, hide a device from the list and ask to be told when it comes back; the public address of the line is shown.
+- **System menu: the machine live.** Processor, memory, temperatures, disks (card, USB, NVMe) and network cards with charts of the last five minutes, like a task manager.
+- 250 tests.
+
 ## [0.4.2] - Arming that answers, an administrator that stays one, a design that cannot be lost
 
 - **Arm and disarm ask in the page, and say why when they fail.** The question used the browser's own `confirm()`, which a browser can switch off ("stop this page from creating dialogs"), and then the button did nothing at all; it is now a dialog of Studio's. When the change fails it says whether the session had ended, the account is not allowed, the server refused (with its error) or it did not answer, instead of one sentence for everything.

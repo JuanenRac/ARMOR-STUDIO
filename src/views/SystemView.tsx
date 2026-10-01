@@ -8,6 +8,7 @@ import { usePolled } from "../hooks";
 import type { Translate } from "../components/camera";
 import "./system.css";
 import { MenuTitle } from "../menuLogos";
+import { MachineMonitor } from "./MachineMonitor";
 
 const size = (bytes: number): string => bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1)} GB` : bytes >= 1e6 ? `${(bytes / 1e6).toFixed(1)} MB` : `${Math.round(bytes / 1e3)} kB`;
 export const uptimeText = (seconds: number, t: Translate): string => {
@@ -29,6 +30,7 @@ export function SystemView({ t, origin, isAdmin }: { t: Translate; origin: strin
 
   return <section className="system-view">
     <header className="devices-head"><MenuTitle kind="system"><p className="eyebrow">{t("systemTitle")}</p><h2>{t("system")}</h2><p className="muted">{t("systemHelp")}</p></MenuTitle></header>
+    <MachineMonitor t={t} origin={origin} />
     {system && counts && <>
       <div className="sys-hero">
         <div><small>{t("sysVersion")}</small><strong>v{system.version}</strong></div>
