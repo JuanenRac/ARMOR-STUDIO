@@ -15,7 +15,7 @@ server {
     add_header Referrer-Policy "no-referrer" always;
     add_header Cross-Origin-Opener-Policy "same-origin" always;
     add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tilecache.rainviewer.com https://view.eumetsat.int https://server.arcgisonline.com; media-src 'self' blob:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://air-quality-api.open-meteo.com https://api.rainviewer.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'" always;
 
     # Tells Studio which server to start with: this very origin.
     location = /armor-config.json {
