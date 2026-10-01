@@ -3,6 +3,7 @@
 All notable changes to this project are documented here.
 
 ## [0.4.8] - The camera view after the settings
+- Documentation: the seven READMEs count sixteen themes (they said eleven) and describe the machine monitor, the orders and device logins of the Network menu and the server-address check.
 
 - **Cameras:** coming back from "Configure cameras" the grid is laid out again; the frame that holds it is measured anew each time it appears, instead of keeping the size of the one that was removed.
 
