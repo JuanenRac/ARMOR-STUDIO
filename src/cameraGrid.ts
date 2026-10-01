@@ -36,3 +36,8 @@ export function fitGrid(count: number, width: number, height: number, gap = 12):
   }
   return best as FitGrid;
 }
+
+/** The columns of a wall that fills the whole screen with its tiles side by side, no gap: the arrangement whose tiles are closest to 16:9. */
+export function wallColumns(count: number, width: number, height: number): number {
+  return fitGrid(count, Math.max(width, 640), height, 0).columns;
+}

@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## [0.4.9] - A full-screen wall of cameras
+
+- **Cameras -> "Full-screen wall":** with a view of two or more cameras chosen, a button shows all of them on the whole screen, touching each other with no gap and cropped to fill their place, with only each camera's name drawn on it. Esc (or leaving full screen) goes back to the normal view. Where the browser refuses full screen the wall still covers the window and Esc still works. Texts in the seven languages.
+- **Tests:** 265 (the columns of the wall for 1, 2, 4, 6, 9 and 16 cameras on a wide and on a tall screen).
+
 ## [0.4.8] - The camera view after the settings
 - Documentation: the seven READMEs count sixteen themes (they said eleven) and describe the machine monitor, the orders and device logins of the Network menu and the server-address check.
 
