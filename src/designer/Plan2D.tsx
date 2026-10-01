@@ -366,7 +366,7 @@ export function Plan2D(props: PlanProps) {
         case "kennel": return <><rect x={-w / 2} y={-d / 2} width={w} height={d} className="p-kennel" /><path d={`M0 ${-d / 2}V${d / 2}`} className="p-kennel-line" /><rect x={-w * 0.2} y={d / 2 - 0.12} width={w * 0.4} height={0.14} className="p-kennel-door" /></>;
         case "fence": {
           const posts = Math.max(1, Math.ceil(w / 2));
-          return <><rect x={-w / 2} y={-Math.max(d, 0.1) / 2} width={w} height={Math.max(d, 0.1)} className={`p-fence ${feature.style ?? "picket"}`} />{Array.from({ length: posts + 1 }, (_, i) => <circle key={i} cx={-w / 2 + (w * i) / posts} cy={0} r={0.09} className="p-fence-post" />)}</>;
+          return <><rect x={-w / 2} y={-Math.max(d, 0.1) / 2} width={w} height={Math.max(d, 0.1)} className={`p-fence ${feature.style ?? "mesh"}`} />{Array.from({ length: posts + 1 }, (_, i) => <circle key={i} cx={-w / 2 + (w * i) / posts} cy={0} r={0.09} className="p-fence-post" />)}</>;
         }
         case "fountain": return <><circle r={w / 2} className="p-fountain" /><circle r={w / 2 * 0.78} className="p-fountain-water" /><circle r={w * 0.2} className="p-fountain-tier" /><circle r={w * 0.06} className="p-fountain-jet" /></>;
         case "coop": return <><rect x={-w / 2} y={-d / 2} width={w * 0.62} height={d} className="p-coop" /><rect x={-w / 2 + w * 0.62} y={-d * 0.28} width={w * 0.38} height={d * 0.56} className="p-coop-run" /><path d={`M${-w * 0.1} ${d / 2}L${-w * 0.1} ${d / 2 + 0.55}`} className="p-coop-ramp" /></>;

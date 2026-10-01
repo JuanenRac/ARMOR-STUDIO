@@ -131,7 +131,7 @@
 .p-tree { fill: rgba(56, 140, 76, .55); stroke: #2f7d45; stroke-width: 1.2; vector-effect: non-scaling-stroke; } .p-tree.pine { fill: rgba(36, 92, 59, .6); } .p-tree.palm { fill: rgba(80, 150, 90, .3); } .p-tree.bush { fill: rgba(60, 140, 80, .5); }
 .p-tree-ring { fill: none; stroke: #63b57b; stroke-width: 1; vector-effect: non-scaling-stroke; opacity: .8; } .p-trunk { fill: #6a4a2a; }
 .p-kennel { fill: #a6763f; stroke: #e8c894; stroke-width: 1; } .p-kennel-line { stroke: #7b3a2c; stroke-width: 1.4; fill: none; } .p-kennel-door { fill: #1c1410; }
-.p-fence { fill: #8b6a44; stroke: #c9b48f; stroke-width: 1; } .p-fence.wall { fill: #9ea8ab; stroke: #cfd6d8; } .p-fence.wire { fill: #7d8b93; } .p-fence.rail { fill: #8b6a44; }
+.p-fence { fill: #8b6a44; stroke: #c9b48f; stroke-width: 1; } .p-fence.wall { fill: #9ea8ab; stroke: #cfd6d8; } .p-fence.wire { fill: #7d8b93; } .p-fence.rail { fill: #8b6a44; } .p-fence.mesh { fill: #8a9296; stroke: #b9c4c8; }
 .p-fence-post { fill: #3b2b1a; stroke: #e0d2b4; stroke-width: .8; vector-effect: non-scaling-stroke; }
 .p-fountain { fill: #b3b8b3; stroke: #e6ebe6; stroke-width: 1; } .p-fountain-water { fill: rgba(89, 184, 230, .7); } .p-fountain-tier { fill: #b3b8b3; stroke: #79c5e8; stroke-width: 1; vector-effect: non-scaling-stroke; } .p-fountain-jet { fill: #d5f1fb; }
 .p-coop { fill: #c9583b; stroke: #f0b0a0; stroke-width: 1; } .p-coop-run { fill: rgba(162, 106, 58, .5); stroke: #d8b088; stroke-width: 1; stroke-dasharray: 3 3; } .p-coop-ramp { stroke: #8a6234; stroke-width: 3; vector-effect: non-scaling-stroke; }

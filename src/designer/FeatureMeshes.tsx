@@ -1,5 +1,5 @@
 /**
- * The 3D bodies of the garden and farm objects: trees (oak, pine, palm, bush), fences (picket, rail, wire, wall), gates (iron, wood,
+ * The 3D bodies of the garden and farm objects: trees (oak, pine, palm, bush), fences (mesh, picket, rail, wire, wall), gates (iron, wood,
  * modern, stone), fountains, dog kennels and chicken coops. Each is drawn at its own origin on the ground, facing +Z (south) at rotation 0.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
@@ -46,8 +46,8 @@ function Tree({ feature, glow }: Props) {
 }
 
 function Fence({ feature, glow }: Props) {
-  const length = feature.width, h = feature.height, style = feature.style ?? "picket";
-  const segments = Math.max(1, Math.ceil(length / 2)), postColour = feature.color ? shade(feature.color, -0.25) : style === "wall" ? "#8f9a9d" : style === "wire" ? "#7d8b93" : "#8b6a44", main = feature.color;
+  const length = feature.width, h = feature.height, style = feature.style ?? "mesh";
+  const segments = Math.max(1, Math.ceil(length / 2)), postColour = feature.color ? shade(feature.color, -0.25) : style === "wall" ? "#8f9a9d" : style === "wire" || style === "mesh" ? "#7d8b93" : "#8b6a44", main = feature.color;
   const posts = Array.from({ length: segments + 1 }, (_, index) => -length / 2 + (length * index) / segments);
   if (style === "wall") {
     return <group>
@@ -57,12 +57,26 @@ function Fence({ feature, glow }: Props) {
     </group>;
   }
   const pickets = style === "picket" ? Math.min(90, Math.floor(length / 0.14)) : 0;
+  const strands = style === "mesh" ? Math.min(60, Math.max(6, Math.floor(length / 0.1))) : 0;
   return <group>
-    {posts.map(x => <Box key={x} size={[style === "wire" ? 0.05 : 0.09, h + 0.05, style === "wire" ? 0.05 : 0.09]} at={[x, (h + 0.05) / 2, 0]} color={postColour} glow={glow} />)}
+    {posts.map(x => <Box key={x} size={[style === "wire" || style === "mesh" ? 0.05 : 0.09, h + 0.05, style === "wire" || style === "mesh" ? 0.05 : 0.09]} at={[x, (h + 0.05) / 2, 0]} color={postColour} glow={glow} />)}
     {style === "picket" && <>{[0.3, 0.75].map(f => <Box key={f} size={[length, 0.05, 0.04]} at={[0, h * f, -0.03]} color={postColour} glow={glow} />)}
       {Array.from({ length: pickets }, (_, index) => <Box key={index} size={[0.06, h * 0.92, 0.02]} at={[-length / 2 + 0.07 + index * (length - 0.14) / Math.max(1, pickets - 1), h * 0.46, 0.01]} color={main ?? "#c9b48f"} rough={0.9} cast={false} />)}</>}
     {style === "rail" && [0.25, 0.5, 0.78].map(f => <Box key={f} size={[length, 0.09, 0.05]} at={[0, h * f, 0]} color={postColour} glow={glow} />)}
     {style === "wire" && [0.2, 0.45, 0.7, 0.95].map(f => <mesh key={f} position={[0, h * f, 0]}><boxGeometry args={[length, 0.012, 0.012]} /><meshStandardMaterial color={main ?? "#b9c4c8"} metalness={0.8} roughness={0.4} /></mesh>)}
+    {/* A real chain-link/mesh security fence: a top and bottom tension wire (the frame a real diamond mesh fabric is tied to) plus a dense
+        crosshatch of thin diagonal strands standing in for the woven wire fabric itself - the geometry this file already uses elsewhere
+        (thin boxes, no textures), just doubled up in both diagonal directions to read as a mesh rather than a few bare strands. */}
+    {style === "mesh" && <>
+      {[0.04, 0.96].map(f => <mesh key={f} position={[0, h * f, 0]}><boxGeometry args={[length, 0.02, 0.02]} /><meshStandardMaterial color={main ?? "#9aa4a8"} metalness={0.7} roughness={0.45} /></mesh>)}
+      {Array.from({ length: strands }, (_, index) => {
+        const x = -length / 2 + (index + 0.5) * (length / strands), tilt = Math.min(1.3, h / (length / strands));
+        return <group key={index}>
+          <mesh position={[x, h / 2, 0]} rotation={[0, 0, tilt]}><boxGeometry args={[0.014, h * 1.05, 0.014]} /><meshStandardMaterial color={main ?? "#b9c4c8"} metalness={0.75} roughness={0.4} /></mesh>
+          <mesh position={[x, h / 2, 0]} rotation={[0, 0, -tilt]}><boxGeometry args={[0.014, h * 1.05, 0.014]} /><meshStandardMaterial color={main ?? "#b9c4c8"} metalness={0.75} roughness={0.4} /></mesh>
+        </group>;
+      })}
+    </>}
   </group>;
 }
 

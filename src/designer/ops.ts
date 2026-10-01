@@ -222,7 +222,7 @@ export const FEATURE_DEFAULTS: Record<SiteFeatureKind, Omit<SiteFeature, "id" | 
   road: { width: 4, depth: 10, height: 0.03, rotation: 0, slope: 0 },
   tree: { width: 3, depth: 3, height: 5, rotation: 0, slope: 0, style: "oak" },
   kennel: { width: 1, depth: 1.2, height: 0.95, rotation: 0, slope: 0 },
-  fence: { width: 4, depth: 0.08, height: 1.2, rotation: 0, slope: 0, style: "picket" },
+  fence: { width: 4, depth: 0.08, height: 1.2, rotation: 0, slope: 0, style: "mesh" },
   fountain: { width: 2.4, depth: 2.4, height: 1.6, rotation: 0, slope: 0 },
   coop: { width: 1.8, depth: 1.2, height: 1.4, rotation: 0, slope: 0 },
   gate: { width: 4.2, depth: 0.6, height: 2.4, rotation: 0, slope: 0, style: "iron" },

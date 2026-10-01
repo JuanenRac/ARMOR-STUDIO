@@ -20,7 +20,7 @@ describe("colours", () => {
   it("every kind of ground object and every style has a default colour to start the picker from", () => {
     for (const kind of Object.keys(DEFAULT_FEATURE_COLOUR) as SiteFeatureKind[]) expect(isColour(featureColourOf(kind, undefined)), kind).toBe(true);
     for (const style of ["iron", "wood", "modern", "stone"]) expect(isColour(featureColourOf("gate", style))).toBe(true);
-    for (const style of ["picket", "rail", "wire", "wall"]) expect(isColour(featureColourOf("fence", style))).toBe(true);
+    for (const style of ["mesh", "picket", "rail", "wire", "wall"]) expect(isColour(featureColourOf("fence", style))).toBe(true);
     for (const style of ["concrete", "brick", "gravel"]) expect(isColour(featureColourOf("sidewalk", style))).toBe(true);
   });
 });

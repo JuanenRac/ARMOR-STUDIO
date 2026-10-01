@@ -26,10 +26,10 @@ export const DEFAULT_ROOF_ITEM_COLOUR = { chimney: "#8a5a4a", solar: "#173f7a", 
 /** The colour a kind of ground object shows by default (its main body). */
 export const DEFAULT_FEATURE_COLOUR: Record<SiteFeatureKind, string> = {
   pillar: "#a8b4b8", lamp: "#59666d", mast: "#c3d0d4", solar: "#173f7a", canopy: "#4b6f7a", entrance: "#9fb1b7", path: "#6f8b93", road: "#1c252b",
-  tree: "#2f7d45", kennel: "#a6763f", fence: "#c9b48f", fountain: "#b3b8b3", coop: "#c9583b", gate: "#20272b", sidewalk: "#b8bcbd",
+  tree: "#2f7d45", kennel: "#a6763f", fence: "#8a9296", fountain: "#b3b8b3", coop: "#c9583b", gate: "#20272b", sidewalk: "#b8bcbd",
 };
 export const featureColourOf = (kind: SiteFeatureKind, style: string | undefined): string =>
   kind === "gate" ? (style === "wood" ? "#8a6234" : style === "modern" ? "#2d3438" : style === "stone" ? "#9a8f82" : "#20272b")
-  : kind === "fence" ? (style === "wall" ? "#9ea8ab" : style === "wire" ? "#7d8b93" : style === "rail" ? "#8b6a44" : "#c9b48f")
+  : kind === "fence" ? (style === "wall" ? "#9ea8ab" : style === "wire" ? "#7d8b93" : style === "rail" ? "#8b6a44" : style === "picket" ? "#c9b48f" : "#8a9296")
   : kind === "sidewalk" ? (style === "brick" ? "#a9583f" : style === "gravel" ? "#a39d93" : "#b8bcbd")
   : DEFAULT_FEATURE_COLOUR[kind];
