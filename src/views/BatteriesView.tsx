@@ -13,14 +13,16 @@ import {
   type SolarBatteryReading, type SolarCatalog, type SolarDeviceView, type SolarModuleReading, type SolarRegistration, type SolarTotals,
 } from "../solarModel";
 import { SolarEquipment } from "../SolarEquipment";
+import { SolarNodes } from "../SolarNodes";
+import type { NetworkOverview } from "../networkModel";
 import "./solar.css";
 
-type Props = { t: Translate; origin: string; devices: SolarDeviceView[]; waiting: SolarRegistration[]; catalog: SolarCatalog | null; reload: () => void; totals: SolarTotals | null; now: number; unreachable: boolean };
+type Props = { t: Translate; origin: string; devices: SolarDeviceView[]; waiting: SolarRegistration[]; catalog: SolarCatalog | null; reload: () => void; totals: SolarTotals | null; now: number; unreachable: boolean; network?: NetworkOverview | null };
 type Battery = SolarDeviceView & { reading: SolarBatteryReading };
 const RANGES = [{ minutes: 60, key: "solarRange1" }, { minutes: 360, key: "solarRange6" }, { minutes: 1440, key: "solarRange24" }] as const;
 const TONE = { ok: SOLAR_COLOURS.battery, warn: SOLAR_COLOURS.pv, bad: SOLAR_COLOURS.bad } as const;
 
-export function BatteriesView({ t, origin, devices, totals, now, unreachable, waiting, catalog, reload }: Props) {
+export function BatteriesView({ t, origin, devices, totals, now, unreachable, waiting, catalog, reload, network }: Props) {
   const stacks = useMemo(() => devices.filter((d): d is Battery => d.kind === "battery"), [devices]);
   const registrations = useMemo(() => [...stacks.flatMap(d => (d.registered ? [d.registered] : [])), ...waiting.filter(item => item.kind === "battery")], [stacks, waiting]);
   const [chosen, setChosen] = useState("");
@@ -40,7 +42,8 @@ export function BatteriesView({ t, origin, devices, totals, now, unreachable, wa
       </div>}
     </header>
     {unreachable && <p className="solar-notice bad">{t("solarNoHistory")}</p>}
-    <SolarEquipment kind="battery" t={t} origin={origin} catalog={catalog} registrations={registrations} reporting={stacks} reload={reload} />
+    <SolarNodes t={t} devices={devices} registrations={[...devices.flatMap(d => (d.registered ? [d.registered] : [])), ...waiting]} now={now} />
+    <SolarEquipment kind="battery" network={network} t={t} origin={origin} catalog={catalog} registrations={registrations} reporting={stacks} reload={reload} />
     {stacks.length === 0 ? (registrations.length > 0 ? <p className="solar-notice">{t("solarWaitingHelp")}</p> : <div className="solar-empty"><BatteryLogo size={92} /><h3>{t("solarNone")}</h3><p>{t("solarNoneHelp")}</p><p>{t("solarNoneAdd")}</p></div>) : <>
       {stacks.length > 1 && <div className="solar-tabs" role="tablist">{stacks.map(item => {
         const key = `${item.node_id}/${item.device}`;
