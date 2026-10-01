@@ -31,11 +31,12 @@ export function useServerStatus(origin: string): { state: SystemState; connectio
   const [connection, setConnection] = useState<Connection>("demo");
   const [latencyMs, setLatencyMs] = useState<number | null>(null);
   useEffect(() => {
-    let cancelled = false;
+    let cancelled = false, failures = 0;
+    // One answer that is late or lost is not a lost server (a browser shares a few connections between the camera pictures and these calls): the console says it is offline after three in a row.
     const refresh = async () => {
       const started = performance.now();
-      try { const next = await readStatus(origin); if (!cancelled) { setState(next); setConnection("synced"); setLatencyMs(Math.round(performance.now() - started)); } }
-      catch { if (!cancelled) { setConnection("demo"); setLatencyMs(null); } }
+      try { const next = await readStatus(origin); failures = 0; if (!cancelled) { setState(next); setConnection("synced"); setLatencyMs(Math.round(performance.now() - started)); } }
+      catch { failures += 1; if (!cancelled && failures >= 3) { setConnection("demo"); setLatencyMs(null); } }
     };
     void refresh();
     const timer = window.setInterval(() => void refresh(), 3000);
@@ -44,17 +45,25 @@ export function useServerStatus(origin: string): { state: SystemState; connectio
   return { state, connection, latencyMs, apply: setState };
 }
 
-/** One short-lived stream address per live camera, renewed when the set of live cameras changes. */
+/**
+ * One short-lived stream address per live camera. An address is asked once for each camera and kept while the camera stays live: the list of cameras is read again
+ * every minute, and asking again each time gave every picture a new address, so all the streams were dropped and started over (slow, and the pictures blinked).
+ * A camera whose address cannot be had does not take the others with it.
+ */
 export function useStreamUrls(origin: string, cameras: readonly Camera[]): Record<string, string> {
   const [urls, setUrls] = useState<Record<string, string>>({});
+  const liveIds = cameras.filter(camera => camera.enabled && camera.liveVideoAvailable).map(camera => camera.id).sort().join(",");
   useEffect(() => {
     let cancelled = false;
-    const live = cameras.filter(camera => camera.enabled && camera.liveVideoAvailable);
-    void Promise.all(live.map(async camera => [camera.id, await createCameraStreamUrl(origin, camera.id)] as const))
-      .then(entries => { if (!cancelled) setUrls(Object.fromEntries(entries)); })
-      .catch(() => { if (!cancelled) setUrls({}); });
+    const live = liveIds ? liveIds.split(",") : [];
+    setUrls(current => Object.fromEntries(Object.entries(current).filter(([id]) => live.includes(id))));
+    for (const id of live) {
+      void createCameraStreamUrl(origin, id)
+        .then(url => { if (!cancelled) setUrls(current => current[id] ? current : { ...current, [id]: url }); })
+        .catch(() => { /* this camera shows no picture until the set of live cameras changes */ });
+    }
     return () => { cancelled = true; };
-  }, [origin, cameras]);
+  }, [origin, liveIds]);
   return urls;
 }
 

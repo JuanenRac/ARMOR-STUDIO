@@ -42,7 +42,7 @@ export async function openOperatorSession(origin: string, token: string): Promis
   return body.expiresAt ?? "";
 }
 export async function readStatus(origin: string): Promise<SystemState> {
-  const response = await timedFetch(`${origin.replace(/\/$/, "")}/api/v1/status`, { headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(`${origin.replace(/\/$/, "")}/api/v1/status`, { headers: { Accept: "application/json" }, ...localSession, signal: AbortSignal.timeout(8_000) });
   if (!response.ok) throw new Error(`Server returned ${response.status}`);
   return response.json() as Promise<SystemState>;
 }

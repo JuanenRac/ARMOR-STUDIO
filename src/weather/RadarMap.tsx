@@ -122,6 +122,7 @@ export function RadarMap({ place, t, locale }: { place: Place; t: Translate; loc
     <div className="wx-radar-bar">
       <button className={showRain ? "on" : ""} onClick={() => setShowRain(value => !value)}>🌧 {t("wxRadarRain")}</button>
       <button className={showClouds ? "on" : ""} onClick={() => setShowClouds(value => !value)}>☁ {t("wxRadarClouds")}</button>
+      <button onClick={() => map.current?.setView([place.latitude, place.longitude], 7)} title={place.name}>◎ {t("wxRadarCenter")}</button>
       <button onClick={() => setPlaying(value => !value)} disabled={!showRain || !radar}>{playing ? `⏸ ${t("wxRadarPause")}` : `▶ ${t("wxRadarPlay")}`}</button>
       <label className="wx-opacity">{t("wxRadarOpacity")} <input type="range" min={0.2} max={1} step={0.05} value={opacity} onChange={event => setOpacity(Number(event.target.value))} /></label>
     </div>

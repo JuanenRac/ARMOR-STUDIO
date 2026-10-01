@@ -101,6 +101,7 @@ const ROWS: Record<string, Row> = {
   wxRadarRain: ["Rain", "Lluvia", "Regen", "Pluie", "Pioggia", "雨", "雨"],
   wxRadarClouds: ["Clouds (satellite)", "Nubes (satélite)", "Wolken (Satellit)", "Nuages (satellite)", "Nuvole (satellite)", "雲（衛星）", "云（卫星）"],
   wxRadarPlay: ["Play", "Reproducir", "Abspielen", "Lecture", "Riproduci", "再生", "播放"],
+  wxRadarCenter: ["Center on my place", "Centrar en mi lugar", "Auf meinen Ort zentrieren", "Centrer sur mon lieu", "Centra sul mio luogo", "現在地に戻す", "回到我的位置"],
   wxRadarPause: ["Pause", "Pausa", "Pause", "Pause", "Pausa", "一時停止", "暂停"],
   wxRadarOpacity: ["Opacity", "Opacidad", "Deckkraft", "Opacité", "Opacità", "不透明度", "不透明度"],
   wxRadarPast: ["Last two hours, every ten minutes", "Últimas dos horas, cada diez minutos", "Letzte zwei Stunden, alle zehn Minuten", "Deux dernières heures, toutes les dix minutes", "Ultime due ore, ogni dieci minuti", "過去2時間（10分ごと）", "最近两小时，每十分钟"],
