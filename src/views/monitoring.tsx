@@ -2,9 +2,9 @@
  * The overview, camera monitor and radar views.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import { useLayoutEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { CameraTile, type Translate } from "../components/camera";
-import { fitGrid } from "../cameraGrid";
+import { fitGrid, wallColumns } from "../cameraGrid";
 import { resolveSlots } from "../cameraLayout";
 import { GRID_SIZES, type Camera, type GridSize, type View } from "../domain";
 import type { Reachability } from "../api";
@@ -65,19 +65,54 @@ function useElementSize<T extends HTMLElement>() {
   return { ref: setElement, ...size };
 }
 
+/** Every camera of the chosen view on the whole screen, touching each other and cropped to fill it; Esc (or leaving full screen) goes back. */
+function CameraWall(props: CameraViewProps & { shown: readonly Camera[]; exit: () => void }) {
+  const { shown, exit, t } = props;
+  const root = useRef<HTMLDivElement>(null);
+  const [screen, setScreen] = useState({ width: window.innerWidth, height: window.innerHeight });
+  useEffect(() => {
+    const element = root.current;
+    // The browser's full screen takes the whole display; where it is refused the wall still covers the window.
+    void element?.requestFullscreen?.().catch(() => undefined);
+    const leave = () => { if (!document.fullscreenElement) exit(); };
+    const key = (event: KeyboardEvent) => { if (event.key === "Escape") exit(); };
+    const resize = () => setScreen({ width: window.innerWidth, height: window.innerHeight });
+    document.addEventListener("fullscreenchange", leave);
+    window.addEventListener("keydown", key);
+    window.addEventListener("resize", resize);
+    return () => {
+      document.removeEventListener("fullscreenchange", leave);
+      window.removeEventListener("keydown", key);
+      window.removeEventListener("resize", resize);
+      if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
+    };
+  }, [exit]);
+  const columns = wallColumns(shown.length, screen.width, screen.height), rows = Math.max(1, Math.ceil(shown.length / columns));
+  return <div ref={root} className="camera-wall" role="dialog" aria-label={t("cam_wall")}>
+    <div className="camera-wall-grid" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
+      {shown.map(camera => <CameraTile key={camera.id} bare camera={camera} selected={false} select={() => undefined} toggle={() => undefined} snapshot={() => undefined} record={() => undefined} expand={exit}
+        recording={props.recordingIds.includes(camera.id)} streamUrl={props.streamUrls[camera.id]} reachability={props.reachability[camera.id]} invokePtz={() => Promise.resolve()} t={t} />)}
+    </div>
+    <p className="camera-wall-hint">{t("cam_wall_exit")}</p>
+  </div>;
+}
+
 export function CameraMonitorView(props: CameraViewProps) {
   const { cameras, selected, selectedId, gridSize, recordingIds, streamUrls, reachability, notice, t } = props;
   const frame = useElementSize<HTMLDivElement>();
   const [configuring, setConfiguring] = useState(false);
+  const [wall, setWall] = useState(false);
+  const leaveWall = useCallback(() => setWall(false), []);
   // Every tile is 16:9 and as large as the frame allows for the chosen number of views; the picture inside is never cropped.
   const layout = fitGrid(gridSize, frame.width, frame.height, GRID_GAP);
   const placed = resolveSlots(cameras.map(camera => camera.id), props.slots, gridSize);
   const shown = placed.flatMap(id => { const camera = cameras.find(item => item.id === id); return camera ? [camera] : []; });
   const shownIndex = (id: string) => placed.indexOf(id);
   return <section className="camera-workspace">
+    {wall && <CameraWall {...props} shown={shown} exit={leaveWall} />}
     <div className="panel-heading">
       <MenuTitle kind="cameras"><p className="eyebrow">{t("videoOperations")}</p><h2>{t("cameraMonitor")}</h2><p className="muted">{t("cameraHelp")}</p></MenuTitle>
-      <div className="grid-picker">{!configuring && GRID_SIZES.map(size => <button key={size} className={gridSize === size ? "active" : ""} onClick={() => props.setGridSize(size)}>{size} {size > 1 ? t("views") : t("view")}</button>)}<button className={configuring ? "active" : ""} onClick={() => setConfiguring(value => !value)}>{configuring ? `‹ ${t("cam_back")}` : `⚙ ${t("cam_configure")}`}</button></div>
+      <div className="grid-picker">{!configuring && GRID_SIZES.map(size => <button key={size} className={gridSize === size ? "active" : ""} onClick={() => props.setGridSize(size)}>{size} {size > 1 ? t("views") : t("view")}</button>)}{!configuring && gridSize >= 2 && shown.length >= 2 && <button title={t("cam_wall_help")} onClick={() => setWall(true)}>⛶ {t("cam_wall")}</button>}<button className={configuring ? "active" : ""} onClick={() => setConfiguring(value => !value)}>{configuring ? `‹ ${t("cam_back")}` : `⚙ ${t("cam_configure")}`}</button></div>
     </div>
     {configuring ? <div className="camera-config-frame">{props.settings}</div> : <>
     <div ref={frame.ref} className={`camera-frame ${layout.scrolls ? "scrolls" : ""}`}>

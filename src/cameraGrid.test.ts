@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { columnChoices, fitGrid, TILE_ASPECT } from "./cameraGrid";
+import { columnChoices, fitGrid, TILE_ASPECT, wallColumns } from "./cameraGrid";
 import { GRID_SIZES } from "./domain";
 
 describe("camera grid", () => {
@@ -40,5 +40,20 @@ describe("camera grid", () => {
   });
   it("copes with a frame that has not been measured yet", () => {
     expect(fitGrid(4, 0, 0)).toMatchObject({ tileWidth: 0, columns: 2, rows: 2 });
+  });
+});
+
+describe("the full-screen wall", () => {
+  it("fills a 16:9 screen with the arrangement whose tiles are closest to 16:9, no gap", () => {
+    expect(wallColumns(2, 1920, 1080)).toBe(2);
+    expect(wallColumns(4, 1920, 1080)).toBe(2);
+    expect(wallColumns(9, 1920, 1080)).toBe(3);
+    expect(wallColumns(16, 1920, 1080)).toBe(4);
+    expect(wallColumns(6, 1920, 1080)).toBe(3);
+  });
+  it("stacks the tiles on a tall screen and never gives zero columns", () => {
+    expect(wallColumns(2, 800, 1280)).toBe(1);
+    expect(wallColumns(1, 1920, 1080)).toBe(1);
+    expect(wallColumns(8, 0, 0)).toBeGreaterThan(0);
   });
 });
