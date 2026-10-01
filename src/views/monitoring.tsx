@@ -4,7 +4,7 @@
  */
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { CameraTile, type Translate } from "../components/camera";
-import { fitGrid, wallColumns } from "../cameraGrid";
+import { fitGrid } from "../cameraGrid";
 import { resolveSlots } from "../cameraLayout";
 import { GRID_SIZES, type Camera, type GridSize, type View } from "../domain";
 import type { Reachability } from "../api";
@@ -87,10 +87,12 @@ function CameraWall(props: CameraViewProps & { shown: readonly Camera[]; exit: (
       if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     };
   }, [exit]);
-  const columns = wallColumns(shown.length, screen.width, screen.height), rows = Math.max(1, Math.ceil(shown.length / columns));
+  // The wall is the chosen view, whatever number of cameras fill it (6 views are 3 x 2, 8 are 4 x 2, 9 are 3 x 3, 12 are 4 x 3, 16 are 4 x 4; a place without a camera stays black), laid out as the
+  // normal view is - every picture 16:9 and whole - only with no gap between the cameras, so the block of them is as large as the screen allows.
+  const layout = fitGrid(props.gridSize, Math.max(screen.width, 640), screen.height, 0);
   const placed = resolveSlots(cameras.map(camera => camera.id), props.slots, props.gridSize);
   return <div ref={root} className="camera-wall camera-frame" role="dialog" aria-label={t("cam_wall")}>
-    <div className="camera-wall-grid" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
+    <div className="camera-wall-grid" style={{ gridTemplateColumns: `repeat(${layout.columns}, ${layout.tileWidth}px)`, gridAutoRows: `${layout.tileHeight}px` }}>
       {shown.map(camera => <CameraTile key={camera.id} choices={cameras} pick={id => props.setSlot(placed.indexOf(camera.id), id)} camera={camera} selected={camera.id === props.selectedId} select={() => props.select(camera.id)}
         toggle={() => props.toggle(camera)} snapshot={() => props.snapshot(camera)} record={() => props.record(camera)} expand={() => { exit(); props.expand(camera.id); }} recording={props.recordingIds.includes(camera.id)}
         streamUrl={props.streamUrls[camera.id]} reachability={props.reachability[camera.id]} invokePtz={command => props.ptz(camera, command)} t={t} />)}

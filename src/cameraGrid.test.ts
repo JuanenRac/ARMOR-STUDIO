@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { columnChoices, fitGrid, TILE_ASPECT, wallColumns } from "./cameraGrid";
+import { columnChoices, fitGrid, TILE_ASPECT } from "./cameraGrid";
 import { GRID_SIZES } from "./domain";
 
 describe("camera grid", () => {
@@ -44,16 +44,16 @@ describe("camera grid", () => {
 });
 
 describe("the full-screen wall", () => {
-  it("fills a 16:9 screen with the arrangement whose tiles are closest to 16:9, no gap", () => {
-    expect(wallColumns(2, 1920, 1080)).toBe(2);
-    expect(wallColumns(4, 1920, 1080)).toBe(2);
-    expect(wallColumns(9, 1920, 1080)).toBe(3);
-    expect(wallColumns(16, 1920, 1080)).toBe(4);
-    expect(wallColumns(6, 1920, 1080)).toBe(3);
+  it("is the chosen view laid out with no gap: 3 x 2 for six, 4 x 2 for eight, 3 x 3 for nine, 4 x 3 for twelve, 4 x 4 for sixteen", () => {
+    const columns = (count: number) => fitGrid(count, 1920, 1080, 0).columns;
+    expect([1, 2, 4, 6, 8, 9, 12, 16].map(columns)).toEqual([1, 2, 2, 3, 4, 3, 4, 4]);
   });
-  it("stacks the tiles on a tall screen and never gives zero columns", () => {
-    expect(wallColumns(2, 800, 1280)).toBe(1);
-    expect(wallColumns(1, 1920, 1080)).toBe(1);
-    expect(wallColumns(8, 0, 0)).toBeGreaterThan(0);
+  it("keeps every picture 16:9 and fills the screen as far as that allows", () => {
+    for (const count of [2, 4, 6, 8, 9, 12, 16]) {
+      const layout = fitGrid(count, 1920, 1080, 0);
+      expect(layout.tileWidth / layout.tileHeight).toBeCloseTo(16 / 9, 3);
+      expect(layout.tileWidth * layout.columns).toBeLessThanOrEqual(1920.5);
+      expect(layout.tileHeight * layout.rows).toBeLessThanOrEqual(1080.5);
+    }
   });
 });
