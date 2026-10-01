@@ -22,7 +22,7 @@ export const DEFAULT_TERRAIN_COLOUR = "#17414d";
 export const DEFAULT_WALL_COLOUR = "#d9e3e6", DEFAULT_ROOF_COLOUR = "#9a4d3f";
 export const DEFAULT_DOOR_COLOUR = "#6f8f9a", DEFAULT_WINDOW_FRAME_COLOUR = "#eef6f8";
 export const DEFAULT_LIGHT_COLOUR = "#ffe9a8";
-export const DEFAULT_ROOF_ITEM_COLOUR = { chimney: "#8a5a4a", solar: "#173f7a", antenna: "#c3d0d4", vent: "#7d8b93" } as const;
+export const DEFAULT_ROOF_ITEM_COLOUR = { chimney: "#8a5a4a", solar: "#173f7a", antenna: "#c3d0d4", vent: "#7d8b93", gutter: "#8d9aa1", downpipe: "#8d9aa1" } as const;
 /** The colour a kind of ground object shows by default (its main body). */
 export const DEFAULT_FEATURE_COLOUR: Record<SiteFeatureKind, string> = {
   pillar: "#a8b4b8", lamp: "#59666d", mast: "#c3d0d4", solar: "#173f7a", canopy: "#4b6f7a", entrance: "#9fb1b7", path: "#6f8b93", road: "#1c252b",

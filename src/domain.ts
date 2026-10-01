@@ -4,7 +4,7 @@
  */
 import type { SystemState } from "./types";
 
-export type View = "overview" | "weather" | "alarms" | "cameras" | "radar" | "inverters" | "batteries" | "devices" | "automations" | "record" | "history" | "network" | "services" | "siteDesigner" | "electricalDesigner" | "networkDesigner" | "system" | "configuration";
+export type View = "overview" | "weather" | "alarms" | "cameras" | "radar" | "inverters" | "batteries" | "electrical" | "devices" | "automations" | "record" | "history" | "network" | "services" | "siteDesigner" | "electricalDesigner" | "networkDesigner" | "system" | "configuration";
 export type GridSize = 1 | 2 | 4 | 6 | 8 | 9 | 12 | 16;
 export const GRID_SIZES: readonly GridSize[] = [1, 2, 4, 6, 8, 9, 12, 16];
 
@@ -49,7 +49,7 @@ export type OpeningKind = "door" | "window" | "garage" | "opening";
 /** A door or window in one wall (the footprint edge from point `edge` to the next) of one floor, at any height. */
 export type Opening = { id: string; buildingId: string; edge: number; floor: number; kind: OpeningKind; offset: number; width: number; height: number; sill: number; /** Arched at the top. */ arch?: boolean; /** A small balcony outside it (a door or a window of an upper floor). */ balcony?: boolean; /** The door leaf or the window frame, "#rrggbb". */ color?: string };
 
-export type RoofItemKind = "chimney" | "solar" | "antenna" | "vent";
+export type RoofItemKind = "chimney" | "solar" | "antenna" | "vent" | "gutter" | "downpipe";
 /** Something standing on a roof; its height above the ground follows the roof surface. */
 export type RoofItem = { id: string; buildingId: string; kind: RoofItemKind; x: number; y: number; width: number; depth: number; height: number; rotation: number; tilt: number; color?: string };
 
@@ -89,7 +89,7 @@ export type DevicePlacement = { device_id: string; x: number; y: number; z: numb
 /** The menus, in groups: what is happening now, what the system controls, the design, and administration. */
 export const NAV_GROUPS: ReadonlyArray<{ title: string; items: ReadonlyArray<readonly [View, string]> }> = [
   { title: "navMonitor", items: [["overview", "⌂"], ["weather", "☁"], ["alarms", "!"], ["cameras", "◉"], ["radar", "◌"]] },
-  { title: "navEnergy", items: [["inverters", "☀"], ["batteries", "▮"]] },
+  { title: "navEnergy", items: [["inverters", "☀"], ["batteries", "▮"], ["electrical", "⌁"]] },
   { title: "navNetwork", items: [["network", "⇄"]] },
   { title: "navControl", items: [["devices", "◈"], ["automations", "⚡"]] },
   { title: "navEvidence", items: [["record", "▣"], ["history", "≡"]] },

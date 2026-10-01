@@ -169,3 +169,5 @@
 .p-garage-line { stroke: #d7dde0; stroke-width: .28; } .p-garage-tick { stroke: #7d8b93; stroke-width: .06; } .p-opening-line { stroke: #f3ba55; stroke-width: .12; stroke-dasharray: .25 .2; }
 .p-arch-mark { fill: none; stroke: #f3ba55; stroke-width: .06; } .p-balcony { fill: rgba(174, 188, 193, .55); stroke: #8895a0; stroke-width: .05; }
 .check-row { display: flex; align-items: center; gap: .45rem; margin: .35rem 0; font-size: .78rem; } .mast-part { border-top: 1px solid rgba(120, 180, 190, .25); padding-top: .4rem; }
+
+.p-gutter { fill: #8d9aa1; stroke: #cfd9de; stroke-width: 1; } .p-gutter-line { stroke: #4b585f; stroke-width: 1; fill: none; } .p-downpipe { fill: #8d9aa1; stroke: #cfd9de; stroke-width: 1; } .p-downpipe-hole { fill: #263238; }

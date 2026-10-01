@@ -41,8 +41,8 @@ type Props = {
 type Snapshot = { model: SiteModel; dimensions: Dimensions };
 const GRID_M = 0.25, HISTORY_LIMIT = 100, COALESCE_MS = 900;
 const FEATURE_TOOLS: ReadonlySet<Tool> = new Set(["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace"]);
-const ROOF_ITEM_OF: Partial<Record<Tool, RoofItemKind>> = { chimney: "chimney", "roof-solar": "solar", antenna: "antenna" };
-const REPEATING: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp", "chimney", "roof-solar", "antenna", "pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road"]);
+const ROOF_ITEM_OF: Partial<Record<Tool, RoofItemKind>> = { chimney: "chimney", "roof-solar": "solar", antenna: "antenna", gutter: "gutter", downpipe: "downpipe" };
+const REPEATING: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp", "chimney", "roof-solar", "antenna", "gutter", "downpipe", "pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road"]);
 const NUDGE = 0.25;
 
 export function SiteDesignerInteractive(props: Props) {
@@ -371,7 +371,8 @@ export function SiteDesignerInteractive(props: Props) {
 
   const actions = { undo, redo, canUndo: past.current.length > 0, canRedo: future.current.length > 0, turn, canTurn: (axis: TurnAxis) => canTurnAbout(selection, axis), remove: removeCurrent, canRemove: selection.kind !== "none" && selection.kind !== "camera" && !(selection.kind === "terrain" && selection.vertex === undefined) };
   const shared = actionSections(t, actions);
-  const planSections = arrangeToolbox(toolSections(t, "2d", tool, setTool), shared);
+  const planTools = toolSections(t, "2d", tool, setTool);
+  const planSections = arrangeToolbox(planTools, shared);
 
   const dimensionsBar = <div className="designer-status">
     <span title={t("workArea")}>{dimensions.width} × {dimensions.depth} m</span>
@@ -401,6 +402,7 @@ export function SiteDesignerInteractive(props: Props) {
                 onSelect={select} onDragStart={beginGesture} onDrag={dragPlan} onPlace={place} onFinishPolygon={finishPolygon} onFinishRect={finishRect} onPlaceLine={placeFence}
                 onInsertVertex={insertVertex} onFloor={setActiveFloor} onNotice={props.setNotice} />
               <FloatingToolbox storageKey="armor-studio-toolbox-2d-v1" title={t("toolboxTitle2d")} sections={planSections} containerRef={canvas} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 32, y: 32 }} />
+              {planTools.branches.map((branch, index) => <FloatingToolbox key={branch.id} storageKey={`armor-studio-toolbox-2d-${branch.id}-v1`} title={branch.title} sections={branch.sections} containerRef={canvas} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 100 + index * 68, y: 32 }} />)}
             </>
           : <Suspense fallback={<div className="viewport-loading">{t("loading")}</div>}>
               <Viewport3D t={t} devices={props.devices} dimensions={dimensions} model={model} selection={selection} tool={tool} onTool={setTool} activeFloor={floorsChosen} floorCount={floorCount} onFloor={setActiveFloor}

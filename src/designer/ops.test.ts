@@ -118,6 +118,15 @@ describe("openings, lamps and roof items", () => {
     expect(addOpening(model, "building-01", 0, 5, "door")).toBeNull();
     expect(addOpening(model, "building-02", 0, 0, "door", 1)!.model.openings.filter(item => item.buildingId === "building-02")).toHaveLength(2);
   });
+  it("puts a gutter along the nearest edge of the roof and a downpipe down from it", () => {
+    const model = sample(), b = house(model);
+    const gutter = addRoofItem(model, "building-01", "gutter", 20, 12.5)!;
+    const placed = gutter.model.roofItems.find(item => item.id === gutter.id)!;
+    expect(pointInPolygon({ x: placed.x, y: placed.y }, b.points)).toBe(true);
+    expect(Math.min(placed.rotation % 180, 180 - (placed.rotation % 180)) % 90).toBeCloseTo(0, 0);   // along a wall of the house, which are at right angles
+    const pipe = addRoofItem(model, "building-01", "downpipe", 20, 12.5)!.model.roofItems.find(item => item.kind === "downpipe")!;
+    expect(pipe.height).toBeCloseTo(totalHeight(b.floors), 1);
+  });
   it("mounts a lamp on a wall", () => {
     const added = addWallLamp(sample(), "building-01", 2, 3)!;
     expect(added.model.wallLamps.find(item => item.id === added.id)).toMatchObject({ edge: 2, offset: 3, reach: 0.4 });

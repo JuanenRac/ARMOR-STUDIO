@@ -45,7 +45,7 @@ const SELECT = "#00e5ff";
 /** Light cones and rings are only drawn: they never take a click meant for what is behind them. */
 const NO_PICK = () => null;
 const site = (x: number, y: number, z = 0): [number, number, number] => [x, z, -y];
-const ROOF_TOOLS: ReadonlySet<Tool> = new Set(["chimney", "roof-solar", "antenna"]);
+const ROOF_TOOLS: ReadonlySet<Tool> = new Set(["chimney", "roof-solar", "antenna", "gutter", "downpipe"]);
 const WALL_TOOLS: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp"]);
 /** Every tool that puts something where you click in the 3D view: all of them except selecting, moving, lifting and drawing outlines. */
 const PLACING: ReadonlySet<Tool> = new Set(TOOL_GROUPS.flat().filter(spec => spec.views.includes("3d") && !["select", "move", "elevate"].includes(spec.tool)).map(spec => spec.tool));
@@ -207,6 +207,19 @@ function RoofItemView({ item, building, selected, hover, hooks }: { item: SiteMo
       {[0.55, 0.75, 0.92].map(f => <mesh key={f} position={[0, h * f, 0]} rotation={[0, yaw, 0]}><boxGeometry args={[0.7 * (1.1 - f * 0.5), 0.02, 0.02]} /><meshStandardMaterial color="#c3d0d4" metalness={0.6} roughness={0.35} /></mesh>)}
       <mesh position={[0, h + 0.05, 0]}><sphereGeometry args={[0.05, 10, 10]} /><meshStandardMaterial color="#ff4040" emissive="#ff4040" emissiveIntensity={1.2} /></mesh>
     </group>}
+    {item.kind === "gutter" && <group rotation={[0, yaw, 0]}>
+      {/* an open channel: the bottom and the two sides, along its length (w) */}
+      <mesh position={[0, 0.02, 0]} castShadow><boxGeometry args={[w, 0.03, d]} /><meshStandardMaterial color={item.color ?? "#8d9aa1"} metalness={0.5} roughness={0.4} {...glow} /></mesh>
+      {[-1, 1].map(side => <mesh key={side} position={[0, 0.02 + h / 2, side * (d / 2 - 0.015)]} castShadow><boxGeometry args={[w, h, 0.03]} /><meshStandardMaterial color={item.color ?? "#8d9aa1"} metalness={0.5} roughness={0.4} {...glow} /></mesh>)}
+    </group>}
+    {item.kind === "downpipe" && (() => {
+      // a vertical tube from the roof's edge down to the ground (never below the building's foot), with a small elbow at the top
+      const length = Math.max(0.2, Math.min(h, z - building.base)), radius = Math.max(0.03, w / 2);
+      return <group rotation={[0, yaw, 0]}>
+        <mesh position={[0, -length / 2, 0]} castShadow><cylinderGeometry args={[radius, radius, length, 12]} /><meshStandardMaterial color={item.color ?? "#8d9aa1"} metalness={0.5} roughness={0.4} {...glow} /></mesh>
+        <mesh position={[0, 0.02, 0]} castShadow><sphereGeometry args={[radius * 1.25, 10, 10]} /><meshStandardMaterial color={item.color ?? "#8d9aa1"} metalness={0.5} roughness={0.4} /></mesh>
+      </group>;
+    })()}
     {item.kind === "vent" && <mesh position={[0, h / 2, 0]} castShadow rotation={[0, yaw, 0]}><boxGeometry args={[w, h, d]} /><meshStandardMaterial color={item.color ?? "#7d8b93"} roughness={0.6} {...glow} /></mesh>}
   </group>;
 }
@@ -542,7 +555,8 @@ export default function Viewport3D(props: ViewportProps) {
       item("layers", ICON.layers, t("layers"), t("layersHelp"), () => setLayersOpen(value => !value), { active: layersOpen }),
     ],
   ];
-  const sections = arrangeToolbox(toolSections(t, "3d", tool, props.onTool), props.sharedSections, viewControls);
+  const tools3d = toolSections(t, "3d", tool, props.onTool);
+  const sections = arrangeToolbox(tools3d, props.sharedSections, viewControls);
   const floors = Array.from({ length: props.floorCount }, (_, index) => index);
   const start = useMemo(() => {
     const all = [...props.model.terrain.points, ...props.model.buildings.flatMap(building => building.points)], box = all.length ? bounds(all) : { minX: 0, minY: 0, maxX: 60, maxY: 40 };
@@ -556,6 +570,7 @@ export default function Viewport3D(props: ViewportProps) {
       <Scene {...props} shadows={shadows} xray={xray} turntable={turntable} layers={layers} request={request} compass={compass} />
     </Canvas>
     <FloatingToolbox storageKey="armor-studio-toolbox-3d-v1" title={t("toolboxTitle3d")} sections={sections} containerRef={host} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 12, y: 12 }} />
+    {tools3d.branches.map((branch, index) => <FloatingToolbox key={branch.id} storageKey={`armor-studio-toolbox-3d-${branch.id}-v1`} title={branch.title} sections={branch.sections} containerRef={host} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 80 + index * 68, y: 12 }} />)}
     {layersOpen && <div className="v3d-layers" role="group" aria-label={t("layers")}>
       <strong>{t("layers")}</strong>
       {LAYER_KEYS.map(key => <label key={key}><input type="checkbox" checked={layers[key]} onChange={event => setLayers(current => ({ ...current, [key]: event.target.checked }))} /> {t(`layer_${key}`)}</label>)}
