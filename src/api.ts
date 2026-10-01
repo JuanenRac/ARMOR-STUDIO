@@ -9,13 +9,19 @@ export type MediaItem = { id: string; cameraId: string; kind: "snapshot" | "reco
 const endpoint = (origin: string, suffix: string) => origin.replace(/\/$/, "") + suffix;
 const localSession = { credentials: "include" as const };
 /**
+ * Every call of the console to the server gives up after a while. A browser keeps only a few connections open to one address, and a call that is never
+ * answered would wait for ever behind them - the buttons would seem dead until the page is reloaded.
+ */
+const CALL_TIMEOUT_MS = 30_000;
+const timedFetch = (url: string, init: RequestInit = {}): Promise<Response> => fetch(url, { ...init, signal: init.signal ?? AbortSignal.timeout(CALL_TIMEOUT_MS) });
+/**
  * Whether the Studio session is still valid. Only the server saying so ends it: a slow answer, a rate limit or a network
  * hiccup is "unknown" and must never throw the operator back to the sign-in page.
  */
 export type SessionState = "active" | "ended" | "unknown";
 export async function studioSessionState(origin: string): Promise<SessionState> {
   try {
-    const response = await fetch(endpoint(origin, "/api/v1/studio/session"), { headers: { Accept: "application/json" }, ...localSession });
+    const response = await timedFetch(endpoint(origin, "/api/v1/studio/session"), { headers: { Accept: "application/json" }, ...localSession });
     if (response.status === 401) return "ended";
     if (!response.ok) return "unknown";
     return (await response.json() as { authenticated?: boolean }).authenticated ? "active" : "ended";
@@ -23,25 +29,25 @@ export async function studioSessionState(origin: string): Promise<SessionState> 
 }
 export async function studioSessionActive(origin: string): Promise<boolean> { return (await studioSessionState(origin)) === "active"; }
 export async function openStudioSession(origin: string, username: string, password: string): Promise<void> {
-  const response = await fetch(endpoint(origin, "/api/v1/studio/session"), {
+  const response = await timedFetch(endpoint(origin, "/api/v1/studio/session"), {
     method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession,
     body: JSON.stringify({ username, password }),
   });
   if (!response.ok) throw new Error(`Studio login returned ${response.status}`);
 }
 export async function openOperatorSession(origin: string, token: string): Promise<string> {
-  const response = await fetch(endpoint(origin, "/api/v1/operator/session"), { method: "POST", headers: { Accept: "application/json", Authorization: `Bearer ${token}` }, ...localSession });
+  const response = await timedFetch(endpoint(origin, "/api/v1/operator/session"), { method: "POST", headers: { Accept: "application/json", Authorization: `Bearer ${token}` }, ...localSession });
   if (!response.ok) throw new Error(`Operator session returned ${response.status}`);
   const body = await response.json() as { expiresAt?: string };
   return body.expiresAt ?? "";
 }
 export async function readStatus(origin: string): Promise<SystemState> {
-  const response = await fetch(`${origin.replace(/\/$/, "")}/api/v1/status`, { headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(`${origin.replace(/\/$/, "")}/api/v1/status`, { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`Server returned ${response.status}`);
   return response.json() as Promise<SystemState>;
 }
 export async function discoverCameras(origin: string): Promise<DiscoveredCamera[]> {
-  const response = await fetch(`${origin.replace(/\/$/, "")}/api/v1/cameras/discover`, {
+  const response = await timedFetch(`${origin.replace(/\/$/, "")}/api/v1/cameras/discover`, {
     method: "POST", headers: { Accept: "application/json" }, ...localSession,
   });
   if (!response.ok) throw new Error(`Camera discovery returned ${response.status}`);
@@ -49,37 +55,37 @@ export async function discoverCameras(origin: string): Promise<DiscoveredCamera[
   return Array.isArray(body.cameras) ? body.cameras : [];
 }
 export async function listConfiguredCameras(origin: string): Promise<PublicCameraConnection[]> {
-  const response = await fetch(origin.replace(/\/$/, "") + "/api/v1/cameras", { headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(origin.replace(/\/$/, "") + "/api/v1/cameras", { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error("Camera list returned " + response.status);
   const body = await response.json() as { cameras?: PublicCameraConnection[] };
   return Array.isArray(body.cameras) ? body.cameras : [];
 }
 export async function listCameraViews(origin: string): Promise<CameraView[]> {
-  const response = await fetch(origin.replace(/\/$/, "") + "/api/v1/camera-views", { headers: { Accept: "application/json" } });
+  const response = await timedFetch(origin.replace(/\/$/, "") + "/api/v1/camera-views", { headers: { Accept: "application/json" } });
   if (!response.ok) throw new Error("Camera view list returned " + response.status);
   const body = await response.json() as { cameras?: CameraView[] };
   return Array.isArray(body.cameras) ? body.cameras : [];
 }
 export async function configureCamera(origin: string, camera: CameraConnection): Promise<PublicCameraConnection> {
-  const response = await fetch(origin.replace(/\/$/, "") + "/api/v1/cameras/configure", {
+  const response = await timedFetch(origin.replace(/\/$/, "") + "/api/v1/cameras/configure", {
     method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify(camera),
   });
   if (!response.ok) throw new Error("Camera configuration returned " + response.status);
   return response.json() as Promise<PublicCameraConnection>;
 }
 export async function deleteCamera(origin: string, id: string): Promise<void> {
-  const response = await fetch(endpoint(origin, "/api/v1/cameras/" + encodeURIComponent(id)), { method: "DELETE", ...localSession });
+  const response = await timedFetch(endpoint(origin, "/api/v1/cameras/" + encodeURIComponent(id)), { method: "DELETE", ...localSession });
   if (!response.ok) throw new Error("Camera delete returned " + response.status);
 }
 export async function discoverCameraStreams(origin: string, id: string): Promise<{ paths: string[]; camera: PublicCameraConnection }> {
-  const response = await fetch(origin.replace(/\/$/, "") + "/api/v1/cameras/" + encodeURIComponent(id) + "/discover-rtsp", {
+  const response = await timedFetch(origin.replace(/\/$/, "") + "/api/v1/cameras/" + encodeURIComponent(id) + "/discover-rtsp", {
     method: "POST", headers: { Accept: "application/json" }, ...localSession,
   });
   if (!response.ok) throw new Error("RTSP discovery returned " + response.status);
   return response.json() as Promise<{ paths: string[]; camera: PublicCameraConnection }>;
 }
 export async function createCameraStreamUrl(origin: string, id: string): Promise<string> {
-  const response = await fetch(endpoint(origin, `/api/v1/cameras/${encodeURIComponent(id)}/stream-ticket`), {
+  const response = await timedFetch(endpoint(origin, `/api/v1/cameras/${encodeURIComponent(id)}/stream-ticket`), {
     method: "POST", headers: { Accept: "application/json" }, ...localSession,
   });
   if (!response.ok) throw new Error(`Camera stream ticket returned ${response.status}`);
@@ -88,7 +94,7 @@ export async function createCameraStreamUrl(origin: string, id: string): Promise
   return endpoint(origin, body.path);
 }
 export async function sendPtz(origin: string, id: string, command: string): Promise<void> {
-  const response = await fetch(origin.replace(/\/$/, "") + "/api/v1/cameras/" + encodeURIComponent(id) + "/ptz", {
+  const response = await timedFetch(origin.replace(/\/$/, "") + "/api/v1/cameras/" + encodeURIComponent(id) + "/ptz", {
     method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ command }),
   });
   if (!response.ok) {
@@ -98,32 +104,32 @@ export async function sendPtz(origin: string, id: string, command: string): Prom
   }
 }
 export async function captureSnapshot(origin: string, id: string): Promise<MediaItem> {
-  const response = await fetch(endpoint(origin, "/api/v1/cameras/" + encodeURIComponent(id) + "/snapshot"), { method: "POST", headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(endpoint(origin, "/api/v1/cameras/" + encodeURIComponent(id) + "/snapshot"), { method: "POST", headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error("Snapshot returned " + response.status);
   return (await response.json() as { item: MediaItem }).item;
 }
 export async function startCameraRecording(origin: string, id: string): Promise<void> {
-  const response = await fetch(endpoint(origin, "/api/v1/cameras/" + encodeURIComponent(id) + "/recordings/start"), { method: "POST", headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(endpoint(origin, "/api/v1/cameras/" + encodeURIComponent(id) + "/recordings/start"), { method: "POST", headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error("Recording start returned " + response.status);
 }
 export async function stopCameraRecording(origin: string, id: string): Promise<MediaItem> {
-  const response = await fetch(endpoint(origin, "/api/v1/cameras/" + encodeURIComponent(id) + "/recordings/stop"), { method: "POST", headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(endpoint(origin, "/api/v1/cameras/" + encodeURIComponent(id) + "/recordings/stop"), { method: "POST", headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error("Recording stop returned " + response.status);
   return (await response.json() as { item: MediaItem }).item;
 }
 export async function listMedia(origin: string): Promise<{ items: MediaItem[]; activeCameraIds: string[] }> {
-  const response = await fetch(endpoint(origin, "/api/v1/media"), { headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(endpoint(origin, "/api/v1/media"), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error("Media list returned " + response.status);
   const body = await response.json() as { items?: MediaItem[]; activeCameraIds?: string[] };
   return { items: Array.isArray(body.items) ? body.items : [], activeCameraIds: Array.isArray(body.activeCameraIds) ? body.activeCameraIds : [] };
 }
 export async function deleteMedia(origin: string, item: MediaItem): Promise<void> {
   const kind = item.kind === "snapshot" ? "snapshots" : "recordings";
-  const response = await fetch(endpoint(origin, `/api/v1/media/${encodeURIComponent(item.cameraId)}/${kind}/${encodeURIComponent(item.file)}`), { method: "DELETE", ...localSession });
+  const response = await timedFetch(endpoint(origin, `/api/v1/media/${encodeURIComponent(item.cameraId)}/${kind}/${encodeURIComponent(item.file)}`), { method: "DELETE", ...localSession });
   if (!response.ok) throw new Error("Media delete returned " + response.status);
 }
 export async function deleteAllMedia(origin: string, kind: "snapshot" | "recording" | "all"): Promise<number> {
-  const response = await fetch(endpoint(origin, "/api/v1/media"), { method: "DELETE", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ kind }) });
+  const response = await timedFetch(endpoint(origin, "/api/v1/media"), { method: "DELETE", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ kind }) });
   if (!response.ok) throw new Error("Media delete returned " + response.status);
   return (await response.json() as { deleted: number }).deleted;
 }
@@ -167,18 +173,18 @@ export async function listHistory(origin: string, options: HistoryQuery = {}): P
   if (options.until) query.set("until", options.until);
   if (options.level) query.set("level", options.level);
   if (options.order) query.set("order", options.order);
-  const response = await fetch(endpoint(origin, `/api/v1/history?${query}`), { headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(endpoint(origin, `/api/v1/history?${query}`), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`History returned ${response.status}`);
   const body = await response.json() as { events?: ArmorEvent[]; next_before?: number | null };
   return { events: Array.isArray(body.events) ? body.events : [], next_before: body.next_before ?? null };
 }
 export async function readRules(origin: string): Promise<Rules> {
-  const response = await fetch(endpoint(origin, "/api/v1/rules"), { headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(endpoint(origin, "/api/v1/rules"), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`Rules returned ${response.status}`);
   return response.json() as Promise<Rules>;
 }
 export async function saveRules(origin: string, rules: Rules): Promise<Rules> {
-  const response = await fetch(endpoint(origin, "/api/v1/rules"), {
+  const response = await timedFetch(endpoint(origin, "/api/v1/rules"), {
     method: "PUT", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify(rules),
   });
   if (!response.ok) throw new Error(`Rules save returned ${response.status}`);
@@ -186,13 +192,13 @@ export async function saveRules(origin: string, rules: Rules): Promise<Rules> {
 }
 export type CameraHealth = { id: string; status: Reachability; since_ms: number | null; last_checked_ms: number | null; consecutive_failures: number };
 export async function listCameraStatus(origin: string): Promise<CameraHealth[]> {
-  const response = await fetch(endpoint(origin, "/api/v1/camera-status"), { headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(endpoint(origin, "/api/v1/camera-status"), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`Camera status returned ${response.status}`);
   const body = await response.json() as { cameras?: CameraHealth[] };
   return Array.isArray(body.cameras) ? body.cameras : [];
 }
 export async function forgetNode(origin: string, id: string): Promise<void> {
-  const response = await fetch(endpoint(origin, `/api/v1/nodes/${encodeURIComponent(id)}`), { method: "DELETE", ...localSession });
+  const response = await timedFetch(endpoint(origin, `/api/v1/nodes/${encodeURIComponent(id)}`), { method: "DELETE", ...localSession });
   if (!response.ok && response.status !== 404) throw new Error(`Forget node returned ${response.status}`);
 }
 export type HistorySummary = {
@@ -201,7 +207,7 @@ export type HistorySummary = {
   last_24h: { events: number; high_alerts: number; node_incidents: number; camera_incidents: number };
 };
 export async function readHistorySummary(origin: string): Promise<HistorySummary> {
-  const response = await fetch(endpoint(origin, "/api/v1/history/summary"), { headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(endpoint(origin, "/api/v1/history/summary"), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`History summary returned ${response.status}`);
   return response.json() as Promise<HistorySummary>;
 }
@@ -210,18 +216,18 @@ export async function deleteHistory(origin: string, scope: { kind: "all" } | { k
   const query = new URLSearchParams({ confirm: "delete", scope: scope.kind });
   if (scope.kind === "older-than") query.set("days", String(scope.days));
   if (type) query.set("type", type);
-  const response = await fetch(endpoint(origin, `/api/v1/history?${query}`), { method: "DELETE", headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(endpoint(origin, `/api/v1/history?${query}`), { method: "DELETE", headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`History delete returned ${response.status}`);
   return response.json() as Promise<{ deleted: number; remaining: number }>;
 }
 export type ServerInfo = { service: string; version: string; uptime_s: number; mode?: "armed" | "disarmed"; live_video?: boolean; mqtt?: boolean };
 export async function readInfo(origin: string): Promise<ServerInfo> {
-  const response = await fetch(endpoint(origin, "/api/v1/info"), { headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(endpoint(origin, "/api/v1/info"), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`Info returned ${response.status}`);
   return response.json() as Promise<ServerInfo>;
 }
 export async function closeStudioSession(origin: string): Promise<void> {
-  await fetch(endpoint(origin, "/api/v1/studio/session"), { method: "DELETE", ...localSession }).catch(() => undefined);
+  await timedFetch(endpoint(origin, "/api/v1/studio/session"), { method: "DELETE", ...localSession }).catch(() => undefined);
 }
 
 // ---- Studio users -------------------------------------------------------------------------------------------------------------
@@ -234,7 +240,7 @@ export class ApiError extends Error {
   constructor(readonly status: number, readonly code: string) { super(`${status} ${code}`); }
 }
 async function userCall<T>(origin: string, method: string, route: string, body?: unknown): Promise<T> {
-  const response = await fetch(endpoint(origin, route), {
+  const response = await timedFetch(endpoint(origin, route), {
     method, headers: { Accept: "application/json", ...(body === undefined ? {} : { "Content-Type": "application/json" }) }, ...localSession,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
@@ -247,7 +253,7 @@ async function userCall<T>(origin: string, method: string, route: string, body?:
 export type SessionUserState = { state: "user"; user: StudioUser } | { state: "anonymous" } | { state: "unknown"; reason: string };
 export async function sessionUserState(origin: string): Promise<SessionUserState> {
   try {
-    const response = await fetch(endpoint(origin, "/api/v1/studio/session"), { headers: { Accept: "application/json" }, ...localSession });
+    const response = await timedFetch(endpoint(origin, "/api/v1/studio/session"), { headers: { Accept: "application/json" }, ...localSession });
     if (response.status === 401) return { state: "anonymous" };
     if (!response.ok) return { state: "unknown", reason: `the server answered ${response.status}` };
     const body = await response.json() as { authenticated?: boolean; user?: StudioUser };
@@ -266,7 +272,7 @@ export const changeAccount = (origin: string, change: { currentPassword: string;
 
 /** Arm or disarm the system (an operator, from Studio). Answers with the new state of the perimeter. */
 export async function setSystemMode(origin: string, mode: "armed" | "disarmed"): Promise<SystemState> {
-  const response = await fetch(endpoint(origin, "/api/v1/mode"), { method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ mode }) });
+  const response = await timedFetch(endpoint(origin, "/api/v1/mode"), { method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ mode }) });
   if (!response.ok) throw new ApiError(response.status, response.status === 401 ? "session_ended" : response.status === 403 ? "forbidden" : "generic");
   return response.json() as Promise<SystemState>;
 }
@@ -326,7 +332,7 @@ export const readAudit = (origin: string, limit = 100) => userCall<{ entries: Au
 export const readSite = (origin: string) => userCall<SiteDocument>(origin, "GET", "/api/v1/site");
 /** Save the design. A 409 (someone saved first) comes back as an ApiError whose `current` holds their version. */
 export async function saveSite(origin: string, revision: number, site: Record<string, unknown>): Promise<{ revision: number } | { conflict: SiteDocument }> {
-  const response = await fetch(endpoint(origin, "/api/v1/site"), { method: "PUT", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ revision, site }) });
+  const response = await timedFetch(endpoint(origin, "/api/v1/site"), { method: "PUT", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ revision, site }) });
   if (response.status === 409) return { conflict: (await response.json() as { current: SiteDocument }).current };
   if (!response.ok) throw new ApiError(response.status, "site_save_failed");
   return { revision: (await response.json() as { revision: number }).revision };
@@ -347,7 +353,7 @@ export type ElectricalDocument = { revision: number; updated_at: string | null; 
 export const readElectrical = (origin: string) => userCall<ElectricalDocument>(origin, "GET", "/api/v1/electrical/design");
 /** Save the electrical drawing. A 409 (someone saved first) comes back as `conflict` with their version. */
 export async function saveElectrical(origin: string, revision: number, electrical: Record<string, unknown>): Promise<{ revision: number } | { conflict: ElectricalDocument }> {
-  const response = await fetch(endpoint(origin, "/api/v1/electrical/design"), { method: "PUT", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ revision, electrical }) });
+  const response = await timedFetch(endpoint(origin, "/api/v1/electrical/design"), { method: "PUT", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ revision, electrical }) });
   if (response.status === 409) return { conflict: (await response.json() as { current: ElectricalDocument }).current };
   if (!response.ok) throw new ApiError(response.status, "electrical_save_failed");
   return { revision: (await response.json() as { revision: number }).revision };
@@ -366,7 +372,7 @@ export type ElectricalSwitchReading = {
 export type ElectricalNodeReading = { node_id: string; reading: { kind: "electrical"; node_id: string; timestamp_ms: number; switching_enabled?: boolean; channels: ElectricalChannelReading[]; switches?: ElectricalSwitchReading[] }; received_at: string; stale: boolean };
 export type ElectricalReadings = { nodes: ElectricalNodeReading[]; totals: { nodes: number; channels: number; stale: number; grid_w: number | null; grid_kwh: number | null; alarms: number } };
 export async function listElectricalReadings(origin: string): Promise<ElectricalReadings> {
-  const response = await fetch(endpoint(origin, "/api/v1/electrical/readings"), { headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(endpoint(origin, "/api/v1/electrical/readings"), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`Electrical readings returned ${response.status}`);
   return response.json() as Promise<ElectricalReadings>;
 }
@@ -415,7 +421,7 @@ export const forgetDeviceLogin = (origin: string, id: string) => userCall<void>(
 export const readNetworkDesign = (origin: string) => userCall<NetworkDocument>(origin, "GET", "/api/v1/network/design");
 /** Save the network drawing. A 409 (someone saved first) comes back as `conflict` with their version. */
 export async function saveNetworkDesign(origin: string, revision: number, network: Record<string, unknown>): Promise<{ revision: number } | { conflict: NetworkDocument }> {
-  const response = await fetch(endpoint(origin, "/api/v1/network/design"), { method: "PUT", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ revision, network }) });
+  const response = await timedFetch(endpoint(origin, "/api/v1/network/design"), { method: "PUT", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ revision, network }) });
   if (response.status === 409) return { conflict: (await response.json() as { current: NetworkDocument }).current };
   if (!response.ok) throw new ApiError(response.status, "network_save_failed");
   return { revision: (await response.json() as { revision: number }).revision };
@@ -424,7 +430,7 @@ export async function saveNetworkDesign(origin: string, revision: number, networ
 // ---- solar (inverters and batteries read by the gateway nodes) ---------------------------------------------------------------------------
 export type SolarOverview = { devices: SolarDeviceView[]; waiting: SolarRegistration[]; totals: SolarTotals; catalog: SolarCatalog };
 export async function listSolar(origin: string): Promise<SolarOverview> {
-  const response = await fetch(endpoint(origin, "/api/v1/solar"), { headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(endpoint(origin, "/api/v1/solar"), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`Solar returned ${response.status}`);
   return response.json() as Promise<SolarOverview>;
 }
@@ -433,7 +439,7 @@ export const deleteSolarDevice = (origin: string, node: string, device: string) 
 export const solarExample = (origin: string, node: string, device: string) => userCall<{ accepted: boolean }>(origin, "POST", `/api/v1/solar/devices/${encodeURIComponent(node)}/${encodeURIComponent(device)}/example`);
 export async function solarHistory(origin: string, node: string, device: string, minutes: number): Promise<{ samples: SolarSample[] }> {
   const query = new URLSearchParams({ node, device, minutes: String(minutes) });
-  const response = await fetch(endpoint(origin, `/api/v1/solar/history?${query}`), { headers: { Accept: "application/json" }, ...localSession });
+  const response = await timedFetch(endpoint(origin, `/api/v1/solar/history?${query}`), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`Solar history returned ${response.status}`);
   return response.json() as Promise<{ samples: SolarSample[] }>;
 }

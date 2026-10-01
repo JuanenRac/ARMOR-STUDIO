@@ -86,6 +86,8 @@ export function formatDuration(seconds: number): string {
 export const formatAgo = (atMs: number, nowMs: number): string => formatDuration((nowMs - atMs) / 1000);
 
 export const formatTime = (atMs: number): string => new Date(atMs).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+/** A moment with its seconds, for the exact start and end of an outage. */
+export const formatDateTimeSeconds = (atMs: number): string => new Date(atMs).toLocaleString([], { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" });
 export const formatDateTime = (atMs: number): string => new Date(atMs).toLocaleString([], { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
 
 /** The colour class of the internet's state. */
