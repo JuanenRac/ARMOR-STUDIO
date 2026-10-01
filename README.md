@@ -61,7 +61,6 @@ flowchart LR
 * **Stored settings are untrusted input.** They are parsed value by value: an invalid origin, theme, language or shape is dropped, positions are clamped and lists are capped.
 * **No third-party requests.** Fonts are local stacks; the static host sends `Content-Security-Policy: default-src 'self'` limited to the configured server, `frame-ancestors 'none'`, `nosniff` and `no-referrer`.
 * Live video is shown only through a stream address the server issues to an operator.
-* **Optional TLS for this static host itself.** `TLS_CERT_PATH`/`TLS_KEY_PATH` (both, or neither) switch `tools/serve.mjs` from plain HTTP to HTTPS, the same convention as ARMOR-SERVER's own. Needed once Studio is reached over `https://`: a plain-HTTP static host answering a browser's HTTPS request fails the TLS handshake outright (Firefox's own `SSL_ERROR_RX_RECORD_TOO_LONG`, found for real trying exactly that) rather than serving anything.
 
 ## 📂 Repository Structure
 
@@ -101,6 +100,7 @@ $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # 
 * **[ARMOR-RADAR](https://github.com/JuanenRac/ARMOR-RADAR)** - Field-node firmware for ESP32-S3 with three radars and its own web panel
 * **[ARMOR-SOLAR](https://github.com/JuanenRac/ARMOR-SOLAR)** - Solar inverter and battery protocols and the messages of a gateway node
 * **[ARMOR-ELECTRICAL](https://github.com/JuanenRac/ARMOR-ELECTRICAL)** - Electrical node: meters, the message of the network's readings and the rules for switching
+* **[ARMOR-HMI](https://github.com/JuanenRac/ARMOR-HMI)** - Touch panel: the state of the system on a wall screen, arming and acknowledging, and the home of the voice assistant
 * **[ARMOR-NETWORK](https://github.com/JuanenRac/ARMOR-NETWORK)** - The local network: its devices, the internet and what changes
 * **[ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER)** - Central coordinator: telemetry, alarms, devices, solar readings and cameras
 * **ARMOR-STUDIO** (this repository) - Web console: cameras, radar, alarms, solar energy and the 2D/3D site designer

@@ -61,7 +61,6 @@ flowchart LR
 * **Les réglages stockés sont une entrée non fiable.** Ils sont lus valeur par valeur : une origine, un thème, une langue ou une forme invalides sont écartés, les positions sont bornées et les listes plafonnées.
 * **Aucune requête vers un tiers.** Les polices sont locales ; l'hôte statique envoie `Content-Security-Policy: default-src 'self'` limitée au serveur configuré, `frame-ancestors 'none'`, `nosniff` et `no-referrer`.
 * La vidéo en direct n'est montrée que par une adresse de flux que le serveur délivre à un opérateur.
-* **TLS optionnel pour cet hôte statique lui-même.** `TLS_CERT_PATH`/`TLS_KEY_PATH` (les deux, ou aucun) font passer `tools/serve.mjs` du HTTP en clair au HTTPS, la même convention que le propre ARMOR-SERVER. Nécessaire dès que Studio est atteint via `https://` : un hôte statique en HTTP en clair qui répond à une requête HTTPS d'un navigateur échoue net la poignée de main TLS (le `SSL_ERROR_RX_RECORD_TOO_LONG` propre à Firefox, rencontré réellement en essayant exactement cela) au lieu de servir quoi que ce soit.
 
 ## 📂 Structure du dépôt
 
@@ -101,6 +100,7 @@ $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # 
 * **[ARMOR-RADAR](https://github.com/JuanenRac/ARMOR-RADAR)** - Firmware du nœud de terrain pour ESP32-S3 avec trois radars et son propre panneau web
 * **[ARMOR-SOLAR](https://github.com/JuanenRac/ARMOR-SOLAR)** - Protocoles des onduleurs et batteries solaires et messages d'un nœud passerelle
 * **[ARMOR-ELECTRICAL](https://github.com/JuanenRac/ARMOR-ELECTRICAL)** - Nœud électrique : compteurs, le message des mesures du réseau et les règles de commutation
+* **[ARMOR-HMI](https://github.com/JuanenRac/ARMOR-HMI)** - Panneau tactile : l'état du système sur un écran mural, armer et acquitter, et la maison de l'assistant vocal
 * **[ARMOR-NETWORK](https://github.com/JuanenRac/ARMOR-NETWORK)** - Le réseau local : ses appareils, internet et ce qui change
 * **[ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER)** - Coordinateur central : télémétrie, alarmes, appareils, relevés solaires et caméras
 * **ARMOR-STUDIO** (ce dépôt) - Console web : caméras, radar, alarmes, énergie solaire et concepteur de site 2D/3D

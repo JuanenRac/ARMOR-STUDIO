@@ -61,7 +61,6 @@ flowchart LR
 * **保存された設定は信頼できない入力です。** 値ごとに読み取られ、無効なオリジン、テーマ、言語、形は捨てられ、位置は範囲内に収められ、リストは上限が設けられます。
 * **サードパーティへのリクエストはありません。** フォントはローカルのものです。静的ホストは、設定されたサーバーに限定した `Content-Security-Policy: default-src 'self'`、`frame-ancestors 'none'`、`nosniff`、`no-referrer` を送ります。
 * ライブ映像は、サーバーがオペレーターに発行するストリームアドレスを通じてのみ表示されます。
-* **この静的ホスト自体の任意のTLS。** `TLS_CERT_PATH`/`TLS_KEY_PATH`(両方、またはどちらも設定しない)は、`tools/serve.mjs` を平文HTTPからHTTPSに切り替えます。ARMOR-SERVER自体と同じ規約です。Studioが `https://` 経由でアクセスされるようになったら必要です。平文HTTPの静的ホストがブラウザーからのHTTPSリクエストに応答しようとすると、TLSハンドシェイク自体がそのまま失敗します(まさにこれを試して実際に見つかったFirefox自身の `SSL_ERROR_RX_RECORD_TOO_LONG`)。何かを配信する代わりに。
 
 ## 📂 リポジトリの構成
 
@@ -101,6 +100,7 @@ $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # 
 * **[ARMOR-RADAR](https://github.com/JuanenRac/ARMOR-RADAR)** - ESP32-S3 用フィールドノードのファームウェア。レーダー 3 基と独自の Web パネル付き
 * **[ARMOR-SOLAR](https://github.com/JuanenRac/ARMOR-SOLAR)** - 太陽光インバーターとバッテリーのプロトコル、およびゲートウェイノードのメッセージ
 * **[ARMOR-ELECTRICAL](https://github.com/JuanenRac/ARMOR-ELECTRICAL)** - 電気ノード：電力量計、電力網の計測メッセージ、開閉のルール
+* **[ARMOR-HMI](https://github.com/JuanenRac/ARMOR-HMI)** - タッチパネル：壁面ディスプレイでのシステム状態表示、警戒・確認操作、音声アシスタントの拠点
 * **[ARMOR-NETWORK](https://github.com/JuanenRac/ARMOR-NETWORK)** - ローカルネットワーク：機器、インターネット、そして変化
 * **[ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER)** - 中央コーディネーター：テレメトリ、アラーム、デバイス、太陽光の測定値、カメラ
 * **ARMOR-STUDIO** (このリポジトリ) - Web コンソール：カメラ、レーダー、アラーム、太陽光発電、2D/3D サイト設計
