@@ -16,7 +16,7 @@
   "maturity": "functional",
   "family": "Clients",
   "parent": "ARMOR-SERVER",
-  "native_version": "0.4.2",
+  "native_version": "0.4.3",
   "build": "npm run typecheck && npm test && npm run build",
   "notes": "Operational browser dashboard for the A.R.M.O.R. server API. Credentials are never persisted by Studio."
 }
