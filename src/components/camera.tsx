@@ -8,12 +8,10 @@ import { cameraIsConfigured, type Camera } from "../domain";
 
 export type Translate = (key: string) => string;
 
-export function CameraTile({ camera, selected, select, toggle, snapshot, record, expand, recording, streamUrl, reachability, invokePtz, t, choices, pick, bare }: {
+export function CameraTile({ camera, selected, select, toggle, snapshot, record, expand, recording, streamUrl, reachability, invokePtz, t, choices, pick }: {
   camera: Camera; selected: boolean; select: () => void; toggle: () => void; snapshot: () => void; record: () => void; expand: () => void;
   /** The cameras this place of the grid can show, and the way to change it. */
   choices?: readonly Camera[]; pick?: (id: string) => void;
-  /** On the full-screen wall: the picture and the name only, no buttons. */
-  bare?: boolean;
   recording: boolean; streamUrl?: string; reachability?: Reachability; invokePtz: (command: string) => Promise<void>; t: Translate;
 }) {
   const [ptzOpen, setPtzOpen] = useState(false);
@@ -21,7 +19,7 @@ export function CameraTile({ camera, selected, select, toggle, snapshot, record,
   const powered = camera.enabled && configured;
   // The server's watchdog knows whether the camera answers on the network; an enabled camera that does not is not "online".
   const unreachable = powered && reachability === "offline";
-  return <article className={`camera-tile ${selected ? "selected" : ""} ${bare ? "bare" : ""}`} onClick={select} onDoubleClick={expand}>
+  return <article className={`camera-tile ${selected ? "selected" : ""}`} onClick={select} onDoubleClick={expand}>
     <div className="camera-image">
       {powered && camera.liveVideoAvailable && streamUrl ? <img src={streamUrl} alt={`${t("cameraMonitor")}: ${camera.name}`} /> : powered && camera.snapshotUrl ? <img src={camera.snapshotUrl} alt={`${t("snapshot")}: ${camera.name}`} /> : <div className="camera-placeholder"><span>◉</span><p>{configured ? t("noStream") : t("selectCameraFirst")}</p></div>}
       <span className={`live-chip ${powered && !unreachable ? "online" : "offline"}`}>{unreachable ? t("unreachable") : powered ? t("online") : t("powerOff")}</span>

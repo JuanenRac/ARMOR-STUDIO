@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## [0.4.10] - The camera wall looks like the normal view, and the Site Designer's tool panel is in order
+
+- **Camera wall:** it now has the look of the normal view - the same tiles with their name, state and buttons, in the same order, pictures never cropped - and only the space between the cameras is gone. (The first version cropped the pictures and drew nothing but the name.)
+- **Site Designer, the floating tool panel (2D and 3D):** first what selects, moves and turns (select, move, elevate, and the turning buttons), then the other commands (undo, redo, delete, and the 3D view's own controls), then the objects grouped by what they are: the ground (terrain, paths, roads, pavement), a building and what is cut into it (walls, doors, windows, garage door, arch, chimney), roof and masts (panels on the roof, antenna, mast), light and energy (lamp, wall lamp, solar panel), the boundary and the ways in (fence, gate, entrance, pillar), the garden (tree, planter, fountain, pool, terrace, canopy, kennel, coop) and what ARMOR watches with (camera, sensor, device). Similar objects used to sit at opposite ends of the list.
+- **Tests:** 266 (the new order of the tool groups).
+
 ## [0.4.9] - A full-screen wall of cameras
 
 - **Cameras -> "Full-screen wall":** with a view of two or more cameras chosen, a button shows all of them on the whole screen, touching each other with no gap and cropped to fill their place, with only each camera's name drawn on it. Esc (or leaving full screen) goes back to the normal view. Where the browser refuses full screen the wall still covers the window and Esc still works. Texts in the seven languages.

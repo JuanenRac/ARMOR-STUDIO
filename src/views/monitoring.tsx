@@ -65,9 +65,9 @@ function useElementSize<T extends HTMLElement>() {
   return { ref: setElement, ...size };
 }
 
-/** Every camera of the chosen view on the whole screen, touching each other and cropped to fill it; Esc (or leaving full screen) goes back. */
+/** The chosen view on the whole screen, in the order and with the look of the normal view (the same tiles, with their name, state and buttons), but touching each other with no gap. Esc (or leaving full screen) goes back. */
 function CameraWall(props: CameraViewProps & { shown: readonly Camera[]; exit: () => void }) {
-  const { shown, exit, t } = props;
+  const { shown, exit, cameras, t } = props;
   const root = useRef<HTMLDivElement>(null);
   const [screen, setScreen] = useState({ width: window.innerWidth, height: window.innerHeight });
   useEffect(() => {
@@ -88,10 +88,12 @@ function CameraWall(props: CameraViewProps & { shown: readonly Camera[]; exit: (
     };
   }, [exit]);
   const columns = wallColumns(shown.length, screen.width, screen.height), rows = Math.max(1, Math.ceil(shown.length / columns));
-  return <div ref={root} className="camera-wall" role="dialog" aria-label={t("cam_wall")}>
+  const placed = resolveSlots(cameras.map(camera => camera.id), props.slots, props.gridSize);
+  return <div ref={root} className="camera-wall camera-frame" role="dialog" aria-label={t("cam_wall")}>
     <div className="camera-wall-grid" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
-      {shown.map(camera => <CameraTile key={camera.id} bare camera={camera} selected={false} select={() => undefined} toggle={() => undefined} snapshot={() => undefined} record={() => undefined} expand={exit}
-        recording={props.recordingIds.includes(camera.id)} streamUrl={props.streamUrls[camera.id]} reachability={props.reachability[camera.id]} invokePtz={() => Promise.resolve()} t={t} />)}
+      {shown.map(camera => <CameraTile key={camera.id} choices={cameras} pick={id => props.setSlot(placed.indexOf(camera.id), id)} camera={camera} selected={camera.id === props.selectedId} select={() => props.select(camera.id)}
+        toggle={() => props.toggle(camera)} snapshot={() => props.snapshot(camera)} record={() => props.record(camera)} expand={() => { exit(); props.expand(camera.id); }} recording={props.recordingIds.includes(camera.id)}
+        streamUrl={props.streamUrls[camera.id]} reachability={props.reachability[camera.id]} invokePtz={command => props.ptz(camera, command)} t={t} />)}
     </div>
     <p className="camera-wall-hint">{t("cam_wall_exit")}</p>
   </div>;

@@ -1,6 +1,7 @@
 /**
  * The tool panel content shared by the 2D plan and the 3D view: every tool in the same groups and order, with the ones the current
- * view cannot use greyed out (and saying where they work), then undo, redo, turn and delete. Each view adds its own view controls after these.
+ * view cannot use greyed out (and saying where they work). The panel is arranged by `arrangeToolbox`: select, move and turn first, then undo, redo, delete and the view's
+ * own controls, then the objects.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { ICON, toolIcon } from "./icons";
@@ -15,8 +16,9 @@ export type SharedActions = {
 };
 export const TURN_STEP = 15;
 
-export function toolSections(t: (key: string) => string, mode: ToolMode, tool: Tool, onTool: (tool: Tool) => void): ToolboxItem[][] {
-  return TOOL_GROUPS.map(group => group.map(spec => {
+/** The tools of the panel: `selection` is what picks and moves (the first group), `objects` are the things that can be placed, in groups of what belongs together. */
+export function toolSections(t: (key: string) => string, mode: ToolMode, tool: Tool, onTool: (tool: Tool) => void): { selection: ToolboxItem[][]; objects: ToolboxItem[][] } {
+  const groups = TOOL_GROUPS.map(group => group.map(spec => {
     const usable = spec.views.includes(mode), other = mode === "2d" ? "3d" : "2d";
     return {
       id: spec.tool, icon: toolIcon(spec.tool), label: t(spec.labelKey), keyHint: toolKeyOf(spec.tool), active: tool === spec.tool, disabled: !usable,
@@ -24,6 +26,16 @@ export function toolSections(t: (key: string) => string, mode: ToolMode, tool: T
       onClick: () => onTool(spec.tool),
     } satisfies ToolboxItem;
   }));
+  return { selection: groups.slice(0, 1), objects: groups.slice(1) };
+}
+
+/**
+ * The order of the panel, the same in both views: first what selects, moves and turns, then the other commands (undo, redo, delete, and the view's own),
+ * then the objects. `shared` is what `actionSections` makes: the editing commands, then the turning ones.
+ */
+export function arrangeToolbox(tools: { selection: ToolboxItem[][]; objects: ToolboxItem[][] }, shared: ToolboxItem[][], view: ToolboxItem[][] = []): ToolboxItem[][] {
+  const [editing, turning] = shared;
+  return [...tools.selection, ...(turning ? [turning] : []), ...(editing ? [editing] : []), ...view, ...tools.objects];
 }
 
 export function actionSections(t: (key: string) => string, actions: SharedActions): ToolboxItem[][] {

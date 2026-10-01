@@ -109,4 +109,17 @@ describe("one tool panel for both views", () => {
     expect(toolForKey("i", "2d")).toBe("tree");
     expect(toolForKey("3", "3d")).toBe("gate");
   });
+  it("puts what picks and moves first and the objects after, each group of things that belong together", () => {
+    const groups = TOOL_GROUPS.map(group => group.map(spec => spec.tool));
+    expect(groups[0]).toEqual(["select", "move", "elevate"]);
+    const groupOf = (tool: string) => groups.findIndex(group => group.includes(tool as never));
+    // similar objects sit in the same group, not one at each end of the list
+    expect(groupOf("lamp")).toBe(groupOf("wall-lamp")); expect(groupOf("lamp")).toBe(groupOf("solar"));
+    expect(groupOf("roof-solar")).toBe(groupOf("antenna")); expect(groupOf("antenna")).toBe(groupOf("mast"));
+    expect(groupOf("fence")).toBe(groupOf("gate")); expect(groupOf("door")).toBe(groupOf("garage")); expect(groupOf("door")).toBe(groupOf("window"));
+    expect(groupOf("tree")).toBe(groupOf("planter")); expect(groupOf("pool")).toBe(groupOf("terrace")); expect(groupOf("kennel")).toBe(groupOf("coop"));
+    expect(groupOf("path")).toBe(groupOf("road")); expect(groupOf("road")).toBe(groupOf("sidewalk"));
+    expect(groups.flat().length).toBe(36);   // no tool was lost or repeated
+    expect(new Set(groups.flat()).size).toBe(36);
+  });
 });

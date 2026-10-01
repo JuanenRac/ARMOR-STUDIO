@@ -18,7 +18,7 @@ import { bounds, edgeOf, floorBottom, nearestOnOutline, pointInPolygon, roofFram
 import { ICON } from "./icons";
 import { CAMERA_HEIGHT_M, cameraView, clamp, formatMetres, headingOf, radarView, SENSOR_HEIGHT_M, TOOL_GROUPS, toMetres, type Point, type Selection, type Tool } from "./model";
 import { FeatureBody, NEW_FEATURE_KINDS } from "./FeatureMeshes";
-import { toolSections } from "./toolItems";
+import { arrangeToolbox, toolSections } from "./toolItems";
 import type { PlaceHit } from "./Plan2D";
 import { roofSurfaceZ, type SiteModel } from "./ops";
 import { FloatingToolbox, type ToolboxItem } from "./Toolbox";
@@ -527,9 +527,7 @@ export default function Viewport3D(props: ViewportProps) {
   const ask = (name: ViewRequest["name"]) => setRequest(current => ({ name, n: current.n + 1 }));
   const nextElevation = () => { ask(ELEVATIONS[elevation.current % ELEVATIONS.length]); elevation.current += 1; };
   const item = (id: string, icon: React.ReactNode, label: string, help: string, onClick: () => void, extra: Partial<ToolboxItem> = {}): ToolboxItem => ({ id, icon, label, help, onClick, ...extra });
-  const sections: ToolboxItem[][] = [
-    ...toolSections(t, "3d", tool, props.onTool),
-    ...props.sharedSections,
+  const viewControls: ToolboxItem[][] = [
     [
       item("iso", ICON.iso, t("viewIso"), t("viewIsoHelp"), () => ask("iso")),
       item("top", ICON.top, t("viewTop"), t("viewTopHelp"), () => ask("top")),
@@ -544,6 +542,7 @@ export default function Viewport3D(props: ViewportProps) {
       item("layers", ICON.layers, t("layers"), t("layersHelp"), () => setLayersOpen(value => !value), { active: layersOpen }),
     ],
   ];
+  const sections = arrangeToolbox(toolSections(t, "3d", tool, props.onTool), props.sharedSections, viewControls);
   const floors = Array.from({ length: props.floorCount }, (_, index) => index);
   const start = useMemo(() => {
     const all = [...props.model.terrain.points, ...props.model.buildings.flatMap(building => building.points)], box = all.length ? bounds(all) : { minX: 0, minY: 0, maxX: 60, maxY: 40 };
