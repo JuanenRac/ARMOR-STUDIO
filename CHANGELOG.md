@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## [0.5.4] - The buttons keep answering, and every outage with its hours
+
+- **The console no longer seems to die after a while:** a camera picture that went away (a menu change) kept its stream open until the browser collected it, and after several changes those streams used every connection the browser allows to the server, so calls waited for ever and no button answered until the page was reloaded. A live picture now closes its stream when it goes away, and every call of the console gives up after 30 seconds instead of waiting for ever.
+- **Network:** the outages of the last 24 hours are listed under the state of the internet, each with its exact start, its end (with seconds) and how long it lasted; the "Outages, 24 h" figure opens the full list, which now also shows the end of each outage.
+
 ## [0.5.3] - The Weather menu
 
 - **Weather** (below Overview): the weather of a place you choose - by name, or by its coordinates - because guessing it from the internet address would put Yecla in Madrid. It shows the weather now, the rain of the next hour, the warnings the forecast implies, the next 24 hours, 48 hours of temperature, rain, clouds and wind, ten days, the air quality and pollen, and the sun and the moon, with a live radar of rain (last two hours, animated) and of clouds (Meteosat infrared) over a map. Data from Open-Meteo, RainViewer, EUMETSAT and Esri's map tiles; nothing is requested until a place is chosen, and only its coordinates leave. The static host and the nginx template allow just those origins. Texts in the seven languages.

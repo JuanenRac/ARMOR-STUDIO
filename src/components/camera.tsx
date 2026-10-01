@@ -4,6 +4,16 @@
  */
 import type { Reachability } from "../api";
 import { useEffect, useRef, useState } from "react";
+
+/**
+ * A live picture (a stream that never ends). When it goes away its connection is closed on purpose: a browser keeps a removed picture's stream open until it
+ * collects the garbage, and after some menu changes those streams used up every connection to the server, so no button answered any more.
+ */
+export function LiveImage({ src, alt }: { src: string; alt: string }) {
+  const image = useRef<HTMLImageElement>(null);
+  useEffect(() => { const element = image.current; return () => { if (element) element.removeAttribute("src"); }; }, [src]);
+  return <img ref={image} src={src} alt={alt} />;
+}
 import { cameraIsConfigured, type Camera } from "../domain";
 
 export type Translate = (key: string) => string;
@@ -21,7 +31,7 @@ export function CameraTile({ camera, selected, select, toggle, snapshot, record,
   const unreachable = powered && reachability === "offline";
   return <article className={`camera-tile ${selected ? "selected" : ""}`} onClick={select} onDoubleClick={expand}>
     <div className="camera-image">
-      {powered && camera.liveVideoAvailable && streamUrl ? <img src={streamUrl} alt={`${t("cameraMonitor")}: ${camera.name}`} /> : powered && camera.snapshotUrl ? <img src={camera.snapshotUrl} alt={`${t("snapshot")}: ${camera.name}`} /> : <div className="camera-placeholder"><span>◉</span><p>{configured ? t("noStream") : t("selectCameraFirst")}</p></div>}
+      {powered && camera.liveVideoAvailable && streamUrl ? <LiveImage src={streamUrl} alt={`${t("cameraMonitor")}: ${camera.name}`} /> : powered && camera.snapshotUrl ? <img src={camera.snapshotUrl} alt={`${t("snapshot")}: ${camera.name}`} /> : <div className="camera-placeholder"><span>◉</span><p>{configured ? t("noStream") : t("selectCameraFirst")}</p></div>}
       <span className={`live-chip ${powered && !unreachable ? "online" : "offline"}`}>{unreachable ? t("unreachable") : powered ? t("online") : t("powerOff")}</span>
       <div className="camera-overlay-actions" aria-label={`${t("cameraMonitor")}: ${camera.name}`}>
         <button className={powered ? "" : "power-off"} title={powered ? t("powerOff") : t("powerOn")} aria-label={powered ? t("powerOff") : t("powerOn")} disabled={!powered && !configured} onClick={event => { event.stopPropagation(); toggle(); }}>⏻</button>
@@ -121,7 +131,7 @@ export function CameraFullscreen({ camera, cameras, origin, recording, t, close,
     </header>
     <div className="camera-fullscreen-video">
       {cameras.length > 1 && <button className="camera-switch previous" title={t("previousCamera")} onClick={() => step(-1)}>‹</button>}
-      {live ? <img src={`${origin.replace(/\/$/, "")}/api/v1/cameras/${encodeURIComponent(camera.id)}/mjpeg`} alt={`${t("cameraMonitor")}: ${camera.name}`} /> : <div className="camera-placeholder"><span>◉</span><p>{t("noStream")}</p></div>}
+      {live ? <LiveImage src={`${origin.replace(/\/$/, "")}/api/v1/cameras/${encodeURIComponent(camera.id)}/mjpeg`} alt={`${t("cameraMonitor")}: ${camera.name}`} /> : <div className="camera-placeholder"><span>◉</span><p>{t("noStream")}</p></div>}
       {cameras.length > 1 && <button className="camera-switch next" title={t("nextCamera")} onClick={() => step(1)}>›</button>}
       <span className="camera-position">{index + 1} / {cameras.length}</span>
       {ptzOpen && <div className="ptz-overlay big"><CameraPtz enabled={camera.enabled && Boolean(camera.hasCredentials)} invoke={invokePtz} t={t} /></div>}

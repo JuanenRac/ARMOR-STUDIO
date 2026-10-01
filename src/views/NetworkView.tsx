@@ -12,7 +12,7 @@ import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
 import { MenuTitle } from "../menuLogos";
 import {
-  KIND_ICON, NETWORK_KINDS, RISKY_PORTS, deviceName, describeEvent, eventTone, filterDevices, formatAgo, formatBps, formatDateTime, formatDuration, formatTime, internetTone, isKnown,
+  KIND_ICON, NETWORK_KINDS, RISKY_PORTS, deviceName, describeEvent, eventTone, filterDevices, formatAgo, formatBps, formatDateTime, formatDateTimeSeconds, formatDuration, formatTime, internetTone, isKnown,
   kindOf, lastOf, linePath, type NetworkDevice, type NetworkNode, type NetworkOverview, type NetworkSample,
 } from "../networkModel";
 import { servicesOf, useNetworkOrders, type OrderState } from "../networkOrders";
@@ -157,6 +157,7 @@ export function NetworkView({ t, origin, isAdmin, overview, reload, now }: { t: 
   const selectedDevice = devices.find(device => device.id === selected);
   const events = data?.events ?? [];
   const internet = node?.internet;
+  const lastDay = (data?.outages ?? []).filter(outage => outage.ended_ms >= now - 86_400_000);
   const sweep = states.scan_now;
   const withPorts = useMemo(() => devices.filter(device => (device.ports?.length ?? 0) > 0), [devices]);
 
@@ -174,10 +175,14 @@ export function NetworkView({ t, origin, isAdmin, overview, reload, now }: { t: 
         </div>
         <div><small>{t("net_latency")}</small><strong>{internet.latency_ms !== undefined ? `${internet.latency_ms} ms` : "—"}</strong></div>
         <div><small>{t("net_loss")}</small><strong>{internet.loss_percent !== undefined ? `${internet.loss_percent} %` : "—"}</strong></div>
-        <div><small>{t("net_outages24")}</small><strong>{internet.outages_24h ?? 0}</strong></div>
+        <button type="button" className="net-stat-link" onClick={() => setTab("internet")} title={t("net_outages_open")}><small>{t("net_outages24")}</small><strong>{internet.outages_24h ?? 0}</strong></button>
         <div><small>{t("net_downtime24")}</small><strong>{formatDuration(internet.downtime_24h_s ?? 0)}</strong></div>
         <div><small>{t("net_devices")}</small><strong>{data!.totals.online}/{data!.totals.devices}</strong><em>{data!.totals.unknown} {t("net_not_known")}</em></div>
       </div>
+      {lastDay.length > 0 && <section className="net-outage-day" aria-label={t("net_outages_last24")}>
+        <h3>{t("net_outages_last24")}</h3>
+        <ul>{lastDay.map(outage => <li key={`${outage.started_ms}${outage.kind}`}><b>{formatDateTimeSeconds(outage.started_ms)}</b> → <b>{formatDateTimeSeconds(outage.ended_ms)}</b><span>{formatDuration(outage.duration_s)}</span><em>{t(`net_outage_${outage.kind}`)}</em></li>)}</ul>
+      </section>}
       <div className="net-toolbar">
         <p className="muted net-meta">{t("net_interface")}: <b>{node.interface.name}</b> · {node.interface.ip} · {t("net_network")} {node.interface.cidr} · {t("net_router")} {node.interface.gateway ?? "—"}
           {node.public ? <> · {t("no_public_ip")} <b>{node.public.ip}</b></> : null}
@@ -258,8 +263,8 @@ export function NetworkView({ t, origin, isAdmin, overview, reload, now }: { t: 
         <article className="stack-card wide">
           <h3>{t("net_outages")}</h3>
           {data!.outages.length === 0 ? <p className="muted">{t("net_no_outages")}</p> : <div className="net-table small" role="table">
-            <div className="net-row head" role="row"><span>{t("net_outage_when")}</span><span>{t("net_outage_len")}</span><span>{t("net_outage_kind")}</span></div>
-            {data!.outages.map(outage => <div className="net-row" role="row" key={`${outage.started_ms}${outage.kind}`}><span>{formatDateTime(outage.started_ms)}</span><span>{formatDuration(outage.duration_s)}</span><span>{t(`net_outage_${outage.kind}`)}</span></div>)}
+            <div className="net-row head" role="row"><span>{t("net_outage_when")}</span><span>{t("net_outage_end")}</span><span>{t("net_outage_len")}</span><span>{t("net_outage_kind")}</span></div>
+            {data!.outages.map(outage => <div className="net-row" role="row" key={`${outage.started_ms}${outage.kind}`}><span>{formatDateTimeSeconds(outage.started_ms)}</span><span>{formatDateTimeSeconds(outage.ended_ms)}</span><span>{formatDuration(outage.duration_s)}</span><span>{t(`net_outage_${outage.kind}`)}</span></div>)}
           </div>}
         </article>
       </div>}
