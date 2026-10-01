@@ -10,7 +10,7 @@ import type { StudioDevice } from "./api";
 import { Inspector } from "./designer/Inspector";
 import { ICON } from "./designer/icons";
 import { FloatingToolbox } from "./designer/Toolbox";
-import { actionSections, toolSections, TURN_STEP, type TurnAxis } from "./designer/toolItems";
+import { actionSections, arrangeToolbox, toolSections, TURN_STEP, type TurnAxis } from "./designer/toolItems";
 import { bounds, edgeOf, isSimplePolygon, nearestOnOutline, pointInPolygon, rectangle } from "./designer/geometry";
 import { clamp, round2, snapTo, toMetres, toolForKey, toolLabelKey, toolWorksIn, toPercent, type Point, type Selection, type Tool } from "./designer/model";
 import {
@@ -371,7 +371,7 @@ export function SiteDesignerInteractive(props: Props) {
 
   const actions = { undo, redo, canUndo: past.current.length > 0, canRedo: future.current.length > 0, turn, canTurn: (axis: TurnAxis) => canTurnAbout(selection, axis), remove: removeCurrent, canRemove: selection.kind !== "none" && selection.kind !== "camera" && !(selection.kind === "terrain" && selection.vertex === undefined) };
   const shared = actionSections(t, actions);
-  const planSections = [...toolSections(t, "2d", tool, setTool), ...shared];
+  const planSections = arrangeToolbox(toolSections(t, "2d", tool, setTool), shared);
 
   const dimensionsBar = <div className="designer-status">
     <span title={t("workArea")}>{dimensions.width} × {dimensions.depth} m</span>
