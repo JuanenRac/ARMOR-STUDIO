@@ -387,6 +387,14 @@ export type MachineMetrics = {
   uptime_s: number;
   history: Array<{ t: number; cpu: number | null; memory: number; swap: number; temperature: number | null; rx_bps: number; tx_bps: number }>;
 };
+/** The services of the system, running or not: the programs of the machine (from systemd) and the field nodes. */
+export type ServiceState = "running" | "stopped" | "failed" | "starting" | "not_installed" | "online" | "offline" | "unknown";
+export type ServiceInfo = {
+  id: string; name: string; family: string; description: string; kind: "systemd" | "field-node"; state: ServiceState; sub_state?: string; unit?: string; enabled?: boolean | null;
+  pid?: number | null; since_ms?: number | null; memory_bytes?: number | null; restarts?: number | null; port?: number | null;
+};
+export type ServicesOverview = { time_ms: number; systemd: boolean; services: ServiceInfo[] };
+export const readServices = (origin: string) => userCall<ServicesOverview>(origin, "GET", "/api/v1/system/services");
 export const readMetrics = (origin: string) => userCall<MachineMetrics>(origin, "GET", "/api/v1/system/metrics");
 /** Where the server listens and where Studio is served (see ARMOR-SERVER's connection.ts). */
 export type ConnectionSettings = { host?: string; port?: number; studio_port?: number };

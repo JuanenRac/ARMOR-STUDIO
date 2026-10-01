@@ -4,7 +4,7 @@
  */
 import type { SystemState } from "./types";
 
-export type View = "overview" | "alarms" | "cameras" | "radar" | "inverters" | "batteries" | "devices" | "automations" | "record" | "history" | "network" | "siteDesigner" | "electricalDesigner" | "networkDesigner" | "system" | "configuration";
+export type View = "overview" | "alarms" | "cameras" | "radar" | "inverters" | "batteries" | "devices" | "automations" | "record" | "history" | "network" | "services" | "siteDesigner" | "electricalDesigner" | "networkDesigner" | "system" | "configuration";
 export type GridSize = 1 | 2 | 4 | 6 | 8 | 9 | 12 | 16;
 export const GRID_SIZES: readonly GridSize[] = [1, 2, 4, 6, 8, 9, 12, 16];
 
@@ -94,7 +94,7 @@ export const NAV_GROUPS: ReadonlyArray<{ title: string; items: ReadonlyArray<rea
   { title: "navControl", items: [["devices", "◈"], ["automations", "⚡"]] },
   { title: "navEvidence", items: [["record", "▣"], ["history", "≡"]] },
   { title: "navDesign", items: [["siteDesigner", "⌗"], ["electricalDesigner", "⌁"], ["networkDesigner", "⌬"]] },
-  { title: "navAdmin", items: [["system", "▤"], ["configuration", "⚙"]] },
+  { title: "navAdmin", items: [["system", "▤"], ["services", "▦"], ["configuration", "⚙"]] },
 ];
 export const NAV: ReadonlyArray<readonly [View, string]> = NAV_GROUPS.flatMap(group => group.items);
 
