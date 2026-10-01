@@ -16,6 +16,33 @@ type Props = {
 
 const tabs: Tab[] = ["general", "users", "server"];
 
+/** Can the browser reach something at this address at all? (no-cors: only a network failure rejects, which is what a wrong scheme or port gives.) */
+async function reachable(url: string): Promise<boolean> {
+  const control = new AbortController(), timer = window.setTimeout(() => control.abort(), 4000);
+  try { await fetch(url, { mode: "no-cors", signal: control.signal, cache: "no-store" }); return true; } catch { return false; } finally { window.clearTimeout(timer); }
+}
+
+/** The server's address with a button that tells a wrong scheme (https against a server that speaks plain http, or the other way round) from a server that is down. */
+function OriginCheck({ t, origin, setOrigin }: { t: (key: string) => string; origin: string; setOrigin: (value: string) => void }) {
+  const [result, setResult] = useState<{ text: string; use?: string }>({ text: "" });
+  const [busy, setBusy] = useState(false);
+  const check = async () => {
+    const value = origin.trim().replace(/\/+$/, "");
+    if (!/^https?:\/\//i.test(value)) { setResult({ text: t("oc_scheme") }); return; }
+    setBusy(true);
+    try {
+      if (await reachable(value)) { setResult({ text: t("oc_ok") }); return; }
+      const other = value.startsWith("https://") ? `http://${value.slice(8)}` : `https://${value.slice(7)}`;
+      if (await reachable(other)) setResult({ text: t(value.startsWith("https://") ? "oc_try_http" : "oc_try_https"), use: other });
+      else setResult({ text: t("oc_down") });
+    } finally { setBusy(false); }
+  };
+  return <>
+    <button type="button" onClick={() => void check()} disabled={busy}>{t("oc_check")}</button>
+    {result.text && <p className="hint">{result.text}{result.use && <> <button type="button" onClick={() => { setOrigin(result.use!); setResult({ text: t("oc_changed") }); }}>{t("oc_use")} {result.use}</button></>}</p>}
+  </>;
+}
+
 /** The technical settings of the server: where it listens and where Studio is served (an administrator's). */
 function ServerSettings({ t, origin, isAdmin }: { t: (key: string) => string; origin: string; isAdmin: boolean }) {
   const [state, setState] = useState<ConnectionState | null>(null);
@@ -52,7 +79,7 @@ export function ConfigurationPanel(props: Props) {
       {tabs.map(item => <button key={item} className={tab === item ? "active" : ""} role="tab" aria-selected={tab === item} onClick={() => setTab(item)}>{tabLabel(item)}</button>)}
     </div>
     {tab === "general" && <div className="config-grid">
-      <article className="stack-card"><h3>{t("serverOrigin")}</h3><label>{t("serverOrigin")}<input value={props.origin} onChange={event => props.setOrigin(event.target.value)} inputMode="url" /></label><small>{props.connection}</small><p className={`operator-session ${props.operatorUnlocked ? "ready" : ""}`}>{props.operatorUnlocked ? t("studioAccessActive") : t("studioAccessWaiting")}</p><small>{t("studioAccessNotice")}</small><button onClick={props.savePreferences}>{t("savePreferences")}</button><button onClick={props.exportSite}>{t("exportSite")}</button></article>
+      <article className="stack-card"><h3>{t("serverOrigin")}</h3><label>{t("serverOrigin")}<input value={props.origin} onChange={event => props.setOrigin(event.target.value)} inputMode="url" /></label><OriginCheck t={t} origin={props.origin} setOrigin={props.setOrigin} /><small>{props.connection}</small><p className={`operator-session ${props.operatorUnlocked ? "ready" : ""}`}>{props.operatorUnlocked ? t("studioAccessActive") : t("studioAccessWaiting")}</p><small>{t("studioAccessNotice")}</small><button onClick={props.savePreferences}>{t("savePreferences")}</button><button onClick={props.exportSite}>{t("exportSite")}</button></article>
       <article className="stack-card"><h3>{t("interface")}</h3><label>{t("theme")}<select value={props.theme} onChange={event => props.setTheme(event.target.value)}>{props.themes.map(item => <option key={item}>{item}</option>)}</select></label><label>{t("language")}<select value={props.language} onChange={event => props.setLanguage(event.target.value)}>{props.languages.map(item => <option key={item.code} value={item.code}>{item.name}</option>)}</select></label><button onClick={props.savePreferences}>{t("saveUi")}</button></article>
     </div>}
     {tab === "users" && <UsersPanel t={t} origin={props.origin} />}
