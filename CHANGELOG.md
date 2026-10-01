@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here.
 
+## [0.4.8] - The camera view after the settings
+
+- **Cameras:** coming back from "Configure cameras" the grid is laid out again; the frame that holds it is measured anew each time it appears, instead of keeping the size of the one that was removed.
+
 ## [0.4.7] - Check the server's address
 
 - **Configuration -> General -> Server origin** has a "Check the address" button. If nothing answers over https but the server does over http (or the other way round), it says so and offers to switch, instead of leaving the generic network error behind a wrong scheme. Texts in the seven languages.

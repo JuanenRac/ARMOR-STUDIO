@@ -2,7 +2,7 @@
  * The overview, camera monitor and radar views.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useLayoutEffect, useState, type ReactNode } from "react";
 import { CameraTile, type Translate } from "../components/camera";
 import { fitGrid } from "../cameraGrid";
 import { resolveSlots } from "../cameraLayout";
@@ -50,20 +50,19 @@ export type CameraViewProps = {
 
 const GRID_GAP = 12;
 
-/** The size of an element, kept up to date as the window or the layout around it changes. */
+/** The size of an element, kept up to date as the window or the layout around it changes. The element is followed through a callback ref, so one that is taken out and put back (the camera frame while the settings are open) is measured again. */
 function useElementSize<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
+  const [element, setElement] = useState<T | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   useLayoutEffect(() => {
-    const element = ref.current;
     if (!element) return;
     const measure = () => setSize({ width: element.clientWidth, height: element.clientHeight });
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => observer.disconnect();
-  }, []);
-  return { ref, ...size };
+  }, [element]);
+  return { ref: setElement, ...size };
 }
 
 export function CameraMonitorView(props: CameraViewProps) {
