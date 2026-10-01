@@ -3,7 +3,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
-import { createCameraStreamUrl, listCameraStatus, listCameraViews, listConfiguredCameras, readInfo, readStatus, type Reachability, type ServerInfo } from "./api";
+import { createCameraStreamUrl, listCameraStatus, listCameraViews, listConfiguredCameras, readInfo, readStatus, sessionUserState, type Reachability, type ServerInfo, type StudioUser } from "./api";
 import { mergeServerCameras } from "./cameras";
 import { DEMO_STATE, type Camera } from "./domain";
 import type { SystemState } from "./types";
@@ -142,4 +142,29 @@ export function usePolled<T>(load: () => Promise<T>, everyMs: number, key: unkno
     return () => { cancelled = true; window.clearInterval(timer); };
   }, [key, everyMs, tick]);   // eslint-disable-line react-hooks/exhaustive-deps
   return { data, reload: () => setTick(value => value + 1), failed };
+}
+
+/**
+ * Who is signed in, kept up to date: asked again every minute, when the window comes back into view and a few seconds after an answer that
+ * could not be had. Only the server saying "nobody" clears the user: a failed or slow answer keeps the last one, so a hiccup of the network
+ * never takes the administrator role away (the Users tab used to say "only an administrator" until the page was reloaded).
+ */
+export function useSessionUser(origin: string): { user: StudioUser | null; known: boolean; refresh: () => void } {
+  const [answer, setAnswer] = useState<{ user: StudioUser | null; known: boolean }>({ user: null, known: false });
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    let cancelled = false, retry: number | undefined;
+    const ask = () => void sessionUserState(origin).then(result => {
+      if (cancelled) return;
+      if (result.state === "user") setAnswer({ user: result.user, known: true });
+      else if (result.state === "anonymous") setAnswer({ user: null, known: true });
+      else retry = window.setTimeout(ask, 4_000);
+    });
+    ask();
+    const every = window.setInterval(ask, 60_000);
+    const onVisible = () => { if (document.visibilityState === "visible") ask(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => { cancelled = true; window.clearInterval(every); if (retry) window.clearTimeout(retry); document.removeEventListener("visibilitychange", onVisible); };
+  }, [origin, tick]);
+  return { ...answer, refresh: () => setTick(value => value + 1) };
 }

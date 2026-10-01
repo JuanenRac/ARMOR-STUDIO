@@ -1,0 +1,12 @@
+/* Dialogs of the console: the confirmation and the versions of a design. */
+/* The list of the versions of a design (DesignVersionsDialog). */
+.versions-dialog { text-align: left; max-height: min(80vh, 640px); overflow: auto; }
+.versions-dialog h2 { text-align: center; }
+.versions-list { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: .5rem; }
+.versions-list li { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .6rem .8rem; border: 1px solid #244b58; border-radius: 10px; background: #08212b; }
+.versions-list li > div { display: grid; gap: .1rem; min-width: 0; }
+.versions-list small { color: #8eb1bb; overflow-wrap: anywhere; }
+.versions-done { color: #7ff4a0; }
+.versions-failed { color: #ff9b9b; }
+.confirm-dialog { text-align: center; }
+.confirm-actions { display: flex; justify-content: center; gap: .8rem; margin-top: 1.2rem; }

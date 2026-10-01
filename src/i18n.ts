@@ -8,6 +8,7 @@ import { usersCatalogues } from "./usersText";
 import { radarCatalogues } from "./radarText";
 import { solarCatalogues } from "./solarText";
 import { chromeCatalogues } from "./chromeText";
+import { versionsCatalogues } from "./versionsText";
 import { devicesCatalogues } from "./devicesText";
 import { alarmsCatalogues } from "./alarmsText";
 import { overviewCatalogues } from "./overviewText";
@@ -246,7 +247,7 @@ Object.assign(ja, {"toolboxTitle": "設計ツール", "toolboxDrag": "ドラッ�
 Object.assign(zh, {"toolboxTitle": "设计工具", "toolboxDrag": "拖动以移动面板", "toolboxCollapse": "收起工具", "toolboxExpand": "展开工具", "toolHelp_select": "选择、移动和编辑任何对象。拖动空白处平移视图。", "toolHelp_wall": "绘制墙体：先点起点，再点终点。自动吸附网格和其他墙体。", "toolHelp_door": "点击墙体开门，之后可沿墙拖动。", "toolHelp_window": "点击墙体开窗，之后可沿墙拖动。", "toolHelp_roof": "放置屋顶(双坡、四坡、单坡或平顶)并设置尺寸和坡度。", "toolHelp_solar": "放置带支架的倾斜太阳能板。", "toolHelp_canopy": "放置四柱雨棚。", "toolHelp_pillar": "放置柱子或立柱。", "toolHelp_entrance": "放置入口台阶。", "toolHelp_path": "放置人行小路。", "toolHelp_road": "放置带中线的道路。", "toolHelp_camera": "将所选摄像头移到点击位置。拖动摄像头重新定位，拖动手柄调整朝向。", "toolHelp_sensor": "放置雷达 (LD2450)，绘制其额定 6 米、±60° 扇区；拖动手柄调整朝向。", "north": "北", "zoomLabel": "缩放", "gridLabel": "网格", "off": "关", "zoomIn": "放大", "zoomOut": "缩小", "fitView": "适配站点视图", "snapToggle": "吸附网格和墙体", "gridToggle": "显示或隐藏网格", "viewIso": "等轴视图", "viewTop": "俯视图", "viewFront": "正视图", "shadowsToggle": "开关阴影", "orbitHint": "左键拖动：旋转 · 右键拖动：平移 · 滚轮：缩放 · 点击对象选择，拖动移动", "deviceHeading": "朝向", "deviceName": "名称", "cameraViewNote": "所绘视场仅为示意，取决于镜头。", "radarRated": "额定探测区域 (Hi-Link 手册)：", "radarUnknownRange": "此雷达型号没有探测范围数据。"});
 
 // The site designer's phrases live in their own file, one row per phrase in all seven languages.
-for (const [code, catalogue] of Object.entries({ en, es, de, fr, it, ja, zh })) { Object.assign(catalogue, designerCatalogues[code as Locale]); Object.assign(catalogue, usersCatalogues[code as Locale]); Object.assign(catalogue, radarCatalogues[code as Locale]); Object.assign(catalogue, solarCatalogues[code as Locale]); Object.assign(catalogue, chromeCatalogues[code as Locale]); Object.assign(catalogue, devicesCatalogues[code as Locale]); Object.assign(catalogue, alarmsCatalogues[code as Locale]); Object.assign(catalogue, overviewCatalogues[code as Locale]); Object.assign(catalogue, electricalCatalogues[code as Locale]); Object.assign(catalogue, networkCatalogues[code as Locale]); }
+for (const [code, catalogue] of Object.entries({ en, es, de, fr, it, ja, zh })) { Object.assign(catalogue, designerCatalogues[code as Locale]); Object.assign(catalogue, usersCatalogues[code as Locale]); Object.assign(catalogue, radarCatalogues[code as Locale]); Object.assign(catalogue, solarCatalogues[code as Locale]); Object.assign(catalogue, chromeCatalogues[code as Locale]); Object.assign(catalogue, versionsCatalogues[code as Locale]); Object.assign(catalogue, devicesCatalogues[code as Locale]); Object.assign(catalogue, alarmsCatalogues[code as Locale]); Object.assign(catalogue, overviewCatalogues[code as Locale]); Object.assign(catalogue, electricalCatalogues[code as Locale]); Object.assign(catalogue, networkCatalogues[code as Locale]); }
 
 const translations: Record<Locale, Catalogue> = { en, es, de, fr, it, ja, zh };
 export const requiredUiKeys = Object.keys(en);

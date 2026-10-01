@@ -243,6 +243,17 @@ async function userCall<T>(origin: string, method: string, route: string, body?:
   if (!response.ok) throw new ApiError(response.status, parsed.code ?? (response.status === 403 || response.status === 401 ? "forbidden" : "generic"));
   return parsed;
 }
+/** Who is signed in: the user, nobody (the server said so), or unknown (it could not be asked - never to be taken as "not an administrator"). */
+export type SessionUserState = { state: "user"; user: StudioUser } | { state: "anonymous" } | { state: "unknown" };
+export async function sessionUserState(origin: string): Promise<SessionUserState> {
+  try {
+    const response = await fetch(endpoint(origin, "/api/v1/studio/session"), { headers: { Accept: "application/json" }, ...localSession });
+    if (response.status === 401) return { state: "anonymous" };
+    if (!response.ok) return { state: "unknown" };
+    const body = await response.json() as { authenticated?: boolean; user?: StudioUser };
+    return body.authenticated && body.user ? { state: "user", user: body.user } : { state: "anonymous" };
+  } catch { return { state: "unknown" }; }
+}
 /** Who is signed in (null when nobody is). */
 export async function readSessionUser(origin: string): Promise<StudioUser | null> {
   try { return (await userCall<{ authenticated: boolean; user?: StudioUser }>(origin, "GET", "/api/v1/studio/session")).user ?? null; } catch { return null; }
@@ -256,7 +267,7 @@ export const changeAccount = (origin: string, change: { currentPassword: string;
 /** Arm or disarm the system (an operator, from Studio). Answers with the new state of the perimeter. */
 export async function setSystemMode(origin: string, mode: "armed" | "disarmed"): Promise<SystemState> {
   const response = await fetch(endpoint(origin, "/api/v1/mode"), { method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ mode }) });
-  if (!response.ok) throw new Error(`Mode change returned ${response.status}`);
+  if (!response.ok) throw new ApiError(response.status, response.status === 401 ? "session_ended" : response.status === 403 ? "forbidden" : "generic");
   return response.json() as Promise<SystemState>;
 }
 
@@ -316,6 +327,17 @@ export async function saveSite(origin: string, revision: number, site: Record<st
   if (response.status === 409) return { conflict: (await response.json() as { current: SiteDocument }).current };
   if (!response.ok) throw new ApiError(response.status, "site_save_failed");
   return { revision: (await response.json() as { revision: number }).revision };
+}
+
+/** The versions the server keeps of each of the three designs (what it had before the changes), to be taken back from. */
+export type DesignKind = "site" | "electrical" | "network";
+export type DesignVersion = { id: string; revision: number; saved_at: string; updated_by: string | null; counts: Record<string, number> };
+const DESIGN_ROUTE: Record<DesignKind, string> = { site: "/api/v1/site", electrical: "/api/v1/electrical/design", network: "/api/v1/network/design" };
+export const listDesignVersions = (origin: string, kind: DesignKind) => userCall<{ versions: DesignVersion[] }>(origin, "GET", `${DESIGN_ROUTE[kind]}/versions`);
+export async function readDesignVersion(origin: string, kind: DesignKind, id: string): Promise<Record<string, unknown> | null> {
+  const document = await userCall<Record<string, unknown>>(origin, "GET", `${DESIGN_ROUTE[kind]}/versions/${encodeURIComponent(id)}`);
+  const design = document[kind];
+  return typeof design === "object" && design !== null ? design as Record<string, unknown> : null;
 }
 
 export type ElectricalDocument = { revision: number; updated_at: string | null; updated_by: string | null; electrical: Record<string, unknown> | null };
