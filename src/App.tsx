@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listNetwork, readSessionUser, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
+import { listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
-import { AboutDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
+import { AboutDialog, ConfirmDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
+import { DesignVersionsDialog } from "./DesignVersionsDialog";
 import { CameraFullscreen } from "./components/camera";
 import { ConfigurationPanel } from "./ConfigurationPanel";
 import { DEFAULT_SERVER_ORIGIN, loadDeploymentOrigin } from "./config";
@@ -15,7 +16,7 @@ import {
   type Building, type Camera, type DevicePlacement, type Dimensions, type GridSize, type LanguageCode, type Opening, type RoofItem, type Sensor, type SiteFeature, type Terrain, type Theme, type View, type WallLamp,
 } from "./domain";
 import type { SiteModel } from "./designer/ops";
-import { usePolled, useFullscreen, useCameraReachability, useServerCameras, useServerInfo, useServerStatus, useStreamUrls } from "./hooks";
+import { usePolled, useFullscreen, useCameraReachability, useServerCameras, useServerInfo, useServerStatus, useSessionUser, useStreamUrls } from "./hooks";
 import { text } from "./i18n";
 import { HistoryView } from "./HistoryView";
 import { MediaLibrary } from "./MediaLibrary";
@@ -24,10 +25,11 @@ import { SiteDesignerInteractive } from "./SiteDesignerInteractive";
 import { ElectricalDesigner } from "./ElectricalDesigner";
 import { EMPTY_DESIGN, type Design as ElectricalDesign } from "./electrical/model";
 import { loadLocalElectrical, saveLocalElectrical } from "./electrical/local";
+import { applyElectricalDoc } from "./electrical/sync";
 import { useElectricalSync } from "./electrical/useElectricalSync";
 import { NetworkDesigner } from "./NetworkDesigner";
 import { EMPTY_DESIGN as EMPTY_NETWORK_DESIGN, type Design as NetworkDesign } from "./network/model";
-import { loadLocalNetwork, saveLocalNetwork } from "./network/sync";
+import { applyNetworkDoc, loadLocalNetwork, saveLocalNetwork } from "./network/sync";
 import { useNetworkSync } from "./network/useNetworkSync";
 import { NetworkView } from "./views/NetworkView";
 import { StudioLogin } from "./StudioLogin";
@@ -47,6 +49,7 @@ import "./camera-layout.css";
 import "./nav.css";
 import "./compact.css";
 import "./hover.css";
+import "./dialogs.css";
 
 const studioVersion = manifest.version;
 
@@ -71,7 +74,10 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const [wantsToPlace, setWantsToPlace] = useState("");
   const [electrical, setElectrical] = useState<ElectricalDesign>(EMPTY_DESIGN);
   const [networkDesign, setNetworkDesign] = useState<NetworkDesign>(EMPTY_NETWORK_DESIGN);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [versionsOf, setVersionsOf] = useState<"site" | "electrical" | "network" | null>(null);
+  const sessionUser = useSessionUser(origin);
+  const isAdmin = sessionUser.user?.role === "admin";
+  const [pendingMode, setPendingMode] = useState<"armed" | "disarmed" | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [restored, setRestored] = useState(false);
   const [gridSize, setGridSize] = useState<GridSize>(4);
@@ -99,7 +105,6 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const alarms = alarmPoll.data;
   const alarmsPending = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at).length;
   const cameraNames = useMemo(() => Object.fromEntries(cameras.map(camera => [camera.id, camera.name])), [cameras]);
-  useEffect(() => { void readSessionUser(origin).then(user => setIsAdmin(user?.role === "admin")).catch(() => setIsAdmin(false)); }, [origin]);
   useEffect(() => { const timer = window.setInterval(() => setNow(Date.now()), 1000); return () => window.clearInterval(timer); }, []);
 
   useEffect(() => {
@@ -136,8 +141,8 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const site: SiteModel = useMemo(() => ({ terrain, buildings, openings, roofItems, wallLamps, features, cameras, sensors, placements }), [terrain, buildings, openings, roofItems, wallLamps, features, cameras, sensors, placements]);
   /** The designer hands back a whole model; only the parts that changed are stored again. */
   const design = useMemo(() => ({ dimensions, terrain, buildings, openings, roofItems, wallLamps, features, sensors, placements, cameras }), [dimensions, terrain, buildings, openings, roofItems, wallLamps, features, sensors, placements, cameras]);
-  const siteStatus = useSiteSync({
-    origin, enabled: restored && operatorUnlocked, design, onConflict: () => setNotice(t("siteConflict")),
+  const siteSync = useSiteSync({
+    origin, enabled: restored && operatorUnlocked, design, onConflict: () => setNotice(t("siteConflict")), onNotice: kind => setNotice(t(kind === "recovered" ? "versionsDraftRecovered" : "versionsDraftNotice")),
     apply: next => { setDimensions(next.dimensions); setTerrain(next.terrain); setBuildings(next.buildings); setOpenings(next.openings); setRoofItems(next.roofItems); setWallLamps(next.wallLamps); setFeatures(next.features); setSensors(next.sensors); setPlacements(next.placements); setCameras(next.cameras); },
   });
   const electricalStatus = useElectricalSync({ origin, enabled: restored && operatorUnlocked, design: electrical, apply: setElectrical, onConflict: () => setNotice(t("elConflict")) });
@@ -179,11 +184,18 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     URL.revokeObjectURL(url);
     setNotice(t("siteExported"));
   };
-  const toggleMode = async () => {
-    const next = state.mode === "armed" ? "disarmed" : "armed";
-    if (!window.confirm(t(next === "armed" ? "confirmArm" : "confirmDisarm"))) return;
+  // The question is asked in the page (ConfirmDialog), not with the browser's confirm(): a browser can switch that one off, and then the button did nothing at all.
+  const toggleMode = () => setPendingMode(state.mode === "armed" ? "disarmed" : "armed");
+  const changeMode = async (next: "armed" | "disarmed") => {
+    setPendingMode(null);
     try { applyState(await setSystemMode(origin, next)); setNotice(t(next === "armed" ? "modeArmedNotice" : "modeDisarmedNotice")); }
-    catch { setNotice(t("modeFailed")); }
+    catch (error) {
+      // Say why: a ended session, a refusal, an error of the server or no answer at all are different things to do something about.
+      if (error instanceof ApiError && error.status === 401) { setNotice(t("modeSessionEnded")); sessionUser.refresh(); }
+      else if (error instanceof ApiError && error.status === 403) setNotice(t("modeForbidden"));
+      else if (error instanceof ApiError) setNotice(t("modeServerError").replace("{status}", String(error.status)));
+      else setNotice(t("modeNoAnswer"));
+    }
   };
   const fullscreen = useFullscreen(() => setNotice(t("fullscreenUnavailable")));
   const fullScreen = fullscreen.toggle;
@@ -225,8 +237,8 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   };
 
   const panels: Record<View, ReactNode> = {
-    overview: <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={() => void toggleMode()} demo={connectionState === "demo"} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} />,
-    alarms: <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={() => void toggleMode()} now={now} isAdmin={isAdmin} />,
+    overview: <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} />,
+    alarms: <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} />,
     inverters: <InvertersView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} />,
     batteries: <BatteriesView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} />,
     devices: <DevicesView t={t} origin={origin} devices={devices} reload={devicePoll.reload} placedIds={new Set(placements.map(item => item.device_id))} onPlace={id => { setWantsToPlace(id); setView("siteDesigner"); }} now={now} />,
@@ -236,7 +248,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     record: <MediaLibrary origin={origin} cameras={cameras} t={t} />,
     history: <HistoryView origin={origin} t={t} />,
     radar: <RadarView nodes={nodes} model={site} dimensions={dimensions} origin={origin} openDesigner={() => setView("siteDesigner")} openZones={() => setView("history")} setSensors={setSensors} forget={id => void forgetNode(origin, id).then(() => setNotice(t("nodeForgotten"))).catch(() => setNotice(t("recordingFailed")))} t={t} />,
-    siteDesigner: <SiteDesignerInteractive t={t} dimensions={dimensions} setDimensions={setDimensions} model={site} applyModel={applySite} selectedCamera={selectedCamera} setSelectedCamera={setSelectedCamera} notice={notice} setNotice={setNotice} save={saveSettings} nodeIds={nodes.map(node => node.node_id)} devices={devices} wantsToPlace={wantsToPlace} clearWantsToPlace={() => setWantsToPlace("")} openDevices={() => setView("devices")} />,
+    siteDesigner: <SiteDesignerInteractive openVersions={() => setVersionsOf("site")} t={t} dimensions={dimensions} setDimensions={setDimensions} model={site} applyModel={applySite} selectedCamera={selectedCamera} setSelectedCamera={setSelectedCamera} notice={notice} setNotice={setNotice} save={saveSettings} nodeIds={nodes.map(node => node.node_id)} devices={devices} wantsToPlace={wantsToPlace} clearWantsToPlace={() => setWantsToPlace("")} openDevices={() => setView("devices")} />,
     electricalDesigner: <ElectricalDesigner t={t} design={electrical} setDesign={setElectrical} status={electricalStatus} nodeIds={nodes.map(node => node.node_id)} solarDevices={solarPoll.data?.devices ?? []} solarWaiting={solarPoll.data?.waiting ?? []} electricalNodes={electricalPoll.data?.nodes ?? []} />,
     network: <NetworkView t={t} origin={origin} isAdmin={isAdmin} overview={networkPoll.data} reload={networkPoll.reload} now={now} />,
     networkDesigner: <NetworkDesigner t={t} design={networkDesign} setDesign={setNetworkDesign} status={networkStatus} overview={networkPoll.data} />,
@@ -256,11 +268,15 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   return <div className="studio-frame"><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
     <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} connection={connection} alarmBadge={alarmsPending} t={t} />
     <section className="main-stage">
-      <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteStatus} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} toggleMode={() => void toggleMode()} t={t} />
+      <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} toggleMode={toggleMode} t={t} />
       {panels[view]}
     </section>
     {expandedCamera && <CameraFullscreen camera={expandedCamera} cameras={cameras} origin={origin} recording={recordingCameraIds.includes(expandedCamera.id)} t={t} close={() => setExpandedCameraId("")} fullScreen={fullScreen} step={stepExpanded} snapshot={() => void saveSnapshot(expandedCamera)} toggleRecording={() => void toggleRecording(expandedCamera)} invokePtz={command => commandPtz(expandedCamera, command)} />}
     {aboutOpen && <AboutDialog version={studioVersion} revision={state.revision} close={() => setAboutOpen(false)} t={t} />}
+    {versionsOf && <DesignVersionsDialog kind={versionsOf} origin={origin} t={t} close={() => setVersionsOf(null)}
+      draft={versionsOf === "site" ? siteSync.draft : null} restoreDraft={siteSync.restoreDraft}
+      restore={design => { if (versionsOf === "site") siteSync.restoreDocument(design); else if (versionsOf === "electrical") setElectrical(current => applyElectricalDoc(design, current)); else setNetworkDesign(current => applyNetworkDoc(design, current)); }} />}
+    {pendingMode && <ConfirmDialog title={t(pendingMode === "armed" ? "armSystem" : "disarmSystem")} text={t(pendingMode === "armed" ? "confirmArm" : "confirmDisarm")} confirmLabel={t(pendingMode === "armed" ? "armSystem" : "disarmSystem")} danger={pendingMode === "disarmed"} confirm={() => void changeMode(pendingMode)} cancel={() => setPendingMode(null)} t={t} />}
   </main>
   <StatusBar serverName={serverName} synced={connectionState === "synced"} mode={state.mode}
     nodesOnline={nodes.filter(node => node.online && !node.stale).length} nodesTotal={nodes.length}

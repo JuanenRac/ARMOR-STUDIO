@@ -58,6 +58,20 @@ export function AboutDialog({ version, revision, close, t }: { version: string; 
   </div>;
 }
 
+/** A confirmation in the page itself: unlike the browser's own confirm() it cannot be switched off by the browser ("stop this page from creating dialogs"), which left the arm button doing nothing. */
+export function ConfirmDialog({ title, text, confirmLabel, danger, confirm, cancel, t }: { title: string; text: string; confirmLabel: string; danger?: boolean; confirm: () => void; cancel: () => void; t: Translate }) {
+  return <div className="modal-backdrop" role="presentation" onMouseDown={cancel} onKeyDown={event => { if (event.key === "Escape") cancel(); }}>
+    <section className="about-dialog confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-text" onMouseDown={event => event.stopPropagation()}>
+      <h2 id="confirm-title">{title}</h2>
+      <p id="confirm-text">{text}</p>
+      <div className="confirm-actions">
+        <button onClick={cancel}>{t("cancelAction")}</button>
+        <button className={danger ? "danger" : "primary"} onClick={confirm} autoFocus>{confirmLabel}</button>
+      </div>
+    </section>
+  </div>;
+}
+
 export type StatusBarProps = {
   serverName: string; synced: boolean; mode: "armed" | "disarmed";
   nodesOnline: number; nodesTotal: number; camerasReachable: number; camerasTotal: number; highAlerts: number;

@@ -30,6 +30,8 @@ type Props = {
   selectedCamera: string; setSelectedCamera: (id: string) => void;
   notice: string; setNotice: (value: string) => void;
   save: () => void;
+  /** Opens the versions the server keeps of this design. */
+  openVersions: () => void;
   /** The field nodes the server knows, for wiring a radar to one. */
   nodeIds: string[];
   /** The devices of the system (with their live state), and a device the Devices menu asked to place. */
@@ -384,6 +386,7 @@ export function SiteDesignerInteractive(props: Props) {
           <div className="designer-view-toggle" role="tablist"><button className={view === "2d" ? "active" : ""} onClick={() => switchView("2d")}>{t("view2d")}</button><button className={view === "3d" ? "active" : ""} onClick={() => switchView("3d")}>{t("view3d")}</button></div>
           <button className="designer-icon-button" onClick={undo} disabled={past.current.length === 0} title={`${t("undo")} (Ctrl+Z)`} aria-label={t("undo")}>{ICON.undo}</button>
           <button className="designer-icon-button" onClick={redo} disabled={future.current.length === 0} title={`${t("redo")} (Ctrl+Y)`} aria-label={t("redo")}>{ICON.redo}</button>
+          <button onClick={props.openVersions} title={t("versionsTitle")}>{t("versionsButton")}</button>
           <button className="designer-save" onClick={props.save}>{t("savePreferences")}</button>
         </div>
         {dimensionsBar}

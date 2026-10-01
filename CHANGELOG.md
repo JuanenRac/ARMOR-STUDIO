@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+## [0.4.2] - Arming that answers, an administrator that stays one, a design that cannot be lost
+
+- **Arm and disarm ask in the page, and say why when they fail.** The question used the browser's own `confirm()`, which a browser can switch off ("stop this page from creating dialogs"), and then the button did nothing at all; it is now a dialog of Studio's. When the change fails it says whether the session had ended, the account is not allowed, the server refused (with its error) or it did not answer, instead of one sentence for everything.
+- **The administrator role is no longer lost to a hiccup.** Studio asked who was signed in once, when it started, and any failed answer was read as "not an administrator" (the Users tab said so until the page was reloaded). Now it asks every minute and when the window comes back, and only the server saying "nobody" clears the user; a failed answer keeps the last one, and the Users tab says it could not ask and offers to try again.
+- **Versions of the design, and no silent loss.** A Versions button in the Site Designer lists what the server kept (see ARMOR-SERVER 0.3.3) and takes one back. Changes that had not reached the server (it was off, the session ended) are also kept in the browser as a draft: at the next start a draft whose server copy has not changed is put back and saved, and one whose server copy has moved on is kept aside and offered in Versions. Before, the server's copy replaced them without a word.
+- The phrases in the seven languages; 3 new tests (247 in all).
+
 ## [0.4.1] - Every button answers the pointer
 
 - Some buttons gave no sign that the pointer was on them. Every hover rule was scoped to one panel's own buttons (`.device-actions button:hover`, `.camera-actions button:hover`...), and there was no rule for a button anywhere else: the primary and danger buttons (login, configuration, history, users, solar equipment), the big arm and disarm modes of the overview and the alarms, the link buttons, the previous and next of a camera, the close of a dialog, the history rows and about 140 buttons with no class of their own. `src/hover.css` gives every enabled button a brightening on hover and a darkening while pressed, written with `:where()` so it adds no specificity: the scoped rules keep their own colours and the theme is followed, because it only changes the brightness of what the button already looks like. It stops under prefers-reduced-motion.
