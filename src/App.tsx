@@ -46,6 +46,7 @@ import "./index.css";
 import "./camera-layout.css";
 import "./nav.css";
 import "./compact.css";
+import "./hover.css";
 
 const studioVersion = manifest.version;
 

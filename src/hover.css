@@ -1,0 +1,15 @@
+/* A baseline hover and press cue for every enabled button.
+ *
+ * Almost every hover rule in these style sheets is scoped to one panel's own buttons ('.device-actions button:hover',
+ * '.camera-actions button:hover'...), so a button anywhere else - the primary and danger buttons, the big arm and disarm
+ * modes, the link buttons, the previous and next of a camera, the close of a dialog - gave no sign that the pointer was on it.
+ *
+ * It is written with :where() so it adds no specificity: a scoped rule still sets its own colours, and this only brightens
+ * whatever the button already looks like (so it needs no colour of its own and follows every theme). */
+:where(button:not(:disabled, [aria-disabled="true"])) { transition: filter .15s ease; }
+:where(button:not(:disabled, [aria-disabled="true"])):hover { filter: brightness(1.18); }
+:where(button:not(:disabled, [aria-disabled="true"])):active { filter: brightness(.9); }
+
+@media (prefers-reduced-motion: reduce) {
+  :where(button) { transition: none; }
+}
