@@ -47,7 +47,7 @@ const ROWS: Record<string, Row> = {
   net_no_outages: ["No outage since the server has been watching.", "Ningún corte desde que el servidor vigila.", "Kein Ausfall, seit der Server beobachtet.", "Aucune coupure depuis que le serveur surveille.", "Nessuna interruzione da quando il server osserva.", "サーバーが監視を始めてから停止はありません。", "自服务器开始监控以来没有中断。"],
   net_outage_end: ["Ended", "Terminó", "Ende", "Fin", "Fine", "終了", "结束"],
   net_outages_last24: ["Outages in the last 24 hours (start, end, length)", "Cortes de las últimas 24 horas (inicio, fin, duración)", "Ausfälle der letzten 24 Stunden (Beginn, Ende, Dauer)", "Coupures des dernières 24 heures (début, fin, durée)", "Interruzioni delle ultime 24 ore (inizio, fine, durata)", "過去24時間の停止（開始・終了・継続）", "过去 24 小时的中断（开始、结束、持续）"],
-  net_outages_open: ["See every outage", "Ver cada corte", "Jeden Ausfall ansehen", "Voir chaque coupure", "Vedi ogni interruzione", "すべての停止を見る", "查看每次中断"],
+  net_outages_open: ["Show or hide every outage", "Mostrar u ocultar cada corte", "Jeden Ausfall ein- oder ausblenden", "Afficher ou masquer chaque coupure", "Mostra o nascondi ogni interruzione", "すべての停止を表示/非表示", "显示或隐藏每次中断"],
   net_outage_when: ["Began", "Empezó", "Begann", "Début", "Inizio", "開始", "开始"],
   net_outage_len: ["Lasted", "Duró", "Dauer", "Durée", "Durata", "継続", "持续"],
   net_outage_kind: ["What failed", "Qué falló", "Was ausfiel", "Ce qui a failli", "Cosa è mancato", "対象", "故障对象"],

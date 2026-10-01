@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+## [0.5.5] - Cameras that keep their stream, and fewer false alarms of "offline"
+
+- **Cameras:** the list of cameras is read again every minute and that made every picture ask for a new stream address, dropping all the streams and starting them over, which is what made the cameras slow. An address is now asked once for each camera and kept while it stays live, and a camera whose address cannot be had no longer takes the others down. Needs ARMOR-SERVER 0.4.0 for the faster start of the video.
+- **Offline demonstration:** the label in the top bar appeared when a single answer of the server was late; it now needs three in a row, and a status call that gets no answer in eight seconds is given up.
+- **Weather:** a "Center on my place" button on the radar.
+- **Network:** the list of outages of the last 24 hours (start, end and length) shows and hides when you press the "Outages, 24 h" card, which keeps its card look.
+
 ## [0.5.4] - The buttons keep answering, and every outage with its hours
 
 - **The console no longer seems to die after a while:** a camera picture that went away (a menu change) kept its stream open until the browser collected it, and after several changes those streams used every connection the browser allows to the server, so calls waited for ever and no button answered until the page was reloaded. A live picture now closes its stream when it goes away, and every call of the console gives up after 30 seconds instead of waiting for ever.

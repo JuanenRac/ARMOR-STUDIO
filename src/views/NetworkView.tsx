@@ -142,6 +142,7 @@ function DeviceDetail({ t, origin, node, device, isAdmin, reload, now, close, st
 
 export function NetworkView({ t, origin, isAdmin, overview, reload, now }: { t: Translate; origin: string; isAdmin: boolean; overview: NetworkOverview | null; reload: () => void; now: number }) {
   const [tab, setTab] = useState<Tab>("devices");
+  const [showOutages, setShowOutages] = useState(false);
   const [query, setQuery] = useState(""), [kind, setKind] = useState(""), [onlyUnknown, setOnlyUnknown] = useState(false), [onlyOffline, setOnlyOffline] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
@@ -175,13 +176,13 @@ export function NetworkView({ t, origin, isAdmin, overview, reload, now }: { t: 
         </div>
         <div><small>{t("net_latency")}</small><strong>{internet.latency_ms !== undefined ? `${internet.latency_ms} ms` : "—"}</strong></div>
         <div><small>{t("net_loss")}</small><strong>{internet.loss_percent !== undefined ? `${internet.loss_percent} %` : "—"}</strong></div>
-        <button type="button" className="net-stat-link" onClick={() => setTab("internet")} title={t("net_outages_open")}><small>{t("net_outages24")}</small><strong>{internet.outages_24h ?? 0}</strong></button>
+        <div className={`net-stat-link ${showOutages ? "open" : ""}`} role="button" tabIndex={0} aria-expanded={showOutages} title={t("net_outages_open")} onClick={() => setShowOutages(value => !value)} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setShowOutages(value => !value); } }}><small>{t("net_outages24")}</small><strong>{internet.outages_24h ?? 0}</strong></div>
         <div><small>{t("net_downtime24")}</small><strong>{formatDuration(internet.downtime_24h_s ?? 0)}</strong></div>
         <div><small>{t("net_devices")}</small><strong>{data!.totals.online}/{data!.totals.devices}</strong><em>{data!.totals.unknown} {t("net_not_known")}</em></div>
       </div>
-      {lastDay.length > 0 && <section className="net-outage-day" aria-label={t("net_outages_last24")}>
+      {showOutages && <section className="net-outage-day" aria-label={t("net_outages_last24")}>
         <h3>{t("net_outages_last24")}</h3>
-        <ul>{lastDay.map(outage => <li key={`${outage.started_ms}${outage.kind}`}><b>{formatDateTimeSeconds(outage.started_ms)}</b> → <b>{formatDateTimeSeconds(outage.ended_ms)}</b><span>{formatDuration(outage.duration_s)}</span><em>{t(`net_outage_${outage.kind}`)}</em></li>)}</ul>
+        {lastDay.length === 0 ? <p className="muted">{t("net_no_outages")}</p> : <ul>{lastDay.map(outage => <li key={`${outage.started_ms}${outage.kind}`}><b>{formatDateTimeSeconds(outage.started_ms)}</b> → <b>{formatDateTimeSeconds(outage.ended_ms)}</b><span>{formatDuration(outage.duration_s)}</span><em>{t(`net_outage_${outage.kind}`)}</em></li>)}</ul>}
       </section>}
       <div className="net-toolbar">
         <p className="muted net-meta">{t("net_interface")}: <b>{node.interface.name}</b> · {node.interface.ip} · {t("net_network")} {node.interface.cidr} · {t("net_router")} {node.interface.gateway ?? "—"}
