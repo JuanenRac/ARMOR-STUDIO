@@ -3,14 +3,17 @@
  * with creation, renaming, new passwords, roles and removal. Passwords are only ever typed here; the server keeps a hash.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { ApiError, changeAccount, createUser, deleteUser, listUsers, sessionUserState, updateUser, type ListedUser, type Role, type StudioUser } from "./api";
+import { useCallback, useContext, useEffect, useState, type FormEvent } from "react";
+import { ApiError, changeAccount, createUser, deleteUser, listUsers, updateUser, type ListedUser, type Role } from "./api";
+import { SessionUserContext } from "./sessionContext";
 
 type Props = { t: (key: string) => string; origin: string };
 const ROLES: readonly Role[] = ["admin", "operator"];
 
 export function UsersPanel({ t, origin }: Props) {
-  const [me, setMe] = useState<StudioUser | null>(null);
+  // Who is signed in comes from the one answer Studio keeps up to date (it asks again by itself), never from a question of this panel's own.
+  const session = useContext(SessionUserContext);
+  const me = session?.user ?? null;
   const [users, setUsers] = useState<ListedUser[] | null>(null);
   const [minimum, setMinimum] = useState(12);
   const [message, setMessage] = useState<{ text: string; bad: boolean }>({ text: "", bad: false });
@@ -22,17 +25,11 @@ export function UsersPanel({ t, origin }: Props) {
     say(text === key ? t("userErr_generic") : text, true);
   };
 
-  // "unknown" is a session that could not be asked (a hiccup, a restart): it is not "not an administrator", so it keeps what was known and says so.
-  const [sessionUnknown, setSessionUnknown] = useState(false);
+  const isAdmin = me?.role === "admin";
   const reload = useCallback(async () => {
-    const answer = await sessionUserState(origin);
-    if (answer.state === "unknown") { setSessionUnknown(true); return; }
-    setSessionUnknown(false);
-    const user = answer.state === "user" ? answer.user : null;
-    setMe(user);
-    if (user?.role !== "admin") { setUsers(null); return; }
+    if (!isAdmin) { setUsers(null); return; }
     try { const listed = await listUsers(origin); setUsers(listed.users); setMinimum(listed.minPasswordLength); } catch { /* the list keeps what it had; the next reload tries again */ }
-  }, [origin]);
+  }, [origin, isAdmin]);
   useEffect(() => { void reload(); }, [reload]);
 
   // ---- my account ----
@@ -91,8 +88,8 @@ export function UsersPanel({ t, origin }: Props) {
       </form>
     </article>
 
-    {sessionUnknown && !me
-      ? <article className="stack-card users-card"><h3>{t("usersTitle")}</h3><p className="muted">{t("usersSessionUnknown")}</p><div className="users-actions"><button className="primary" onClick={() => void reload()}>{t("retryAction")}</button></div></article>
+    {!session?.known && !me
+      ? <article className="stack-card users-card"><h3>{t("usersTitle")}</h3><p className="muted">{t("usersSessionUnknown")}{session?.reason ? ` (${session.reason})` : ""}</p><div className="users-actions"><button className="primary" onClick={() => session?.refresh()}>{t("retryAction")}</button></div></article>
       : me?.role !== "admin"
       ? <article className="stack-card users-card"><h3>{t("usersTitle")}</h3><p className="muted">{t("usersAdminOnly")}</p></article>
       : <>

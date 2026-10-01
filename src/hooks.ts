@@ -149,16 +149,17 @@ export function usePolled<T>(load: () => Promise<T>, everyMs: number, key: unkno
  * could not be had. Only the server saying "nobody" clears the user: a failed or slow answer keeps the last one, so a hiccup of the network
  * never takes the administrator role away (the Users tab used to say "only an administrator" until the page was reloaded).
  */
-export function useSessionUser(origin: string): { user: StudioUser | null; known: boolean; refresh: () => void } {
-  const [answer, setAnswer] = useState<{ user: StudioUser | null; known: boolean }>({ user: null, known: false });
+export type SessionUser = { user: StudioUser | null; known: boolean; /** Why the last attempt to ask could not be answered (empty when it could). */ reason: string; refresh: () => void };
+export function useSessionUser(origin: string): SessionUser {
+  const [answer, setAnswer] = useState<{ user: StudioUser | null; known: boolean; reason: string }>({ user: null, known: false, reason: "" });
   const [tick, setTick] = useState(0);
   useEffect(() => {
     let cancelled = false, retry: number | undefined;
     const ask = () => void sessionUserState(origin).then(result => {
       if (cancelled) return;
-      if (result.state === "user") setAnswer({ user: result.user, known: true });
-      else if (result.state === "anonymous") setAnswer({ user: null, known: true });
-      else retry = window.setTimeout(ask, 4_000);
+      if (result.state === "user") setAnswer({ user: result.user, known: true, reason: "" });
+      else if (result.state === "anonymous") setAnswer({ user: null, known: true, reason: "" });
+      else { setAnswer(current => ({ ...current, reason: result.reason })); retry = window.setTimeout(ask, 4_000); }
     });
     ask();
     const every = window.setInterval(ask, 60_000);

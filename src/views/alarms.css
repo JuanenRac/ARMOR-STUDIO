@@ -32,3 +32,18 @@
 .automation-form { display: grid; gap: .9rem; } .automation-form label { display: grid; gap: .25rem; font-size: .72rem; color: #a9d0d6; }
 .automation-row { display: flex; gap: .6rem; flex-wrap: wrap; align-items: end; padding: .7rem; border: 1px solid #1d4b56; border-radius: 12px; background: rgba(6, 20, 29, .6); } .automation-row label { flex: 1; min-width: 140px; } .automation-row .step { align-self: center; color: #63e6f2; font: 800 .62rem "DM Mono", ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; min-width: 3.4rem; }
 .template-row { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; } .template-row button { padding: .4rem .8rem; border-radius: 999px; border: 1px dashed #2d7583; background: transparent; color: #9bd8e0; font-size: .7rem; cursor: pointer; } .template-row button:hover { background: #0d3a44; }
+
+/* what an alarm is about, and the controls to act on it by hand */
+.alarm-summary { color: #cfeff4; font: 600 .78rem "DM Mono", ui-monospace, monospace; overflow-wrap: anywhere; }
+.alarm-actions { display: flex; gap: .4rem; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
+.alarm-actions button { padding: .35rem .7rem; border-radius: 8px; border: 1px solid #285a66; background: #0a202a; color: #bfe0e6; font-size: .72rem; }
+.alarm-actions .primary { background: linear-gradient(135deg, #1d6570, #24869a); color: #f4ffff; border-color: #4fcac4; }
+.alarm-actions .danger-button { min-width: 2rem; font-size: 1rem; line-height: 1; }
+.alarm-actions.compact button { padding: .2rem .5rem; font-size: .66rem; }
+.alarm-facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: .45rem .9rem; margin: .5rem 0 0; padding: .7rem .8rem; border: 1px solid #1d4b56; border-radius: 12px; background: rgba(6, 20, 29, .6); }
+.alarm-facts div { display: grid; gap: .1rem; min-width: 0; } .alarm-facts dt { color: #6f97a0; font: 600 .6rem "DM Mono", ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; }
+.alarm-facts dd { margin: 0; color: #e8fbff; font-size: .8rem; overflow-wrap: anywhere; } .alarm-facts dd.mono { font-family: "DM Mono", ui-monospace, monospace; }
+.alarm-toolbar { display: flex; flex-wrap: wrap; gap: .8rem; align-items: end; padding: .7rem .9rem; border: 1px solid #1d4b56; border-radius: 14px; background: rgba(6, 20, 29, .55); }
+.alarm-toolbar label { display: grid; gap: .2rem; font-size: .68rem; color: #a9d0d6; } .alarm-search { flex: 1 1 220px; min-width: 0; }
+.alarm-record .alarm-record-row { grid-template-columns: 12px minmax(0, 1.4fr) minmax(0, 1fr) auto auto; } .alarm-record-facts { grid-column: 1 / -1; }
+@media (max-width: 800px) { .alarm-record .alarm-record-row { grid-template-columns: 12px minmax(0, 1fr); } .alarm-actions { justify-content: flex-start; } }

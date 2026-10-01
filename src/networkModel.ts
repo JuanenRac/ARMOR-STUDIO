@@ -9,7 +9,7 @@ export type NetworkKind = (typeof NETWORK_KINDS)[number];
 export type InternetState = "up" | "degraded" | "down" | "lan_down" | "unknown";
 
 export type NetworkPort = { port: number; proto: "tcp" | "udp"; service?: string; banner?: string };
-export type DeviceNote = { name?: string; notes?: string; trusted?: boolean; kind?: NetworkKind; updated_at: string };
+export type DeviceNote = { name?: string; notes?: string; trusted?: boolean; kind?: NetworkKind; /** Left out of the list. */ hidden?: boolean; /** Tell me the next time it comes onto the network. */ watch?: boolean; updated_at: string };
 export type NetworkDevice = {
   id: string; ip: string; mac?: string; randomized_mac?: boolean; vendor?: string; hostname?: string; kind?: NetworkKind; os?: string; online: boolean;
   first_seen_ms: number; last_seen_ms: number; latency_ms?: number; ports?: NetworkPort[]; services?: string[]; note?: DeviceNote;
@@ -19,8 +19,10 @@ export type NetworkInternet = {
   state: InternetState; since_ms?: number; gateway_ok?: boolean; latency_ms?: number; loss_percent?: number; probes?: NetworkProbe[];
   last_outage?: { started_ms: number; ended_ms: number; duration_s: number }; outages_24h?: number; downtime_24h_s?: number;
 };
+/** What the internet sees of the connection, as the node asked a public service. */
+export type NetworkPublic = { ip: string; hostname?: string; city?: string; region?: string; country?: string; org?: string; timezone?: string; checked_ms: number; changed_ms?: number };
 export type NetworkNode = {
-  node_id: string; received_at: string; stale: boolean;
+  node_id: string; received_at: string; stale: boolean; public?: NetworkPublic; /** How many devices are hidden from the list. */ hidden?: number;
   interface: { name: string; ip: string; cidr: string; gateway?: string; rx_bps?: number; tx_bps?: number };
   internet: NetworkInternet; devices: NetworkDevice[]; scan?: { last_ms: number; hosts: number; duration_ms?: number };
 };

@@ -39,3 +39,16 @@ button.net-row { cursor: pointer; } button.net-row:hover { background: #0c2530; 
 .net-events li.bad { border-left-color: #ff6f79; background: #1a1015; } .net-events li.warn { border-left-color: #ffb020; } .net-events li.good { border-left-color: #5df0c4; }
 @media (max-width: 1100px) { .net-hero { grid-template-columns: repeat(3, 1fr); } .net-hero > .net-state-card { grid-column: 1 / -1; } .net-devices.with-detail { grid-template-columns: 1fr; } .net-detail { position: static; } }
 @media (max-width: 760px) { .net-row { grid-template-columns: 30px 1fr 1fr; } .net-row > :nth-child(n+4) { display: none; } .net-hero { grid-template-columns: repeat(2, 1fr); } }
+
+/* the manual orders, the services and the public connection */
+.net-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .8rem; } .net-toolbar .net-meta { margin: 0; flex: 1 1 360px; }
+.net-order { margin: 0; padding: .5rem .8rem; border: 1px solid #285a66; border-radius: 10px; background: #08171f; font-size: .78rem; display: grid; gap: .3rem; }
+.net-order p { margin: 0; } .net-order b { color: #eafcff; } .net-order.good { border-color: #1f7a5c; } .net-order.bad { border-color: #9a3c47; color: #ffb8bf; } .net-order.wait { border-color: #8a6a1c; color: #ffcf7d; }
+.net-order pre { margin: 0; max-height: 14rem; overflow: auto; white-space: pre-wrap; font: .72rem "DM Mono", ui-monospace, monospace; color: #cfeff4; }
+.net-order-buttons, .net-copy { display: flex; flex-wrap: wrap; gap: .4rem; margin: .2rem 0; } .net-copy { margin: 0; }
+.net-order-buttons button, .net-copy button { padding: .35rem .7rem; border-radius: 8px; border: 1px solid #285a66; background: #0a202a; color: #bfe0e6; font-size: .72rem; } .net-order-buttons button.on { border-color: #22d3ee; background: #0d2f3b; }
+.net-services { list-style: none; margin: 0; padding: 0; display: grid; gap: .3rem; font-size: .78rem; } .net-services li { display: flex; justify-content: space-between; gap: .6rem; align-items: center; flex-wrap: wrap; }
+.net-services li.risky span:first-child, .net-chips span.risky, .net-svc-list .risky { color: #ff8e99; } .net-service-actions { display: flex; gap: .4rem; align-items: center; } .net-service-actions a, .net-svc-list a { color: #63e6f2; }
+.net-service-actions button { padding: .2rem .5rem; border-radius: 8px; border: 1px solid #285a66; background: #0a202a; color: #bfe0e6; font-size: .68rem; }
+.net-table.services .net-row { grid-template-columns: minmax(150px, 1.2fr) minmax(120px, .8fr) 3fr; } .net-svc-list { display: flex; flex-wrap: wrap; gap: .4rem .8rem; font-size: .76rem; }
+.net-facts { display: grid; gap: .35rem; margin: 0; } .net-facts > div { display: grid; grid-template-columns: 9rem 1fr; gap: .5rem; font-size: .8rem; } .net-facts dt { color: #86a8b3; } .net-facts dd { margin: 0; color: #eafcff; overflow-wrap: anywhere; } .net-facts .mono { font-family: "DM Mono", ui-monospace, monospace; }
