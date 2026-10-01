@@ -207,7 +207,7 @@ describe("storing the drawing", () => {
     };
     const design = parseElectricalDoc(messy)!;
     expect(design.elements.map(element => element.id)).toEqual(["mcb-01", "load-01"]);
-    expect(design.elements[0].props).toEqual({ rating_a: 4000, curve: "C", poles: "1P+N" });
+    expect(design.elements[0].props).toEqual({ manufacturer: "", model: "", rating_a: 4000, curve: "C", poles: "1P+N" });
     expect(design.wires.map(wire => wire.id)).toEqual(["wire-01"]);
     expect(design.frames.map(frame => [frame.id, frame.colour])).toEqual([["frame-01", "cyan"]]);
   });

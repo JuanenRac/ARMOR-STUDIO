@@ -13,6 +13,8 @@
  *   ARMOR_SERVER_ORIGIN        server Studio should start with, e.g. http://192.168.0.180:18080; a comma-separated list when the
  *                              same Studio is reached by more than one address (the LAN one and a public one): the first is the
  *                              default, and the one that shares its host name with the request is offered to that visitor
+ *   ARMOR_CONNECTION_FILE      the connection.json an administrator saves from Studio (in ARMOR-SERVER's data directory): its studio_port wins over
+ *                              ARMOR_STUDIO_PORT and its port is the port of the server Studio is offered; a missing or broken file changes nothing
  *   TLS_CERT_PATH/TLS_KEY_PATH set both to serve this static host itself over HTTPS too, same convention as ARMOR-SERVER's own
  *                              (src/app.ts) - off (today's plain HTTP) unless both are set. A browser given an https:// address
  *                              for Studio gets a real TLS handshake instead of feeding it a TLS ClientHello a plain HTTP server
@@ -28,7 +30,16 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.resolve(process.env.ARMOR_STUDIO_DIST ?? path.join(here, "..", "dist"));
 const host = process.env.ARMOR_STUDIO_HOST?.trim() || "127.0.0.1";
-const port = Number(process.env.ARMOR_STUDIO_PORT ?? 5178);
+/** The saved connection settings: only whole ports from 1 to 65535 are taken, anything else is ignored. */
+export function readSavedConnection(file) {
+  try {
+    const parsed = JSON.parse(readFileSync(file, "utf8"));
+    const valid = value => (Number.isInteger(value) && value >= 1 && value <= 65535 ? value : undefined);
+    return { port: valid(parsed?.port), studioPort: valid(parsed?.studio_port) };
+  } catch { return {}; }
+}
+const savedConnection = process.env.ARMOR_CONNECTION_FILE ? readSavedConnection(process.env.ARMOR_CONNECTION_FILE) : {};
+const port = savedConnection.studioPort ?? Number(process.env.ARMOR_STUDIO_PORT ?? 5178);
 
 /** The server origins of a comma-separated setting, each normalised (scheme, host and port only); anything that is not an http(s) origin is dropped. */
 export function parseServerOrigins(value) {
@@ -51,7 +62,12 @@ export function pickServerOrigin(origins, hostHeader) {
   return origins.find(origin => new URL(origin).hostname.toLowerCase() === asked) ?? origins[0];
 }
 
-const serverOrigins = parseServerOrigins(process.env.ARMOR_SERVER_ORIGIN);
+const serverOrigins = parseServerOrigins(process.env.ARMOR_SERVER_ORIGIN).map(origin => {
+  if (savedConnection.port === undefined) return origin;
+  const url = new URL(origin);
+  url.port = String(savedConnection.port);
+  return url.origin;
+});
 
 const TYPES = {
   ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",

@@ -1,0 +1,50 @@
+/**
+ * The phrases of the technical settings of the server (address and ports) and of the camera settings that now live in the Cameras menu, in the seven languages.
+ * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
+ */
+import { cataloguesFromRows, type Row } from "./catalogueRows";
+
+const ROWS: Record<string, Row> = {
+  tabServer: ["Server", "Servidor", "Server", "Serveur", "Server", "サーバー", "服务器"],
+  cs_title: ["Server address and ports", "Dirección y puertos del servidor", "Adresse und Ports des Servers", "Adresse et ports du serveur", "Indirizzo e porte del server", "サーバーのアドレスとポート", "服务器地址与端口"],
+  cs_help: ["Where the ARMOR server listens and where Studio is served. What you save is kept now and takes effect the next time the server and Studio are started.", "Dónde escucha el servidor ARMOR y dónde se sirve Studio. Lo que guardes queda anotado ya y se aplica la próxima vez que se arranquen el servidor y Studio.", "Wo der ARMOR-Server lauscht und wo Studio ausgeliefert wird. Was Sie speichern, gilt ab dem nächsten Start von Server und Studio.", "Où le serveur ARMOR écoute et où Studio est servi. Ce que vous enregistrez est pris en compte au prochain démarrage du serveur et de Studio.", "Dove ascolta il server ARMOR e dove viene servito Studio. Ciò che salvi vale dal prossimo avvio di server e Studio.", "ARMOR サーバーの待ち受け先と Studio の配信先。保存内容は、次にサーバーと Studio を起動したときに反映されます。", "ARMOR 服务器的监听位置以及 Studio 的服务位置。保存的内容将在下次启动服务器和 Studio 时生效。"],
+  cs_host: ["Address the server listens on", "Dirección en la que escucha el servidor", "Adresse, auf der der Server lauscht", "Adresse d'écoute du serveur", "Indirizzo di ascolto del server", "サーバーの待ち受けアドレス", "服务器监听地址"],
+  cs_host_help: ["0.0.0.0 = every network card, 127.0.0.1 = only this machine, or the address of one card.", "0.0.0.0 = todas las tarjetas de red, 127.0.0.1 = solo esta máquina, o la dirección de una tarjeta.", "0.0.0.0 = alle Netzwerkkarten, 127.0.0.1 = nur dieser Rechner, oder die Adresse einer Karte.", "0.0.0.0 = toutes les cartes réseau, 127.0.0.1 = cette machine seulement, ou l'adresse d'une carte.", "0.0.0.0 = tutte le schede di rete, 127.0.0.1 = solo questa macchina, oppure l'indirizzo di una scheda.", "0.0.0.0 = すべてのネットワークカード、127.0.0.1 = このマシンのみ、または特定のカードのアドレス。", "0.0.0.0 = 所有网卡，127.0.0.1 = 仅本机，或某一网卡的地址。"],
+  cs_port: ["Server port", "Puerto del servidor", "Server-Port", "Port du serveur", "Porta del server", "サーバーのポート", "服务器端口"],
+  cs_studio_port: ["Studio port", "Puerto de Studio", "Studio-Port", "Port de Studio", "Porta di Studio", "Studio のポート", "Studio 端口"],
+  cs_active: ["Running now", "En marcha ahora", "Läuft jetzt", "En cours", "In esecuzione ora", "現在の設定", "当前运行"],
+  cs_saved: ["Saved for the next start", "Guardado para el próximo arranque", "Für den nächsten Start gespeichert", "Enregistré pour le prochain démarrage", "Salvato per il prossimo avvio", "次回起動用に保存済み", "已保存，下次启动生效"],
+  cs_save: ["Save address and ports", "Guardar dirección y puertos", "Adresse und Ports speichern", "Enregistrer l'adresse et les ports", "Salva indirizzo e porte", "アドレスとポートを保存", "保存地址与端口"],
+  cs_done: ["Saved. Start the server and Studio again for it to take effect.", "Guardado. Vuelve a arrancar el servidor y Studio para que se aplique.", "Gespeichert. Starten Sie Server und Studio neu, damit es gilt.", "Enregistré. Redémarrez le serveur et Studio pour l'appliquer.", "Salvato. Riavvia server e Studio per applicarlo.", "保存しました。反映するにはサーバーと Studio を再起動してください。", "已保存。请重新启动服务器和 Studio 以生效。"],
+  cs_restart: ["A restart is pending: what is saved differs from what is running.", "Hay un reinicio pendiente: lo guardado es distinto de lo que está en marcha.", "Ein Neustart steht aus: das Gespeicherte weicht vom Laufenden ab.", "Un redémarrage est en attente : l'enregistré diffère de ce qui tourne.", "Riavvio in sospeso: ciò che è salvato differisce da ciò che è in esecuzione.", "再起動待ち：保存内容が実行中の設定と異なります。", "有待重启：已保存内容与当前运行的不同。"],
+  cs_error: ["It was not saved: ", "No se guardó: ", "Nicht gespeichert: ", "Non enregistré : ", "Non salvato: ", "保存できませんでした：", "未保存："],
+  cs_admin_only: ["Only an administrator can see and change this.", "Solo un administrador puede ver y cambiar esto.", "Nur ein Administrator kann das sehen und ändern.", "Seul un administrateur peut voir et modifier ceci.", "Solo un amministratore può vedere e modificare questo.", "管理者のみが表示・変更できます。", "只有管理员可以查看和更改。"],
+  cs_leave_empty: ["Empty = as the installation has it", "Vacío = como lo tiene la instalación", "Leer = wie in der Installation", "Vide = comme dans l'installation", "Vuoto = come nell'installazione", "空欄 = インストール時のまま", "留空 = 保持安装时的设置"],
+  cam_configure: ["Configure cameras", "Configurar cámaras", "Kameras einrichten", "Configurer les caméras", "Configura le telecamere", "カメラを設定", "配置摄像头"],
+  cam_back: ["Back to the cameras", "Volver a las cámaras", "Zurück zu den Kameras", "Retour aux caméras", "Torna alle telecamere", "カメラ表示に戻る", "返回摄像头"],
+  cam_slot: ["Camera shown in this place", "Cámara que se muestra en este lugar", "In diesem Feld angezeigte Kamera", "Caméra affichée à cet endroit", "Telecamera mostrata in questo spazio", "この枠に表示するカメラ", "此位置显示的摄像头"],
+  cam_hint: ["Double-click a camera to see it full screen; the layout is kept for next time.", "Doble clic en una cámara para verla a pantalla completa; la distribución se guarda para la próxima vez.", "Doppelklick auf eine Kamera für Vollbild; die Anordnung bleibt für das nächste Mal erhalten.", "Double-cliquez sur une caméra pour la voir en plein écran ; la disposition est conservée.", "Doppio clic su una telecamera per vederla a schermo intero; la disposizione viene conservata.", "カメラをダブルクリックで全画面表示。レイアウトは次回も保持されます。", "双击摄像头可全屏查看；布局会被保留。"],
+  cam_back_grid: ["Back", "Atrás", "Zurück", "Retour", "Indietro", "戻る", "返回"],
+  "ndk_camera-server": ["Camera server", "Servidor de cámaras", "Kameraserver", "Serveur de caméras", "Server delle telecamere", "カメラサーバー", "摄像头服务器"],
+  ndp_ssid_5: ["Wi-Fi name 5 GHz (SSID)", "Nombre del Wi-Fi 5 GHz (SSID)", "WLAN-Name 5 GHz (SSID)", "Nom du Wi-Fi 5 GHz (SSID)", "Nome del Wi-Fi 5 GHz (SSID)", "Wi-Fi 名 5 GHz (SSID)", "Wi-Fi 名称 5 GHz (SSID)"],
+  ndp_manufacturer: ["Manufacturer", "Fabricante", "Hersteller", "Fabricant", "Produttore", "メーカー", "制造商"],
+  ndp_model: ["Model", "Modelo", "Modell", "Modèle", "Modello", "モデル", "型号"],
+  ndp_admin_user: ["Admin user", "Usuario de administración", "Admin-Benutzer", "Utilisateur admin", "Utente amministratore", "管理ユーザー", "管理员用户"],
+  ndp_admin_password: ["Admin password", "Contraseña de administración", "Admin-Passwort", "Mot de passe admin", "Password amministratore", "管理パスワード", "管理员密码"],
+  ndp_link: ["Connection", "Conexión", "Verbindung", "Connexion", "Connessione", "接続", "连接方式"],
+  ndp_camera_id: ["Camera in Cameras menu", "Cámara del menú Cámaras", "Kamera im Kameramenü", "Caméra du menu Caméras", "Telecamera del menu Telecamere", "カメラメニューのカメラ", "摄像头菜单中的摄像头"],
+  ndp_onvif_port: ["ONVIF port", "Puerto ONVIF", "ONVIF-Port", "Port ONVIF", "Porta ONVIF", "ONVIF ポート", "ONVIF 端口"],
+  ndp_rtsp_port: ["RTSP port", "Puerto RTSP", "RTSP-Port", "Port RTSP", "Porta RTSP", "RTSP ポート", "RTSP 端口"],
+  ndp_software: ["Software", "Programa", "Software", "Logiciel", "Software", "ソフトウェア", "软件"],
+  ndp_channels: ["Channels", "Canales", "Kanäle", "Canaux", "Canali", "チャンネル", "通道数"],
+  ndp_storage_tb: ["Storage", "Almacenamiento", "Speicher", "Stockage", "Archiviazione", "ストレージ", "存储"],
+  nd_rotate: ["Rotate (R)", "Girar (R)", "Drehen (R)", "Pivoter (R)", "Ruota (R)", "回転 (R)", "旋转 (R)"],
+  nd_replace: ["Replace with another device", "Sustituir por otro dispositivo", "Durch anderes Gerät ersetzen", "Remplacer par un autre appareil", "Sostituisci con un altro dispositivo", "別のデバイスに置き換え", "替换为其他设备"],
+  nd_replace_pick: ["— choose —", "— elegir —", "— wählen —", "— choisir —", "— scegli —", "— 選択 —", "— 选择 —"],
+  nd_cam_link: ["Linked camera (Cameras menu)", "Cámara enlazada (menú Cámaras)", "Verknüpfte Kamera (Kameramenü)", "Caméra liée (menu Caméras)", "Telecamera collegata (menu Telecamere)", "リンクしたカメラ (カメラメニュー)", "关联的摄像头（摄像头菜单）"],
+  nd_group_edit: ["Edit", "Edición", "Bearbeiten", "Édition", "Modifica", "編集", "编辑"],
+  nd_group_design: ["Design", "Diseño", "Entwurf", "Plan", "Progetto", "設計", "设计"],
+  nd_group_files: ["Files", "Archivos", "Dateien", "Fichiers", "File", "ファイル", "文件"],
+  cam_none: ["— nothing —", "— nada —", "— nichts —", "— rien —", "— niente —", "— なし —", "— 无 —"],
+};
+export const configCatalogues = cataloguesFromRows(ROWS);

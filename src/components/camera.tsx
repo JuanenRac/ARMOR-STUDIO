@@ -8,8 +8,10 @@ import { cameraIsConfigured, type Camera } from "../domain";
 
 export type Translate = (key: string) => string;
 
-export function CameraTile({ camera, selected, select, toggle, snapshot, record, expand, recording, streamUrl, reachability, invokePtz, t }: {
+export function CameraTile({ camera, selected, select, toggle, snapshot, record, expand, recording, streamUrl, reachability, invokePtz, t, choices, pick }: {
   camera: Camera; selected: boolean; select: () => void; toggle: () => void; snapshot: () => void; record: () => void; expand: () => void;
+  /** The cameras this place of the grid can show, and the way to change it. */
+  choices?: readonly Camera[]; pick?: (id: string) => void;
   recording: boolean; streamUrl?: string; reachability?: Reachability; invokePtz: (command: string) => Promise<void>; t: Translate;
 }) {
   const [ptzOpen, setPtzOpen] = useState(false);
@@ -17,7 +19,7 @@ export function CameraTile({ camera, selected, select, toggle, snapshot, record,
   const powered = camera.enabled && configured;
   // The server's watchdog knows whether the camera answers on the network; an enabled camera that does not is not "online".
   const unreachable = powered && reachability === "offline";
-  return <article className={`camera-tile ${selected ? "selected" : ""}`} onClick={select}>
+  return <article className={`camera-tile ${selected ? "selected" : ""}`} onClick={select} onDoubleClick={expand}>
     <div className="camera-image">
       {powered && camera.liveVideoAvailable && streamUrl ? <img src={streamUrl} alt={`${t("cameraMonitor")}: ${camera.name}`} /> : powered && camera.snapshotUrl ? <img src={camera.snapshotUrl} alt={`${t("snapshot")}: ${camera.name}`} /> : <div className="camera-placeholder"><span>◉</span><p>{configured ? t("noStream") : t("selectCameraFirst")}</p></div>}
       <span className={`live-chip ${powered && !unreachable ? "online" : "offline"}`}>{unreachable ? t("unreachable") : powered ? t("online") : t("powerOff")}</span>
@@ -30,7 +32,7 @@ export function CameraTile({ camera, selected, select, toggle, snapshot, record,
       </div>
       {ptzOpen && powered && <div className="ptz-overlay"><CameraPtz enabled={powered && Boolean(camera.hasCredentials)} invoke={invokePtz} t={t} /></div>}
     </div>
-    <div className="camera-meta"><div><strong>{camera.name}</strong><small>{camera.host}</small></div></div>
+    <div className="camera-meta"><div><strong>{camera.name}</strong><small>{camera.host}</small></div>{choices && pick && choices.length > 1 && <select className="camera-slot" aria-label={t("cam_slot")} title={t("cam_slot")} value={camera.id} onClick={event => event.stopPropagation()} onDoubleClick={event => event.stopPropagation()} onChange={event => pick(event.target.value)}>{choices.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select>}</div>
   </article>;
 }
 
@@ -102,9 +104,19 @@ export function CameraFullscreen({ camera, cameras, origin, recording, t, close,
   const [ptzOpen, setPtzOpen] = useState(false);
   const index = cameras.findIndex(item => item.id === camera.id);
   const live = camera.enabled && camera.liveVideoAvailable;
+  // The keyboard works here as the buttons do: left and right go to the other cameras, Escape goes back.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close();
+      else if (event.key === "ArrowLeft") step(-1);
+      else if (event.key === "ArrowRight") step(1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [close, step]);
   return <div className="camera-fullscreen" role="dialog" aria-modal="true" aria-label={camera.name}>
     <header>
-      <div><span className="live-chip online">{t("online")}</span><h2>{camera.name}</h2><small>{camera.host}</small></div>
+      <div><button className="icon-button camera-back" onClick={close}>‹ {t("cam_back_grid")}</button><span className="live-chip online">{t("online")}</span><h2>{camera.name}</h2><small>{camera.host}</small></div>
       <div><button className={ptzOpen ? "icon-button ptz-toggle active" : "icon-button ptz-toggle"} title={ptzOpen ? t("ptzHide") : t("ptzShow")} aria-pressed={ptzOpen} disabled={!camera.enabled || !camera.hasCredentials} onClick={() => setPtzOpen(open => !open)}>PTZ</button><button className="icon-button" title={t("fullscreen")} onClick={fullScreen}>⛶</button><button className="icon-button" title={t("close")} onClick={close}>×</button></div>
     </header>
     <div className="camera-fullscreen-video">

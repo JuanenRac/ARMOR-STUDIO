@@ -5,7 +5,7 @@
  */
 import { nextId } from "../designer/ops";
 import type { FrameColour } from "../electrical/model";
-import { GRID, isKind, kindDef, portOf, snap, type Binding, type Design, type Element, type Frame, type PortRef, type PropDef, type PropValue, type Wire } from "./model";
+import { GRID, isKind, kindDef, portOf, rotationOf, sizeOf, snap, type Binding, type Design, type Element, type Frame, type PortRef, type PropDef, type PropValue, type Wire } from "./model";
 
 const MAX_ELEMENTS = 400, MAX_WIRES = 800, MAX_FRAMES = 60;
 export const LIMITS = { elements: MAX_ELEMENTS, wires: MAX_WIRES, frames: MAX_FRAMES } as const;
@@ -46,7 +46,40 @@ export function setProp(design: Design, id: string, key: string, value: unknown)
   if (!element || !def) return design;
   const clean = cleanProp(def, value);
   if (clean === undefined) return design;
-  return { ...design, elements: design.elements.map(item => item.id === id ? { ...item, props: { ...item.props, [key]: clean } } : item) };
+  const changed = { ...design, elements: design.elements.map(item => item.id === id ? { ...item, props: { ...item.props, [key]: clean } } : item) };
+  return dropDeadWires(changed);
+}
+
+/** The links whose port no longer exists (a switch given fewer ports, an element turned into another kind) are removed. */
+export function dropDeadWires(design: Design): Design {
+  const byId = new Map(design.elements.map(element => [element.id, element]));
+  const alive = design.wires.filter(wire => { const a = byId.get(wire.from.element), b = byId.get(wire.to.element); return a && b && portOf(a, wire.from.port) && portOf(b, wire.to.port); });
+  return alive.length === design.wires.length ? design : { ...design, wires: alive };
+}
+
+/** Turn an element a quarter turn clockwise; its links stay joined to the same ports. */
+export function rotateElement(design: Design, id: string): Design {
+  return { ...design, elements: design.elements.map(element => element.id === id ? { ...element, rot: (rotationOf(element) + 90) % 360 } : element) };
+}
+
+/**
+ * Put another kind of device in the place of this one: its name, address, maker and notes stay, and every link whose port exists in the new kind with the same medium stays
+ * joined; the others are dropped.
+ */
+export function replaceKind(design: Design, id: string, kind: string): Design {
+  const source = design.elements.find(element => element.id === id), def = kindDef(kind);
+  if (!source || !def || source.kind === kind) return design;
+  const props: Record<string, PropValue> = { ...def.defaults };
+  for (const prop of def.props) { const value = cleanProp(prop, source.props[prop.key]); if (value !== undefined) props[prop.key] = value; }
+  const next: Element = { ...source, kind, props };
+  const elements = design.elements.map(element => element.id === id ? next : element);
+  const before = new Map(design.elements.map(element => [element.id, element]));
+  const wires = design.wires.filter(wire => [wire.from, wire.to].every(ref => {
+    if (ref.element !== id) return true;
+    const was = portOf(source, ref.port), now = portOf(next, ref.port);
+    return Boolean(was && now && was.medium === now.medium);
+  }) && before.has(wire.from.element));
+  return { ...design, elements, wires };
 }
 
 const DEVICE_ID = /^[a-z0-9][a-z0-9:._-]{0,63}$/;
@@ -140,7 +173,7 @@ export function removeFrame(design: Design, id: string): Design { return { ...de
 
 /** The elements whose box lies inside a frame (so moving the frame can carry them along). */
 export function elementsInFrame(design: Design, frame: Frame): string[] {
-  return design.elements.filter(element => { const def = kindDef(element.kind); return def && element.x >= frame.x && element.y >= frame.y && element.x + def.w <= frame.x + frame.w && element.y + def.h <= frame.y + frame.h; }).map(element => element.id);
+  return design.elements.filter(element => { const { w, h } = sizeOf(element); return w > 0 && element.x >= frame.x && element.y >= frame.y && element.x + w <= frame.x + frame.w && element.y + h <= frame.y + frame.h; }).map(element => element.id);
 }
 
 export const isPlaceable = (kind: string): boolean => isKind(kind);

@@ -37,12 +37,13 @@ function glyph(kind: string, colour: string): ReactNode {
 }
 
 /** The body of an element (its box and picture), drawn at the origin. `tone` colours the edge; `live` says whether the device it is tied to is there. */
-export function ElementBody({ kind, selected, tone, live }: { kind: string; selected: boolean; tone?: "ok" | "warn" | "bad"; live?: "on" | "off" | "missing" }) {
+export function ElementBody({ kind, selected, tone, live, rot = 0 }: { kind: string; selected: boolean; tone?: "ok" | "warn" | "bad"; live?: "on" | "off" | "missing"; rot?: number }) {
   const def = kindDef(kind);
   if (!def) return null;
   const colour = CATEGORY_COLOUR[def.category];
   const edge = tone === "bad" ? "#f87171" : tone === "warn" ? "#fbbf24" : colour;
-  return <g>
+  const turned = rot % 180 !== 0, boxW = turned ? def.h : def.w, boxH = turned ? def.w : def.h;
+  return <g transform={rot ? `translate(${boxW / 2} ${boxH / 2}) rotate(${rot}) translate(${-def.w / 2} ${-def.h / 2})` : undefined}>
     <rect width={def.w} height={def.h} rx={8} fill={colour} fillOpacity={0.12} stroke={selected ? "#00e5ff" : edge} strokeWidth={selected ? 2.4 : 1.6} />
     <g transform={`translate(${def.w / 2 - 20} ${def.h / 2 - 20})`}>{glyph(kind, colour)}</g>
     {live && <circle cx={def.w - 8} cy={8} r={4} fill={live === "on" ? "#5df0c4" : live === "off" ? "#ff6f79" : "#64748b"} stroke="#060d13" strokeWidth={1.5} />}

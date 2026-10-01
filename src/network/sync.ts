@@ -29,6 +29,7 @@ function cleanElement(value: unknown): Element | undefined {
   const props: Props = { ...def.defaults };
   for (const prop of def.props) { const clean = cleanProp(prop, given[prop.key]); if (clean !== undefined) props[prop.key] = clean; }
   const element: Element = { id: value.id, kind: value.kind, x, y, name: typeof value.name === "string" ? value.name.slice(0, 60) : "", props };
+  if (value.rot === 90 || value.rot === 180 || value.rot === 270) element.rot = value.rot;
   if (isRecord(value.bind) && typeof value.bind.device === "string" && DEVICE_ID.test(value.bind.device)) element.bind = { device: value.bind.device };
   return element;
 }

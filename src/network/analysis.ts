@@ -5,7 +5,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import type { NetworkDevice } from "../networkModel";
-import { kindDef, numberProp, textProp, type Design, type Element } from "./model";
+import { kindDef, portOf, numberProp, textProp, type Design, type Element } from "./model";
 
 export type Level = "error" | "warn" | "info";
 export type Issue = { level: Level; code: string; args: Array<string | number>; element?: string; wire?: string };
@@ -132,5 +132,5 @@ export function analyse(design: Design, live?: Live): { issues: Issue[]; totals:
 
 function portMedium(design: Design, elementId: string, portId: string): string | undefined {
   const element = design.elements.find(item => item.id === elementId);
-  return element ? kindDef(element.kind)?.ports.find(port => port.id === portId)?.medium : undefined;
+  return element ? portOf(element, portId)?.medium : undefined;
 }

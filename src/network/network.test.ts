@@ -6,8 +6,8 @@ import {
   sortByAddress, type NetworkDevice, type NetworkEvent,
 } from "../networkModel";
 import { analyse, inNetwork, isCidr, isIp } from "./analysis";
-import { KINDS, kindDef, portOf, portPosition, wirePath, type Design } from "./model";
-import { addElement, addFrame, canConnect, connect, duplicateElement, elementsInFrame, moveElement, removeElement, removeFrame, setBinding, setProp, updateFrame, updateWire } from "./ops";
+import { KINDS, kindDef, portOf, portPosition, portsOf, sizeOf, wirePath, type Design } from "./model";
+import { addElement, addFrame, canConnect, connect, duplicateElement, elementsInFrame, moveElement, removeElement, removeFrame, replaceKind, rotateElement, setBinding, setProp, updateFrame, updateWire } from "./ops";
 import { drawFound, emptyDesign, housePreset, isWireless } from "./presets";
 import { applyNetworkDoc, buildNetworkDoc, networkKey, parseNetworkDoc } from "./sync";
 
@@ -216,15 +216,17 @@ describe("the Network Designer's checks", () => {
     expect(found).toContain("unlinked");
     expect(found.filter(code => code === "no_internet_path")).toHaveLength(2);       // the switch and the computer on their own island
   });
-  it("finds a switch with more cables than ports, and PoE the switch cannot give", () => {
+  it("draws only the ports a switch has, and finds PoE the switch cannot give", () => {
     const design = build((add, join) => {
       const s = add("switch", 0, { ports: 4, poe_budget_w: 10 }, "S");
       const cams = [1, 2, 3].map(index => add("camera", 200 * index, { poe_w: 6 }));
       const extra = [add("server", 900), add("nas", 1100)];
-      [...cams, ...extra].forEach((id, index) => join(s, `p${index + 1}`, id, "eth"));
+      [...cams, extra[0]].forEach((id, index) => join(s, `p${index + 1}`, id, "eth"));
+      // a 4-port switch has 4 ports: the fifth cable has nowhere to go (it used to be drawn on 8 points)
+      expect(() => join(s, "p5", extra[1], "eth")).toThrow("unknown_port");
     });
     const issues = analyse(design).issues;
-    expect(issues.find(issue => issue.code === "switch_full")?.args).toEqual(["S", 5, 4]);
+    expect(design.wires).toHaveLength(4);
     expect(issues.find(issue => issue.code === "poe_over")?.args).toEqual(["S", 18, 10]);
   });
   it("suggests a cable for a server that is only on Wi-Fi", () => {
@@ -326,5 +328,38 @@ describe("the drawing as a document", () => {
     expect(design.frames).toEqual([{ id: "frame-01", name: "F", x: 0, y: 0, w: 200, h: 100, colour: "cyan" }]);
     expect([parseNetworkDoc(null), parseNetworkDoc("x"), parseNetworkDoc({}), parseNetworkDoc({ elements: [], wires: 1 })]).toEqual([undefined, undefined, undefined, undefined]);
     expect(applyNetworkDoc("nonsense", housePreset(t))).toEqual(housePreset(t));
+  });
+});
+
+describe("rotation, replacing a device and the maker's data", () => {
+  it("turns the sides of the ports with the element and keeps the links", () => {
+    let design = addElement(emptyDesign(), "router", 0, 0)!.design;
+    const id = design.elements[0].id;
+    expect(portsOf(design.elements[0]).find(port => port.id === "wan")?.side).toBe("left");
+    design = rotateElement(design, id);
+    expect(design.elements[0].rot).toBe(90);
+    expect(portsOf(design.elements[0]).find(port => port.id === "wan")?.side).toBe("top");
+    expect(sizeOf(design.elements[0])).toEqual({ w: 96, h: 132 });
+    for (let turn = 0; turn < 3; turn += 1) design = rotateElement(design, id);
+    expect(design.elements[0].rot).toBe(0);
+  });
+  it("gives every kind a maker, a model and an administrator login, and a switch only the ports it has", () => {
+    const design = addElement(emptyDesign(), "switch", 0, 0, "", { ports: 4, manufacturer: "TP-Link" })!.design;
+    expect(design.elements[0].props.manufacturer).toBe("TP-Link");
+    expect(portsOf(design.elements[0]).filter(port => port.id.startsWith("p"))).toHaveLength(4);
+    expect(kindDef("camera")?.props.some(prop => prop.key === "admin_password")).toBe(true);
+  });
+  it("replaces a device keeping the links whose ports still exist", () => {
+    let design = emptyDesign();
+    const a = addElement(design, "switch", 0, 0)!; design = a.design;
+    const b = addElement(design, "server", 400, 0, "Box", { ip: "10.0.0.2" })!; design = b.design;
+    const wired = connect(design, { element: a.id, port: "p1" }, { element: b.id, port: "eth" });
+    if (wired.ok) design = wired.design;
+    design = replaceKind(design, b.id, "nas");
+    expect(design.elements[1].kind).toBe("nas");
+    expect(design.elements[1].props.ip).toBe("10.0.0.2");
+    expect(design.wires).toHaveLength(1);
+    design = replaceKind(design, b.id, "phone");
+    expect(design.wires).toHaveLength(0);
   });
 });

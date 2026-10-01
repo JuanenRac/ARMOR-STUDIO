@@ -22,7 +22,7 @@ export type PortDef = {
 
 export type PropDef =
   | { key: string; type: "number"; unit?: string; min: number; max: number; step?: number }
-  | { key: string; type: "text"; max: number }
+  | { key: string; type: "text"; max: number; secret?: boolean }
   | { key: string; type: "choice"; choices: readonly string[] };
 export type PropValue = number | string;
 export type Props = Record<string, PropValue>;
@@ -50,7 +50,7 @@ const choice = (key: string, choices: readonly string[]): PropDef => ({ key, typ
 const rating = (): PropDef => num("rating_a", "A", 1, 4000);
 const CURVES = ["B", "C", "D"] as const;
 
-export const KINDS: readonly KindDef[] = [
+const BASE_KINDS: readonly KindDef[] = [
   // ---- sources ----
   { kind: "grid", category: "source", w: 96, h: 64, ports: [port("out", "ac", "right", 0.5, { required: true })], props: [num("voltage_v", "V", 100, 480), num("contracted_kw", "kW", 0, 500, 0.01)], defaults: { voltage_v: 230, contracted_kw: 5.75 } },
   { kind: "pv-array", category: "source", w: 96, h: 64, ports: [port("dc", "dc", "right", 0.5, { required: true })], props: [num("peak_wp", "Wp", 0, 500000), num("strings", "", 1, 64), num("voc_v", "V", 0, 1500)], defaults: { peak_wp: 0, strings: 1, voc_v: 0 } },
@@ -96,6 +96,10 @@ export const KINDS: readonly KindDef[] = [
   { kind: "hvac", category: "load", w: 88, h: 60, ports: [port("in", "ac", "left", 0.5, { required: true })], props: [num("power_w", "W", 0, 50000)], defaults: { power_w: 2500 } },
   { kind: "load-dc", category: "load", w: 88, h: 60, ports: [port("in", "dc", "left", 0.5, { required: true })], props: [num("power_w", "W", 0, 100000), num("voltage_v", "V", 3, 1000)], defaults: { power_w: 100, voltage_v: 12 } },
 ];
+
+/** What every element can say about itself: who made it and which model it is (the same fields the Network Designer has). */
+const COMMON_PROPS: readonly PropDef[] = [{ key: "manufacturer", type: "text", max: 40 }, { key: "model", type: "text", max: 40 }];
+export const KINDS: readonly KindDef[] = BASE_KINDS.map(def => ({ ...def, props: [...def.props, ...COMMON_PROPS.filter(common => !def.props.some(prop => prop.key === common.key))], defaults: { manufacturer: "", model: "", ...def.defaults } }));
 
 const BY_KIND = new Map(KINDS.map(def => [def.kind, def]));
 export const kindDef = (kind: string): KindDef | undefined => BY_KIND.get(kind);

@@ -57,6 +57,8 @@ const ROWS: Record<string, Row> = {
   el_hvac: ["Air conditioning", "Climatización", "Klimaanlage", "Climatisation", "Climatizzazione", "空調", "空调"],
   "el_load-dc": ["DC load", "Carga DC", "DC-Verbraucher", "Charge DC", "Carico DC", "DC 負荷", "直流负载"],
   // properties
+  elp_manufacturer: ["Manufacturer", "Fabricante", "Hersteller", "Fabricant", "Produttore", "メーカー", "制造商"],
+  elp_model: ["Model", "Modelo", "Modell", "Modèle", "Modello", "モデル", "型号"],
   elp_voltage_v: ["Voltage (V)", "Tensión (V)", "Spannung (V)", "Tension (V)", "Tensione (V)", "電圧 (V)", "电压 (V)"],
   elp_contracted_kw: ["Contracted power (kW)", "Potencia contratada (kW)", "Vertragsleistung (kW)", "Puissance souscrite (kW)", "Potenza impegnata (kW)", "契約電力 (kW)", "合同功率 (kW)"],
   elp_peak_wp: ["Peak power (Wp)", "Potencia pico (Wp)", "Spitzenleistung (Wp)", "Puissance crête (Wc)", "Potenza di picco (Wp)", "ピーク電力 (Wp)", "峰值功率 (Wp)"],
