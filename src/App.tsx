@@ -10,6 +10,7 @@ import { AboutDialog, ConfirmDialog, Sidebar, StatusBar, TopBar } from "./compon
 import { DesignVersionsDialog } from "./DesignVersionsDialog";
 import { SessionUserContext } from "./sessionContext";
 import { CameraFullscreen } from "./components/camera";
+import { ElectricalView } from "./views/ElectricalView";
 import { ConfigurationPanel } from "./ConfigurationPanel";
 import { CameraSettings } from "./CameraSettings";
 import { loadLayout, saveLayout } from "./cameraLayout";
@@ -249,6 +250,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const panels: Record<View, ReactNode> = {
     overview: <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} />,
     alarms: <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} />,
+    electrical: <ElectricalView t={t} origin={origin} readings={electricalPoll.data ?? null} unreachable={electricalPoll.failed} design={electrical} openDesigner={() => setView("electricalDesigner")} network={networkPoll.data} now={now} />,
     inverters: <InvertersView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} network={networkPoll.data} />,
     batteries: <BatteriesView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} network={networkPoll.data} />,
     devices: <DevicesView t={t} origin={origin} devices={devices} reload={devicePoll.reload} placedIds={new Set(placements.map(item => item.device_id))} onPlace={id => { setWantsToPlace(id); setView("siteDesigner"); }} now={now} />,

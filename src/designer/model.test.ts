@@ -119,7 +119,7 @@ describe("one tool panel for both views", () => {
     expect(groupOf("fence")).toBe(groupOf("gate")); expect(groupOf("door")).toBe(groupOf("garage")); expect(groupOf("door")).toBe(groupOf("window"));
     expect(groupOf("tree")).toBe(groupOf("planter")); expect(groupOf("pool")).toBe(groupOf("terrace")); expect(groupOf("kennel")).toBe(groupOf("coop"));
     expect(groupOf("path")).toBe(groupOf("road")); expect(groupOf("road")).toBe(groupOf("sidewalk"));
-    expect(groups.flat().length).toBe(36);   // no tool was lost or repeated
-    expect(new Set(groups.flat()).size).toBe(36);
+    expect(groups.flat().length).toBe(38);   // no tool was lost or repeated
+    expect(new Set(groups.flat()).size).toBe(38);
   });
 });

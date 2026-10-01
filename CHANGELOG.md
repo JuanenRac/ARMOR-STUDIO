@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+## [0.5.7] - The Electrical menu, a menu for each branch of the plan, and gutters
+
+- **Electrical** (Energy group, beside Inverters and Batteries): what the ARMOR-ELECTRICAL nodes measure, live - the grid's power and energy, the nodes reporting, the alarms, and one card per node with its channels (voltage, current, power, energy, frequency, power factor, line closed or open) and its transfer switches as their contacts show them. Each node says whether the Electrical Designer already draws it, with a button to open the designer. Read only. The node finder of the other menus is here too.
+- **Site Designer:** the things of ARMOR (camera, radar sensor, device) have their own floating menu, in the 2D plan and in the 3D view, and the first menu keeps the construction, the vegetation and the like. More branches can have their own menu in the same way.
+- **Roof gutters and downpipes:** two new objects for roofs. A gutter lies along the nearest eave and a downpipe runs down the wall from it to the ground; length, colour and turn are in the properties. Keys `-` and `=`.
+- Texts in the seven languages; 6 new tests.
+
 ## [0.5.6] - Nodes you can see and find
 
 - **Find nodes on the network** (Inverters, Batteries and Radar menus): a list of what the network node has found that looks like an ARMOR node - a host name starting with "armor-", or an Espressif maker - and is not yet a node of the menu, with a button to search now, a link to the node's own panel and, in the solar menus, a button that puts the node in the form of a new equipment.

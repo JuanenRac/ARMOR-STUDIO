@@ -1,0 +1,11 @@
+/* The Electrical menu (live readings). */
+.electrical-live { display: grid; gap: 1rem; align-content: start; }
+.el-live-logo { display: grid; place-items: center; width: 68px; height: 68px; border-radius: 18px; border: 1px solid #285a66; background: linear-gradient(160deg, #0b2028, #071720); color: #22d3ee; font-size: 2.4rem; } .el-live-logo.big { width: 92px; height: 92px; font-size: 3.2rem; }
+.el-node-card { display: grid; gap: .7rem; padding: 1rem 1.2rem; border: 1px solid #214858; border-radius: 16px; background: linear-gradient(155deg, rgba(16, 40, 51, .94), rgba(7, 23, 32, .94)); } .el-node-card.stale { border-color: #9a3c47; }
+.el-node-card > header { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; } .el-node-card strong { color: #f2feff; font-size: 1.05rem; }
+.el-pill { padding: .15rem .6rem; border-radius: 999px; border: 1px solid #285a66; font-size: .7rem; color: #a9d0d6; } .el-pill.good { border-color: #1f7a5c; color: #5df0c4; } .el-pill.warn { border-color: #8a6a1c; color: #ffcf7d; } .el-pill.bad { border-color: #9a3c47; color: #ff8e99; }
+.el-channels { display: grid; border: 1px solid #1d4b56; border-radius: 12px; overflow: hidden; overflow-x: auto; }
+.el-row { display: grid; grid-template-columns: minmax(140px, 1.6fr) repeat(6, minmax(58px, .7fr)) minmax(90px, 1fr); gap: .5rem; padding: .45rem .7rem; background: #08171f; font-size: .8rem; color: #d9f6fb; font-variant-numeric: tabular-nums; align-items: center; min-width: 640px; }
+.el-row:nth-child(even) { background: #0a1d26; } .el-row.head { background: #0b2029; color: #86a8b3; font: 600 .6rem "DM Mono", ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
+.el-row b { display: block; color: #f2feff; font-weight: 600; } .el-row small { color: #86a8b3; } .el-row.alarm { background: rgba(255, 111, 121, .1); } .el-row .ok { color: #5df0c4; } .el-row .warn { color: #ffcf7d; } .el-row .fail { color: #ff8e99; }
+.el-switches { display: grid; gap: .5rem; } .el-switch { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem; padding: .55rem .8rem; border: 1px solid #285a66; border-radius: 10px; background: #0a202a; font-size: .8rem; color: #a9d0d6; } .el-switch strong { font-size: .9rem; } .el-switch b { color: #f2feff; } .el-switch.alarm { border-color: #9a3c47; }

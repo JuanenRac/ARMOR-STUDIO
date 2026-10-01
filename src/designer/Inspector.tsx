@@ -56,7 +56,7 @@ function CornerTable({ t, points, selected, onSelect, onMove, onInsert, onRemove
 
 const ROOF_STYLES: readonly RoofStyle[] = ["flat", "shed", "gable", "hip", "pyramid"];
 const FEATURE_TOOL: Record<SiteFeature["kind"], Tool> = { pillar: "pillar", lamp: "lamp", mast: "mast", solar: "solar", canopy: "canopy", entrance: "entrance", path: "path", road: "road", tree: "tree", kennel: "kennel", fence: "fence", fountain: "fountain", coop: "coop", gate: "gate", sidewalk: "sidewalk", pool: "pool", planter: "planter", terrace: "terrace" };
-const ROOF_ITEM_TOOL: Record<RoofItem["kind"], Tool> = { chimney: "chimney", solar: "roof-solar", antenna: "antenna", vent: "chimney" };
+const ROOF_ITEM_TOOL: Record<RoofItem["kind"], Tool> = { chimney: "chimney", solar: "roof-solar", antenna: "antenna", vent: "chimney", gutter: "gutter", downpipe: "downpipe" };
 
 export function Inspector(p: InspectorProps) {
   const { t, model, selection, edit } = p;

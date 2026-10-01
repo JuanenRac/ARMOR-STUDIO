@@ -5,7 +5,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { ICON, toolIcon } from "./icons";
-import { TOOL_GROUPS, toolKeyOf, toolLabelKey, type Tool, type ToolMode } from "./model";
+import { BRANCHES, TOOL_GROUPS, toolKeyOf, toolLabelKey, type Tool, type ToolMode } from "./model";
 import type { ToolboxItem } from "./Toolbox";
 
 export type TurnAxis = "yaw" | "pitch" | "roll";
@@ -17,7 +17,9 @@ export type SharedActions = {
 export const TURN_STEP = 15;
 
 /** The tools of the panel: `selection` is what picks and moves (the first group), `objects` are the things that can be placed, in groups of what belongs together. */
-export function toolSections(t: (key: string) => string, mode: ToolMode, tool: Tool, onTool: (tool: Tool) => void): { selection: ToolboxItem[][]; objects: ToolboxItem[][] } {
+export type ToolBranch = { id: string; title: string; sections: ToolboxItem[][] };
+export function toolSections(t: (key: string) => string, mode: ToolMode, tool: Tool, onTool: (tool: Tool) => void): { selection: ToolboxItem[][]; objects: ToolboxItem[][]; branches: ToolBranch[] } {
+  const inBranch = (spec: { tool: Tool }) => BRANCHES.some(branch => branch.tools.includes(spec.tool));
   const groups = TOOL_GROUPS.map(group => group.map(spec => {
     const usable = spec.views.includes(mode), other = mode === "2d" ? "3d" : "2d";
     return {
@@ -26,14 +28,20 @@ export function toolSections(t: (key: string) => string, mode: ToolMode, tool: T
       onClick: () => onTool(spec.tool),
     } satisfies ToolboxItem;
   }));
-  return { selection: groups.slice(0, 1), objects: groups.slice(1) };
+  const specGroups = TOOL_GROUPS;
+  const keep = (index: number) => !specGroups[index]!.every(inBranch);
+  const branches = BRANCHES.map(branch => ({
+    id: branch.id, title: t(branch.titleKey),
+    sections: groups.filter((_, index) => index > 0 && specGroups[index]!.every(spec => branch.tools.includes(spec.tool))),
+  })).filter(branch => branch.sections.length > 0);
+  return { selection: groups.slice(0, 1), objects: groups.slice(1).filter((_, index) => keep(index + 1)), branches };
 }
 
 /**
  * The order of the panel, the same in both views: first what selects, moves and turns, then the other commands (undo, redo, delete, and the view's own),
  * then the objects. `shared` is what `actionSections` makes: the editing commands, then the turning ones.
  */
-export function arrangeToolbox(tools: { selection: ToolboxItem[][]; objects: ToolboxItem[][] }, shared: ToolboxItem[][], view: ToolboxItem[][] = []): ToolboxItem[][] {
+export function arrangeToolbox(tools: { selection: ToolboxItem[][]; objects: ToolboxItem[][]; branches?: ToolBranch[] }, shared: ToolboxItem[][], view: ToolboxItem[][] = []): ToolboxItem[][] {
   const [editing, turning] = shared;
   return [...tools.selection, ...(turning ? [turning] : []), ...(editing ? [editing] : []), ...view, ...tools.objects];
 }

@@ -4,7 +4,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import type { Building, Camera, DevicePlacement, Dimensions, Opening, Point, Roof, RoofItem, RoofItemKind, Sensor, SiteFeature, SiteFeatureKind, Terrain, WallLamp, MastPart } from "../domain";
-import { area, bounds, centroid, edgeOf, ensureCounterClockwise, floorBottom, isSimplePolygon, pointInPolygon, rectangle, roofFrame, roofHeight, totalHeight } from "./geometry";
+import { area, bounds, centroid, edgeOf, ensureCounterClockwise, nearestOnOutline, floorBottom, isSimplePolygon, pointInPolygon, rectangle, roofFrame, roofHeight, totalHeight } from "./geometry";
 import { toMetres, toPercent, type Selection } from "./model";
 
 export type SiteModel = {
@@ -188,6 +188,7 @@ export function addWallLamp(model: SiteModel, buildingId: string, edge: number, 
 
 const ROOF_ITEM_DEFAULTS: Record<RoofItemKind, { width: number; depth: number; height: number }> = {
   chimney: { width: 0.6, depth: 0.6, height: 1.2 }, solar: { width: 1.7, depth: 1, height: 0.06 }, antenna: { width: 0.1, depth: 0.1, height: 3 }, vent: { width: 0.4, depth: 0.4, height: 0.4 },
+  gutter: { width: 4, depth: 0.14, height: 0.1 }, downpipe: { width: 0.09, depth: 0.09, height: 3 },
 };
 
 /** The height above the ground of the roof surface at a point of a building. */
@@ -200,7 +201,17 @@ export function addRoofItem(model: SiteModel, buildingId: string, kind: RoofItem
   const building = model.buildings.find(item => item.id === buildingId);
   if (!building || !pointInPolygon({ x, y }, building.points)) return null;
   const id = nextId(kind, model.roofItems.map(item => item.id));
-  const item: RoofItem = { id, buildingId, kind, x: round2(x), y: round2(y), ...ROOF_ITEM_DEFAULTS[kind], rotation: 0, tilt: 0 };
+  let item: RoofItem = { id, buildingId, kind, x: round2(x), y: round2(y), ...ROOF_ITEM_DEFAULTS[kind], rotation: 0, tilt: 0 };
+  if (kind === "gutter" || kind === "downpipe") {
+    // A gutter and a downpipe belong to the eaves: they go to the nearest edge of the roof, the gutter lying along it and the downpipe running down the wall from it.
+    const near = nearestOnOutline(building.points, { x, y }), edge = edgeOf(building.points, near.edge);
+    const width = kind === "gutter" ? Math.min(ROOF_ITEM_DEFAULTS.gutter.width, edge.length) : ROOF_ITEM_DEFAULTS.downpipe.width;
+    const along = Math.min(edge.length - width / 2, Math.max(width / 2, near.along)), inset = 0.05;
+    item = {
+      ...item, x: round2(edge.a.x + edge.ux * along - edge.nx * inset), y: round2(edge.a.y + edge.uy * along - edge.ny * inset), width,
+      ...(kind === "gutter" ? { rotation: round2(((Math.atan2(edge.uy, edge.ux) * 180 / Math.PI) % 180 + 180) % 180) } : { height: Math.max(1, round2(totalHeight(building.floors))) }),
+    };
+  }
   return { model: { ...model, roofItems: [...model.roofItems, item] }, id };
 }
 

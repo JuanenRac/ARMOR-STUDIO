@@ -20,6 +20,8 @@ const TOOL_ICONS: Record<Tool, ReactNode> = {
   "wall-lamp": frame(<><path d="M3 4v16" /><path d="M3 9h5" /><path d="M8 7l5 1.5-1 5H8z" fill="currentColor" fillOpacity=".2" /><path d="M14 16l4 3M15 12l5 1M13 19l2 3" strokeWidth="1.2" /></>),
   chimney: frame(<><path d="M3 20l9-9 9 9" /><path d="M14 8V4h4v9" /><path d="M13 3h6" /><path d="M16 2c1-1.4-1-2.2 0-3" strokeWidth="1.1" /></>),
   "roof-solar": frame(<><path d="M2 20l10-10 10 10" /><path d="M8 13l4-4 4 4-4 4z" fill="currentColor" fillOpacity=".25" /><path d="M10 11l4 4M14 11l-4 4" strokeWidth="1" /></>),
+  gutter: frame(<><path d="M2 8l10-5 10 5" /><path d="M3 12h18v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="currentColor" fillOpacity=".2" /><path d="M5 20h14" strokeDasharray="2 2" /></>),
+  downpipe: frame(<><path d="M2 6l10-3 10 3" /><path d="M8 6h8" /><path d="M10 6v14M14 6v14" /><path d="M8 20h8" /></>),
   antenna: frame(<><path d="M12 22V8" /><path d="M8 22h8" /><circle cx="12" cy="6" r="1.8" fill="currentColor" /><path d="M7.5 4.5a6 6 0 0 0 0 3M16.5 4.5a6 6 0 0 1 0 3M5 3a10 10 0 0 0 0 6M19 3a10 10 0 0 1 0 6" strokeWidth="1.3" /></>),
   pillar: frame(<><rect x="9" y="4" width="6" height="14" rx="1" /><path d="M6 20h12M7.5 4h9" /></>),
   lamp: frame(<><path d="M12 22V9" /><path d="M9 22h6" /><path d="M7 9h10l-2-4H9z" fill="currentColor" fillOpacity=".22" /><path d="M9 12l-2 3M15 12l2 3M12 12v3" strokeWidth="1.2" /></>),

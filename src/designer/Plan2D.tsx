@@ -47,7 +47,7 @@ const MIN_SCALE = 4, MAX_SCALE = 260, RULER = 22;
 const isPlacing = (tool: Tool) => tool !== "select" && tool !== "move" && tool !== "elevate";
 const isDrawing = (tool: Tool) => tool === "terrain-rect" || tool === "terrain-poly" || tool === "building-rect" || tool === "building-poly";
 const EDGE_TOOLS: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp"]);
-const ROOF_TOOLS: ReadonlySet<Tool> = new Set(["chimney", "roof-solar", "antenna"]);
+const ROOF_TOOLS: ReadonlySet<Tool> = new Set(["chimney", "roof-solar", "antenna", "gutter", "downpipe"]);
 
 /** The nearest corner of any outline, if one is within `tolerance`; what is being dragged is never snapped to itself. */
 function nearestCorner(model: SiteModel, point: Point, tolerance: number, skip: { terrain?: boolean; building?: string } = {}): Point | null {
@@ -451,6 +451,8 @@ export function Plan2D(props: PlanProps) {
           {item.kind === "solar" && <><rect x={-w / 2} y={-d / 2} width={w} height={d} className="p-solar" />{[1, 2, 3].map(i => <path key={i} d={`M${-w / 2 + w * i / 4} ${-d / 2}V${d / 2}`} className="p-solar-line" />)}<path d={`M${-w / 2} 0H${w / 2}`} className="p-solar-line" /></>}
           {item.kind === "antenna" && <><circle r={Math.max(w, 0.12)} className="p-mast" /><circle r={0.45} className="p-mast-ring" /><path d="M-0.6 0H0.6M0 -0.6V0.6" className="p-mast-line" /></>}
           {item.kind === "vent" && <><rect x={-w / 2} y={-d / 2} width={w} height={d} className="p-vent" /><circle r={Math.min(w, d) * 0.32} className="p-vent-hole" /></>}
+          {item.kind === "gutter" && <><rect x={-w / 2} y={-d / 2} width={w} height={d} rx={d / 2} className="p-gutter" /><path d={`M${-w / 2 + d / 2} 0H${w / 2 - d / 2}`} className="p-gutter-line" /></>}
+          {item.kind === "downpipe" && <><circle r={Math.max(w, 0.09)} className="p-downpipe" /><circle r={Math.max(w, 0.09) * 0.4} className="p-downpipe-hole" /></>}
           <circle r={Math.max(Math.max(w, d) / 2, 9 * inv)} className="p-device-hit" />
           {chosenItem && <rect x={-w / 2 - 0.12} y={-d / 2 - 0.12} width={w + 0.24} height={d + 0.24} className="p-selection" />}
           <title>{`${t(`roofItem_${item.kind}`)} · ${formatMetres(item.height)}`}</title>

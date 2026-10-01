@@ -11,7 +11,7 @@ export type Tool =
   | "select" | "move" | "elevate"
   | "terrain-rect" | "terrain-poly" | "building-rect" | "building-poly"
   | "door" | "window" | "garage" | "arch" | "wall-lamp"
-  | "chimney" | "roof-solar" | "antenna"
+  | "chimney" | "roof-solar" | "antenna" | "gutter" | "downpipe"
   | "pillar" | "lamp" | "mast" | "solar" | "canopy" | "entrance" | "path" | "road"
   | "tree" | "kennel" | "fence" | "fountain" | "coop" | "gate" | "sidewalk" | "pool" | "planter" | "terrace"
   | "camera" | "sensor" | "device";
@@ -47,11 +47,18 @@ export const TOOL_GROUPS: ReadonlyArray<readonly ToolSpec[]> = [
   [{ tool: "select", key: "V", labelKey: "toolSelect", views: BOTH }, { tool: "move", key: "X", labelKey: "toolMove", views: BOTH }, { tool: "elevate", key: "Z", labelKey: "toolElevate", views: ONLY_3D }],
   [{ tool: "terrain-rect", key: "T", labelKey: "toolTerrainRect", views: ONLY_2D }, { tool: "terrain-poly", key: "Y", labelKey: "toolTerrainPoly", views: ONLY_2D }, { tool: "path", key: "H", labelKey: "toolPath", views: BOTH }, { tool: "road", key: "O", labelKey: "toolRoad", views: BOTH }, { tool: "sidewalk", key: "4", labelKey: "toolSidewalk", views: BOTH }],
   [{ tool: "building-rect", key: "B", labelKey: "toolBuildingRect", views: ONLY_2D }, { tool: "building-poly", key: "G", labelKey: "toolBuildingPoly", views: ONLY_2D }, { tool: "door", key: "D", labelKey: "toolDoor", views: BOTH }, { tool: "window", key: "N", labelKey: "toolWindow", views: BOTH }, { tool: "garage", key: "5", labelKey: "toolGarage", views: BOTH }, { tool: "arch", key: "6", labelKey: "toolArch", views: BOTH }, { tool: "chimney", key: "C", labelKey: "toolChimney", views: BOTH }],
-  [{ tool: "roof-solar", key: "R", labelKey: "toolRoofSolar", views: BOTH }, { tool: "antenna", key: "A", labelKey: "toolAntenna", views: BOTH }, { tool: "mast", key: "M", labelKey: "toolMast", views: BOTH }],
+  [{ tool: "roof-solar", key: "R", labelKey: "toolRoofSolar", views: BOTH }, { tool: "antenna", key: "A", labelKey: "toolAntenna", views: BOTH }, { tool: "gutter", key: "-", labelKey: "toolGutter", views: BOTH }, { tool: "downpipe", key: "=", labelKey: "toolDownpipe", views: BOTH }, { tool: "mast", key: "M", labelKey: "toolMast", views: BOTH }],
   [{ tool: "lamp", key: "F", labelKey: "toolLamp", views: BOTH }, { tool: "wall-lamp", key: "W", labelKey: "toolWallLamp", views: BOTH }, { tool: "solar", key: "S", labelKey: "toolSolar", views: BOTH }],
   [{ tool: "fence", key: "J", labelKey: "toolFence", views: BOTH }, { tool: "gate", key: "3", labelKey: "toolGate", views: BOTH }, { tool: "entrance", key: "E", labelKey: "toolEntrance", views: BOTH }, { tool: "pillar", key: "P", labelKey: "toolPillar", views: BOTH }],
   [{ tool: "tree", key: "I", labelKey: "toolTree", views: BOTH }, { tool: "planter", key: "0", labelKey: "toolPlanter", views: BOTH }, { tool: "fountain", key: "1", labelKey: "toolFountain", views: BOTH }, { tool: "pool", key: "7", labelKey: "toolPool", views: BOTH }, { tool: "terrace", key: "8", labelKey: "toolTerrace", views: BOTH }, { tool: "canopy", key: "Q", labelKey: "toolCanopy", views: BOTH }, { tool: "kennel", key: "U", labelKey: "toolKennel", views: BOTH }, { tool: "coop", key: "2", labelKey: "toolCoop", views: BOTH }],
   [{ tool: "camera", key: "K", labelKey: "toolCamera", views: BOTH }, { tool: "sensor", key: "L", labelKey: "toolSensor", views: BOTH }, { tool: "device", key: "9", labelKey: "toolDevice", views: BOTH }],
+];
+/**
+ * The branches of the system that have their own floating menu, apart from the one of the construction (the ground, buildings, roofs, light, boundary, garden). A branch is
+ * the things of one system of ARMOR that are placed in the house; its tools are still part of TOOL_GROUPS (keys, 2D and 3D work, texts), only the panel they are shown in changes.
+ */
+export const BRANCHES: ReadonlyArray<{ id: string; titleKey: string; tools: readonly Tool[] }> = [
+  { id: "armor", titleKey: "toolboxTitleArmor", tools: ["camera", "sensor", "device"] },
 ];
 const inView = (mode: ToolMode) => TOOL_GROUPS.map(group => group.filter(spec => spec.views.includes(mode))).filter(group => group.length > 0);
 /** The tools that work in the 2D plan, and in the 3D view. */
