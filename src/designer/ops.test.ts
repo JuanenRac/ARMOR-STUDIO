@@ -180,7 +180,7 @@ describe("garden and farm objects", () => {
   it("draws a fence between two points, as long as the gap and lying along it", () => {
     const added = addFence(sample(), { x: 10, y: 10 }, { x: 10, y: 16 })!;
     const fence = added.model.features.find(item => item.id === added.id)!;
-    expect(fence).toMatchObject({ kind: "fence", x: 10, y: 13, width: 6, rotation: 90, style: "picket" });
+    expect(fence).toMatchObject({ kind: "fence", x: 10, y: 13, width: 6, rotation: 90, style: "mesh" });
     expect(addFence(sample(), { x: 1, y: 1 }, { x: 1.1, y: 1 })).toBeNull();
   });
   it("places the new kinds with their own sizes and styles", () => {

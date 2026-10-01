@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## [0.4.0] - Chain-link mesh fences in the Site Designer
+
+- **A new fence style, `mesh` (chain-link / metal mesh), now the default.** The Site Designer only offered a wooden picket, a rail, a few bare horizontal wires and a masonry wall, so a perimeter of metal mesh fencing - the usual one for a security installation - could not be drawn at all (the nearest, `wire`, is a few loose strands, not a woven fabric). Drawn in 3D as tension wires top and bottom with a dense diagonal crosshatch between the posts, in the plan as a grey strip; every new fence and the built-in sample site now start as mesh instead of wooden picket. The picket, rail, wire and wall styles are still in the Inspector's style list, and fences already saved keep the style they were saved with.
+- The new style's name in the seven languages; two existing tests now cover it (the default style of a drawn fence and the colour of every fence style).
+
 ## [0.3.9] - TLS for this static host itself
 
 - `tools/serve.mjs` can now serve Studio itself over HTTPS: `TLS_CERT_PATH`/`TLS_KEY_PATH` (both, or neither, same convention as ARMOR-SERVER) switch `wrapWithTls()` from plain `http.createServer()` to a real `https.createServer()` around the same request handler. Fixes a real bug: once ARMOR-SERVER's own API moved to HTTPS, opening Studio itself at `https://host:18081` (rather than its API) hit Firefox's `SSL_ERROR_RX_RECORD_TOO_LONG`, because the static host answering that port was still plain HTTP and could not even parse a TLS handshake.

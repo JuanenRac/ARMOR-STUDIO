@@ -59,7 +59,7 @@ export type WallLamp = { id: string; buildingId: string; edge: number; offset: n
 export type SiteFeatureKind = "pillar" | "lamp" | "mast" | "solar" | "canopy" | "entrance" | "path" | "road" | "tree" | "kennel" | "fence" | "fountain" | "coop" | "gate" | "sidewalk";
 /** The looks a kind can have (a tree is an oak, a pine, a palm or a bush; a fence, a gate). */
 export const FEATURE_STYLES: Partial<Record<SiteFeatureKind, readonly string[]>> = {
-  tree: ["oak", "pine", "palm", "bush"], fence: ["picket", "rail", "wire", "wall"], gate: ["iron", "wood", "modern", "stone"], sidewalk: ["concrete", "brick", "gravel"],
+  tree: ["oak", "pine", "palm", "bush"], fence: ["mesh", "picket", "rail", "wire", "wall"], gate: ["iron", "wood", "modern", "stone"], sidewalk: ["concrete", "brick", "gravel"],
 };
 export type SiteFeature = {
   id: string; kind: SiteFeatureKind; x: number; y: number; z: number; width: number; depth: number; height: number;
@@ -160,8 +160,8 @@ export const INITIAL_FEATURES: SiteFeature[] = [
   { id: "kennel-01", kind: "kennel", x: 43, y: 21, z: 0, width: 1, depth: 1.2, height: 0.95, rotation: 20, slope: 0 },
   { id: "coop-01", kind: "coop", x: 47, y: 16, z: 0, width: 1.9, depth: 1.2, height: 1.4, rotation: -15, slope: 0 },
   { id: "gate-01", kind: "gate", x: 30, y: 33.5, z: 0, width: 4.6, depth: 0.6, height: 2.5, rotation: 0, slope: 0, style: "iron" },
-  { id: "fence-01", kind: "fence", x: 22.5, y: 33.75, z: 0, width: 15, depth: 0.08, height: 1.2, rotation: 2, slope: 0, style: "picket" },
-  { id: "fence-02", kind: "fence", x: 43, y: 32.5, z: 0, width: 17, depth: 0.08, height: 1.2, rotation: -10, slope: 0, style: "picket" },
+  { id: "fence-01", kind: "fence", x: 22.5, y: 33.75, z: 0, width: 15, depth: 0.08, height: 1.2, rotation: 2, slope: 0, style: "mesh" },
+  { id: "fence-02", kind: "fence", x: 43, y: 32.5, z: 0, width: 17, depth: 0.08, height: 1.2, rotation: -10, slope: 0, style: "mesh" },
 ];
 
 export const cameraIsConfigured = (camera: Camera): boolean =>
