@@ -9,12 +9,12 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import { FRAME_COLOURS, type FrameColour } from "./electrical/model";
 import { analyse, type Issue } from "./network/analysis";
 import {
-  CATEGORY_COLOUR, CATEGORY_ORDER, GRID, MEDIUM_COLOUR, designBounds, kindDef, kindsIn, portOf, portPosition, snap, summaryOf, wirePath,
+  CATEGORY_COLOUR, CATEGORY_ORDER, GRID, KINDS, MEDIUM_COLOUR, designBounds, kindDef, kindsIn, portOf, portPosition, portsOf, rotationOf, sizeOf, snap, summaryOf, wirePath,
   type Design, type Element, type Frame, type PortDef, type PortRef, type PropDef, type Wire,
 } from "./network/model";
 import {
   addElement, addFrame, canConnect, connect, duplicateElement, elementsInFrame, moveElement, nudgeElements, removeElement, removeFrame, removeWire, renameElement,
-  setBinding, setProp, updateFrame, updateWire, type ConnectError,
+  replaceKind, rotateElement, setBinding, setProp, updateFrame, updateWire, type ConnectError,
 } from "./network/ops";
 import { drawFound, emptyDesign, housePreset } from "./network/presets";
 import { buildNetworkDoc, parseNetworkDoc } from "./network/sync";
@@ -22,12 +22,15 @@ import { ElementBody, KindSwatch } from "./network/symbols";
 import type { SyncStatus } from "./network/useNetworkSync";
 import { deviceName, sortByAddress, type NetworkOverview } from "./networkModel";
 import "./electrical/electrical.css";
+import "./electrical/group.css";
 
 type Props = {
   t: (key: string) => string;
   design: Design; setDesign: (next: Design) => void; status: SyncStatus;
   /** What the nodes report: the drawing is compared with it and can draw what it finds. */
   overview: NetworkOverview | null;
+  /** The cameras of the Cameras menu: a drawn camera can be tied to one, and takes its address and ports. */
+  cameras?: ReadonlyArray<{ id: string; name: string; host: string; onvifPort?: number; rtspPort?: number; rtspPath?: string }>;
 };
 type Selection = { kind: "element" | "wire" | "frame"; id: string } | null;
 type Tool = "select" | "wire";
@@ -37,7 +40,7 @@ type Point = { x: number; y: number };
 const HISTORY_LIMIT = 100, COALESCE_MS = 800, MIN_ZOOM = 0.15, MAX_ZOOM = 3;
 const format = (template: string, args: ReadonlyArray<string | number>): string => template.replace(/\{(\d+)\}/g, (_match, index: string) => String(args[Number(index)] ?? ""));
 
-export function NetworkDesigner({ t, design, setDesign, status, overview }: Props) {
+export function NetworkDesigner({ t, design, setDesign, status, overview, cameras = [] }: Props) {
   const [tool, setTool] = useState<Tool>("select");
   const [place, setPlace] = useState<string | null>(null);
   const [selection, setSelection] = useState<Selection>(null);
@@ -239,6 +242,7 @@ export function NetworkDesigner({ t, design, setDesign, status, overview }: Prop
       if (key === "w") { setTool("wire"); setPlace(null); return; }
       const chosen = selectionRef.current;
       if (!chosen) return;
+      if (key === "r" && chosen.kind === "element") { commit(rotateElement(designRef.current, chosen.id)); return; }
       if (key === "delete" || key === "backspace") { event.preventDefault(); removeSelected(); return; }
       if (chosen.kind === "element" && ["arrowleft", "arrowright", "arrowup", "arrowdown"].includes(key)) {
         event.preventDefault();
@@ -307,6 +311,19 @@ export function NetworkDesigner({ t, design, setDesign, status, overview }: Prop
     window.setTimeout(fit, 0);
   };
 
+  const linkCamera = (element: Element, id: string) => {
+    const camera = cameras.find(item => item.id === id);
+    let next = setProp(designRef.current, element.id, "camera_id", id);
+    if (camera) {
+      next = setProp(next, element.id, "ip", /^\d{1,3}(\.\d{1,3}){3}$/.test(camera.host) ? camera.host : "");
+      if (camera.onvifPort) next = setProp(next, element.id, "onvif_port", camera.onvifPort);
+      if (camera.rtspPort) next = setProp(next, element.id, "rtsp_port", camera.rtspPort);
+      if (camera.rtspPath) next = setProp(next, element.id, "rtsp", camera.rtspPath);
+      if (!element.name) next = renameElement(next, element.id, camera.name);
+    }
+    commit(next);
+  };
+
   // ---- the state of the device an element is tied to ----
   const liveOf = (element: Element): "on" | "off" | "missing" | undefined => {
     const id = element.bind?.device;
@@ -346,18 +363,19 @@ export function NetworkDesigner({ t, design, setDesign, status, overview }: Prop
   const renderElement = (element: Element): ReactNode => {
     const def = kindDef(element.kind);
     if (!def) return null;
+    const { w: boxW, h: boxH } = sizeOf(element);
     const chosen = selection?.kind === "element" && selection.id === element.id;
     const fullName = element.name || label(element.kind), name = fullName.length > 17 ? `${fullName.slice(0, 16)}…` : fullName, summary = summaryOf(element);
     return <g key={element.id} transform={`translate(${element.x} ${element.y})`} style={{ cursor: "grab" }} onPointerDown={event => onElementDown(event, element)}>
-      <ElementBody kind={element.kind} selected={chosen} tone={toneOf.get(element.id)} live={liveOf(element)} />
-      <text x={def.w / 2} y={def.h + 13} textAnchor="middle" fontSize={11} fontWeight={700} fill="#e2eef2" fontFamily='"Space Grotesk", "Segoe UI", system-ui, sans-serif' stroke="#060d13" strokeWidth={3} paintOrder="stroke">{name}<title>{fullName}</title></text>
-      {summary && <text x={def.w / 2} y={def.h + 25} textAnchor="middle" fontSize={9.5} fill="#8fb3bc" fontFamily='"DM Mono", ui-monospace, Consolas, monospace' stroke="#060d13" strokeWidth={3} paintOrder="stroke">{summary}</text>}
+      <ElementBody kind={element.kind} selected={chosen} tone={toneOf.get(element.id)} live={liveOf(element)} rot={rotationOf(element)} />
+      <text x={boxW / 2} y={boxH + 13} textAnchor="middle" fontSize={11} fontWeight={700} fill="#e2eef2" fontFamily='"Space Grotesk", "Segoe UI", system-ui, sans-serif' stroke="#060d13" strokeWidth={3} paintOrder="stroke">{name}<title>{fullName}</title></text>
+      {chosen && <g data-editor="rotate" style={{ cursor: "pointer" }} onPointerDown={event => { event.stopPropagation(); commit(rotateElement(designRef.current, element.id)); }}><circle cx={boxW / 2} cy={-14} r={10} fill="#0b2530" stroke="#00e5ff" strokeWidth={1.5} /><text x={boxW / 2} y={-9.5} textAnchor="middle" fontSize={13} fill="#00e5ff">↻<title>{t("nd_rotate")}</title></text></g>}
+      {summary && <text x={boxW / 2} y={boxH + 25} textAnchor="middle" fontSize={9.5} fill="#8fb3bc" fontFamily='"DM Mono", ui-monospace, Consolas, monospace' stroke="#060d13" strokeWidth={3} paintOrder="stroke">{summary}</text>}
     </g>;
   };
   const renderPorts = (element: Element): ReactNode => {
-    const def = kindDef(element.kind);
-    if (!def) return null;
-    return def.ports.map((port: PortDef) => {
+    if (!kindDef(element.kind)) return null;
+    return portsOf(element).map((port: PortDef) => {
       const at = portPosition(element, port.id)!, ref: PortRef = { element: element.id, port: port.id }, key = `${element.id}/${port.id}`;
       const isHover = hoverPort?.element === element.id && hoverPort.port === port.id, isStart = wireFrom?.element === element.id && wireFrom.port === port.id;
       const candidate = wireFrom && !isStart ? canConnect(design, wireFrom, ref) === undefined : false;
@@ -387,7 +405,7 @@ export function NetworkDesigner({ t, design, setDesign, status, overview }: Prop
     const title = t(`ndp_${prop.key}`);
     if (prop.type === "number") return <label key={prop.key}>{title}<input type="number" min={prop.min} max={prop.max} step={prop.step ?? 1} value={typeof value === "number" ? value : 0} onChange={event => { const next = Number(event.target.value); if (event.target.value !== "" && Number.isFinite(next)) commit(setProp(designRef.current, element.id, prop.key, next), `prop:${element.id}:${prop.key}`); }} /></label>;
     if (prop.type === "choice") return <label key={prop.key}>{title}<select value={String(value)} onChange={event => commit(setProp(designRef.current, element.id, prop.key, event.target.value))}>{prop.choices.map(choice => <option key={choice} value={choice}>{choiceText(choice)}</option>)}</select></label>;
-    return <label key={prop.key}>{title}<input type="text" maxLength={prop.max} value={String(value ?? "")} onChange={event => commit(setProp(designRef.current, element.id, prop.key, event.target.value.trim()), `prop:${element.id}:${prop.key}`)} /></label>;
+    return <label key={prop.key}>{title}<input type={prop.secret ? "password" : "text"} autoComplete="off" maxLength={prop.max} value={String(value ?? "")} onChange={event => commit(setProp(designRef.current, element.id, prop.key, event.target.value.trim()), `prop:${element.id}:${prop.key}`)} /></label>;
   };
   const elementPanel = (element: Element): ReactNode => {
     const def = kindDef(element.kind)!;
@@ -396,7 +414,10 @@ export function NetworkDesigner({ t, design, setDesign, status, overview }: Prop
     return <div className="ed-form">
       <h4><span style={{ color: CATEGORY_COLOUR[def.category] }}>●</span> {label(element.kind)}</h4>
       <label>{t("elName")}<input type="text" maxLength={60} value={element.name} placeholder={label(element.kind)} onChange={event => commit(renameElement(designRef.current, element.id, event.target.value), `name:${element.id}`)} /></label>
+      <label>{t("nd_replace")}<select value="" onChange={event => { if (event.target.value) commit(replaceKind(designRef.current, element.id, event.target.value)); }}><option value="">{t("nd_replace_pick")}</option>{KINDS.filter(other => other.kind !== element.kind).map(other => <option key={other.kind} value={other.kind}>{label(other.kind)}</option>)}</select></label>
+      <button onClick={() => commit(rotateElement(designRef.current, element.id))}>↻ {t("nd_rotate")}</button>
       {def.props.map(prop => propField(element, prop))}
+      {element.kind === "camera" && cameras.length > 0 && <label>{t("nd_cam_link")}<select value={String(element.props.camera_id ?? "")} onChange={event => linkCamera(element, event.target.value)}><option value="">{t("elBindNone")}</option>{cameras.map(camera => <option key={camera.id} value={camera.id}>{camera.name} ({camera.host})</option>)}</select></label>}
       <label>{t("nd_bind_device")}<select value={element.bind?.device ?? ""} onChange={event => commit(setBinding(designRef.current, element.id, event.target.value || undefined))}>
         <option value="">{t("elBindNone")}</option>
         {element.bind?.device && !deviceById.has(element.bind.device) && <option value={element.bind.device}>{element.bind.device}</option>}
@@ -462,22 +483,25 @@ export function NetworkDesigner({ t, design, setDesign, status, overview }: Prop
       </aside>
       <div className="ed-main">
         <div className="ed-toolbar" role="toolbar">
-          <button className={tool === "select" && !place ? "on" : ""} onClick={() => { setTool("select"); setPlace(null); setWireFrom(null); }} title="V">{t("elToolSelect")}</button>
-          <button className={tool === "wire" ? "on" : ""} onClick={() => { setTool("wire"); setPlace(null); say(t("elWiringHint")); }} title="W">{t("nd_tool_link")}</button>
-          <button onClick={() => { const added = addFrame(designRef.current, snap((-view.x + 80) / view.k), snap((-view.y + 80) / view.k)); if (added) { commit(added.design); setSelection({ kind: "frame", id: added.id }); } }}>{t("elToolFrame")}</button>
-          <span className="sep" />
-          <button onClick={undo} disabled={!past.current.length} title="Ctrl+Z">{t("elUndo")}</button>
-          <button onClick={redo} disabled={!future.current.length} title="Ctrl+Y">{t("elRedo")}</button>
-          <button onClick={fit}>{t("elFit")}</button>
-          <span className="sep" />
-          <button onClick={() => startNew(false)}>{t("elNew")}</button>
-          <button onClick={() => startNew(true)}>{t("nd_example")}</button>
-          <button className="ed-found" onClick={drawWhatWasFound} disabled={!node}>{t("nd_draw_found")}</button>
-          <span className="sep" />
-          <button onClick={exportJson}>{t("elExportJson")}</button>
-          <button onClick={exportSvg} disabled={!design.elements.length && !design.frames.length}>{t("elExportSvg")}</button>
-          <button onClick={() => fileInput.current?.click()}>{t("elImport")}</button>
-          <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={event => void importJson(event.target.files?.[0])} />
+          <div className="ed-group" role="group" aria-label={t("nd_group_edit")}>
+            <button className={tool === "select" && !place ? "on" : ""} onClick={() => { setTool("select"); setPlace(null); setWireFrom(null); }} title={`${t("elToolSelect")} (V)`} aria-label={t("elToolSelect")}>↖</button>
+            <button className={tool === "wire" ? "on" : ""} onClick={() => { setTool("wire"); setPlace(null); say(t("elWiringHint")); }} title={`${t("nd_tool_link")} (W)`} aria-label={t("nd_tool_link")}>⌁</button>
+            <button onClick={() => { const added = addFrame(designRef.current, snap((-view.x + 80) / view.k), snap((-view.y + 80) / view.k)); if (added) { commit(added.design); setSelection({ kind: "frame", id: added.id }); } }} title={t("elToolFrame")} aria-label={t("elToolFrame")}>▭</button>
+            <button onClick={undo} disabled={!past.current.length} title={`${t("elUndo")} (Ctrl+Z)`} aria-label={t("elUndo")}>↶</button>
+            <button onClick={redo} disabled={!future.current.length} title={`${t("elRedo")} (Ctrl+Y)`} aria-label={t("elRedo")}>↷</button>
+            <button onClick={fit} title={t("elFit")} aria-label={t("elFit")}>⤢</button>
+          </div>
+          <div className="ed-group" role="group" aria-label={t("nd_group_design")}>
+            <button onClick={() => startNew(false)} title={t("elNew")} aria-label={t("elNew")}>▢</button>
+            <button onClick={() => startNew(true)} title={t("nd_example")} aria-label={t("nd_example")}>⌂</button>
+            <button className="ed-found" onClick={drawWhatWasFound} disabled={!node} title={t("nd_draw_found")} aria-label={t("nd_draw_found")}>⌕</button>
+          </div>
+          <div className="ed-group" role="group" aria-label={t("nd_group_files")}>
+            <button onClick={exportJson} title={t("elExportJson")} aria-label={t("elExportJson")}>{"{ }"}</button>
+            <button onClick={exportSvg} disabled={!design.elements.length && !design.frames.length} title={t("elExportSvg")} aria-label={t("elExportSvg")}>◫</button>
+            <button onClick={() => fileInput.current?.click()} title={t("elImport")} aria-label={t("elImport")}>⇪</button>
+            <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={event => void importJson(event.target.files?.[0])} />
+          </div>
           <span className="grow" />
           <button className={`ed-badge ${errors ? "bad" : warnings ? "warn" : "ok"}`} onClick={() => setPanel("checks")}>{errors} {t("elIssueErrors")} · {warnings} {t("elIssueWarnings")}</button>
         </div>

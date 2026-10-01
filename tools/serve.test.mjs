@@ -144,3 +144,21 @@ describe("wrapWithTls", () => {
     }
   });
 });
+
+describe("readSavedConnection", () => {
+  it("takes the ports an administrator saved and ignores a missing or broken file", async () => {
+    const { writeFileSync, mkdtempSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const path = await import("node:path");
+    const { readSavedConnection } = await import("./serve.mjs");
+    const dir = mkdtempSync(path.join(tmpdir(), "armor-conn-"));
+    const file = path.join(dir, "connection.json");
+    expect(readSavedConnection(file)).toEqual({});
+    writeFileSync(file, JSON.stringify({ host: "0.0.0.0", port: 18080, studio_port: 19000 }));
+    expect(readSavedConnection(file)).toEqual({ port: 18080, studioPort: 19000 });
+    writeFileSync(file, JSON.stringify({ port: 0, studio_port: "x" }));
+    expect(readSavedConnection(file)).toEqual({ port: undefined, studioPort: undefined });
+    writeFileSync(file, "{ broken");
+    expect(readSavedConnection(file)).toEqual({});
+  });
+});

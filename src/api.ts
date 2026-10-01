@@ -388,6 +388,11 @@ export type MachineMetrics = {
   history: Array<{ t: number; cpu: number | null; memory: number; swap: number; temperature: number | null; rx_bps: number; tx_bps: number }>;
 };
 export const readMetrics = (origin: string) => userCall<MachineMetrics>(origin, "GET", "/api/v1/system/metrics");
+/** Where the server listens and where Studio is served (see ARMOR-SERVER's connection.ts). */
+export type ConnectionSettings = { host?: string; port?: number; studio_port?: number };
+export type ConnectionState = { active: { host: string; port: number; tls: boolean; studio_origins: string[] }; saved: ConnectionSettings; restart_required: boolean };
+export const readConnection = (origin: string) => userCall<ConnectionState>(origin, "GET", "/api/v1/system/connection");
+export const saveConnection = (origin: string, settings: ConnectionSettings) => userCall<ConnectionState>(origin, "PUT", "/api/v1/system/connection", settings);
 export type NetworkOrderType = "scan_now" | "ping" | "traceroute" | "wake" | "ports" | "http";
 export type NetworkResultView = { id: string; type: NetworkOrderType; ok: boolean; finished_ms: number; device_id?: string; output?: string; ports?: NetworkPort[]; latency_ms?: number };
 export type NetworkOrderView = { id: string; node_id: string; type: NetworkOrderType; device_id?: string; status: "queued" | "sent" | "done" | "expired"; by: string; created_at: string; result?: NetworkResultView };

@@ -11,6 +11,8 @@ import { DesignVersionsDialog } from "./DesignVersionsDialog";
 import { SessionUserContext } from "./sessionContext";
 import { CameraFullscreen } from "./components/camera";
 import { ConfigurationPanel } from "./ConfigurationPanel";
+import { CameraSettings } from "./CameraSettings";
+import { loadLayout, saveLayout } from "./cameraLayout";
 import { DEFAULT_SERVER_ORIGIN, loadDeploymentOrigin } from "./config";
 import {
   DEFAULT_THEME, INITIAL_BUILDINGS, INITIAL_CAMERAS, INITIAL_DIMENSIONS, INITIAL_FEATURES, INITIAL_OPENINGS, INITIAL_ROOF_ITEMS, INITIAL_SENSORS, INITIAL_TERRAIN, INITIAL_WALL_LAMPS, LANGUAGES, THEMES,
@@ -51,6 +53,7 @@ import "./nav.css";
 import "./compact.css";
 import "./hover.css";
 import "./dialogs.css";
+import "./themes.css";
 
 const studioVersion = manifest.version;
 
@@ -81,7 +84,11 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const [pendingMode, setPendingMode] = useState<"armed" | "disarmed" | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [restored, setRestored] = useState(false);
-  const [gridSize, setGridSize] = useState<GridSize>(4);
+  const savedLayout = useMemo(() => loadLayout(), []);
+  const [gridSize, setGridSize] = useState<GridSize>(savedLayout?.gridSize ?? 4);
+  const [slots, setSlots] = useState<string[]>(savedLayout?.slots ?? []);
+  // The number of views and the camera of each place are kept, so the monitor is as it was left.
+  useEffect(() => { saveLayout({ gridSize, slots }); }, [gridSize, slots]);
   const [selectedCamera, setSelectedCamera] = useState("cam-01");
   const [recordingCameraIds, setRecordingCameraIds] = useState<string[]>([]);
   const [discovered, setDiscovered] = useState<DiscoveredCamera[]>([]);
@@ -245,22 +252,23 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     devices: <DevicesView t={t} origin={origin} devices={devices} reload={devicePoll.reload} placedIds={new Set(placements.map(item => item.device_id))} onPlace={id => { setWantsToPlace(id); setView("siteDesigner"); }} now={now} />,
     automations: <AutomationsView t={t} origin={origin} automations={automationPoll.data?.automations ?? []} reload={automationPoll.reload} devices={devices} now={now} />,
     system: <SystemView t={t} origin={origin} isAdmin={isAdmin} />,
-    cameras: <CameraMonitorView cameras={cameras} selected={selected} selectedId={selectedCamera} gridSize={gridSize} setGridSize={setGridSize} recordingIds={recordingCameraIds} streamUrls={streamUrls} reachability={reachability} notice={notice} t={t} select={setSelectedCamera} toggle={camera => updateCamera(camera.id, { enabled: !camera.enabled })} snapshot={camera => void saveSnapshot(camera)} record={camera => void toggleRecording(camera)} expand={expand} ptz={commandPtz} />,
+    cameras: <CameraMonitorView cameras={cameras} selected={selected} selectedId={selectedCamera} gridSize={gridSize} setGridSize={setGridSize} recordingIds={recordingCameraIds} streamUrls={streamUrls} reachability={reachability} notice={notice} t={t} select={setSelectedCamera} toggle={camera => updateCamera(camera.id, { enabled: !camera.enabled })} snapshot={camera => void saveSnapshot(camera)} record={camera => void toggleRecording(camera)} expand={expand} ptz={commandPtz} slots={slots} setSlot={(index, id) => setSlots(current => { const next = [...current]; while (next.length <= index) next.push(""); next[index] = id; return next; })}
+      settings={<CameraSettings t={t} origin={origin} cameras={cameras} selectedCameraId={selectedCamera} onCameraSelected={setSelectedCamera}
+        onCameraSaved={camera => setCameras(current => { const next = upsertCamera(current, camera); persist(next); return next; })}
+        onCameraDeleted={id => setCameras(current => { const next = current.filter(camera => camera.id !== id); persist(next); setSelectedCamera(selectionAfterRemoval(next, selectedCamera, id)); return next; })}
+        discovered={discovered} discover={() => void discoverLocalCameras()} />} />,
     record: <MediaLibrary origin={origin} cameras={cameras} t={t} />,
     history: <HistoryView origin={origin} t={t} />,
     radar: <RadarView nodes={nodes} model={site} dimensions={dimensions} origin={origin} openDesigner={() => setView("siteDesigner")} openZones={() => setView("history")} setSensors={setSensors} forget={id => void forgetNode(origin, id).then(() => setNotice(t("nodeForgotten"))).catch(() => setNotice(t("recordingFailed")))} t={t} />,
     siteDesigner: <SiteDesignerInteractive openVersions={() => setVersionsOf("site")} t={t} dimensions={dimensions} setDimensions={setDimensions} model={site} applyModel={applySite} selectedCamera={selectedCamera} setSelectedCamera={setSelectedCamera} notice={notice} setNotice={setNotice} save={saveSettings} nodeIds={nodes.map(node => node.node_id)} devices={devices} wantsToPlace={wantsToPlace} clearWantsToPlace={() => setWantsToPlace("")} openDevices={() => setView("devices")} />,
     electricalDesigner: <ElectricalDesigner t={t} design={electrical} setDesign={setElectrical} status={electricalStatus} nodeIds={nodes.map(node => node.node_id)} solarDevices={solarPoll.data?.devices ?? []} solarWaiting={solarPoll.data?.waiting ?? []} electricalNodes={electricalPoll.data?.nodes ?? []} />,
     network: <NetworkView t={t} origin={origin} isAdmin={isAdmin} overview={networkPoll.data} reload={networkPoll.reload} now={now} />,
-    networkDesigner: <NetworkDesigner t={t} design={networkDesign} setDesign={setNetworkDesign} status={networkStatus} overview={networkPoll.data} />,
+    networkDesigner: <NetworkDesigner t={t} design={networkDesign} setDesign={setNetworkDesign} status={networkStatus} overview={networkPoll.data} cameras={cameras} />,
     configuration: <ConfigurationPanel
       t={t} origin={origin} setOrigin={setOrigin} theme={theme} themes={THEMES}
       setTheme={value => setTheme(value as Theme)} language={language} languages={LANGUAGES}
-      setLanguage={value => setLanguage(value as LanguageCode)} cameras={cameras}
-      selectedCameraId={selectedCamera} onCameraSelected={setSelectedCamera}
-      onCameraSaved={camera => setCameras(current => { const next = upsertCamera(current, camera); persist(next); return next; })}
-      onCameraDeleted={id => setCameras(current => { const next = current.filter(camera => camera.id !== id); persist(next); setSelectedCamera(selectionAfterRemoval(next, selectedCamera, id)); return next; })}
-      discovered={discovered} discover={() => void discoverLocalCameras()} connection={connection}
+      setLanguage={value => setLanguage(value as LanguageCode)} isAdmin={isAdmin}
+      connection={connection}
       savePreferences={saveSettings} exportSite={exportSettings} operatorUnlocked={operatorUnlocked}
     />,
   };

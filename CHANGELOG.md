@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here.
 
+## [0.4.4] - Themes for the whole interface, cameras in their own menu, designers with more detail
+
+- **Themes.** Sixteen themes that restyle the whole interface (sidebar, top bar, cards, buttons, fields, tabs, status bar, corners and letters), among them Metallic, Professional, Videogame, Terminal and Blueprint.
+- **Cameras menu.** Double-click a camera to see it full screen (arrows, keyboard and a Back button); the number of views and the camera of each place are kept; "Configure cameras" opens the camera settings, the search for cameras and the connection data inside the menu. The Discovery, Video & PTZ and Cameras tabs of Configuration are gone.
+- **Configuration: Server tab.** An administrator changes the address and ports of the server and of Studio.
+- **Network and Electrical designers.** Toolbar in framed groups of icons with tooltips; every device has manufacturer and model (and, in the network, the administrator login); a rotation button above the selected element; a device can be replaced by another keeping the links; a switch draws only the ports it has; a modem/ONT and a router have separate 2.4 GHz and 5 GHz names; access points have a mode (access point, client, bridge, repeater); a camera has ethernet or Wi-Fi, ONVIF and RTSP ports and can be tied to a camera of the Cameras menu; new Camera server device.
+- 258 tests.
+
 ## [0.4.3] - Alarms that say what happened, orders for the network node, the machine live
 
 - **Alarms with their facts.** Each alarm shows what it is about (which device, its address and MAC, the port that opened, the two machines in an address clash), can be deleted one by one, the record can be emptied for good, and the "Internet is slow" warning only appears once the line has stayed degraded for a while.

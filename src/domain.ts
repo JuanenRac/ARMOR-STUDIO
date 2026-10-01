@@ -91,7 +91,7 @@ export const NAV_GROUPS: ReadonlyArray<{ title: string; items: ReadonlyArray<rea
 export const NAV: ReadonlyArray<readonly [View, string]> = NAV_GROUPS.flatMap(group => group.items);
 
 /** The Armor theme is the default look (near-black, cyan, amber); the others are alternatives. */
-export const THEMES = ["Armor", "Aqua", "Midnight", "Ember", "Forest", "Violet", "Solar", "Ice", "Crimson", "Mono", "High contrast"] as const;
+export const THEMES = ["Armor", "Aqua", "Midnight", "Ember", "Forest", "Violet", "Solar", "Ice", "Crimson", "Mono", "High contrast", "Metallic", "Professional", "Videogame", "Terminal", "Blueprint"] as const;
 export type Theme = (typeof THEMES)[number];
 export const DEFAULT_THEME: Theme = "Armor";
 

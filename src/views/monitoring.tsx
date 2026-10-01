@@ -2,9 +2,10 @@
  * The overview, camera monitor and radar views.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { CameraTile, type Translate } from "../components/camera";
 import { fitGrid } from "../cameraGrid";
+import { resolveSlots } from "../cameraLayout";
 import { GRID_SIZES, type Camera, type GridSize, type View } from "../domain";
 import type { Reachability } from "../api";
 import type { NodeState } from "../types";
@@ -41,6 +42,10 @@ export type CameraViewProps = {
   recordingIds: readonly string[]; streamUrls: Record<string, string>; reachability: Record<string, Reachability>; notice: string; t: Translate;
   select: (id: string) => void; toggle: (camera: Camera) => void; snapshot: (camera: Camera) => void; record: (camera: Camera) => void;
   expand: (id: string) => void; ptz: (camera: Camera, command: string) => Promise<void>;
+  /** The camera chosen for each place of the grid ("" = the next one not shown), and the way to change one. */
+  slots: readonly string[]; setSlot: (index: number, id: string) => void;
+  /** The settings of the cameras, shown in place of the grid when "Configure cameras" is on. */
+  settings: ReactNode;
 };
 
 const GRID_GAP = 12;
@@ -64,18 +69,24 @@ function useElementSize<T extends HTMLElement>() {
 export function CameraMonitorView(props: CameraViewProps) {
   const { cameras, selected, selectedId, gridSize, recordingIds, streamUrls, reachability, notice, t } = props;
   const frame = useElementSize<HTMLDivElement>();
+  const [configuring, setConfiguring] = useState(false);
   // Every tile is 16:9 and as large as the frame allows for the chosen number of views; the picture inside is never cropped.
   const layout = fitGrid(gridSize, frame.width, frame.height, GRID_GAP);
+  const placed = resolveSlots(cameras.map(camera => camera.id), props.slots, gridSize);
+  const shown = placed.flatMap(id => { const camera = cameras.find(item => item.id === id); return camera ? [camera] : []; });
+  const shownIndex = (id: string) => placed.indexOf(id);
   return <section className="camera-workspace">
     <div className="panel-heading">
       <MenuTitle kind="cameras"><p className="eyebrow">{t("videoOperations")}</p><h2>{t("cameraMonitor")}</h2><p className="muted">{t("cameraHelp")}</p></MenuTitle>
-      <div className="grid-picker">{GRID_SIZES.map(size => <button key={size} className={gridSize === size ? "active" : ""} onClick={() => props.setGridSize(size)}>{size} {size > 1 ? t("views") : t("view")}</button>)}</div>
+      <div className="grid-picker">{!configuring && GRID_SIZES.map(size => <button key={size} className={gridSize === size ? "active" : ""} onClick={() => props.setGridSize(size)}>{size} {size > 1 ? t("views") : t("view")}</button>)}<button className={configuring ? "active" : ""} onClick={() => setConfiguring(value => !value)}>{configuring ? `‹ ${t("cam_back")}` : `⚙ ${t("cam_configure")}`}</button></div>
     </div>
+    {configuring ? <div className="camera-config-frame">{props.settings}</div> : <>
     <div ref={frame.ref} className={`camera-frame ${layout.scrolls ? "scrolls" : ""}`}>
       <div className={`camera-grid grid-${gridSize}`} style={layout.tileWidth > 0 ? { gridTemplateColumns: `repeat(${layout.columns}, ${layout.tileWidth}px)`, gridAutoRows: `${layout.tileHeight}px`, gap: GRID_GAP } : undefined}>
-        {cameras.slice(0, gridSize).map(camera => <CameraTile key={camera.id} camera={camera} selected={camera.id === selectedId} select={() => props.select(camera.id)} toggle={() => props.toggle(camera)} snapshot={() => props.snapshot(camera)} record={() => props.record(camera)} expand={() => props.expand(camera.id)} recording={recordingIds.includes(camera.id)} streamUrl={streamUrls[camera.id]} reachability={reachability[camera.id]} invokePtz={command => props.ptz(camera, command)} t={t} />)}
+        {shown.map(camera => <CameraTile key={camera.id} choices={cameras} pick={id => props.setSlot(shownIndex(camera.id), id)} camera={camera} selected={camera.id === selectedId} select={() => props.select(camera.id)} toggle={() => props.toggle(camera)} snapshot={() => props.snapshot(camera)} record={() => props.record(camera)} expand={() => props.expand(camera.id)} recording={recordingIds.includes(camera.id)} streamUrl={streamUrls[camera.id]} reachability={reachability[camera.id]} invokePtz={command => props.ptz(camera, command)} t={t} />)}
       </div>
     </div>
-    <p className="notice">{notice}</p>
+    <p className="notice">{notice} {t("cam_hint")}</p>
+    </>}
   </section>;
 }

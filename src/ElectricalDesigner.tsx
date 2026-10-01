@@ -22,6 +22,7 @@ import { buildElectricalDoc, parseElectricalDoc } from "./electrical/sync";
 import { ElementBody, KindSwatch } from "./electrical/symbols";
 import type { SyncStatus } from "./electrical/useElectricalSync";
 import "./electrical/electrical.css";
+import "./electrical/group.css";
 
 type Props = {
   t: (key: string) => string;
@@ -489,21 +490,24 @@ export function ElectricalDesigner({ t, design, setDesign, status, nodeIds, sola
       </aside>
       <div className="ed-main">
         <div className="ed-toolbar" role="toolbar">
-          <button className={tool === "select" && !place ? "on" : ""} onClick={() => { setTool("select"); setPlace(null); setWireFrom(null); }} title="V">{t("elToolSelect")}</button>
-          <button className={tool === "wire" ? "on" : ""} onClick={() => { setTool("wire"); setPlace(null); say(t("elWiringHint")); }} title="W">{t("elToolWire")}</button>
-          <button onClick={() => { const added = addFrame(designRef.current, snap((-view.x + 80) / view.k), snap((-view.y + 80) / view.k)); if (added) { commit(added.design); setSelection({ kind: "frame", id: added.id }); } }}>{t("elToolFrame")}</button>
-          <span className="sep" />
-          <button onClick={undo} disabled={!past.current.length} title="Ctrl+Z">{t("elUndo")}</button>
-          <button onClick={redo} disabled={!future.current.length} title="Ctrl+Y">{t("elRedo")}</button>
-          <button onClick={fit}>{t("elFit")}</button>
-          <span className="sep" />
-          <button onClick={() => startNew(false)}>{t("elNew")}</button>
-          <button onClick={() => startNew(true)}>{t("elPresetHouse")}</button>
-          <span className="sep" />
-          <button onClick={exportJson}>{t("elExportJson")}</button>
-          <button onClick={exportSvg} disabled={!design.elements.length && !design.frames.length}>{t("elExportSvg")}</button>
-          <button onClick={() => fileInput.current?.click()}>{t("elImport")}</button>
-          <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={event => void importJson(event.target.files?.[0])} />
+          <div className="ed-group" role="group" aria-label={t("nd_group_edit")}>
+            <button className={tool === "select" && !place ? "on" : ""} onClick={() => { setTool("select"); setPlace(null); setWireFrom(null); }} title={`${t("elToolSelect")} (V)`} aria-label={t("elToolSelect")}>↖</button>
+            <button className={tool === "wire" ? "on" : ""} onClick={() => { setTool("wire"); setPlace(null); say(t("elWiringHint")); }} title={`${t("elToolWire")} (W)`} aria-label={t("elToolWire")}>⌁</button>
+          <button title={t("elToolFrame")} aria-label={t("elToolFrame")} onClick={() => { const added = addFrame(designRef.current, snap((-view.x + 80) / view.k), snap((-view.y + 80) / view.k)); if (added) { commit(added.design); setSelection({ kind: "frame", id: added.id }); } }}>▭</button>
+            <button onClick={undo} disabled={!past.current.length} title={`${t("elUndo")} (Ctrl+Z)`} aria-label={t("elUndo")}>↶</button>
+            <button onClick={redo} disabled={!future.current.length} title={`${t("elRedo")} (Ctrl+Y)`} aria-label={t("elRedo")}>↷</button>
+            <button onClick={fit} title={t("elFit")} aria-label={t("elFit")}>⤢</button>
+          </div>
+          <div className="ed-group" role="group" aria-label={t("nd_group_design")}>
+            <button onClick={() => startNew(false)} title={t("elNew")} aria-label={t("elNew")}>▢</button>
+            <button onClick={() => startNew(true)} title={t("elPresetHouse")} aria-label={t("elPresetHouse")}>⌂</button>
+          </div>
+          <div className="ed-group" role="group" aria-label={t("nd_group_files")}>
+            <button onClick={exportJson} title={t("elExportJson")} aria-label={t("elExportJson")}>{"{ }"}</button>
+            <button onClick={exportSvg} disabled={!design.elements.length && !design.frames.length} title={t("elExportSvg")} aria-label={t("elExportSvg")}>◫</button>
+            <button onClick={() => fileInput.current?.click()} title={t("elImport")} aria-label={t("elImport")}>⇪</button>
+            <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={event => void importJson(event.target.files?.[0])} />
+          </div>
           <span className="grow" />
           <button className={`ed-badge ${errors ? "bad" : warnings ? "warn" : "ok"}`} onClick={() => setPanel("checks")}>{errors} {t("elIssueErrors")} · {warnings} {t("elIssueWarnings")}</button>
         </div>

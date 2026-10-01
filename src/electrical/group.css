@@ -1,0 +1,4 @@
+/* The buttons of a designer's toolbar come in framed groups of icons; the name of each shows as a tooltip. */
+.ed-toolbar .ed-group { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid #315e6b; border-radius: 10px; background: rgba(6, 18, 26, .55); }
+.ed-toolbar .ed-group button { min-width: 32px; height: 30px; padding: 0 .5rem; border-radius: 7px; font-size: 1rem; line-height: 1; }
+.ed-toolbar .ed-group button.on { box-shadow: 0 0 0 1px #00e5ff inset; }

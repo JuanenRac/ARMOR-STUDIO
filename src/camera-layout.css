@@ -107,3 +107,10 @@
 .ptz-overlay button { touch-action: none; user-select: none; -webkit-user-select: none; cursor: pointer; }
 .ptz-overlay button:active:not(:disabled) { background: #00b8cc; color: #031217; }
 .ptz-problem { max-width: 190px; margin: 0; color: #ffbec2; font: 600 .58rem "DM Mono", "Cascadia Mono", ui-monospace, Consolas, monospace; text-align: center; line-height: 1.35; }
+
+/* The place of each camera can be changed from the tile, and the settings of the cameras take the place of the grid. */
+.camera-meta { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.camera-slot { max-width: 46%; font-size: .68rem; padding: .15rem .3rem; }
+.camera-config-frame { flex: 1 1 0; min-height: 0; overflow: auto; margin-top: .6rem; }
+.camera-discovery { display: grid; gap: .35rem; margin-top: .8rem; padding-top: .7rem; border-top: 1px solid rgba(120, 180, 190, .25); }
+.camera-back { margin-right: .6rem; }
