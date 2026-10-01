@@ -44,6 +44,7 @@ import { CameraMonitorView } from "./views/monitoring";
 import { OverviewView } from "./views/OverviewView";
 import { SystemView } from "./views/SystemView";
 import { ServicesView } from "./views/ServicesView";
+import { WeatherView } from "./views/WeatherView";
 import { RadarView } from "./views/RadarView";
 import { InvertersView } from "./views/InvertersView";
 import { BatteriesView } from "./views/BatteriesView";
@@ -254,6 +255,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     automations: <AutomationsView t={t} origin={origin} automations={automationPoll.data?.automations ?? []} reload={automationPoll.reload} devices={devices} now={now} />,
     system: <SystemView t={t} origin={origin} isAdmin={isAdmin} />,
     services: <ServicesView t={t} origin={origin} />,
+    weather: <WeatherView t={t} locale={language} />,
     cameras: <CameraMonitorView cameras={cameras} selected={selected} selectedId={selectedCamera} gridSize={gridSize} setGridSize={setGridSize} recordingIds={recordingCameraIds} streamUrls={streamUrls} reachability={reachability} notice={notice} t={t} select={setSelectedCamera} toggle={camera => updateCamera(camera.id, { enabled: !camera.enabled })} snapshot={camera => void saveSnapshot(camera)} record={camera => void toggleRecording(camera)} expand={expand} ptz={commandPtz} slots={slots} setSlot={(index, id) => setSlots(current => { const next = [...current]; while (next.length <= index) next.push(""); next[index] = id; return next; })}
       settings={<CameraSettings t={t} origin={origin} cameras={cameras} selectedCameraId={selectedCamera} onCameraSelected={setSelectedCamera}
         onCameraSaved={camera => setCameras(current => { const next = upsertCamera(current, camera); persist(next); return next; })}

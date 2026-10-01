@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## [0.5.3] - The Weather menu
+
+- **Weather** (below Overview): the weather of a place you choose - by name, or by its coordinates - because guessing it from the internet address would put Yecla in Madrid. It shows the weather now, the rain of the next hour, the warnings the forecast implies, the next 24 hours, 48 hours of temperature, rain, clouds and wind, ten days, the air quality and pollen, and the sun and the moon, with a live radar of rain (last two hours, animated) and of clouds (Meteosat infrared) over a map. Data from Open-Meteo, RainViewer, EUMETSAT and Esri's map tiles; nothing is requested until a place is chosen, and only its coordinates leave. The static host and the nginx template allow just those origins. Texts in the seven languages.
+- **Tests:** weather model and policy tests added.
+
 ## [0.5.2] - The Services menu
 
 - **Services** (below System): every program of the system and every field node, running or not, grouped by family (Core, Network, AI and voice, Field nodes) like HYDRA-UMC's services menu - a summary (total, active, not active, failed, not installed or unknown), a search, filters, and a card for each service with its state, its systemd unit, port, process, memory, restarts, whether it starts at boot and how long it has been up (for a field node, when it last reported). Read only. Needs ARMOR-SERVER 0.3.9. Texts in the seven languages.

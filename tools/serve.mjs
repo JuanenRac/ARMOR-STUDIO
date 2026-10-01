@@ -75,11 +75,17 @@ const TYPES = {
   ".woff2": "font/woff2", ".map": "application/json", ".txt": "text/plain; charset=utf-8",
 };
 
+// The only third parties the console talks to are the ones of the Weather menu (see src/weather/api.ts, which lists the same addresses and is checked against these): Open-Meteo for the
+// forecast, RainViewer for the rain radar, EUMETSAT for the satellite image of the clouds and the tiles of the base map. The menu asks nothing until the person turns it on.
+export const WEATHER_CONNECT = ["https://api.open-meteo.com", "https://geocoding-api.open-meteo.com", "https://air-quality-api.open-meteo.com", "https://api.rainviewer.com"];
+export const WEATHER_IMAGES = ["https://tilecache.rainviewer.com", "https://view.eumetsat.int", "https://server.arcgisonline.com"];
+
 // The console only talks to the configured server(s) and shows camera frames from them.
 export function contentSecurityPolicyFor(origins) {
-  const connect = ["'self'", ...(origins.length ? origins.flatMap(origin => [origin, origin.replace(/^http/, "ws")]) : ["http:", "ws:"])].join(" ");
+  const connect = ["'self'", ...(origins.length ? origins.flatMap(origin => [origin, origin.replace(/^http/, "ws")]) : ["http:", "ws:"]), ...WEATHER_CONNECT].join(" ");
   const media = ["'self'", "data:", "blob:", ...(origins.length ? origins : ["http:", "https:"])].join(" ");
-  return `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src ${media}; media-src ${media}; connect-src ${connect}; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`;
+  const images = [...media.split(" "), ...WEATHER_IMAGES].join(" ");
+  return `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src ${images}; media-src ${media}; connect-src ${connect}; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`;
 }
 
 const SECURITY_HEADERS = {

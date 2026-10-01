@@ -88,8 +88,9 @@ describe("more than one address for the same Studio", () => {
   it("lets the browser talk to every configured server", async () => {
     const { contentSecurityPolicyFor, parseServerOrigins } = await load();
     const policy = contentSecurityPolicyFor(parseServerOrigins(both));
-    expect(policy).toContain("connect-src 'self' http://192.168.0.180:18080 ws://192.168.0.180:18080 http://203.0.113.7:2600 ws://203.0.113.7:2600;");
-    expect(policy).toContain("img-src 'self' data: blob: http://192.168.0.180:18080 http://203.0.113.7:2600;");
+    expect(policy).toContain("connect-src 'self' http://192.168.0.180:18080 ws://192.168.0.180:18080 http://203.0.113.7:2600 ws://203.0.113.7:2600 ");
+    expect(policy).toContain("img-src 'self' data: blob: http://192.168.0.180:18080 http://203.0.113.7:2600 ");
+    expect(policy).toContain("default-src 'self'; script-src 'self';");
   });
 
   it("offers a visitor the server with the host name they used, and the first otherwise", async () => {
