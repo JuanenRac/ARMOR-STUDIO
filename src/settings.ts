@@ -5,7 +5,7 @@
  */
 import { readColour } from "./designer/colors";
 import { parseServerOrigin } from "./config";
-import { FEATURE_STYLES, type DevicePlacement, LANGUAGES, THEMES, type Building, type Camera, type Dimensions, type LanguageCode, type Opening, type Point, type Roof, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type Terrain, type Theme, type WallLamp } from "./domain";
+import { FEATURE_STYLES, MAST_PART_KINDS, type DevicePlacement, type MastPart, LANGUAGES, THEMES, type Building, type Camera, type Dimensions, type LanguageCode, type Opening, type Point, type Roof, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type Terrain, type Theme, type WallLamp } from "./domain";
 import { isSimplePolygon } from "./designer/geometry";
 
 export const SETTINGS_KEY = "armor-studio-settings-v1";
@@ -63,7 +63,7 @@ function readSensor(raw: unknown): Sensor | null {
 
 const COORDINATE_LIMIT = 5000;
 const ROOF_STYLES: readonly RoofStyle[] = ["flat", "shed", "gable", "hip", "pyramid"];
-const FEATURE_KINDS = ["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk"] as const;
+const FEATURE_KINDS = ["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace"] as const;
 const ROOF_ITEM_KINDS = ["chimney", "solar", "antenna", "vent"] as const;
 const num = (raw: Record<string, unknown>, key: string, fallback: number, low: number, high: number) => finite(raw[key]) ? clamp(raw[key] as number, low, high) : fallback;
 const integer = (raw: Record<string, unknown>, key: string, high: number): number | null => finite(raw[key]) && Number.isInteger(raw[key]) && (raw[key] as number) >= 0 && (raw[key] as number) <= high ? (raw[key] as number) : null;
@@ -97,16 +97,16 @@ function readBuilding(raw: unknown): Building | null {
   const name = label(raw.name, 80), points = readPoints(raw.points);
   if (name === null || !points) return null;
   const floors = Array.isArray(raw.floors) ? raw.floors.slice(0, LIMITS.floors).filter(finite).map(height => clamp(height, 0.5, 20)) : [];
-  return { id: raw.id, name, points, base: num(raw, "base", 0, -50, 500), floors: floors.length ? floors : [3], roof: readRoof(raw.roof), thickness: num(raw, "thickness", 0.2, 0.05, 1), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}), ...(readColour(raw.roofColor) ? { roofColor: readColour(raw.roofColor) } : {}) };
+  return { id: raw.id, name, points, base: num(raw, "base", 0, -50, 500), floors: floors.length ? floors : [3], roof: readRoof(raw.roof), thickness: num(raw, "thickness", 0.2, 0.05, 1), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}), ...(readColour(raw.roofColor) ? { roofColor: readColour(raw.roofColor) } : {}), ...(raw.roofHidden === true ? { roofHidden: true } : {}) };
 }
 
 function readOpening(raw: unknown): Opening | null {
-  if (!isRecord(raw) || !id(raw.id) || !id(raw.buildingId) || (raw.kind !== "door" && raw.kind !== "window")) return null;
+  if (!isRecord(raw) || !id(raw.id) || !id(raw.buildingId) || (raw.kind !== "door" && raw.kind !== "window" && raw.kind !== "garage" && raw.kind !== "opening")) return null;
   const edge = integer(raw, "edge", LIMITS.points), floor = integer(raw, "floor", LIMITS.floors);
   if (edge === null || floor === null) return null;
   return {
     id: raw.id, buildingId: raw.buildingId, edge, floor, kind: raw.kind, offset: num(raw, "offset", 0, 0, 1000),
-    width: num(raw, "width", 0.9, 0.2, 20), height: num(raw, "height", 2.1, 0.2, 20), sill: num(raw, "sill", 0, 0, 50), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}),
+    width: num(raw, "width", 0.9, 0.2, 20), height: num(raw, "height", 2.1, 0.2, 20), sill: num(raw, "sill", 0, 0, 50), ...(raw.arch === true ? { arch: true } : {}), ...(raw.balcony === true ? { balcony: true } : {}), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}),
   };
 }
 
@@ -130,6 +130,13 @@ function readPlacement(raw: unknown): DevicePlacement | null {
     ...(finite(raw.pitch) && raw.pitch !== 0 ? { pitch: clamp(raw.pitch, -180, 180) } : {}), ...(finite(raw.roll) && raw.roll !== 0 ? { roll: clamp(raw.roll, -180, 180) } : {}) };
 }
 
+function readMastParts(raw: unknown): MastPart[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const parts = raw.slice(0, 12).flatMap(item => isRecord(item) && MAST_PART_KINDS.includes(item.kind as MastPart["kind"]) && finite(item.z)
+    ? [{ kind: item.kind as MastPart["kind"], z: clamp(item.z, 0, 100), rotation: finite(item.rotation) ? clamp(item.rotation, -360, 360) : 0, size: finite(item.size) ? clamp(item.size, 0.1, 5) : 0.6 }] : []);
+  return parts.length ? parts : undefined;
+}
+
 function readFeature(raw: unknown): SiteFeature | null {
   if (!isRecord(raw) || !id(raw.id) || !FEATURE_KINDS.includes(raw.kind as (typeof FEATURE_KINDS)[number]) || !finite(raw.x) || !finite(raw.y)) return null;
   return {
@@ -140,6 +147,7 @@ function readFeature(raw: unknown): SiteFeature | null {
     ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}),
     ...(typeof raw.label === "string" && raw.label.trim() ? { label: raw.label.trim().slice(0, 40) } : {}),
     ...(typeof raw.style === "string" && FEATURE_STYLES[raw.kind as SiteFeature["kind"]]?.includes(raw.style) ? { style: raw.style } : {}),
+    ...(readMastParts(raw.parts) ? { parts: readMastParts(raw.parts) } : {}),
   };
 }
 

@@ -46,7 +46,7 @@ type View = { scale: number; x: number; y: number };
 const MIN_SCALE = 4, MAX_SCALE = 260, RULER = 22;
 const isPlacing = (tool: Tool) => tool !== "select" && tool !== "move" && tool !== "elevate";
 const isDrawing = (tool: Tool) => tool === "terrain-rect" || tool === "terrain-poly" || tool === "building-rect" || tool === "building-poly";
-const EDGE_TOOLS: ReadonlySet<Tool> = new Set(["door", "window", "wall-lamp"]);
+const EDGE_TOOLS: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp"]);
 const ROOF_TOOLS: ReadonlySet<Tool> = new Set(["chimney", "roof-solar", "antenna"]);
 
 /** The nearest corner of any outline, if one is within `tolerance`; what is being dragged is never snapped to itself. */
@@ -369,6 +369,18 @@ export function Plan2D(props: PlanProps) {
           return <><rect x={-w / 2} y={-Math.max(d, 0.1) / 2} width={w} height={Math.max(d, 0.1)} className={`p-fence ${feature.style ?? "mesh"}`} />{Array.from({ length: posts + 1 }, (_, i) => <circle key={i} cx={-w / 2 + (w * i) / posts} cy={0} r={0.09} className="p-fence-post" />)}</>;
         }
         case "fountain": return <><circle r={w / 2} className="p-fountain" /><circle r={w / 2 * 0.78} className="p-fountain-water" /><circle r={w * 0.2} className="p-fountain-tier" /><circle r={w * 0.06} className="p-fountain-jet" /></>;
+        case "pool": {
+          const style = feature.style ?? "rectangle";
+          return style === "round" ? <><circle r={w / 2} className="p-pool-rim" /><circle r={w / 2 - 0.15} className="p-pool-water" /></>
+            : style === "oval" ? <><ellipse rx={w / 2} ry={d / 2} className="p-pool-rim" /><ellipse rx={w / 2 - 0.15} ry={d / 2 - 0.15} className="p-pool-water" /></>
+            : style === "l-shape" ? <><path d={`M${-w / 2} ${-d / 2}H${w / 2}V${0}H${0}V${d / 2}H${-w / 2}Z`} className="p-pool-rim" /><path d={`M${-w / 2 + 0.15} ${-d / 2 + 0.15}H${w / 2 - 0.15}V${-0.15}H${0.15}V${d / 2 - 0.15}H${-w / 2 + 0.15}Z`} className="p-pool-water" /></>
+            : <><rect x={-w / 2} y={-d / 2} width={w} height={d} className="p-pool-rim" /><rect x={-w / 2 + 0.15} y={-d / 2 + 0.15} width={Math.max(0.1, w - 0.3)} height={Math.max(0.1, d - 0.3)} className="p-pool-water" /></>;
+        }
+        case "planter": {
+          const style = feature.style ?? "box";
+          return style === "round" ? <><circle r={w / 2} className="p-planter" /><circle r={w / 2 * 0.7} className="p-planter-soil" /></> : <><rect x={-w / 2} y={-d / 2} width={w} height={d} className="p-planter" /><rect x={-w / 2 + 0.06} y={-d / 2 + 0.06} width={Math.max(0.05, w - 0.12)} height={Math.max(0.05, d - 0.12)} className="p-planter-soil" /></>;
+        }
+        case "terrace": return <><rect x={-w / 2} y={-d / 2} width={w} height={d} className="p-terrace" />{(feature.style ?? "railed") === "railed" && <path d={`M${-w / 2} ${d / 2}V${-d / 2}H${w / 2}V${d / 2}`} className="p-terrace-rail" />}</>;
         case "coop": return <><rect x={-w / 2} y={-d / 2} width={w * 0.62} height={d} className="p-coop" /><rect x={-w / 2 + w * 0.62} y={-d * 0.28} width={w * 0.38} height={d * 0.56} className="p-coop-run" /><path d={`M${-w * 0.1} ${d / 2}L${-w * 0.1} ${d / 2 + 0.55}`} className="p-coop-ramp" /></>;
         case "gate": {
           const pillar = feature.style === "stone" ? 0.7 : 0.55, leaf = Math.max(1, w - 2 * pillar) / 2;
@@ -412,10 +424,16 @@ export function Plan2D(props: PlanProps) {
         return <g key={opening.id} className={`p-opening ${opening.kind} ${opening.color ? "coloured" : ""} ${chosenOpening ? "selected" : ""} ${onFloor ? "" : "other-floor"}`} style={opening.color ? { ["--c" as string]: opening.color } : undefined}
           onPointerDown={event => beginDrag({ kind: "opening", id: opening.id }, { kind: "opening", id: opening.id }, event)}>
           <path d={path([{ x: start.x + ox, y: start.y + oy }, { x: end.x + ox, y: end.y + oy }, { x: end.x - ox, y: end.y - oy }, { x: start.x - ox, y: start.y - oy }])} className="p-opening-gap" />
-          {isDoor
+          {opening.kind === "garage"
+            ? <><line x1={start.x} y1={Y(start.y)} x2={end.x} y2={Y(end.y)} className="p-garage-line" />{Array.from({ length: 4 }, (_, i) => { const f = (i + 1) / 5, px = start.x + ux * opening.width * f, py = start.y + uy * opening.width * f; return <line key={i} x1={px - nx * 0.18} y1={Y(py - ny * 0.18)} x2={px + nx * 0.18} y2={Y(py + ny * 0.18)} className="p-garage-tick" />; })}</>
+            : opening.kind === "opening"
+            ? <line x1={start.x} y1={Y(start.y)} x2={end.x} y2={Y(end.y)} className="p-opening-line" />
+            : isDoor
             ? <><line x1={start.x} y1={Y(start.y)} x2={hingeEnd.x} y2={Y(hingeEnd.y)} className="p-door-leaf" /><path d={`M${hingeEnd.x} ${Y(hingeEnd.y)}A${opening.width} ${opening.width} 0 0 ${signedArea(building.points) > 0 ? 1 : 0} ${end.x} ${Y(end.y)}`} className="p-door-swing" /></>
             : <><line x1={start.x + ox * 0.5} y1={Y(start.y + oy * 0.5)} x2={end.x + ox * 0.5} y2={Y(end.y + oy * 0.5)} className="p-window-line" /><line x1={start.x - ox * 0.5} y1={Y(start.y - oy * 0.5)} x2={end.x - ox * 0.5} y2={Y(end.y - oy * 0.5)} className="p-window-line" /><line x1={start.x} y1={Y(start.y)} x2={end.x} y2={Y(end.y)} className="p-window-glass" /></>}
-          <title>{`${t(isDoor ? "door" : "window")} · ${t("floorShort")} ${opening.floor + 1} · ${formatMetres(opening.width)} × ${formatMetres(opening.height)} · ${t("openingSill")} ${formatMetres(opening.sill)}`}</title>
+          {opening.arch && <path d={`M${start.x + nx * 0.25} ${Y(start.y + ny * 0.25)}A${opening.width / 2} ${opening.width / 2} 0 0 ${signedArea(building.points) > 0 ? 0 : 1} ${end.x + nx * 0.25} ${Y(end.y + ny * 0.25)}`} className="p-arch-mark" />}
+          {opening.balcony && <path d={path([{ x: start.x - ux * 0.3 + nx * (building.thickness / 2), y: start.y - uy * 0.3 + ny * (building.thickness / 2) }, { x: start.x - ux * 0.3 + nx * (building.thickness / 2 + 1), y: start.y - uy * 0.3 + ny * (building.thickness / 2 + 1) }, { x: end.x + ux * 0.3 + nx * (building.thickness / 2 + 1), y: end.y + uy * 0.3 + ny * (building.thickness / 2 + 1) }, { x: end.x + ux * 0.3 + nx * (building.thickness / 2), y: end.y + uy * 0.3 + ny * (building.thickness / 2) }])} className="p-balcony" />}
+          <title>{`${t(opening.kind)} · ${t("floorShort")} ${opening.floor + 1} · ${formatMetres(opening.width)} × ${formatMetres(opening.height)} · ${t("openingSill")} ${formatMetres(opening.sill)}`}</title>
         </g>;
       })}
       {model.wallLamps.filter(item => item.buildingId === building.id && item.edge < edges).map(lamp => {

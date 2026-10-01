@@ -171,3 +171,34 @@ describe("site export", () => {
     expect(JSON.stringify(exported)).not.toMatch(/password|admin/i);
   });
 });
+
+describe("the new parts of a site survive saving and reading", () => {
+  it("keeps the roof taken off, the arch, the balcony, the garage door, the new objects and the parts of a mast; drops what is wrong", () => {
+    const base = parseStudioSettings(serializeStudioSettings({ ...(parseStudioSettings(null) as StudioSettings) }));
+    const building = { id: "b1", name: "House", points: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 8 }, { x: 0, y: 8 }], base: 0, floors: [3, 3], roof: { style: "gable", slope: 30, overhang: 0.3, ridge: 0 }, thickness: 0.2, roofHidden: true };
+    const raw = JSON.stringify({
+      buildings: [building],
+      openings: [
+        { id: "o1", buildingId: "b1", edge: 0, floor: 1, kind: "garage", offset: 1, width: 2.6, height: 2.2, sill: 0, arch: true, balcony: true },
+        { id: "o2", buildingId: "b1", edge: 1, floor: 0, kind: "opening", offset: 1, width: 1.4, height: 2.3, sill: 0, arch: true },
+        { id: "o3", buildingId: "b1", edge: 1, floor: 0, kind: "teleporter", offset: 1, width: 1.4, height: 2.3, sill: 0 },
+      ],
+      features: [
+        { id: "m1", kind: "mast", x: 1, y: 1, z: 0, width: 0.25, depth: 0.25, height: 9, rotation: 0, slope: 0, parts: [{ kind: "tv", z: 8, rotation: 10, size: 1 }, { kind: "laser", z: 5 }, { kind: "wifi", z: 99999, size: 0.4 }] },
+        { id: "p1", kind: "pool", x: 5, y: 5, z: 0, width: 6, depth: 3, height: 0.3, rotation: 0, slope: 0, style: "oval" },
+        { id: "p2", kind: "planter", x: 6, y: 6, z: 0, width: 1, depth: 1, height: 0.6, rotation: 0, slope: 0, style: "round" },
+        { id: "t1", kind: "terrace", x: 7, y: 7, z: 3, width: 3, depth: 2, height: 0.2, rotation: 0, slope: 0, style: "railed" },
+      ],
+    });
+    const parsed = parseStudioSettings(raw);
+    expect(base).toBeTruthy();
+    expect(parsed.buildings?.[0].roofHidden).toBe(true);
+    expect(parsed.openings?.map(item => item.id)).toEqual(["o1", "o2"]);   // an unknown kind of opening is dropped
+    expect(parsed.openings?.[0]).toMatchObject({ kind: "garage", arch: true, balcony: true });
+    const mast = parsed.features?.find(item => item.id === "m1");
+    expect(mast?.parts?.map(part => part.kind)).toEqual(["tv", "wifi"]);   // an unknown part is dropped
+    expect(mast?.parts?.[1].z).toBe(100);                                  // and a height is kept inside what is allowed
+    expect(parsed.features?.map(item => item.kind)).toEqual(["mast", "pool", "planter", "terrace"]);
+    expect(parsed.features?.find(item => item.id === "p1")?.style).toBe("oval");
+  });
+});

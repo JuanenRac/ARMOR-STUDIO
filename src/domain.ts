@@ -42,11 +42,12 @@ export type Roof = { style: RoofStyle; slope: number; overhang: number; ridge: n
  * A building: a closed footprint polygon in metres, the elevation of its ground floor, the height of each storey
  * (one number per floor, bottom first) and a roof over the top.
  */
-export type Building = { id: string; name: string; points: Point[]; base: number; floors: number[]; roof: Roof; thickness: number; /** Wall and roof colours, "#rrggbb"; unset keeps the default. */ color?: string; roofColor?: string };
+export type Building = { id: string; name: string; points: Point[]; base: number; floors: number[]; roof: Roof; thickness: number; /** Wall and roof colours, "#rrggbb"; unset keeps the default. */ color?: string; roofColor?: string; /** The roof is taken off, to see the rooms of the top floor from above. */ roofHidden?: boolean };
 
-export type OpeningKind = "door" | "window";
+/** A door, a window, a garage door (wide, sectional) or a plain opening in a wall (for an awning, an arch). */
+export type OpeningKind = "door" | "window" | "garage" | "opening";
 /** A door or window in one wall (the footprint edge from point `edge` to the next) of one floor, at any height. */
-export type Opening = { id: string; buildingId: string; edge: number; floor: number; kind: OpeningKind; offset: number; width: number; height: number; sill: number; /** The door leaf or the window frame, "#rrggbb". */ color?: string };
+export type Opening = { id: string; buildingId: string; edge: number; floor: number; kind: OpeningKind; offset: number; width: number; height: number; sill: number; /** Arched at the top. */ arch?: boolean; /** A small balcony outside it (a door or a window of an upper floor). */ balcony?: boolean; /** The door leaf or the window frame, "#rrggbb". */ color?: string };
 
 export type RoofItemKind = "chimney" | "solar" | "antenna" | "vent";
 /** Something standing on a roof; its height above the ground follows the roof surface. */
@@ -56,11 +57,16 @@ export type RoofItem = { id: string; buildingId: string; kind: RoofItemKind; x: 
 export type WallLamp = { id: string; buildingId: string; edge: number; offset: number; z: number; reach: number; /** The colour of its light, "#rrggbb". */ color?: string };
 
 /** Objects standing on the ground. `lamp` is a lamp post (a tube of `height` with the light on top), `mast` an antenna mast. */
-export type SiteFeatureKind = "pillar" | "lamp" | "mast" | "solar" | "canopy" | "entrance" | "path" | "road" | "tree" | "kennel" | "fence" | "fountain" | "coop" | "gate" | "sidewalk";
+export type SiteFeatureKind = "pillar" | "lamp" | "mast" | "solar" | "canopy" | "entrance" | "path" | "road" | "tree" | "kennel" | "fence" | "fountain" | "coop" | "gate" | "sidewalk" | "pool" | "planter" | "terrace";
 /** The looks a kind can have (a tree is an oak, a pine, a palm or a bush; a fence, a gate). */
 export const FEATURE_STYLES: Partial<Record<SiteFeatureKind, readonly string[]>> = {
   tree: ["oak", "pine", "palm", "bush"], fence: ["mesh", "picket", "rail", "wire", "wall"], gate: ["iron", "wood", "modern", "stone"], sidewalk: ["concrete", "brick", "gravel"],
+  pool: ["rectangle", "round", "oval", "l-shape"], planter: ["box", "round", "bed"], terrace: ["open", "railed"],
 };
+/** Something fixed to a mast: a television antenna, a satellite dish or a Wi-Fi dish, at a height, turned, of a size. */
+export type MastPartKind = "tv" | "satellite" | "wifi";
+export type MastPart = { kind: MastPartKind; z: number; rotation: number; size: number };
+export const MAST_PART_KINDS: readonly MastPartKind[] = ["tv", "satellite", "wifi"];
 export type SiteFeature = {
   id: string; kind: SiteFeatureKind; x: number; y: number; z: number; width: number; depth: number; height: number;
   /** Turn about the vertical axis (degrees); `pitch` tips it about the east-west axis (X) and `roll` about the north-south one (Z). */
@@ -73,6 +79,8 @@ export type SiteFeature = {
   color?: string;
   /** A name of the operator's own ("north gate"), shown in the list of objects. */
   label?: string;
+  /** What a mast carries (up to twelve). */
+  parts?: MastPart[];
 };
 
 /** Where a device (a smoke detector, a door contact, a plug...) stands in the design: metres, x east, y north, z up; turned like any object. */

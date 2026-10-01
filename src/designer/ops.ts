@@ -3,7 +3,7 @@
  * The editor only decides which one to call; keeping them here makes them testable and the undo history simple.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import type { Building, Camera, DevicePlacement, Dimensions, Opening, Point, Roof, RoofItem, RoofItemKind, Sensor, SiteFeature, SiteFeatureKind, Terrain, WallLamp } from "../domain";
+import type { Building, Camera, DevicePlacement, Dimensions, Opening, Point, Roof, RoofItem, RoofItemKind, Sensor, SiteFeature, SiteFeatureKind, Terrain, WallLamp, MastPart } from "../domain";
 import { area, bounds, centroid, edgeOf, ensureCounterClockwise, floorBottom, isSimplePolygon, pointInPolygon, rectangle, roofFrame, roofHeight, totalHeight } from "./geometry";
 import { toMetres, toPercent, type Selection } from "./model";
 
@@ -164,17 +164,17 @@ export function removeFloor(model: SiteModel, buildingId: string, floor: number)
 
 // ---- doors, windows, lamps ------------------------------------------------------------------------------------------------
 
-const OPENING_DEFAULTS = { door: { width: 0.9, height: 2.1, sill: 0 }, window: { width: 1.2, height: 1.2, sill: 0.9 } } as const;
+const OPENING_DEFAULTS = { door: { width: 0.9, height: 2.1, sill: 0 }, window: { width: 1.2, height: 1.2, sill: 0.9 }, garage: { width: 2.6, height: 2.2, sill: 0 }, opening: { width: 1.4, height: 2.3, sill: 0 } } as const;
 
 /** A door or window on a wall of one floor, centred at `along` metres from the start of the wall; it is kept inside the wall. */
-export function addOpening(model: SiteModel, buildingId: string, edge: number, floor: number, kind: Opening["kind"], along?: number): { model: SiteModel; id: string } | null {
+export function addOpening(model: SiteModel, buildingId: string, edge: number, floor: number, kind: Opening["kind"], along?: number, extra: Pick<Opening, "arch" | "balcony"> = {}): { model: SiteModel; id: string } | null {
   const building = model.buildings.find(item => item.id === buildingId);
   if (!building || edge < 0 || edge >= building.points.length || floor < 0 || floor >= building.floors.length) return null;
   const { length } = edgeOf(building.points, edge), defaults = OPENING_DEFAULTS[kind];
   const width = Math.min(defaults.width, Math.max(0.3, length - 2 * EDGE_MARGIN)), height = Math.min(defaults.height, Math.max(0.3, building.floors[floor] - defaults.sill - 0.1));
   const centre = along ?? length / 2, offset = clamp(centre - width / 2, EDGE_MARGIN, Math.max(EDGE_MARGIN, length - width - EDGE_MARGIN));
   const id = nextId(kind, model.openings.map(item => item.id));
-  return { model: { ...model, openings: [...model.openings, { id, buildingId, edge, floor, kind, offset: round2(offset), width: round2(width), height: round2(height), sill: defaults.sill }] }, id };
+  return { model: { ...model, openings: [...model.openings, { id, buildingId, edge, floor, kind, offset: round2(offset), width: round2(width), height: round2(height), sill: defaults.sill, ...extra }] }, id };
 }
 
 export function addWallLamp(model: SiteModel, buildingId: string, edge: number, along: number, z?: number): { model: SiteModel; id: string } | null {
@@ -227,6 +227,9 @@ export const FEATURE_DEFAULTS: Record<SiteFeatureKind, Omit<SiteFeature, "id" | 
   coop: { width: 1.8, depth: 1.2, height: 1.4, rotation: 0, slope: 0 },
   gate: { width: 4.2, depth: 0.6, height: 2.4, rotation: 0, slope: 0, style: "iron" },
   sidewalk: { width: 4, depth: 1.2, height: 0.08, rotation: 0, slope: 0, style: "concrete" },
+  pool: { width: 6, depth: 3, height: 0.3, rotation: 0, slope: 0, style: "rectangle" },
+  planter: { width: 1.2, depth: 0.5, height: 0.6, rotation: 0, slope: 0, style: "box" },
+  terrace: { width: 3, depth: 2.5, height: 0.2, rotation: 0, slope: 0, style: "railed" },
 };
 
 export function addFeature(model: SiteModel, kind: SiteFeatureKind, x: number, y: number, z = 0): { model: SiteModel; id: string } {
@@ -383,4 +386,34 @@ export function removeSelected(model: SiteModel, selection: Selection): SiteMode
     case "device": return { ...model, placements: model.placements.filter(item => item.device_id !== selection.id) };
     default: return model;
   }
+}
+
+// ---- what a mast carries -------------------------------------------------------------------------------------------------------------
+
+export const MAST_PART_DEFAULTS: Record<MastPart["kind"], Omit<MastPart, "kind">> = {
+  tv: { z: 0.9, rotation: 0, size: 1.0 }, satellite: { z: 0.7, rotation: 0, size: 0.8 }, wifi: { z: 0.5, rotation: 0, size: 0.4 },
+};
+const MAX_MAST_PARTS = 12;
+
+/** A television antenna, a satellite dish or a Wi-Fi dish on a mast, near its top and a bit below the one put on before it. */
+export function addMastPart(model: SiteModel, mastId: string, kind: MastPart["kind"]): SiteModel {
+  return { ...model, features: model.features.map(item => {
+    if (item.id !== mastId || item.kind !== "mast") return item;
+    const parts = item.parts ?? [];
+    if (parts.length >= MAX_MAST_PARTS) return item;
+    const lowest = parts.length ? Math.min(...parts.map(part => part.z)) : item.height + 0.3;
+    const z = round2(clamp(lowest - 0.9, 0.5, item.height));
+    return { ...item, parts: [...parts, { kind, ...MAST_PART_DEFAULTS[kind], z, rotation: parts.length * 60 % 360 }] };
+  }) };
+}
+export function updateMastPart(model: SiteModel, mastId: string, index: number, patch: Partial<MastPart>): SiteModel {
+  return { ...model, features: model.features.map(item => item.id !== mastId || !item.parts ? item : { ...item, parts: item.parts.map((part, i) => i === index ? { ...part, ...patch } : part) }) };
+}
+export function removeMastPart(model: SiteModel, mastId: string, index: number): SiteModel {
+  return { ...model, features: model.features.map(item => {
+    if (item.id !== mastId || !item.parts) return item;
+    const parts = item.parts.filter((_, i) => i !== index);
+    const { parts: _dropped, ...rest } = item;
+    return parts.length ? { ...rest, parts } : rest;
+  }) };
 }

@@ -40,9 +40,9 @@ type Props = {
 
 type Snapshot = { model: SiteModel; dimensions: Dimensions };
 const GRID_M = 0.25, HISTORY_LIMIT = 100, COALESCE_MS = 900;
-const FEATURE_TOOLS: ReadonlySet<Tool> = new Set(["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk"]);
+const FEATURE_TOOLS: ReadonlySet<Tool> = new Set(["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace"]);
 const ROOF_ITEM_OF: Partial<Record<Tool, RoofItemKind>> = { chimney: "chimney", "roof-solar": "solar", antenna: "antenna" };
-const REPEATING: ReadonlySet<Tool> = new Set(["door", "window", "wall-lamp", "chimney", "roof-solar", "antenna", "pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road"]);
+const REPEATING: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp", "chimney", "roof-solar", "antenna", "pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road"]);
 const NUDGE = 0.25;
 
 export function SiteDesignerInteractive(props: Props) {
@@ -158,11 +158,12 @@ export function SiteDesignerInteractive(props: Props) {
   const place = (raw: Point, hit: PlaceHit) => {
     const point = { x: round2(snapTo(raw.x, GRID_M)), y: round2(snapTo(raw.y, GRID_M)) }, current = modelRef.current;
     const floor = (buildingId: string) => { const building = current.buildings.find(item => item.id === buildingId); return building ? clamp(hit.floor ?? (floorsChosen < 0 ? 0 : floorsChosen), 0, building.floors.length - 1) : 0; };
-    if (tool === "door" || tool === "window") {
+    if (tool === "door" || tool === "window" || tool === "garage" || tool === "arch") {
       const edge = hit.edge;
       if (!edge) { props.setNotice(t("clickWall")); return; }
-      const added = addOpening(current, edge.buildingId, edge.edge, floor(edge.buildingId), tool, edge.along);
-      if (added) { commit(added.model); select({ kind: "opening", id: added.id }); props.setNotice(`${t(tool === "door" ? "doorAdded" : "windowAdded")} · ${t("floorShort")} ${floor(edge.buildingId) + 1}`); }
+      // the arch tool makes a plain opening in the wall, arched at the top (for an awning, a porch)
+      const added = tool === "arch" ? addOpening(current, edge.buildingId, edge.edge, floor(edge.buildingId), "opening", edge.along, { arch: true }) : addOpening(current, edge.buildingId, edge.edge, floor(edge.buildingId), tool, edge.along);
+      if (added) { commit(added.model); select({ kind: "opening", id: added.id }); props.setNotice(`${t(tool === "door" ? "doorAdded" : tool === "window" ? "windowAdded" : tool === "garage" ? "garageAdded" : "archAdded")} · ${t("floorShort")} ${floor(edge.buildingId) + 1}`); }
       return;
     }
     if (tool === "wall-lamp") {

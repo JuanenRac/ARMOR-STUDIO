@@ -7,7 +7,7 @@ import {
 } from "../networkModel";
 import { analyse, inNetwork, isCidr, isIp } from "./analysis";
 import { KINDS, kindDef, portOf, portPosition, portsOf, sizeOf, wirePath, type Design } from "./model";
-import { addElement, addFrame, canConnect, connect, duplicateElement, elementsInFrame, moveElement, removeElement, removeFrame, replaceKind, rotateElement, setBinding, setProp, updateFrame, updateWire } from "./ops";
+import { addElement, addFrame, canConnect, connect, duplicateElement, elementsInFrame, moveElement, removeElement, removeFrame, fillFromDevice, replaceKind, rotateElement, setBinding, setProp, updateFrame, updateWire } from "./ops";
 import { drawFound, emptyDesign, housePreset, isWireless } from "./presets";
 import { applyNetworkDoc, buildNetworkDoc, networkKey, parseNetworkDoc } from "./sync";
 
@@ -361,5 +361,19 @@ describe("rotation, replacing a device and the maker's data", () => {
     expect(design.wires).toHaveLength(1);
     design = replaceKind(design, b.id, "phone");
     expect(design.wires).toHaveLength(0);
+  });
+});
+
+describe("tying an element to a device", () => {
+  it("fills what the element does not say yet and never replaces what a person typed", () => {
+    let design = addElement(emptyDesign(), "camera", 0, 0, "", { ip: "10.0.0.9" })!.design;
+    const id = design.elements[0].id;
+    design = fillFromDevice(design, id, { ip: "192.168.0.203", vendor: "Hikvision", hostname: "cam-garage" });
+    expect(design.elements[0].props.ip).toBe("10.0.0.9");               // already typed
+    expect(design.elements[0].props.manufacturer).toBe("Hikvision");   // was empty
+    expect(design.elements[0].name).toBe("cam-garage");
+    design = fillFromDevice(design, id, { ip: "1.1.1.1", vendor: "Other", note: { name: "Other name" } });
+    expect(design.elements[0].props.manufacturer).toBe("Hikvision");
+    expect(design.elements[0].name).toBe("cam-garage");
   });
 });

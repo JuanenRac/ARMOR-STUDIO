@@ -161,6 +161,54 @@ function Sidewalk({ feature, glow }: Props) {
   </group>;
 }
 
+function Pool({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, style = feature.style ?? "rectangle", rim = feature.color ?? "#d9e3e6", rimHeight = Math.max(0.1, feature.height * 0.4), border = 0.18;
+  const water = <meshStandardMaterial color="#3fa7d6" transparent opacity={0.72} roughness={0.08} metalness={0.15} {...glow} />;
+  if (style === "round" || style === "oval") {
+    return <group scale={[1, 1, d / w]}>
+      <mesh position={[0, rimHeight / 2, 0]} castShadow receiveShadow><cylinderGeometry args={[w / 2, w / 2, rimHeight, 40]} /><meshStandardMaterial color={rim} roughness={0.8} /></mesh>
+      <mesh position={[0, rimHeight + 0.002, 0]}><cylinderGeometry args={[w / 2 - border, w / 2 - border, 0.01, 40]} />{water}</mesh>
+    </group>;
+  }
+  const part = (x: number, z: number, pw: number, pd: number, key: string) => <group key={key} position={[x, 0, z]}>
+    <Box size={[pw, rimHeight, pd]} at={[0, rimHeight / 2, 0]} color={rim} glow={glow} rough={0.8} />
+    <mesh position={[0, rimHeight + 0.002, 0]}><boxGeometry args={[Math.max(0.1, pw - 2 * border), 0.01, Math.max(0.1, pd - 2 * border)]} />{water}</mesh>
+  </group>;
+  return style === "l-shape" ? <group>{part(0, -d / 4, w, d / 2, "a")}{part(-w / 4, d / 4, w / 2, d / 2, "b")}</group> : part(0, 0, w, d, "a");
+}
+
+function Planter({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, h = feature.height, style = feature.style ?? "box", wood = feature.color ?? "#8a5a3c", leaf = "#3f8f4a";
+  if (style === "round") {
+    return <group>
+      <mesh position={[0, h / 2, 0]} castShadow receiveShadow><cylinderGeometry args={[w / 2, w / 2 * 0.75, h, 20]} /><meshStandardMaterial color={wood} roughness={0.85} {...glow} /></mesh>
+      <mesh position={[0, h + 0.01, 0]}><cylinderGeometry args={[w / 2 - 0.04, w / 2 - 0.04, 0.03, 20]} /><meshStandardMaterial color="#3d2b1e" roughness={1} /></mesh>
+      {[[0, 0, 0.22], [0.18, 0.1, 0.16], [-0.16, -0.08, 0.17]].map(([x, z, r], index) => <mesh key={index} position={[x * w, h + 0.18 + index * 0.04, z * w]} castShadow><sphereGeometry args={[r * w, 12, 10]} /><meshStandardMaterial color={leaf} roughness={0.9} /></mesh>)}
+    </group>;
+  }
+  const plants = Math.max(1, Math.round(w / 0.45));
+  return <group>
+    <Box size={[w, h, d]} at={[0, h / 2, 0]} color={wood} glow={glow} />
+    <Box size={[Math.max(0.05, w - 0.1), 0.03, Math.max(0.05, d - 0.1)]} at={[0, h + 0.01, 0]} color="#3d2b1e" rough={1} cast={false} />
+    {Array.from({ length: plants }, (_, index) => <mesh key={index} position={[-w / 2 + (index + 0.5) * w / plants, h + 0.16, 0]} castShadow><sphereGeometry args={[Math.min(0.22, d * 0.45), 12, 10]} /><meshStandardMaterial color={index % 2 ? "#4aa05a" : leaf} roughness={0.9} /></mesh>)}
+  </group>;
+}
+
+function Terrace({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, h = feature.height, floor = feature.color ?? "#a49a8c", railed = (feature.style ?? "railed") === "railed";
+  const raised = feature.z > 0.05;
+  return <group>
+    <Box size={[w, h, d]} at={[0, -h / 2 + h, 0]} color={floor} glow={glow} rough={0.9} />
+    {raised && [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sz]) => <Box key={`${sx}${sz}`} size={[0.12, feature.z, 0.12]} at={[sx * (w / 2 - 0.1), -feature.z / 2, sz * (d / 2 - 0.1)]} color="#8895a0" metal={0.5} />)}
+    {railed && <>
+      {[[0, -d / 2 + 0.02, w, 0.04], [0, d / 2 - 0.02, w, 0.04]].map(([x, z, rw, rd], index) => <Box key={index} size={[rw, 0.05, rd]} at={[x, h + 1.0, z]} color="#6f7d84" metal={0.5} />)}
+      <Box size={[0.04, 0.05, d]} at={[-w / 2 + 0.02, h + 1.0, 0]} color="#6f7d84" metal={0.5} />
+      <Box size={[0.04, 0.05, d]} at={[w / 2 - 0.02, h + 1.0, 0]} color="#6f7d84" metal={0.5} />
+      {Array.from({ length: Math.max(2, Math.round(w / 0.5)) + 1 }, (_, index) => <Box key={index} size={[0.025, 1.0, 0.025]} at={[-w / 2 + index * w / Math.max(2, Math.round(w / 0.5)), h + 0.5, d / 2 - 0.02]} color="#6f7d84" metal={0.5} cast={false} />)}
+    </>}
+  </group>;
+}
+
 /** The body for the kinds this file draws; the older kinds live in Viewport3D. */
 export function FeatureBody(props: Props) {
   switch (props.feature.kind) {
@@ -171,7 +219,10 @@ export function FeatureBody(props: Props) {
     case "kennel": return <Kennel {...props} />;
     case "coop": return <Coop {...props} />;
     case "sidewalk": return <Sidewalk {...props} />;
+    case "pool": return <Pool {...props} />;
+    case "planter": return <Planter {...props} />;
+    case "terrace": return <Terrace {...props} />;
     default: return null;
   }
 }
-export const NEW_FEATURE_KINDS: ReadonlySet<SiteFeature["kind"]> = new Set(["tree", "fence", "gate", "fountain", "kennel", "coop", "sidewalk"]);
+export const NEW_FEATURE_KINDS: ReadonlySet<SiteFeature["kind"]> = new Set(["tree", "fence", "gate", "fountain", "kennel", "coop", "sidewalk", "pool", "planter", "terrace"]);

@@ -3,7 +3,7 @@ import { INITIAL_BUILDINGS, INITIAL_CAMERAS, INITIAL_DIMENSIONS, INITIAL_FEATURE
 import { area, bounds, centroid, edgeOf, pointInPolygon, signedArea, totalHeight } from "./geometry";
 import { toMetres } from "./model";
 import {
-  addFeature, addFence, addSidewalkRing, addFloor, canTurnAbout, turnSelected, addOpening, addRoofItem, addWallLamp, buildingAt, createBuilding, deleteBuilding, duplicateBuilding, fitDimensions, insertBuildingVertex, isRectangle, moveBuilding, moveVertex, rectangularTerrain,
+  addMastPart, removeMastPart, updateMastPart, addFeature, addFence, addSidewalkRing, addFloor, canTurnAbout, turnSelected, addOpening, addRoofItem, addWallLamp, buildingAt, createBuilding, deleteBuilding, duplicateBuilding, fitDimensions, insertBuildingVertex, isRectangle, moveBuilding, moveVertex, rectangularTerrain,
   removeBuildingVertex, removeFloor, removeSelected, rescaleDevices, resizeRectangle, rotateBuilding, roofSurfaceZ, setFootprint, setSideLength, type SiteModel,
 } from "./ops";
 
@@ -230,5 +230,48 @@ describe("sidewalks", () => {
     expect(removed.features).toHaveLength(model.features.length);
     const l = { ...model, buildings: [{ ...model.buildings[0], points: [{ x: 0, y: 0 }, { x: 8, y: 0 }, { x: 8, y: 3 }, { x: 3, y: 3 }, { x: 3, y: 8 }, { x: 0, y: 8 }] }, ...model.buildings.slice(1)] };
     expect(addSidewalkRing(l, "building-01")!.ids).toHaveLength(6);
+  });
+});
+
+describe("the garage door, the arch, the pool, the planter, the terrace and what a mast carries", () => {
+  it("puts a garage door and an arched opening in a wall, kept inside it", () => {
+    const model = sample();
+    const garage = addOpening(model, "building-01", 0, 0, "garage", 3)!;
+    const placed = garage.model.openings.find(item => item.id === garage.id)!;
+    expect(placed.kind).toBe("garage");
+    expect(placed.width).toBeGreaterThan(2);
+    const arch = addOpening(garage.model, "building-01", 0, 0, "opening", 12, { arch: true })!;
+    expect(arch.model.openings.find(item => item.id === arch.id)).toMatchObject({ kind: "opening", arch: true });
+  });
+  it("places the new ground objects with sensible sizes", () => {
+    let model = sample();
+    for (const kind of ["pool", "planter", "terrace"] as const) {
+      const added = addFeature(model, kind, 10, 10);
+      model = added.model;
+      const feature = model.features.find(item => item.id === added.id)!;
+      expect(feature.width).toBeGreaterThan(0);
+      expect(feature.style).toBeTruthy();
+    }
+  });
+  it("adds, changes and takes away the parts of a mast, one below the other", () => {
+    let model = sample();
+    const mast = addFeature(model, "mast", 5, 5);
+    model = mast.model;
+    model = addMastPart(model, mast.id, "tv");
+    model = addMastPart(model, mast.id, "satellite");
+    model = addMastPart(model, mast.id, "wifi");
+    const parts = model.features.find(item => item.id === mast.id)!.parts!;
+    expect(parts.map(part => part.kind)).toEqual(["tv", "satellite", "wifi"]);
+    expect(parts[1].z).toBeLessThan(parts[0].z);
+    expect(parts[2].z).toBeLessThan(parts[1].z);
+    model = updateMastPart(model, mast.id, 1, { size: 1.2 });
+    expect(model.features.find(item => item.id === mast.id)!.parts![1].size).toBe(1.2);
+    model = removeMastPart(model, mast.id, 0);
+    expect(model.features.find(item => item.id === mast.id)!.parts!.map(part => part.kind)).toEqual(["satellite", "wifi"]);
+    model = removeMastPart(removeMastPart(model, mast.id, 0), mast.id, 0);
+    expect(model.features.find(item => item.id === mast.id)!.parts).toBeUndefined();
+    // only a mast carries parts
+    const tree = addFeature(model, "tree", 1, 1);
+    expect(addMastPart(tree.model, tree.id, "tv").features.find(item => item.id === tree.id)!.parts).toBeUndefined();
   });
 });
