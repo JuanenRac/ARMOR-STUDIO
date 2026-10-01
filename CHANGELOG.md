@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here.
 
+## [0.5.6] - Nodes you can see and find
+
+- **Find nodes on the network** (Inverters, Batteries and Radar menus): a list of what the network node has found that looks like an ARMOR node - a host name starting with "armor-", or an Espressif maker - and is not yet a node of the menu, with a button to search now, a link to the node's own panel and, in the solar menus, a button that puts the node in the form of a new equipment.
+- **Solar nodes** (Inverters and Batteries): one card per gateway node with what it reads (inverters, battery stacks), whether it is reporting and when it last did, and a note that says what the role of a node is against the equipment it reads.
+- **Radar:** a note that explains the node against the radars of the design, and each node says how many radars of the design are linked to it.
+- **Cameras:** going to another camera (in the grid, the wall, the large view and the full screen) keeps the picture on show until the new stream has its first frame, instead of black, and the cameras on either side of the large view start their video ahead of the step. Needs ARMOR-SERVER 0.4.0 or later.
+- Texts in the seven languages; 3 new tests.
+
 ## [0.5.5] - Cameras that keep their stream, and fewer false alarms of "offline"
 
 - **Cameras:** the list of cameras is read again every minute and that made every picture ask for a new stream address, dropping all the streams and starting them over, which is what made the cameras slow. An address is now asked once for each camera and kept while it stays live, and a camera whose address cannot be had no longer takes the others down. Needs ARMOR-SERVER 0.4.0 for the faster start of the video.

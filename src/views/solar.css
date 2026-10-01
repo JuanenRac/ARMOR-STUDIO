@@ -144,3 +144,13 @@
 .solar-declared-text small { color: #8ea7b2; overflow-wrap: anywhere; }
 .solar-declared-text .solar-pill { justify-self: start; }
 .solar-declared-actions { display: flex; gap: .4rem; flex-wrap: wrap; }
+
+.solar-nodes { display: grid; gap: .5rem; padding: .8rem 1rem; border: 1px solid #1d4b56; border-radius: 14px; background: #08171f; } .solar-nodes h3 { margin: 0; font-size: .9rem; color: #f2feff; } .solar-nodes p { margin: 0; }
+.solar-node-cards { display: flex; flex-wrap: wrap; gap: .6rem; } .solar-node-card { display: flex; align-items: center; gap: .7rem; padding: .55rem .8rem; border: 1px solid #285a66; border-radius: 12px; background: #0a202a; }
+.solar-node-card strong { display: block; color: #f2feff; } .solar-node-card small { color: #86a8b3; } .solar-node-chip { font-size: 1.4rem; color: #22d3ee; }
+.solar-node-state { font-size: .72rem; color: #86a8b3; padding-left: .5rem; border-left: 1px solid #285a66; } .solar-node-card.reporting { border-color: #1f7a5c; } .solar-node-card.reporting .solar-node-state { color: #5df0c4; } .solar-node-card.stale { border-color: #9a3c47; } .solar-node-card.stale .solar-node-state { color: #ff8e99; } .solar-node-card.waiting { border-style: dashed; }
+
+.node-finder { display: grid; gap: .5rem; padding: .8rem 1rem; border: 1px solid #1d4b56; border-radius: 14px; background: #08171f; } .node-finder p { margin: 0; }
+.node-finder-head { display: flex; justify-content: space-between; align-items: center; gap: .6rem; flex-wrap: wrap; } .node-finder h3 { margin: 0; font-size: .9rem; color: #f2feff; }
+.node-finder-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; } .node-finder-list li { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; padding: .5rem .7rem; border: 1px solid #285a66; border-radius: 10px; background: #0a202a; }
+.node-finder-list li.off { opacity: .6; } .node-finder-list strong { display: block; color: #f2feff; } .node-finder-list small { color: #86a8b3; } .node-finder-list li > div { flex: 1 1 200px; }

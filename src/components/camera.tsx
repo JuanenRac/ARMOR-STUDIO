@@ -2,7 +2,7 @@
  * Camera tile, PTZ pad and the maximized camera dialog.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import type { Reachability } from "../api";
+import { createCameraStreamUrl, type Reachability } from "../api";
 import { useEffect, useRef, useState } from "react";
 
 /**
@@ -10,9 +10,15 @@ import { useEffect, useRef, useState } from "react";
  * collects the garbage, and after some menu changes those streams used up every connection to the server, so no button answered any more.
  */
 export function LiveImage({ src, alt }: { src: string; alt: string }) {
-  const image = useRef<HTMLImageElement>(null);
-  useEffect(() => { const element = image.current; return () => { if (element) element.removeAttribute("src"); }; }, [src]);
-  return <img ref={image} src={src} alt={alt} />;
+  // The picture on show stays until the next stream has its first frame, so going to another camera never shows black in between.
+  const [shown, setShown] = useState(src);
+  const next = useRef<HTMLImageElement>(null), current = useRef<HTMLImageElement>(null);
+  useEffect(() => { const element = next.current; return () => { if (element) element.removeAttribute("src"); }; }, [src]);
+  useEffect(() => () => { current.current?.removeAttribute("src"); }, [shown]);
+  return <>
+    <img ref={current} key={shown} src={shown} alt={alt} />
+    {src !== shown && <img ref={next} key={src} src={src} alt="" aria-hidden="true" className="live-next" onLoad={() => setShown(src)} onError={() => setShown(src)} />}
+  </>;
 }
 import { cameraIsConfigured, type Camera } from "../domain";
 
@@ -114,6 +120,14 @@ export function CameraFullscreen({ camera, cameras, origin, recording, t, close,
   const [ptzOpen, setPtzOpen] = useState(false);
   const index = cameras.findIndex(item => item.id === camera.id);
   const live = camera.enabled && camera.liveVideoAvailable;
+  // The cameras on either side start their video now (asking for a stream address does that), so stepping to one shows a picture at once.
+  useEffect(() => {
+    if (cameras.length < 2 || index < 0) return;
+    for (const offset of [1, -1]) {
+      const neighbour = cameras[(index + offset + cameras.length) % cameras.length];
+      if (neighbour && neighbour.id !== camera.id && neighbour.enabled && neighbour.liveVideoAvailable) void createCameraStreamUrl(origin, neighbour.id).catch(() => undefined);
+    }
+  }, [origin, camera.id, index, cameras]);
   // The keyboard works here as the buttons do: left and right go to the other cameras, Escape goes back.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {

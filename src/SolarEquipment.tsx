@@ -8,19 +8,23 @@ import { deleteSolarDevice, saveSolarDevice, solarExample } from "./api";
 import type { Translate } from "./components/camera";
 import { CONNECTION_LABEL, modelName, type SolarCatalog, type SolarDeviceView, type SolarKind, type SolarRegistration } from "./solarModel";
 import { InverterLogo, BatteryLogo } from "./solarGraphics";
+import { NodeFinder } from "./NodeFinder";
+import type { NetworkOverview } from "./networkModel";
 import "./views/devices.css";
 
 type Props = {
   kind: SolarKind; t: Translate; origin: string; catalog: SolarCatalog | null;
   /** Everything declared of this kind, and what reports of it (to say whether each one has). */
   registrations: SolarRegistration[]; reporting: SolarDeviceView[]; reload: () => void;
+  /** What the network node has found, to look for the gateway nodes on the network. */
+  network?: NetworkOverview | null;
 };
 type Form = { editing: boolean; name: string; node_id: string; device: string; model: string; connection: string; notes: string };
 
 const blank = (kind: SolarKind): Form => ({ editing: false, name: "", node_id: "solar-1", device: "", model: kind === "inverter" ? "voltronic" : "pylontech-us3000", connection: kind === "inverter" ? "rs232" : "rs485", notes: "" });
 const label = (t: Translate, value: string, table: Record<string, string>) => table[value] ?? t("solarOther");
 
-export function SolarEquipment({ kind, t, origin, catalog, registrations, reporting, reload }: Props) {
+export function SolarEquipment({ kind, t, origin, catalog, registrations, reporting, reload, network = null }: Props) {
   const [form, setForm] = useState<Form | null>(null);
   const [message, setMessage] = useState<{ text: string; bad: boolean } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -54,6 +58,7 @@ export function SolarEquipment({ kind, t, origin, catalog, registrations, report
       {registrations.length > 0 && <span className="muted">{t("solarDeclared")}: {registrations.length}</span>}
     </div>
     {message && <p className={`notice ${message.bad ? "bad" : ""}`} role="status">{message.text}</p>}
+    <NodeFinder t={t} origin={origin} network={network} knownIds={[...registrations.map(item => item.node_id), ...reporting.map(item => item.node_id)]} onUse={nodeId => { setMessage(null); setForm({ ...blank(kind), ...(nodeId ? { node_id: nodeId } : {}) }); }} />
 
     {form && <form className="device-form stack-card" onSubmit={event => void save(event)}>
       <h3>{form.editing ? t("solarEditDevice") : kind === "inverter" ? t("solarAddInverter") : t("solarAddBattery")}</h3>

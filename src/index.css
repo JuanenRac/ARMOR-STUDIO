@@ -63,3 +63,5 @@ html[data-armor-theme="Midnight"] body{background:#020611}html[data-armor-theme=
 
 /* Demonstration data is always labelled as such. */
 .demo-badge{padding:.22rem .6rem;border:1px solid #FFB020;border-radius:999px;background:rgba(255,176,32,.12);color:#FFB020;font:600 .68rem "DM Mono","Cascadia Mono",ui-monospace,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase}
+
+.live-next{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}

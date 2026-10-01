@@ -16,10 +16,14 @@ import type { NodeState } from "../types";
 import type { Translate } from "../components/camera";
 import "./radar-map.css";
 import { MenuTitle } from "../menuLogos";
+import { NodeFinder } from "../NodeFinder";
+import type { NetworkOverview } from "../networkModel";
 
 type Props = {
   nodes: NodeState[]; model: SiteModel; dimensions: Dimensions; origin: string;
   forget: (id: string) => void; openDesigner: () => void; openZones: () => void; setSensors: (next: Sensor[]) => void; t: Translate;
+  /** What the network node has found, to look for radar nodes on the network. */
+  network?: NetworkOverview | null;
 };
 
 const LIVE_MS = 800;
@@ -46,7 +50,7 @@ function useLiveNodes(origin: string, fallback: NodeState[]): NodeState[] {
 /** The address of a node's own web panel (port 80 is left out). Only the numbers the server validated as an IPv4 address and a port reach here. */
 export const panelUrl = (panel: { ip: string; port: number }): string => `http://${panel.ip}${panel.port === 80 ? "" : `:${panel.port}`}/`;
 
-export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forget, openDesigner, openZones, setSensors, t }: Props) {
+export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forget, openDesigner, openZones, setSensors, t, network = null }: Props) {
   const nodes = useLiveNodes(origin, consoleNodes);
   const [rules, setRules] = useState<Rules | null>(null);
   useEffect(() => { void readRules(origin).then(setRules).catch(() => setRules(null)); }, [origin]);
@@ -158,13 +162,14 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
     </article>
 
     <div className="radar-side">
+      <p className="muted small radar-role">{t("radarNodeRole")}</p>
       <ViewTabs tabs={[["radars", t("radarsOfDesign")], ["nodes", t("activeRadarNodes")]]} active={side} onChange={setSide} />
       {side === "radars" && <RadarSensors t={t} sensors={model.sensors} dimensions={dimensions} nodes={nodes} rules={rules} targetsBySensor={targetsBySensor} setSensors={setSensors} openZones={openZones} openDesigner={openDesigner} />}
       {side === "nodes" && <article className="stack-card">
         <p className="eyebrow">{t("radarFusion")}</p><h3>{t("activeRadarNodes")}</h3>
         {nodes.map(node => <div className="node-row" key={node.node_id}>
           <span className={`state-dot ${node.alert_level}`} />
-          <div><strong>{node.node_id}</strong><small>{node.stale ? t("staleWord") : node.online ? t("online") : t("offlineWord")} · {node.target_count} {t("tracksWord")} · {node.lux ?? "—"} lux{node.panel ? ` · ${t("firmwareWord")} ${node.panel.firmware}` : ""}</small></div>
+          <div><strong>{node.node_id}</strong><small>{node.stale ? t("staleWord") : node.online ? t("online") : t("offlineWord")} · {node.target_count} {t("tracksWord")} · {model.sensors.filter(sensor => sensor.node === node.node_id).length} {t("radarNodeLinked")} · {node.lux ?? "—"} lux{node.panel ? ` · ${t("firmwareWord")} ${node.panel.firmware}` : ""}</small></div>
           {node.panel && <a className="panel-link" href={panelUrl(node.panel)} target="_blank" rel="noopener noreferrer" title={`${node.panel.name} · ${node.panel.ip}`}>{t("openNodePanel")}</a>}
           <b>{node.alert_level}</b>
           {(!node.online || node.stale) && <button className="danger-button" title={t("forgetNode")} onClick={() => { if (window.confirm(`${t("confirmForgetNode")} ${node.node_id}`)) forget(node.node_id); }}>{t("forgetNode")}</button>}
@@ -172,6 +177,7 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
         {unmapped.map(item => <p key={item.node} className="muted small warn-line"><b>{item.node}</b> {t("unmappedNode")}</p>)}
         {!nodes.length && <p className="muted">{t("noRadar")}</p>}
       </article>}
+      {side === "nodes" && <NodeFinder t={t} origin={origin} network={network} knownIds={nodes.map(node => node.node_id)} knownIps={nodes.flatMap(node => (node.panel ? [node.panel.ip] : []))} />}
     </div>
   </section>;
 }
