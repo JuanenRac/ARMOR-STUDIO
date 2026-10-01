@@ -61,7 +61,6 @@ flowchart LR
 * **Los ajustes guardados son entrada no fiable.** Se leen valor a valor: un origen, tema, idioma o forma no válidos se descartan, las posiciones se acotan y las listas se limitan.
 * **Ninguna petición a terceros.** Las fuentes son locales; el servidor estático envía `Content-Security-Policy: default-src 'self'` limitada al servidor configurado, `frame-ancestors 'none'`, `nosniff` y `no-referrer`.
 * El vídeo en vivo solo se muestra mediante una dirección de emisión que el servidor entrega a un operador.
-* **TLS opcional para este propio servidor estático.** `TLS_CERT_PATH`/`TLS_KEY_PATH` (ambas, o ninguna) cambian `tools/serve.mjs` de HTTP plano a HTTPS, el mismo convenio que el propio ARMOR-SERVER. Necesario en cuanto Studio se accede por `https://`: un servidor estático en HTTP plano que responde a una petición HTTPS de un navegador falla directamente el handshake TLS (el propio `SSL_ERROR_RX_RECORD_TOO_LONG` de Firefox, encontrado de verdad al probar exactamente eso) en vez de servir nada.
 
 ## 📂 Estructura del repositorio
 
@@ -101,6 +100,7 @@ $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # 
 * **[ARMOR-RADAR](https://github.com/JuanenRac/ARMOR-RADAR)** - Firmware del nodo de campo para ESP32-S3 con tres radares y su propio panel web
 * **[ARMOR-SOLAR](https://github.com/JuanenRac/ARMOR-SOLAR)** - Protocolos de inversores y baterías solares y los mensajes de un nodo pasarela
 * **[ARMOR-ELECTRICAL](https://github.com/JuanenRac/ARMOR-ELECTRICAL)** - Nodo eléctrico: contadores, el mensaje de las lecturas de la red y las reglas para maniobrar
+* **[ARMOR-HMI](https://github.com/JuanenRac/ARMOR-HMI)** - Panel táctil: el estado del sistema en una pantalla de pared, armar y reconocer alarmas, y el hogar del asistente de voz
 * **[ARMOR-NETWORK](https://github.com/JuanenRac/ARMOR-NETWORK)** - La red local: sus dispositivos, internet y lo que cambia
 * **[ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER)** - Coordinador central: telemetría, alarmas, dispositivos, lecturas solares y cámaras
 * **ARMOR-STUDIO** (este repositorio) - Consola web: cámaras, radar, alarmas, energía solar y el diseñador de sitio 2D/3D

@@ -61,7 +61,6 @@ flowchart LR
 * **保存的设置属于不可信输入。** 它们被逐值解析：无效的源、主题、语言或形状会被丢弃，位置被限制范围，列表被限制大小。
 * **没有第三方请求。** 字体来自本地；静态主机发送限于所配置服务器的 `Content-Security-Policy: default-src 'self'`、`frame-ancestors 'none'`、`nosniff` 和 `no-referrer`。
 * 实时视频只通过服务器发给操作员的视频流地址显示。
-* **此静态主机自身的可选TLS。**`TLS_CERT_PATH`/`TLS_KEY_PATH`(两者都设置,或都不设置)可将 `tools/serve.mjs` 从明文HTTP切换为HTTPS,与ARMOR-SERVER自身相同的约定。一旦Studio通过 `https://` 访问就需要这个:一个明文HTTP的静态主机在回应浏览器的HTTPS请求时,TLS握手本身会直接失败(正是尝试这种情况时真实遇到的Firefox自身的 `SSL_ERROR_RX_RECORD_TOO_LONG`),而不是提供任何内容。
 
 ## 📂 仓库结构
 
@@ -101,6 +100,7 @@ $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # 
 * **[ARMOR-RADAR](https://github.com/JuanenRac/ARMOR-RADAR)** - 适用于 ESP32-S3 的现场节点固件，带三个雷达和自带网页面板
 * **[ARMOR-SOLAR](https://github.com/JuanenRac/ARMOR-SOLAR)** - 太阳能逆变器与电池的协议，以及网关节点的消息
 * **[ARMOR-ELECTRICAL](https://github.com/JuanenRac/ARMOR-ELECTRICAL)** - 电气节点：电表、电网读数消息和开关规则
+* **[ARMOR-HMI](https://github.com/JuanenRac/ARMOR-HMI)** - 触摸面板：墙面屏幕上的系统状态、布防与确认，以及语音助手的所在
 * **[ARMOR-NETWORK](https://github.com/JuanenRac/ARMOR-NETWORK)** - 本地网络：其设备、互联网以及变化
 * **[ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER)** - 中央协调器：遥测、报警、设备、太阳能读数和摄像头
 * **ARMOR-STUDIO** (本仓库) - 网页控制台：摄像头、雷达、报警、太阳能和 2D/3D 场地设计器
