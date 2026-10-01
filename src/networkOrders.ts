@@ -39,7 +39,7 @@ const POLL_MS = 1500, GIVE_UP_AFTER = 60;
  * Orders given to the node and what became of them, by a key the caller chooses (the order type and the device, say). The result comes with the node's next
  * message, a few seconds later, so the order is asked about until it is done, expired or a minute has gone.
  */
-export function useNetworkOrders(origin: string, onDone?: () => void): { states: Record<string, OrderState>; give: (key: string, order: { type: NetworkOrderType; device_id?: string; port?: number }) => void } {
+export function useNetworkOrders(origin: string, onDone?: () => void): { states: Record<string, OrderState>; give: (key: string, order: { type: NetworkOrderType; device_id?: string; port?: number; login?: boolean }) => void } {
   const [states, setStates] = useState<Record<string, OrderState>>({});
   const timers = useRef(new Map<string, number>());
   const alive = useRef(true);
@@ -59,7 +59,7 @@ export function useNetworkOrders(origin: string, onDone?: () => void): { states:
     }, POLL_MS));
   }, [origin, set]);
 
-  const give = useCallback((key: string, order: { type: NetworkOrderType; device_id?: string; port?: number }) => {
+  const give = useCallback((key: string, order: { type: NetworkOrderType; device_id?: string; port?: number; login?: boolean }) => {
     const earlier = timers.current.get(key);
     if (earlier) window.clearTimeout(earlier);
     set(key, { status: "sending" });
