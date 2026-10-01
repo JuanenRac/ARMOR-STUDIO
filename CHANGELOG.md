@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here.
 
+## [0.4.6] - Inspect a device with its web login
+
+- **Network menu:** a device's detail keeps the user and password of its administration page (administrators only; the password is never shown again) and an "Inspect" button reads its model and firmware and warns about factory logins. Texts in the seven languages.
+
 ## [0.4.5] - The site designer gets garage doors, arches, pools, planters, terraces and masts that carry things
 
 - **Walls:** a garage door (wide, sectional), a plain opening in a wall, any door, window or opening with an arched top, and a small balcony outside a door or a window of an upper floor.

@@ -12,7 +12,7 @@ export type NetworkPort = { port: number; proto: "tcp" | "udp"; service?: string
 export type DeviceNote = { name?: string; notes?: string; trusted?: boolean; kind?: NetworkKind; /** Left out of the list. */ hidden?: boolean; /** Tell me the next time it comes onto the network. */ watch?: boolean; updated_at: string };
 export type NetworkDevice = {
   id: string; ip: string; mac?: string; randomized_mac?: boolean; vendor?: string; hostname?: string; kind?: NetworkKind; os?: string; online: boolean;
-  first_seen_ms: number; last_seen_ms: number; latency_ms?: number; ports?: NetworkPort[]; services?: string[]; note?: DeviceNote;
+  first_seen_ms: number; last_seen_ms: number; latency_ms?: number; ports?: NetworkPort[]; services?: string[]; note?: DeviceNote; /** Present when an administrator kept a login for its web administration (only the user, never the password). */ login?: { user: string };
 };
 export type NetworkProbe = { target: string; kind: "icmp" | "tcp" | "dns" | "http"; ok: boolean; latency_ms?: number };
 export type NetworkInternet = {

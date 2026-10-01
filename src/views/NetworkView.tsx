@@ -6,7 +6,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useEffect, useMemo, useState } from "react";
-import { forgetDeviceNote, listNetwork, readNetworkHistory, saveDeviceNote } from "../api";
+import { forgetDeviceLogin, forgetDeviceNote, listNetwork, readNetworkHistory, saveDeviceLogin, saveDeviceNote } from "../api";
 import { ViewTabs } from "../components/ViewTabs";
 import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
@@ -65,10 +65,13 @@ function DeviceDetail({ t, origin, node, device, isAdmin, reload, now, close, st
   const note = device.note;
   const [name, setName] = useState(note?.name ?? ""), [notes, setNotes] = useState(note?.notes ?? ""), [trusted, setTrusted] = useState(note?.trusted === true), [kind, setKind] = useState(note?.kind ?? "");
   const [message, setMessage] = useState(""), [copied, setCopied] = useState("");
-  useEffect(() => { setName(note?.name ?? ""); setNotes(note?.notes ?? ""); setTrusted(note?.trusted === true); setKind(note?.kind ?? ""); setMessage(""); }, [device.id, note?.updated_at]);   // eslint-disable-line react-hooks/exhaustive-deps
+  const [loginUser, setLoginUser] = useState(device.login?.user ?? ""), [loginPassword, setLoginPassword] = useState("");
+  useEffect(() => { setName(note?.name ?? ""); setNotes(note?.notes ?? ""); setTrusted(note?.trusted === true); setKind(note?.kind ?? ""); setMessage(""); setLoginUser(device.login?.user ?? ""); setLoginPassword(""); }, [device.id, note?.updated_at, device.login?.user]);   // eslint-disable-line react-hooks/exhaustive-deps
   const act = async (work: () => Promise<unknown>) => { try { await work(); setMessage(t("net_saved")); reload(); } catch { setMessage(t("net_failed")); } };
   const save = () => act(() => saveDeviceNote(origin, device.id, { name, notes, kind, ...(isAdmin ? { trusted } : {}) }));
   const forget = () => act(() => forgetDeviceNote(origin, device.id));
+  const keepLogin = () => act(async () => { await saveDeviceLogin(origin, device.id, { user: loginUser, password: loginPassword }); setLoginPassword(""); });
+  const dropLogin = () => act(() => forgetDeviceLogin(origin, device.id));
   const key = (type: string) => `${type}:${device.id}`;
   const services = servicesOf(device);
   const web = services.find(service => service.href?.startsWith("http"));
@@ -91,9 +94,18 @@ function DeviceDetail({ t, origin, node, device, isAdmin, reload, now, close, st
       <button onClick={() => give(key("traceroute"), { type: "traceroute", device_id: device.id })}>{t("no_traceroute")}</button>
       <button onClick={() => give(key("ports"), { type: "ports", device_id: device.id })}>{t("no_rescan_ports")}</button>
       <button onClick={() => give(key("http"), { type: "http", device_id: device.id, port: web ? web.port : 80 })}>{t("no_look_page")}</button>
+      <button onClick={() => give(key("inspect"), { type: "inspect", device_id: device.id, port: web ? web.port : undefined, login: !!device.login })}>{device.login ? t("no_inspect_login") : t("no_inspect")}</button>
       {device.mac && <button onClick={() => give(key("wake"), { type: "wake", device_id: device.id })}>{t("no_wake")}</button>}
     </div>
-    {(["ping", "traceroute", "ports", "http", "wake"] as const).map(type => <OrderResult key={type} t={t} state={states[key(type)]} label={t(type === "ports" ? "no_rescan_ports" : type === "http" ? "no_look_page" : `no_${type}`)} />)}
+    {(["ping", "traceroute", "ports", "http", "inspect", "wake"] as const).map(type => <OrderResult key={type} t={t} state={states[key(type)]} label={t(type === "ports" ? "no_rescan_ports" : type === "http" ? "no_look_page" : type === "inspect" ? "no_inspect" : `no_${type}`)} />)}
+
+    <h4>{t("no_login_title")}</h4>
+    <p className="hint">{t("no_login_help")}</p>
+    {isAdmin ? <form className="net-form" onSubmit={event => { event.preventDefault(); void keepLogin(); }}>
+      <label>{t("no_login_user")}<input value={loginUser} maxLength={64} autoComplete="off" onChange={event => setLoginUser(event.target.value)} /></label>
+      <label>{t("no_login_password")}<input type="password" value={loginPassword} maxLength={128} autoComplete="new-password" placeholder={device.login ? "••••••" : ""} onChange={event => setLoginPassword(event.target.value)} /></label>
+      <div className="net-actions"><button className="primary" type="submit" disabled={!loginUser.trim()}>{t("no_login_keep")}</button>{device.login && <button type="button" onClick={() => void dropLogin()}>{t("no_login_forget")}</button>}</div>
+    </form> : <p className="hint">{t("net_admin_only")}</p>}
 
     <h4>{t("net_ports")}</h4>
     {device.ports?.length ? <ul className="net-ports">{device.ports.map(port => <li key={`${port.proto}${port.port}`} className={RISKY_PORTS.has(port.port) ? "risky" : ""} title={RISKY_PORTS.has(port.port) ? t("net_risky_port") : undefined}>
