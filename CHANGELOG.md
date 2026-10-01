@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## [0.4.5] - The site designer gets garage doors, arches, pools, planters, terraces and masts that carry things
+
+- **Walls:** a garage door (wide, sectional), a plain opening in a wall, any door, window or opening with an arched top, and a small balcony outside a door or a window of an upper floor.
+- **Roofs:** a building's roof can be taken off to see the top floor from above (the layer switch for all roofs was already there).
+- **Ground objects:** swimming pools (rectangular, round, oval or L-shaped), planters (box, round pot, long bed) and terraces or balconies (a slab, with or without a railing, raised to any height on legs).
+- **Masts** carry a television antenna, satellite dishes and Wi-Fi dishes, several each, at their own height, turned and sized.
+- **Network Designer:** tying an element to a device the nodes found fills what the element does not say yet (address, maker, name) and never replaces what was typed.
+- 263 tests.
+
 ## [0.4.4] - Themes for the whole interface, cameras in their own menu, designers with more detail
 
 - **Themes.** Sixteen themes that restyle the whole interface (sidebar, top bar, cards, buttons, fields, tabs, status bar, corners and letters), among them Metallic, Professional, Videogame, Terminal and Blueprint.

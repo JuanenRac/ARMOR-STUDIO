@@ -177,3 +177,19 @@ export function elementsInFrame(design: Design, frame: Frame): string[] {
 }
 
 export const isPlaceable = (kind: string): boolean => isKind(kind);
+
+/**
+ * What a device the nodes found tells about itself, put into the element it is tied to: its address, its maker and, when the element has no name yet, its name. A value the person
+ * already typed is never replaced (only what is empty is filled), so tying a device never loses work.
+ */
+export function fillFromDevice(design: Design, id: string, device: { ip: string; vendor?: string; hostname?: string; os?: string; note?: { name?: string } }): Design {
+  const element = design.elements.find(item => item.id === id), def = element && kindDef(element.kind);
+  if (!element || !def) return design;
+  let next = design;
+  const empty = (key: string) => def.props.some(prop => prop.key === key) && (element.props[key] === undefined || element.props[key] === "");
+  if (empty("ip") && device.ip) next = setProp(next, id, "ip", device.ip);
+  if (empty("manufacturer") && device.vendor) next = setProp(next, id, "manufacturer", device.vendor);
+  if (empty("os") && device.os) next = setProp(next, id, "os", device.os);
+  if (!element.name) { const name = device.note?.name || device.hostname || ""; if (name) next = renameElement(next, id, name); }
+  return next;
+}

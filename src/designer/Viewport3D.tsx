@@ -46,7 +46,7 @@ const SELECT = "#00e5ff";
 const NO_PICK = () => null;
 const site = (x: number, y: number, z = 0): [number, number, number] => [x, z, -y];
 const ROOF_TOOLS: ReadonlySet<Tool> = new Set(["chimney", "roof-solar", "antenna"]);
-const WALL_TOOLS: ReadonlySet<Tool> = new Set(["door", "window", "wall-lamp"]);
+const WALL_TOOLS: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp"]);
 /** Every tool that puts something where you click in the 3D view: all of them except selecting, moving, lifting and drawing outlines. */
 const PLACING: ReadonlySet<Tool> = new Set(TOOL_GROUPS.flat().filter(spec => spec.views.includes("3d") && !["select", "move", "elevate"].includes(spec.tool)).map(spec => spec.tool));
 const ELEVATABLE: ReadonlySet<Target3D["kind"]> = new Set(["building", "opening", "wallLamp", "feature", "camera", "sensor", "device"]);
@@ -66,7 +66,7 @@ const glowOf = (selected: boolean, hover: boolean) => ({ emissive: selected ? SE
 /** One wall as one solid: its bottom on the ground floor, its top the roof line (or the cut), every door and window cut out at its own floor and height. */
 function wallGeometry(building: Building, edge: number, holes: readonly Opening[], visibleFloors: number): THREE.ExtrudeGeometry {
   const { a, length, ux, uy } = edgeOf(building.points, edge), floors = building.floors.slice(0, visibleFloors), top = totalHeight(floors), e = building.thickness / 2;
-  const complete = visibleFloors >= building.floors.length, frame = roofFrame(building.points, building.roof), shape = new THREE.Shape();
+  const complete = visibleFloors >= building.floors.length && !building.roofHidden, frame = roofFrame(building.points, building.roof), shape = new THREE.Shape();
   const profile = (along: number) => complete && building.roof.style !== "flat" ? Math.max(0, roofHeight(frame, building.roof, a.x + ux * clamp(along, 0, length), a.y + uy * clamp(along, 0, length))) : 0;
   const steps = 60, xs = Array.from({ length: steps + 1 }, (_, index) => -e + (length + 2 * e) * index / steps), rise = xs.map(profile);
   shape.moveTo(-e, 0); shape.lineTo(length + e, 0);
@@ -77,7 +77,9 @@ function wallGeometry(building: Building, edge: number, holes: readonly Opening[
     const x0 = clamp(hole.offset, 0.03, length - 0.06), x1 = clamp(hole.offset + hole.width, x0 + 0.05, length - 0.03);
     const y0 = clamp(floorBottom(building.floors, hole.floor) + hole.sill, 0.02, top - 0.12), y1 = clamp(floorBottom(building.floors, hole.floor) + hole.sill + hole.height, y0 + 0.05, top - 0.03);
     const path = new THREE.Path();
-    path.moveTo(x0, y0); path.lineTo(x0, y1); path.lineTo(x1, y1); path.lineTo(x1, y0); path.closePath();
+    const radius = (x1 - x0) / 2, spring = y1 - radius;
+    if (hole.arch && spring > y0 + 0.05) { path.moveTo(x0, y0); path.lineTo(x0, spring); path.absarc((x0 + x1) / 2, spring, radius, Math.PI, 0, true); path.lineTo(x1, y0); path.closePath(); }
+    else { path.moveTo(x0, y0); path.lineTo(x0, y1); path.lineTo(x1, y1); path.lineTo(x1, y0); path.closePath(); }
     shape.holes.push(path);
   }
   const geometry = new THREE.ExtrudeGeometry(shape, { depth: building.thickness, bevelEnabled: false });
@@ -85,21 +87,47 @@ function wallGeometry(building: Building, edge: number, holes: readonly Opening[
   return geometry;
 }
 
+/** A slab the size of an opening whose top is a half circle when `arch` is set (the leaf of a door, the glass of a window), centred on the origin. */
+function openingShape(w: number, h: number, arch: boolean): THREE.Shape {
+  const shape = new THREE.Shape(), radius = w / 2, spring = h / 2 - radius;
+  if (arch && spring > -h / 2 + 0.05) { shape.moveTo(-w / 2, -h / 2); shape.lineTo(-w / 2, spring); shape.absarc(0, spring, radius, Math.PI, 0, true); shape.lineTo(w / 2, -h / 2); shape.closePath(); }
+  else { shape.moveTo(-w / 2, -h / 2); shape.lineTo(-w / 2, h / 2); shape.lineTo(w / 2, h / 2); shape.lineTo(w / 2, -h / 2); shape.closePath(); }
+  return shape;
+}
+
 function OpeningView({ building, opening, selected, hover, xray, hooks }: { building: Building; opening: Opening; selected: boolean; hover: boolean; xray: boolean; hooks: Hooks }) {
   const w = opening.width, h = opening.height, z0 = floorBottom(building.floors, opening.floor) + opening.sill;
-  const glow = glowOf(selected, hover), frameColor = selected ? SELECT : (opening.color ?? "#eef6f8"), t = building.thickness;
+  const glow = glowOf(selected, hover), frameColor = selected ? SELECT : (opening.color ?? "#eef6f8"), t = building.thickness, arch = Boolean(opening.arch);
+  const leaf = useMemo(() => new THREE.ExtrudeGeometry(openingShape(w - 0.06, h - 0.04, arch), { depth: 0.05, bevelEnabled: false }), [w, h, arch]);
+  const glass = useMemo(() => new THREE.ShapeGeometry(openingShape(w, h, arch)), [w, h, arch]);
+  const rim = useMemo(() => { const shape = openingShape(w, h, arch), pts = shape.getPoints(24); return [...pts, pts[0]].map(point => [point.x, point.y, t / 2 + 0.01] as [number, number, number]); }, [w, h, arch, t]);
   return <group position={[opening.offset + w / 2, z0 + h / 2, 0]} {...hooks("opening", opening.id)}>
     {opening.kind === "window"
       ? <>
-          <mesh><boxGeometry args={[w, h, 0.03]} /><meshStandardMaterial color="#8fd8ff" transparent opacity={xray ? 0.2 : 0.38} roughness={0.08} metalness={0.3} depthWrite={false} {...glow} /></mesh>
-          {[[0, h / 2, w, 0.05], [0, -h / 2, w, 0.05], [-w / 2, 0, 0.05, h], [w / 2, 0, 0.05, h], [0, 0, 0.03, h], [0, 0, w, 0.03]].map(([x, y, fw, fh], index) =>
+          <mesh geometry={glass}><meshStandardMaterial color="#8fd8ff" transparent opacity={xray ? 0.2 : 0.38} roughness={0.08} metalness={0.3} depthWrite={false} side={THREE.DoubleSide} {...glow} /></mesh>
+          <Line points={rim} color={frameColor} lineWidth={3} />
+          {arch ? null : [[0, h / 2, w, 0.05], [0, -h / 2, w, 0.05], [-w / 2, 0, 0.05, h], [w / 2, 0, 0.05, h], [0, 0, 0.03, h], [0, 0, w, 0.03]].map(([x, y, fw, fh], index) =>
             <mesh key={index} position={[x, y, 0]} castShadow><boxGeometry args={[fw, fh, t * 0.85]} /><meshStandardMaterial color={frameColor} roughness={0.5} /></mesh>)}
+          {arch && <mesh position={[0, -h / 2, 0]} castShadow><boxGeometry args={[w, 0.05, t * 0.85]} /><meshStandardMaterial color={frameColor} roughness={0.5} /></mesh>}
           <mesh position={[0, -h / 2 - 0.035, t / 2 + 0.05]} castShadow><boxGeometry args={[w + 0.12, 0.05, 0.14]} /><meshStandardMaterial color="#c5d2d6" roughness={0.7} /></mesh>
         </>
+      : opening.kind === "garage"
+      ? <>
+          <mesh castShadow position={[0, 0, 0.02]}><boxGeometry args={[w - 0.06, h - 0.04, 0.06]} /><meshStandardMaterial color={selected ? "#3bd9ee" : (opening.color ?? "#d7dde0")} roughness={0.6} metalness={0.25} {...glow} /></mesh>
+          {Array.from({ length: Math.max(3, Math.round(h / 0.5)) - 1 }, (_, index) => <mesh key={index} position={[0, -h / 2 + (index + 1) * h / Math.max(3, Math.round(h / 0.5)), 0.056]}><boxGeometry args={[w - 0.08, 0.018, 0.012]} /><meshStandardMaterial color="#7d8b93" roughness={0.7} /></mesh>)}
+          {Array.from({ length: 4 }, (_, index) => <mesh key={index} position={[-w / 2 + (index + 0.5) * (w / 4), h / 2 - 0.3, 0.06]}><boxGeometry args={[w / 4 - 0.1, 0.18, 0.012]} /><meshStandardMaterial color="#8fd8ff" roughness={0.1} metalness={0.3} /></mesh>)}
+        </>
+      : opening.kind === "opening"
+      ? <><Line points={rim} color={frameColor} lineWidth={3} /><mesh position={[0, -h / 2 - 0.02, t / 2 + 0.03]}><boxGeometry args={[w + 0.1, 0.04, 0.1]} /><meshStandardMaterial color="#c5d2d6" roughness={0.7} /></mesh></>
       : <>
-          <mesh castShadow><boxGeometry args={[w - 0.06, h - 0.04, 0.05]} /><meshStandardMaterial color={selected ? "#3bd9ee" : (opening.color ?? "#6f8f9a")} roughness={0.45} metalness={0.25} {...glow} /></mesh>
+          <mesh geometry={leaf} position={[0, 0, -0.025]} castShadow><meshStandardMaterial color={selected ? "#3bd9ee" : (opening.color ?? "#6f8f9a")} roughness={0.45} metalness={0.25} {...glow} /></mesh>
           <mesh position={[w / 2 - 0.14, -0.05, 0.06]}><sphereGeometry args={[0.035, 12, 12]} /><meshStandardMaterial color="#e6eef1" metalness={0.8} roughness={0.25} /></mesh>
         </>}
+    {opening.balcony && <group position={[0, -(opening.sill + h / 2) - 0.06, t / 2 + 0.55]}>
+      <mesh castShadow receiveShadow><boxGeometry args={[w + 0.8, 0.12, 1.1]} /><meshStandardMaterial color="#aebcc1" roughness={0.9} /></mesh>
+      {[[-1, 0], [1, 0]].map(([side]) => <mesh key={side} position={[side * (w / 2 + 0.38), 0.52, 0]} castShadow><boxGeometry args={[0.04, 1.0, 1.06]} /><meshStandardMaterial color="#6f7d84" metalness={0.5} roughness={0.5} transparent opacity={0.55} /></mesh>)}
+      <mesh position={[0, 0.52, 0.52]} castShadow><boxGeometry args={[w + 0.8, 1.0, 0.04]} /><meshStandardMaterial color="#6f7d84" metalness={0.5} roughness={0.5} transparent opacity={0.55} /></mesh>
+    </group>}
   </group>;
 }
 
@@ -141,7 +169,7 @@ function BuildingView({ building, model, selected, selection, hoverKey, floorLim
         </group>;
       })}
     </group>}
-    {layers.roofs && layers.buildings && complete && <group position={site(0, 0, building.base + totalHeight(building.floors))}>
+    {layers.roofs && layers.buildings && complete && !building.roofHidden && <group position={site(0, 0, building.base + totalHeight(building.floors))}>
       <mesh geometry={roof} castShadow receiveShadow {...roofHooks}>
         <meshStandardMaterial color={building.roofColor ?? "#9a4d3f"} roughness={0.78} side={THREE.DoubleSide} transparent={xray} opacity={xray ? 0.3 : 1} depthWrite={!xray} {...glow} emissiveIntensity={selected ? 0.16 : 0.4} />
         <Edges color={selected ? SELECT : "#5d2f27"} threshold={12} />
@@ -236,6 +264,7 @@ function FeatureView({ feature, selected, hover, hooks }: { feature: SiteFeature
           <mesh position={[0, h / 2, 0]} castShadow><cylinderGeometry args={[r * 0.6, r, h, 12]} /><meshStandardMaterial color={feature.color ?? "#c3d0d4"} metalness={0.6} roughness={0.35} {...glow} /></mesh>
           {[0.25, 0.5, 0.75].map(f => <mesh key={f} position={[0, h * f, 0]}><boxGeometry args={[0.9 * (1.1 - f * 0.6), 0.03, 0.03]} /><meshStandardMaterial color={feature.color ?? "#c3d0d4"} metalness={0.6} roughness={0.35} /></mesh>)}
           <mesh position={[0, h + 0.06, 0]}><sphereGeometry args={[0.07, 10, 10]} /><meshStandardMaterial color="#ff4040" emissive="#ff4040" emissiveIntensity={1.3} /></mesh>
+          {(feature.parts ?? []).map((part, index) => <MastPartView key={index} part={part} radius={r} />)}
         </group>;
       }
     }
@@ -244,6 +273,26 @@ function FeatureView({ feature, selected, hover, hooks }: { feature: SiteFeature
   return <group position={site(feature.x, feature.y, feature.z)} rotation={[(feature.pitch ?? 0) * Math.PI / 180, feature.rotation * Math.PI / 180, (feature.roll ?? 0) * Math.PI / 180, "XZY"]} {...hooks("feature", feature.id)}>
     {body}
     {selected && <mesh raycast={NO_PICK} position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[Math.max(w, d, 0.3) * 0.7, Math.max(w, d, 0.3) * 0.75 + 0.05, 48]} /><meshBasicMaterial color={SELECT} transparent opacity={0.85} /></mesh>}
+  </group>;
+}
+
+/** A television antenna (a boom with elements), a satellite dish or a Wi-Fi dish, fixed to the side of a mast at its own height and turned by its own angle. */
+function MastPartView({ part, radius }: { part: NonNullable<SiteFeature["parts"]>[number]; radius: number }) {
+  const s = part.size, metal = <meshStandardMaterial color="#d5dde0" metalness={0.6} roughness={0.35} />;
+  return <group position={[0, part.z, 0]} rotation={[0, part.rotation * Math.PI / 180, 0]}>
+    <mesh position={[radius + 0.06, 0, 0]}><boxGeometry args={[0.12, 0.04, 0.04]} />{metal}</mesh>
+    {part.kind === "tv" && <group position={[radius + 0.12, 0, 0]}>
+      <mesh position={[s * 0.4, 0, 0]}><boxGeometry args={[s * 0.8, 0.025, 0.025]} />{metal}</mesh>
+      {[0.05, 0.22, 0.38, 0.52, 0.66, 0.78].map((f, index) => <mesh key={index} position={[s * f, 0, 0]}><boxGeometry args={[0.02, 0.02, s * (0.5 - index * 0.04)]} />{metal}</mesh>)}
+    </group>}
+    {part.kind === "satellite" && <group position={[radius + 0.12, 0.05, 0]} rotation={[0, 0, Math.PI / 6]}>
+      <mesh rotation={[0, 0, -Math.PI / 2]} castShadow><sphereGeometry args={[s * 0.5, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2.6]} /><meshStandardMaterial color="#e8eef0" roughness={0.45} metalness={0.3} side={THREE.DoubleSide} /></mesh>
+      <mesh position={[s * 0.32, 0, 0]}><cylinderGeometry args={[0.012, 0.012, s * 0.5, 6]} /><meshStandardMaterial color="#4a5459" /></mesh>
+    </group>}
+    {part.kind === "wifi" && <group position={[radius + 0.12, 0, 0]}>
+      <mesh rotation={[0, 0, -Math.PI / 2]}><cylinderGeometry args={[s * 0.5, s * 0.5, 0.04, 20]} /><meshStandardMaterial color="#c9d3d6" roughness={0.5} metalness={0.3} /></mesh>
+      <mesh position={[0.04, 0, 0]}><boxGeometry args={[0.07, s * 0.35, s * 0.35]} /><meshStandardMaterial color="#3b4a50" /></mesh>
+    </group>}
   </group>;
 }
 

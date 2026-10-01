@@ -163,3 +163,9 @@
 .p-wall-lamp.coloured .p-lamp { fill: var(--c); }
 .p-wall-lamp.coloured .p-lamp-glow { fill: var(--c); fill-opacity: .16; }
 .p-roof-item.coloured > :first-child { fill: var(--c); }
+.p-pool-rim { fill: #d9e3e6; stroke: #f4fafb; stroke-width: 1; vector-effect: non-scaling-stroke; } .p-pool-water { fill: rgba(63, 167, 214, .75); }
+.p-planter { fill: #8a5a3c; stroke: #c9a27f; stroke-width: 1; vector-effect: non-scaling-stroke; } .p-planter-soil { fill: #3f8f4a; opacity: .85; }
+.p-terrace { fill: rgba(164, 154, 140, .75); stroke: #d8cfc2; stroke-width: 1; vector-effect: non-scaling-stroke; } .p-terrace-rail { fill: none; stroke: #6f7d84; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.p-garage-line { stroke: #d7dde0; stroke-width: .28; } .p-garage-tick { stroke: #7d8b93; stroke-width: .06; } .p-opening-line { stroke: #f3ba55; stroke-width: .12; stroke-dasharray: .25 .2; }
+.p-arch-mark { fill: none; stroke: #f3ba55; stroke-width: .06; } .p-balcony { fill: rgba(174, 188, 193, .55); stroke: #8895a0; stroke-width: .05; }
+.check-row { display: flex; align-items: center; gap: .45rem; margin: .35rem 0; font-size: .78rem; } .mast-part { border-top: 1px solid rgba(120, 180, 190, .25); padding-top: .4rem; }

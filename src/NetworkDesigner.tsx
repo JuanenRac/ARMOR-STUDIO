@@ -14,7 +14,7 @@ import {
 } from "./network/model";
 import {
   addElement, addFrame, canConnect, connect, duplicateElement, elementsInFrame, moveElement, nudgeElements, removeElement, removeFrame, removeWire, renameElement,
-  replaceKind, rotateElement, setBinding, setProp, updateFrame, updateWire, type ConnectError,
+  fillFromDevice, replaceKind, rotateElement, setBinding, setProp, updateFrame, updateWire, type ConnectError,
 } from "./network/ops";
 import { drawFound, emptyDesign, housePreset } from "./network/presets";
 import { buildNetworkDoc, parseNetworkDoc } from "./network/sync";
@@ -311,6 +311,13 @@ export function NetworkDesigner({ t, design, setDesign, status, overview, camera
     window.setTimeout(fit, 0);
   };
 
+  // Tying an element to a device the nodes found fills what it does not say yet (address, maker, name) from what the device says.
+  const bindDevice = (element: Element, id: string | undefined) => {
+    let next = setBinding(designRef.current, element.id, id);
+    const device = id ? deviceById.get(id) : undefined;
+    if (device) next = fillFromDevice(next, element.id, device);
+    commit(next);
+  };
   const linkCamera = (element: Element, id: string) => {
     const camera = cameras.find(item => item.id === id);
     let next = setProp(designRef.current, element.id, "camera_id", id);
@@ -418,7 +425,7 @@ export function NetworkDesigner({ t, design, setDesign, status, overview, camera
       <button onClick={() => commit(rotateElement(designRef.current, element.id))}>↻ {t("nd_rotate")}</button>
       {def.props.map(prop => propField(element, prop))}
       {element.kind === "camera" && cameras.length > 0 && <label>{t("nd_cam_link")}<select value={String(element.props.camera_id ?? "")} onChange={event => linkCamera(element, event.target.value)}><option value="">{t("elBindNone")}</option>{cameras.map(camera => <option key={camera.id} value={camera.id}>{camera.name} ({camera.host})</option>)}</select></label>}
-      <label>{t("nd_bind_device")}<select value={element.bind?.device ?? ""} onChange={event => commit(setBinding(designRef.current, element.id, event.target.value || undefined))}>
+      <label>{t("nd_bind_device")}<select value={element.bind?.device ?? ""} onChange={event => bindDevice(element, event.target.value || undefined)}>
         <option value="">{t("elBindNone")}</option>
         {element.bind?.device && !deviceById.has(element.bind.device) && <option value={element.bind.device}>{element.bind.device}</option>}
         {sortByAddress(devices).filter(device => !taken.has(device.id)).map(device => <option key={device.id} value={device.id}>{deviceName(device)} ({device.ip})</option>)}

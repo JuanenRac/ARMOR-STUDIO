@@ -7,12 +7,12 @@
 import { useEffect, useState } from "react";
 import type { StudioDevice } from "../api";
 import { KindIcon } from "../deviceKinds";
-import { FEATURE_STYLES, type Building, type Camera, type Dimensions, type Opening, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type WallLamp } from "../domain";
+import { FEATURE_STYLES, MAST_PART_KINDS, type Building, type Camera, type Dimensions, type Opening, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type WallLamp } from "../domain";
 import { area, bounds, edgeOf, isSimplePolygon, roofRise, signedArea, totalHeight } from "./geometry";
 import { DEFAULT_DOOR_COLOUR, DEFAULT_FEATURE_COLOUR, DEFAULT_LIGHT_COLOUR, DEFAULT_ROOF_COLOUR, DEFAULT_ROOF_ITEM_COLOUR, DEFAULT_TERRAIN_COLOUR, DEFAULT_WALL_COLOUR, DEFAULT_WINDOW_FRAME_COLOUR, featureColourOf } from "./colors";
 import { toolIcon } from "./icons";
 import { clamp, formatMetres, headingOf, radarView, round2, SENSOR_HEIGHT_M, CAMERA_HEIGHT_M, toolLabelKey, type Selection, type Tool } from "./model";
-import { addFloor, deleteBuilding, insertBuildingVertex, insertVertex, isRectangle, moveVertex, removeBuildingVertex, removeFloor, resizeRectangle, setFootprint, setSideLength, updateBuilding, type SiteModel, FLOOR_HEIGHT_M } from "./ops";
+import { addFloor, addMastPart, removeMastPart, updateMastPart, deleteBuilding, insertBuildingVertex, insertVertex, isRectangle, moveVertex, removeBuildingVertex, removeFloor, resizeRectangle, setFootprint, setSideLength, updateBuilding, type SiteModel, FLOOR_HEIGHT_M } from "./ops";
 import type { Point } from "../domain";
 
 /** A colour of an object: the picker starts from what is on screen, and "default" goes back to the object's own look. */
@@ -55,7 +55,7 @@ function CornerTable({ t, points, selected, onSelect, onMove, onInsert, onRemove
 }
 
 const ROOF_STYLES: readonly RoofStyle[] = ["flat", "shed", "gable", "hip", "pyramid"];
-const FEATURE_TOOL: Record<SiteFeature["kind"], Tool> = { pillar: "pillar", lamp: "lamp", mast: "mast", solar: "solar", canopy: "canopy", entrance: "entrance", path: "path", road: "road", tree: "tree", kennel: "kennel", fence: "fence", fountain: "fountain", coop: "coop", gate: "gate", sidewalk: "sidewalk" };
+const FEATURE_TOOL: Record<SiteFeature["kind"], Tool> = { pillar: "pillar", lamp: "lamp", mast: "mast", solar: "solar", canopy: "canopy", entrance: "entrance", path: "path", road: "road", tree: "tree", kennel: "kennel", fence: "fence", fountain: "fountain", coop: "coop", gate: "gate", sidewalk: "sidewalk", pool: "pool", planter: "planter", terrace: "terrace" };
 const ROOF_ITEM_TOOL: Record<RoofItem["kind"], Tool> = { chimney: "chimney", solar: "roof-solar", antenna: "antenna", vent: "chimney" };
 
 export function Inspector(p: InspectorProps) {
@@ -147,6 +147,7 @@ export function Inspector(p: InspectorProps) {
         <NumberField label={t("groundElevation")} unit="m" step={0.1} min={-5} max={200} value={building.base} onChange={value => setBuilding(building.id, { base: round2(clamp(value, -5, 200)) }, "base")} />
         <NumberField label={t("wallThickness")} unit="m" step={0.05} min={0.1} max={1.5} value={building.thickness} onChange={value => setBuilding(building.id, { thickness: round2(clamp(value, 0.1, 1.5)) }, "thickness")} />
       </div>
+      <label className="check-row"><input type="checkbox" checked={Boolean(building.roofHidden)} onChange={event => setBuilding(building.id, { roofHidden: event.target.checked || undefined }, "roofHidden")} /> {t("roofHidden")}</label>
       <p className="muted small">{area(building.points).toFixed(1)} m² · {t("totalHeight")} {formatMetres(totalHeight(building.floors))}{building.roof.style !== "flat" && <> · {t("roofRise")} {formatMetres(roofRise(building.points, building.roof))}</>}</p>
 
       <h4>{t("floors")}</h4>
@@ -190,8 +191,8 @@ export function Inspector(p: InspectorProps) {
     {opening && (() => {
       const owner = model.buildings.find(item => item.id === opening.buildingId), wall = owner ? edgeOf(owner.points, Math.min(opening.edge, owner.points.length - 1)).length : 1;
       return <section className="object-editor">
-        <h4>{t(opening.kind === "door" ? "doorProperties" : "windowProperties")}</h4>
-        <ColorField t={t} label={opening.kind === "door" ? t("colorDoor") : t("colorFrame")} value={opening.color} fallback={opening.kind === "door" ? DEFAULT_DOOR_COLOUR : DEFAULT_WINDOW_FRAME_COLOUR} onChange={value => setOpening(opening.id, { color: value }, "color")} />
+        <h4>{t(opening.kind === "door" ? "doorProperties" : opening.kind === "window" ? "windowProperties" : opening.kind === "garage" ? "garageProperties" : "archProperties")}</h4>
+        <ColorField t={t} label={opening.kind === "door" || opening.kind === "garage" ? t("colorDoor") : t("colorFrame")} value={opening.color} fallback={opening.kind === "door" ? DEFAULT_DOOR_COLOUR : DEFAULT_WINDOW_FRAME_COLOUR} onChange={value => setOpening(opening.id, { color: value }, "color")} />
         <div className="inspector-grid">
           <label>{t("floor")}<select value={opening.floor} onChange={event => setOpening(opening.id, { floor: Number(event.target.value) }, "floor")}>{(owner?.floors ?? [0]).map((_, floor) => <option key={floor} value={floor}>{floor === 0 ? t("groundFloor") : `${t("floor")} ${floor + 1}`}</option>)}</select></label>
           <label>{t("wallSide")}<select value={opening.edge} onChange={event => setOpening(opening.id, { edge: Number(event.target.value) }, "edge")}>{(owner?.points ?? []).map((_, edge) => <option key={edge} value={edge}>{t("side")} {edge + 1}</option>)}</select></label>
@@ -200,6 +201,8 @@ export function Inspector(p: InspectorProps) {
           <NumberField label={t("openingHeight")} unit="m" min={0.3} max={6} step={0.05} value={opening.height} onChange={value => setOpening(opening.id, { height: round2(clamp(value, 0.3, 6)) }, "height")} />
           <NumberField label={t("openingSill")} unit="m" min={0} max={6} step={0.05} value={opening.sill} onChange={value => setOpening(opening.id, { sill: round2(clamp(value, 0, 6)) }, "sill")} />
         </div>
+        <label className="check-row"><input type="checkbox" checked={Boolean(opening.arch)} onChange={event => setOpening(opening.id, { arch: event.target.checked || undefined }, "arch")} /> {t("openingArch")}</label>
+        {(opening.kind === "door" || opening.kind === "window") && <label className="check-row"><input type="checkbox" checked={Boolean(opening.balcony)} onChange={event => setOpening(opening.id, { balcony: event.target.checked || undefined }, "balcony")} /> {t("openingBalcony")}</label>}
         <div className="inspector-actions">{remove}</div>
       </section>;
     })()}
@@ -247,6 +250,16 @@ export function Inspector(p: InspectorProps) {
         {FEATURE_STYLES[feature.kind] && <label>{t("featureStyle")}<select value={feature.style ?? FEATURE_STYLES[feature.kind]![0]} onChange={event => setFeature(feature.id, { style: event.target.value }, "style")}>{FEATURE_STYLES[feature.kind]!.map(style => <option key={style} value={style}>{t(`style_${style}`)}</option>)}</select></label>}
         {["solar", "canopy"].includes(feature.kind) && <NumberField label={t("roofSlope")} unit="°" min={0} max={60} step={1} value={feature.slope} onChange={value => setFeature(feature.id, { slope: clamp(value, 0, 60) }, "slope")} />}
       </div>
+      {feature.kind === "mast" && <>
+        <h4>{t("mastParts")}</h4>
+        {(feature.parts ?? []).map((part, index) => <div key={index} className="inspector-grid mast-part">
+          <label>{t(`mastPart_${part.kind}`)}<NumberField label={t("objectElevation")} unit="m" min={0} max={feature.height} step={0.1} value={part.z} onChange={value => edit(m => updateMastPart(m, feature.id, index, { z: round2(clamp(value, 0, feature.height)) }), `mast:${feature.id}:${index}:z`)} /></label>
+          <NumberField label={t("turnAboutVertical")} unit="°" min={-180} max={180} step={5} value={part.rotation} onChange={value => edit(m => updateMastPart(m, feature.id, index, { rotation: clamp(value, -360, 360) }), `mast:${feature.id}:${index}:r`)} />
+          <NumberField label={t("objectWidth")} unit="m" min={0.1} max={5} step={0.05} value={part.size} onChange={value => edit(m => updateMastPart(m, feature.id, index, { size: round2(clamp(value, 0.1, 5)) }), `mast:${feature.id}:${index}:s`)} />
+          <button className="danger-button" onClick={() => edit(m => removeMastPart(m, feature.id, index))}>{t("deleteObject")}</button>
+        </div>)}
+        <div className="inspector-actions">{MAST_PART_KINDS.map(kind => <button key={kind} onClick={() => edit(m => addMastPart(m, feature.id, kind))}>+ {t(`mastPart_${kind}`)}</button>)}</div>
+      </>}
       <div className="inspector-actions">{remove}</div>
     </section>}
 
@@ -312,7 +325,7 @@ export function Inspector(p: InspectorProps) {
       {model.roofItems.length + model.wallLamps.length > 0 && <div className="list-group"><span>{t("onBuildings")} · {model.roofItems.length + model.wallLamps.length}</span>
         {model.roofItems.map(item => listRow({ kind: "roofItem", id: item.id }, ROOF_ITEM_TOOL[item.kind], t(`roofItem_${item.kind}`), item.id))}
         {model.wallLamps.map(item => listRow({ kind: "wallLamp", id: item.id }, "wall-lamp", t("toolWallLamp"), item.id))}</div>}
-      {model.openings.length > 0 && <div className="list-group"><span>{t("openings")} · {model.openings.length}</span>{model.openings.map(item => listRow({ kind: "opening", id: item.id }, item.kind, `${t(item.kind)} · ${t("floorShort")} ${item.floor + 1}`, model.buildings.find(b => b.id === item.buildingId)?.name ?? ""))}</div>}
+      {model.openings.length > 0 && <div className="list-group"><span>{t("openings")} · {model.openings.length}</span>{model.openings.map(item => listRow({ kind: "opening", id: item.id }, item.kind === "opening" ? "arch" : item.kind, `${t(item.kind)} · ${t("floorShort")} ${item.floor + 1}`, model.buildings.find(b => b.id === item.buildingId)?.name ?? ""))}</div>}
       {model.features.length > 0 && <div className="list-group"><span>{t("groundObjects")} · {model.features.length}</span>{model.features.map(item => listRow({ kind: "feature", id: item.id }, FEATURE_TOOL[item.kind], item.label ?? t(toolLabelKey(FEATURE_TOOL[item.kind])), item.label ? t(toolLabelKey(FEATURE_TOOL[item.kind])) : item.id))}</div>}
       {model.cameras.length > 0 && <div className="list-group"><span>{t("toolCamera")} · {model.cameras.length}</span>{model.cameras.map(item => listRow({ kind: "camera", id: item.id }, "camera", item.name, item.enabled ? "" : t("powerOff")))}</div>}
       {model.placements.length > 0 && <div className="list-group"><span>{t("devices")} · {model.placements.length}</span>{model.placements.map(item => { const device = deviceOf(item.device_id); return listRow({ kind: "device", id: item.device_id }, "device", device?.name ?? item.device_id, device ? t(`kind_${device.kind}`) : ""); })}</div>}
