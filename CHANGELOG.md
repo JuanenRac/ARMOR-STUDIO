@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## [0.5.8] - The node finder only shows the kind you are looking for
+
+- **Find nodes on the network:** it read a candidate's own panel title ("A.R.M.O.R. radar", "...solar", "...electrical") and now uses it - the Radar menu no longer lists a solar or electrical node found on the network, and the same the other way round. A node whose panel has not answered yet is still shown (it might be the kind you want), only a node that clearly says a different kind is left out.
+- Needs the node's own firmware to say its kind in its panel's title (ARMOR-RADAR 0.3.6, ARMOR-SOLAR 0.1.4, ARMOR-ELECTRICAL 0.1.0 or later); against an older node, nothing changes.
+- 1 new test.
+
 ## [0.5.7] - The Electrical menu, a menu for each branch of the plan, and gutters
 
 - **Electrical** (Energy group, beside Inverters and Batteries): what the ARMOR-ELECTRICAL nodes measure, live - the grid's power and energy, the nodes reporting, the alarms, and one card per node with its channels (voltage, current, power, energy, frequency, power factor, line closed or open) and its transfer switches as their contacts show them. Each node says whether the Electrical Designer already draws it, with a button to open the designer. Read only. The node finder of the other menus is here too.

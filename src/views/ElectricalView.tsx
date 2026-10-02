@@ -50,7 +50,7 @@ export function ElectricalView({ t, origin, readings, unreachable, design, openD
       <p className="muted small">{t("elLiveRoleText")}</p>
       <div><button type="button" onClick={openDesigner}>{t("elLiveOpenDesigner")}</button></div>
     </section>
-    <NodeFinder t={t} origin={origin} network={network} knownIds={nodes.map(node => node.node_id)} />
+    <NodeFinder t={t} origin={origin} network={network} wantKind="electrical" knownIds={nodes.map(node => node.node_id)} />
     {nodes.length === 0 ? <div className="solar-empty"><span className="el-live-logo big" aria-hidden="true">⌁</span><h3>{t("elLiveNone")}</h3><p>{t("elLiveNoneHelp")}</p></div>
       : nodes.map(node => <NodeCard key={node.node_id} t={t} node={node} drawn={drawn.has(node.node_id.toLowerCase())} now={now} />)}
   </div>;

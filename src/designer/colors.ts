@@ -28,6 +28,7 @@ export const DEFAULT_FEATURE_COLOUR: Record<SiteFeatureKind, string> = {
   pillar: "#a8b4b8", lamp: "#59666d", mast: "#c3d0d4", solar: "#173f7a", canopy: "#4b6f7a", entrance: "#9fb1b7", path: "#6f8b93", road: "#1c252b",
   tree: "#2f7d45", kennel: "#a6763f", fence: "#8a9296", fountain: "#b3b8b3", coop: "#c9583b", gate: "#20272b", sidewalk: "#b8bcbd",
   pool: "#3fa7d6", planter: "#8a5a3c", terrace: "#a49a8c",
+  bench: "#9a6b3d", table: "#a2784a", barbecue: "#8a5a4a", pergola: "#9a7448", shed: "#8a6a4a", hedge: "#2f6b3a", mailbox: "#b8392f", bins: "#2f6b4a", tank: "#cfd8dc", "ac-unit": "#e7ecee", "electrical-box": "#9aa6ab", car: "#b5332e",
 };
 export const featureColourOf = (kind: SiteFeatureKind, style: string | undefined): string =>
   kind === "gate" ? (style === "wood" ? "#8a6234" : style === "modern" ? "#2d3438" : style === "stone" ? "#9a8f82" : "#20272b")
