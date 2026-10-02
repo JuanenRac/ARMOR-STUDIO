@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## [0.5.9] - Dead Portuguese removed, a plainer "offline"
+
+- **"Offline demonstration" was never seen by anyone who reads Portuguese:** `src/i18n.ts` built a complete `pt` catalogue (every phrase, kept current through every feature added since) but never listed Portuguese as a selectable language and never merged the other screens' text into it - it could not be picked, and once picked by code it would have been missing most of the interface anyway. Removed rather than finished, to stop it quietly growing with every new feature for no reader.
+- **"Offline demonstration" simplified to "Offline"** (and its translations) across all eight languages: the longer phrasing read oddly once the demo mode became an ordinary disconnected state rather than a guided tour.
+
 ## [0.5.8] - The node finder only shows the kind you are looking for
 
 - **Find nodes on the network:** it read a candidate's own panel title ("A.R.M.O.R. radar", "...solar", "...electrical") and now uses it - the Radar menu no longer lists a solar or electrical node found on the network, and the same the other way round. A node whose panel has not answered yet is still shown (it might be the kind you want), only a node that clearly says a different kind is left out.
