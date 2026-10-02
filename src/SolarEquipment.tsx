@@ -58,7 +58,7 @@ export function SolarEquipment({ kind, t, origin, catalog, registrations, report
       {registrations.length > 0 && <span className="muted">{t("solarDeclared")}: {registrations.length}</span>}
     </div>
     {message && <p className={`notice ${message.bad ? "bad" : ""}`} role="status">{message.text}</p>}
-    <NodeFinder t={t} origin={origin} network={network} knownIds={[...registrations.map(item => item.node_id), ...reporting.map(item => item.node_id)]} onUse={nodeId => { setMessage(null); setForm({ ...blank(kind), ...(nodeId ? { node_id: nodeId } : {}) }); }} />
+    <NodeFinder t={t} origin={origin} network={network} wantKind="solar" knownIds={[...registrations.map(item => item.node_id), ...reporting.map(item => item.node_id)]} onUse={nodeId => { setMessage(null); setForm({ ...blank(kind), ...(nodeId ? { node_id: nodeId } : {}) }); }} />
 
     {form && <form className="device-form stack-card" onSubmit={event => void save(event)}>
       <h3>{form.editing ? t("solarEditDevice") : kind === "inverter" ? t("solarAddInverter") : t("solarAddBattery")}</h3>

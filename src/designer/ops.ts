@@ -206,9 +206,11 @@ export function addRoofItem(model: SiteModel, buildingId: string, kind: RoofItem
     // A gutter and a downpipe belong to the eaves: they go to the nearest edge of the roof, the gutter lying along it and the downpipe running down the wall from it.
     const near = nearestOnOutline(building.points, { x, y }), edge = edgeOf(building.points, near.edge);
     const width = kind === "gutter" ? Math.min(ROOF_ITEM_DEFAULTS.gutter.width, edge.length) : ROOF_ITEM_DEFAULTS.downpipe.width;
-    const along = Math.min(edge.length - width / 2, Math.max(width / 2, near.along)), inset = 0.05;
+    // The normal of an edge points out of the house: a gutter sits at the edge of the roof (beyond the wall by half its thickness and the overhang), a downpipe against the wall.
+    const along = Math.min(edge.length - width / 2, Math.max(width / 2, near.along));
+    const out = kind === "gutter" ? building.thickness / 2 + Math.max(0.1, building.roof.overhang) - 0.04 : building.thickness / 2 + width / 2 + 0.02;
     item = {
-      ...item, x: round2(edge.a.x + edge.ux * along - edge.nx * inset), y: round2(edge.a.y + edge.uy * along - edge.ny * inset), width,
+      ...item, x: round2(edge.a.x + edge.ux * along + edge.nx * out), y: round2(edge.a.y + edge.uy * along + edge.ny * out), width,
       ...(kind === "gutter" ? { rotation: round2(((Math.atan2(edge.uy, edge.ux) * 180 / Math.PI) % 180 + 180) % 180) } : { height: Math.max(1, round2(totalHeight(building.floors))) }),
     };
   }
@@ -241,6 +243,18 @@ export const FEATURE_DEFAULTS: Record<SiteFeatureKind, Omit<SiteFeature, "id" | 
   pool: { width: 6, depth: 3, height: 0.3, rotation: 0, slope: 0, style: "rectangle" },
   planter: { width: 1.2, depth: 0.5, height: 0.6, rotation: 0, slope: 0, style: "box" },
   terrace: { width: 3, depth: 2.5, height: 0.2, rotation: 0, slope: 0, style: "railed" },
+  bench: { width: 1.6, depth: 0.5, height: 0.85, rotation: 0, slope: 0 },
+  table: { width: 2.2, depth: 1.6, height: 0.9, rotation: 0, slope: 0 },
+  barbecue: { width: 1.2, depth: 0.6, height: 1.0, rotation: 0, slope: 0 },
+  pergola: { width: 3.5, depth: 3, height: 2.6, rotation: 0, slope: 0 },
+  shed: { width: 2.4, depth: 1.8, height: 2.2, rotation: 0, slope: 0 },
+  hedge: { width: 4, depth: 0.7, height: 1.3, rotation: 0, slope: 0 },
+  mailbox: { width: 0.4, depth: 0.35, height: 1.3, rotation: 0, slope: 0 },
+  bins: { width: 1.5, depth: 0.7, height: 1.1, rotation: 0, slope: 0 },
+  tank: { width: 1.4, depth: 1.4, height: 1.9, rotation: 0, slope: 0 },
+  "ac-unit": { width: 0.9, depth: 0.4, height: 0.7, rotation: 0, slope: 0 },
+  "electrical-box": { width: 0.7, depth: 0.3, height: 1.0, rotation: 0, slope: 0 },
+  car: { width: 4.4, depth: 1.9, height: 1.5, rotation: 0, slope: 0 },
 };
 
 export function addFeature(model: SiteModel, kind: SiteFeatureKind, x: number, y: number, z = 0): { model: SiteModel; id: string } {

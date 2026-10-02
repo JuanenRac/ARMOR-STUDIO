@@ -186,21 +186,25 @@ function BuildingView({ building, model, selected, selection, hoverKey, floorLim
 // ---- things on roofs, walls and the ground ---------------------------------------------------------------------------------------
 
 function RoofItemView({ item, building, selected, hover, hooks }: { item: SiteModel["roofItems"][number]; building: Building; selected: boolean; hover: boolean; hooks: Hooks }) {
-  const z = roofSurfaceZ(building, item.x, item.y), glow = glowOf(selected, hover);
+  // a gutter and a downpipe belong to the eaves (the top of the walls); everything else follows the roof surface
+  const eaves = item.kind === "gutter" || item.kind === "downpipe", z = eaves ? building.base + totalHeight(building.floors) : roofSurfaceZ(building, item.x, item.y), glow = glowOf(selected, hover);
   // The panel lies on the roof: tilt it by the slope of the roof plane where it stands.
   const frame = roofFrame(building.points, building.roof), k = 0.4;
   const hx = (roofHeight(frame, building.roof, item.x + k, item.y) - roofHeight(frame, building.roof, item.x - k, item.y)) / (2 * k);
   const hy = (roofHeight(frame, building.roof, item.x, item.y + k) - roofHeight(frame, building.roof, item.x, item.y - k)) / (2 * k);
   const quaternion = useMemo(() => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(-hx, 1, hy).normalize()), [hx, hy]);
-  const w = item.width, d = item.depth, h = item.height, yaw = item.rotation * Math.PI / 180;
+  const w = item.width, d = item.depth, h = item.height, yaw = item.rotation * Math.PI / 180, panelTilt = Math.max(0, Math.min(80, item.tilt || 0)) * Math.PI / 180;
   return <group position={site(item.x, item.y, z)} {...hooks("roofItem", item.id)}>
     {item.kind === "chimney" && <group rotation={[0, yaw, 0]}>
       <mesh position={[0, h / 2 - 0.2, 0]} castShadow><boxGeometry args={[w, h + 0.4, d]} /><meshStandardMaterial color={item.color ?? "#8a5a4a"} roughness={0.9} {...glow} /></mesh>
       <mesh position={[0, h + 0.03, 0]} castShadow><boxGeometry args={[w + 0.14, 0.08, d + 0.14]} /><meshStandardMaterial color="#5c6a70" roughness={0.6} /></mesh>
     </group>}
     {item.kind === "solar" && <group quaternion={quaternion}><group rotation={[0, yaw, 0]}>
-      <mesh position={[0, 0.08, 0]} castShadow><boxGeometry args={[w, Math.max(h, 0.05), d]} /><meshStandardMaterial color={item.color ?? "#173f7a"} metalness={0.65} roughness={0.28} {...glow} /><Edges color="#9fc9ee" /></mesh>
-      <mesh position={[0, 0.035, 0]}><boxGeometry args={[w * 0.92, 0.04, d * 0.92]} /><meshStandardMaterial color="#7d8b93" roughness={0.6} /></mesh>
+      {/* the panel can be raised off the roof by its tilt: one edge goes up, the other stays on the roof */}
+      <group position={[0, Math.sin(panelTilt) * d / 2, 0]} rotation={[-panelTilt, 0, 0]}>
+        <mesh position={[0, 0.08, 0]} castShadow><boxGeometry args={[w, Math.max(h, 0.05), d]} /><meshStandardMaterial color={item.color ?? "#173f7a"} metalness={0.65} roughness={0.28} {...glow} /><Edges color="#9fc9ee" /></mesh>
+        <mesh position={[0, 0.035, 0]}><boxGeometry args={[w * 0.92, 0.04, d * 0.92]} /><meshStandardMaterial color="#7d8b93" roughness={0.6} /></mesh>
+      </group>
     </group></group>}
     {item.kind === "antenna" && <group>
       <mesh position={[0, h / 2, 0]} castShadow><cylinderGeometry args={[0.025, 0.04, h, 10]} /><meshStandardMaterial color={item.color ?? "#c3d0d4"} metalness={0.6} roughness={0.35} {...glow} /></mesh>
@@ -209,8 +213,8 @@ function RoofItemView({ item, building, selected, hover, hooks }: { item: SiteMo
     </group>}
     {item.kind === "gutter" && <group rotation={[0, yaw, 0]}>
       {/* an open channel: the bottom and the two sides, along its length (w) */}
-      <mesh position={[0, 0.02, 0]} castShadow><boxGeometry args={[w, 0.03, d]} /><meshStandardMaterial color={item.color ?? "#8d9aa1"} metalness={0.5} roughness={0.4} {...glow} /></mesh>
-      {[-1, 1].map(side => <mesh key={side} position={[0, 0.02 + h / 2, side * (d / 2 - 0.015)]} castShadow><boxGeometry args={[w, h, 0.03]} /><meshStandardMaterial color={item.color ?? "#8d9aa1"} metalness={0.5} roughness={0.4} {...glow} /></mesh>)}
+      <mesh position={[0, -0.06, 0]} castShadow><boxGeometry args={[w, 0.03, d]} /><meshStandardMaterial color={item.color ?? "#8d9aa1"} metalness={0.5} roughness={0.4} {...glow} /></mesh>
+      {[-1, 1].map(side => <mesh key={side} position={[0, -0.06 + h / 2, side * (d / 2 - 0.015)]} castShadow><boxGeometry args={[w, h, 0.03]} /><meshStandardMaterial color={item.color ?? "#8d9aa1"} metalness={0.5} roughness={0.4} {...glow} /></mesh>)}
     </group>}
     {item.kind === "downpipe" && (() => {
       // a vertical tube from the roof's edge down to the ground (never below the building's foot), with a small elbow at the top
@@ -552,6 +556,7 @@ export default function Viewport3D(props: ViewportProps) {
       item("turntable", ICON.turntable, t("turntable"), t("turntableHelp"), () => setTurntable(value => !value), { active: turntable }),
       item("xray", ICON.xray, t("xray"), t("xrayHelp"), () => setXray(value => !value), { active: xray }),
       item("shadows", ICON.shadow, t("shadowsToggle"), t("shadowsHelp"), () => setShadows(value => !value), { active: shadows }),
+      item("roofs", ICON.roofToggle, layers.roofs ? t("roofsOff") : t("roofsOn"), t("roofsToggleHelp"), () => setLayers(current => ({ ...current, roofs: !current.roofs })), { active: !layers.roofs }),
       item("layers", ICON.layers, t("layers"), t("layersHelp"), () => setLayersOpen(value => !value), { active: layersOpen }),
     ],
   ];

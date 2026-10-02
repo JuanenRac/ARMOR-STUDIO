@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { INITIAL_BUILDINGS, INITIAL_CAMERAS, INITIAL_DIMENSIONS, INITIAL_FEATURES, INITIAL_OPENINGS, INITIAL_ROOF_ITEMS, INITIAL_SENSORS, INITIAL_TERRAIN, INITIAL_WALL_LAMPS } from "../domain";
-import { area, bounds, centroid, edgeOf, pointInPolygon, signedArea, totalHeight } from "./geometry";
+import { area, bounds, centroid, edgeOf, nearestOnOutline, pointInPolygon, signedArea, totalHeight } from "./geometry";
 import { toMetres } from "./model";
 import {
   addMastPart, removeMastPart, updateMastPart, addFeature, addFence, addSidewalkRing, addFloor, canTurnAbout, turnSelected, addOpening, addRoofItem, addWallLamp, buildingAt, createBuilding, deleteBuilding, duplicateBuilding, fitDimensions, insertBuildingVertex, isRectangle, moveBuilding, moveVertex, rectangularTerrain,
@@ -122,7 +122,8 @@ describe("openings, lamps and roof items", () => {
     const model = sample(), b = house(model);
     const gutter = addRoofItem(model, "building-01", "gutter", 20, 12.5)!;
     const placed = gutter.model.roofItems.find(item => item.id === gutter.id)!;
-    expect(pointInPolygon({ x: placed.x, y: placed.y }, b.points)).toBe(true);
+    expect(pointInPolygon({ x: placed.x, y: placed.y }, b.points)).toBe(false);          // outside the wall, at the edge of the roof
+    expect(nearestOnOutline(b.points, { x: placed.x, y: placed.y }).distance).toBeLessThan(1);
     expect(Math.min(placed.rotation % 180, 180 - (placed.rotation % 180)) % 90).toBeCloseTo(0, 0);   // along a wall of the house, which are at right angles
     const pipe = addRoofItem(model, "building-01", "downpipe", 20, 12.5)!.model.roofItems.find(item => item.kind === "downpipe")!;
     expect(pipe.height).toBeCloseTo(totalHeight(b.floors), 1);

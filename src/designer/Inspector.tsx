@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import type { StudioDevice } from "../api";
 import { KindIcon } from "../deviceKinds";
 import { FEATURE_STYLES, MAST_PART_KINDS, type Building, type Camera, type Dimensions, type Opening, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type WallLamp } from "../domain";
-import { area, bounds, edgeOf, isSimplePolygon, roofRise, signedArea, totalHeight } from "./geometry";
+import { area, bounds, edgeOf, floorBottom, isSimplePolygon, nearestOnOutline, pointInPolygon, roofRise, signedArea, totalHeight } from "./geometry";
 import { DEFAULT_DOOR_COLOUR, DEFAULT_FEATURE_COLOUR, DEFAULT_LIGHT_COLOUR, DEFAULT_ROOF_COLOUR, DEFAULT_ROOF_ITEM_COLOUR, DEFAULT_TERRAIN_COLOUR, DEFAULT_WALL_COLOUR, DEFAULT_WINDOW_FRAME_COLOUR, featureColourOf } from "./colors";
 import { toolIcon } from "./icons";
 import { clamp, formatMetres, headingOf, radarView, round2, SENSOR_HEIGHT_M, CAMERA_HEIGHT_M, toolLabelKey, type Selection, type Tool } from "./model";
@@ -55,7 +55,7 @@ function CornerTable({ t, points, selected, onSelect, onMove, onInsert, onRemove
 }
 
 const ROOF_STYLES: readonly RoofStyle[] = ["flat", "shed", "gable", "hip", "pyramid"];
-const FEATURE_TOOL: Record<SiteFeature["kind"], Tool> = { pillar: "pillar", lamp: "lamp", mast: "mast", solar: "solar", canopy: "canopy", entrance: "entrance", path: "path", road: "road", tree: "tree", kennel: "kennel", fence: "fence", fountain: "fountain", coop: "coop", gate: "gate", sidewalk: "sidewalk", pool: "pool", planter: "planter", terrace: "terrace" };
+const FEATURE_TOOL: Record<SiteFeature["kind"], Tool> = { pillar: "pillar", lamp: "lamp", mast: "mast", solar: "solar", canopy: "canopy", entrance: "entrance", path: "path", road: "road", tree: "tree", kennel: "kennel", fence: "fence", fountain: "fountain", coop: "coop", gate: "gate", sidewalk: "sidewalk", pool: "pool", planter: "planter", terrace: "terrace", bench: "bench", table: "table", barbecue: "barbecue", pergola: "pergola", shed: "shed", hedge: "hedge", mailbox: "mailbox", bins: "bins", tank: "tank", "ac-unit": "ac-unit", "electrical-box": "electrical-box", car: "car" };
 const ROOF_ITEM_TOOL: Record<RoofItem["kind"], Tool> = { chimney: "chimney", solar: "roof-solar", antenna: "antenna", vent: "chimney", gutter: "gutter", downpipe: "downpipe" };
 
 export function Inspector(p: InspectorProps) {
@@ -217,6 +217,7 @@ export function Inspector(p: InspectorProps) {
         <NumberField label={t("objectDepth")} unit="m" min={0.05} step={0.05} value={roofItem.depth} onChange={value => setRoofItem(roofItem.id, { depth: round2(Math.max(0.05, value)) }, "depth")} />
         <NumberField label={t("objectHeight")} unit="m" min={0.02} step={0.05} value={roofItem.height} onChange={value => setRoofItem(roofItem.id, { height: round2(Math.max(0.02, value)) }, "height")} />
         <NumberField label={t("objectRotation")} unit="°" step={5} value={roofItem.rotation} onChange={value => setRoofItem(roofItem.id, { rotation: value }, "rotation")} />
+        {roofItem.kind === "solar" && <NumberField label={t("panelTilt")} unit="°" step={5} min={0} max={80} value={roofItem.tilt} onChange={value => setRoofItem(roofItem.id, { tilt: Math.max(0, Math.min(80, value)) }, "tilt")} />}
       </div>
       <p className="muted small">{t("roofItemNote")}</p>
       <div className="inspector-actions">{remove}</div>
@@ -244,6 +245,17 @@ export function Inspector(p: InspectorProps) {
         {!["lamp", "mast"].includes(feature.kind) && <NumberField label={t("objectDepth")} unit="m" min={0.05} step={0.05} value={feature.depth} onChange={value => setFeature(feature.id, { depth: round2(Math.max(0.05, value)) }, "depth")} />}
         <NumberField label={t("objectHeight")} unit="m" min={0.01} step={0.1} value={feature.height} onChange={value => setFeature(feature.id, { height: round2(Math.max(0.01, value)) }, "height")} />
         <NumberField label={t("objectElevation")} unit="m" min={0} step={0.1} value={feature.z} onChange={value => setFeature(feature.id, { z: round2(Math.max(0, value)) }, "z")} />
+        {feature.kind === "terrace" && (() => {
+          // a terrace can stand on any floor of the house it belongs to: the building it is over (or beside), and the floor whose level its elevation is at
+          const near = model.buildings.map(item => ({ item, distance: pointInPolygon({ x: feature.x, y: feature.y }, item.points) ? 0 : nearestOnOutline(item.points, { x: feature.x, y: feature.y }).distance })).filter(entry => entry.distance < 4).sort((x, y) => x.distance - y.distance)[0]?.item;
+          if (!near) return null;
+          const levels = near.floors.map((_, floor) => near.base + floorBottom(near.floors, floor));
+          const current = levels.findIndex(level => Math.abs(level - feature.z) < 0.05);
+          return <label>{t("terraceFloor")}<select value={current} onChange={event => { const floor = Number(event.target.value); if (floor >= 0) setFeature(feature.id, { z: round2(levels[floor]) }, "z"); }}>
+            {current < 0 && <option value={-1}>{t("terraceFloorCustom")}</option>}
+            {levels.map((_, floor) => <option key={floor} value={floor}>{floor === 0 ? t("groundFloor") : `${t("floorShort")} ${floor + 1}`}</option>)}
+          </select></label>;
+        })()}
         <NumberField label={t("turnAboutVertical")} unit="°" step={5} min={-180} max={180} value={feature.rotation} onChange={value => setFeature(feature.id, { rotation: value }, "rotation")} />
         <NumberField label={t("tiltAboutX")} unit="°" step={5} min={-180} max={180} value={feature.pitch ?? 0} onChange={value => setFeature(feature.id, { pitch: clamp(value, -180, 180) || undefined }, "pitch")} />
         <NumberField label={t("tiltAboutZ")} unit="°" step={5} min={-180} max={180} value={feature.roll ?? 0} onChange={value => setFeature(feature.id, { roll: clamp(value, -180, 180) || undefined }, "roll")} />

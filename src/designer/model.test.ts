@@ -76,7 +76,8 @@ describe("the floating tool panels", () => {
   it("give every tool one key in its view, and the two views really have different tools", () => {
     for (const groups of [PLAN_TOOL_GROUPS, VIEW_TOOL_GROUPS]) {
       const specs = groups.flat();
-      expect(new Set(specs.map(spec => spec.key)).size).toBe(specs.length);
+      const keyed = specs.filter(spec => spec.key !== "");   // the newer objects have no key of their own
+      expect(new Set(keyed.map(spec => spec.key)).size).toBe(keyed.length);
     }
     const plan = PLAN_TOOL_GROUPS.flat().map(spec => spec.tool), view = VIEW_TOOL_GROUPS.flat().map(spec => spec.tool);
     expect(plan).toContain("terrain-poly"); expect(view).not.toContain("terrain-poly");
@@ -98,7 +99,8 @@ describe("the floating tool panels", () => {
 describe("one tool panel for both views", () => {
   it("lists every tool once, with a unique key, and says where each works", () => {
     const specs = TOOL_GROUPS.flat();
-    expect(new Set(specs.map(spec => spec.key)).size).toBe(specs.length);
+    const keyed = specs.filter(spec => spec.key !== "");
+    expect(new Set(keyed.map(spec => spec.key)).size).toBe(keyed.length);
     expect(new Set(specs.map(spec => spec.tool)).size).toBe(specs.length);
     expect(toolWorksIn("terrain-poly", "3d")).toBe(false);
     expect(toolWorksIn("elevate", "2d")).toBe(false);
@@ -119,7 +121,7 @@ describe("one tool panel for both views", () => {
     expect(groupOf("fence")).toBe(groupOf("gate")); expect(groupOf("door")).toBe(groupOf("garage")); expect(groupOf("door")).toBe(groupOf("window"));
     expect(groupOf("tree")).toBe(groupOf("planter")); expect(groupOf("pool")).toBe(groupOf("terrace")); expect(groupOf("kennel")).toBe(groupOf("coop"));
     expect(groupOf("path")).toBe(groupOf("road")); expect(groupOf("road")).toBe(groupOf("sidewalk"));
-    expect(groups.flat().length).toBe(38);   // no tool was lost or repeated
-    expect(new Set(groups.flat()).size).toBe(38);
+    expect(groups.flat().length).toBe(50);   // no tool was lost or repeated
+    expect(new Set(groups.flat()).size).toBe(50);
   });
 });
