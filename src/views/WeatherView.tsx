@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Translate } from "../components/camera";
 import { MenuTitle } from "../menuLogos";
+import { getPreferences, savePreferences, type WeatherPlace } from "../api";
 import { loadAirQuality, loadForecast, searchPlaces } from "../weather/api";
 import { BarChart, CloudChart, LineChart, WindArrow } from "../weather/charts";
 import { RadarMap } from "../weather/RadarMap";
@@ -25,6 +26,9 @@ export function readSaved(text: string | null): Saved {
 }
 const load = (): Saved => { try { return readSaved(window.localStorage.getItem(KEY)); } catch { return { enabled: false, place: null }; } };
 const store = (saved: Saved | null) => { try { if (saved) window.localStorage.setItem(KEY, JSON.stringify(saved)); else window.localStorage.removeItem(KEY); } catch { /* the choice is not kept */ } };
+// The server keeps the place under lat/lon/region/country (always strings); the client's own Place keeps latitude/longitude and leaves region/country out when unknown.
+const toWeatherPlace = (place: Place): WeatherPlace => ({ name: place.name, region: place.region ?? "", country: place.country ?? "", lat: place.latitude, lon: place.longitude });
+const fromWeatherPlace = (place: WeatherPlace): Place => ({ name: place.name, region: place.region || undefined, country: place.country || undefined, latitude: place.lat, longitude: place.lon });
 
 const fixed = (value: number | null | undefined, digits = 0): string => value === null || value === undefined ? "–" : value.toFixed(digits);
 const timeOf = (iso: string | undefined): string => iso ? iso.slice(11, 16) : "–";
@@ -59,7 +63,7 @@ function Detail({ label, children, hint }: { label: string; children: React.Reac
   return <div className="wx-detail" title={hint}><small>{label}</small><strong>{children}</strong></div>;
 }
 
-export function WeatherView({ t, locale }: { t: Translate; locale: string }) {
+export function WeatherView({ t, locale, origin }: { t: Translate; locale: string; origin: string }) {
   const [saved, setSaved] = useState<Saved>(load);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Place[] | null>(null);
@@ -68,7 +72,23 @@ export function WeatherView({ t, locale }: { t: Translate; locale: string }) {
   const weather = useWeather(saved.place, saved.enabled);
   const { forecast, air } = weather;
 
-  const update = (next: Saved | null) => { setSaved(next ?? { enabled: false, place: null }); store(next); };
+  // The account's own choice, kept on the server, wins over whatever this browser remembers locally - so it travels with
+  // the person rather than staying behind at whichever address they used before. A place never set server-side (not even
+  // explicitly cleared) leaves the local fallback alone, so a first sync does not erase a choice nobody migrated yet.
+  useEffect(() => {
+    let cancelled = false;
+    getPreferences(origin).then(prefs => {
+      if (cancelled || prefs.weatherPlace === undefined) return;
+      const next: Saved = prefs.weatherPlace ? { enabled: true, place: fromWeatherPlace(prefs.weatherPlace) } : { enabled: false, place: null };
+      setSaved(next); store(next);
+    }).catch(() => { /* the local fallback stands when the server cannot be asked */ });
+    return () => { cancelled = true; };
+  }, [origin]);
+
+  const update = (next: Saved | null) => {
+    setSaved(next ?? { enabled: false, place: null }); store(next);
+    savePreferences(origin, { weatherPlace: next?.place ? toWeatherPlace(next.place) : null }).catch(() => { /* kept locally at least */ });
+  };
   const search = useCallback(async () => {
     setSearching(true); setResults(null);
     try { setResults(await searchPlaces(query, locale)); } catch { setResults([]); }

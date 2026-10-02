@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## [0.5.10] - Language and the weather place now follow the account, not the browser
+
+- **Language, theme and the saved weather place were only in this browser's own storage:** signing in from a different address (another network, a new fixed IP after moving the server) looked like every one of them had been reset, because a browser keeps that storage separate for every address it visits. They are now also kept server-side (`GET`/`PUT /api/v1/preferences`, ARMOR-SERVER 0.4.1), tied to the account; the browser's own copy stays as the first paint and the offline fallback, but the server's value wins once it answers.
+- **The sidebar's bottom was invisible below 1080 px of screen height:** `.studio-shell` fixes its height to the window and hides overflow, and the sidebar had no scroll of its own - on a shorter screen (a 768p laptop), whatever did not fit above the fold was simply unreachable. It now scrolls on its own under 1080 px.
+
 ## [0.5.9] - Dead Portuguese removed, a plainer "offline"
 
 - **"Offline demonstration" was never seen by anyone who reads Portuguese:** `src/i18n.ts` built a complete `pt` catalogue (every phrase, kept current through every feature added since) but never listed Portuguese as a selectable language and never merged the other screens' text into it - it could not be picked, and once picked by code it would have been missing most of the interface anyway. Removed rather than finished, to stop it quietly growing with every new feature for no reader.

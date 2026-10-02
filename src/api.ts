@@ -41,6 +41,21 @@ export async function openOperatorSession(origin: string, token: string): Promis
   const body = await response.json() as { expiresAt?: string };
   return body.expiresAt ?? "";
 }
+export type WeatherPlace = { name: string; region: string; country: string; lat: number; lon: number };
+export type Preferences = { language?: string; theme?: string; weatherPlace?: WeatherPlace | null };
+/** Language, theme and the saved weather place, tied to the account: they travel with the person, not the browser or address. */
+export async function getPreferences(origin: string): Promise<Preferences> {
+  const response = await timedFetch(endpoint(origin, "/api/v1/preferences"), { headers: { Accept: "application/json" }, ...localSession });
+  if (!response.ok) throw new Error(`Server returned ${response.status}`);
+  return response.json() as Promise<Preferences>;
+}
+export async function savePreferences(origin: string, patch: Preferences): Promise<Preferences> {
+  const response = await timedFetch(endpoint(origin, "/api/v1/preferences"), {
+    method: "PUT", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify(patch),
+  });
+  if (!response.ok) throw new Error(`Server returned ${response.status}`);
+  return response.json() as Promise<Preferences>;
+}
 export async function readStatus(origin: string): Promise<SystemState> {
   const response = await timedFetch(`${origin.replace(/\/$/, "")}/api/v1/status`, { headers: { Accept: "application/json" }, ...localSession, signal: AbortSignal.timeout(8_000) });
   if (!response.ok) throw new Error(`Server returned ${response.status}`);
