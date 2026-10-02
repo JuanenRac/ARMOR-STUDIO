@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
+import { listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
 import { AboutDialog, ConfirmDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
 import { DesignVersionsDialog } from "./DesignVersionsDialog";
@@ -149,6 +149,20 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     setRestored(true);
   }, []);
 
+  // The account's own language and theme, kept on the server, win over whatever this browser remembers locally - so they
+  // travel with the person, not with the browser or the address used to reach the server. Left alone when the server has
+  // never had them set (a brand new account, or one never migrated from the local-only days), so nothing gets erased.
+  useEffect(() => {
+    let cancelled = false;
+    getPreferences(origin).then(prefs => {
+      if (cancelled) return;
+      if (prefs.language) setLanguage(prefs.language as LanguageCode);
+      if (prefs.theme) setTheme(prefs.theme as Theme);
+    }).catch(() => { /* the local fallback stands when the server cannot be asked */ });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [origin]);
+
   const site: SiteModel = useMemo(() => ({ terrain, buildings, openings, roofItems, wallLamps, features, cameras, sensors, placements }), [terrain, buildings, openings, roofItems, wallLamps, features, cameras, sensors, placements]);
   /** The designer hands back a whole model; only the parts that changed are stored again. */
   const design = useMemo(() => ({ dimensions, terrain, buildings, openings, roofItems, wallLamps, features, sensors, placements, cameras }), [dimensions, terrain, buildings, openings, roofItems, wallLamps, features, sensors, placements, cameras]);
@@ -257,7 +271,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     automations: <AutomationsView t={t} origin={origin} automations={automationPoll.data?.automations ?? []} reload={automationPoll.reload} devices={devices} now={now} />,
     system: <SystemView t={t} origin={origin} isAdmin={isAdmin} />,
     services: <ServicesView t={t} origin={origin} />,
-    weather: <WeatherView t={t} locale={language} />,
+    weather: <WeatherView t={t} locale={language} origin={origin} />,
     cameras: <CameraMonitorView cameras={cameras} selected={selected} selectedId={selectedCamera} gridSize={gridSize} setGridSize={setGridSize} recordingIds={recordingCameraIds} streamUrls={streamUrls} reachability={reachability} notice={notice} t={t} select={setSelectedCamera} toggle={camera => updateCamera(camera.id, { enabled: !camera.enabled })} snapshot={camera => void saveSnapshot(camera)} record={camera => void toggleRecording(camera)} expand={expand} ptz={commandPtz} slots={slots} setSlot={(index, id) => setSlots(current => { const next = [...current]; while (next.length <= index) next.push(""); next[index] = id; return next; })}
       settings={<CameraSettings t={t} origin={origin} cameras={cameras} selectedCameraId={selectedCamera} onCameraSelected={setSelectedCamera}
         onCameraSaved={camera => setCameras(current => { const next = upsertCamera(current, camera); persist(next); return next; })}
@@ -272,8 +286,8 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     networkDesigner: <NetworkDesigner t={t} design={networkDesign} setDesign={setNetworkDesign} status={networkStatus} overview={networkPoll.data} cameras={cameras} />,
     configuration: <ConfigurationPanel
       t={t} origin={origin} setOrigin={setOrigin} theme={theme} themes={THEMES}
-      setTheme={value => setTheme(value as Theme)} language={language} languages={LANGUAGES}
-      setLanguage={value => setLanguage(value as LanguageCode)} isAdmin={isAdmin}
+      setTheme={value => { setTheme(value as Theme); savePreferences(origin, { theme: value }).catch(() => { /* kept locally at least */ }); }} language={language} languages={LANGUAGES}
+      setLanguage={value => { setLanguage(value as LanguageCode); savePreferences(origin, { language: value }).catch(() => { /* kept locally at least */ }); }} isAdmin={isAdmin}
       connection={connection}
       savePreferences={saveSettings} exportSite={exportSettings} operatorUnlocked={operatorUnlocked}
     />,
