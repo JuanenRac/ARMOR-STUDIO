@@ -14,6 +14,7 @@ export type Tool =
   | "chimney" | "roof-solar" | "antenna" | "gutter" | "downpipe"
   | "pillar" | "lamp" | "mast" | "solar" | "canopy" | "entrance" | "path" | "road"
   | "tree" | "kennel" | "fence" | "fountain" | "coop" | "gate" | "sidewalk" | "pool" | "planter" | "terrace"
+  | "bench" | "table" | "barbecue" | "pergola" | "shed" | "hedge" | "mailbox" | "bins" | "tank" | "ac-unit" | "electrical-box" | "car"
   | "camera" | "sensor" | "device";
 
 export const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
@@ -51,6 +52,9 @@ export const TOOL_GROUPS: ReadonlyArray<readonly ToolSpec[]> = [
   [{ tool: "lamp", key: "F", labelKey: "toolLamp", views: BOTH }, { tool: "wall-lamp", key: "W", labelKey: "toolWallLamp", views: BOTH }, { tool: "solar", key: "S", labelKey: "toolSolar", views: BOTH }],
   [{ tool: "fence", key: "J", labelKey: "toolFence", views: BOTH }, { tool: "gate", key: "3", labelKey: "toolGate", views: BOTH }, { tool: "entrance", key: "E", labelKey: "toolEntrance", views: BOTH }, { tool: "pillar", key: "P", labelKey: "toolPillar", views: BOTH }],
   [{ tool: "tree", key: "I", labelKey: "toolTree", views: BOTH }, { tool: "planter", key: "0", labelKey: "toolPlanter", views: BOTH }, { tool: "fountain", key: "1", labelKey: "toolFountain", views: BOTH }, { tool: "pool", key: "7", labelKey: "toolPool", views: BOTH }, { tool: "terrace", key: "8", labelKey: "toolTerrace", views: BOTH }, { tool: "canopy", key: "Q", labelKey: "toolCanopy", views: BOTH }, { tool: "kennel", key: "U", labelKey: "toolKennel", views: BOTH }, { tool: "coop", key: "2", labelKey: "toolCoop", views: BOTH }],
+  [{ tool: "bench", key: "", labelKey: "toolBench", views: BOTH }, { tool: "table", key: "", labelKey: "toolTable", views: BOTH }, { tool: "barbecue", key: "", labelKey: "toolBarbecue", views: BOTH }, { tool: "pergola", key: "", labelKey: "toolPergola", views: BOTH }],
+  [{ tool: "shed", key: "", labelKey: "toolShed", views: BOTH }, { tool: "hedge", key: "", labelKey: "toolHedge", views: BOTH }, { tool: "car", key: "", labelKey: "toolCar", views: BOTH }, { tool: "bins", key: "", labelKey: "toolBins", views: BOTH }, { tool: "mailbox", key: "", labelKey: "toolMailbox", views: BOTH }],
+  [{ tool: "tank", key: "", labelKey: "toolTank", views: BOTH }, { tool: "ac-unit", key: "", labelKey: "toolAcUnit", views: BOTH }, { tool: "electrical-box", key: "", labelKey: "toolElectricalBox", views: BOTH }],
   [{ tool: "camera", key: "K", labelKey: "toolCamera", views: BOTH }, { tool: "sensor", key: "L", labelKey: "toolSensor", views: BOTH }, { tool: "device", key: "9", labelKey: "toolDevice", views: BOTH }],
 ];
 /**
@@ -71,7 +75,7 @@ export const toolLabelKey = (tool: Tool): string => ALL_SPECS.find(spec => spec.
 export const toolKeyOf = (tool: Tool): string => ALL_SPECS.find(spec => spec.tool === tool)?.key ?? "";
 /** The tool bound to a key in a view (the 3D view has fewer). */
 export const toolForKey = (key: string, mode: ToolMode): Tool | undefined =>
-  TOOL_GROUPS.flat().find(spec => spec.key === key.toUpperCase() && spec.views.includes(mode))?.tool;
+  TOOL_GROUPS.flat().find(spec => spec.key !== "" && spec.key === key.toUpperCase() && spec.views.includes(mode))?.tool;
 
 /** A camera or radar (percent of the work area) as a point in metres. */
 export const toMetres = (item: { x: number; y: number }, dimensions: Dimensions): Point => ({ x: item.x / 100 * dimensions.width, y: (1 - item.y / 100) * dimensions.depth });

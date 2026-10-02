@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as
 import type { Building, Camera, Dimensions, Point, Sensor, SiteFeature } from "../domain";
 import type { StudioDevice } from "../api";
 import { deviceProblem, KIND_COLOUR, kindGlyph, MAIN_FIELD } from "../deviceKinds";
+import { extraShape, SMALL_EXTRA_KINDS } from "./extraShapes";
 import { bounds, centroid, edgeOf, nearestOnOutline, offsetPolygon, pointInPolygon, roofLines, signedArea } from "./geometry";
 import { ICON } from "./icons";
 import {
@@ -388,6 +389,7 @@ export function Plan2D(props: PlanProps) {
             <path d={`M${-w / 2 + pillar} 0H${-w / 2 + pillar + leaf * 2}`} className="p-gate-leaf" /><path d={`M${-w / 2 + pillar} 0A${leaf} ${leaf} 0 0 1 ${-w / 2 + pillar + leaf} ${leaf}M${w / 2 - pillar} 0A${leaf} ${leaf} 0 0 0 ${w / 2 - pillar - leaf} ${leaf}`} className="p-door-swing" /></>;
         }
         case "mast": return <><circle r={Math.max(w, 0.2)} className="p-mast" /><circle r={Math.max(w, 0.2) * 2.4} className="p-mast-ring" /><path d={`M${-0.7} 0H${0.7}M0 ${-0.7}V${0.7}`} className="p-mast-line" /></>;
+        default: return extraShape(feature);
       }
     })();
     const roundish = feature.kind === "lamp" || feature.kind === "mast" || feature.kind === "tree" || feature.kind === "fountain";
@@ -395,7 +397,7 @@ export function Plan2D(props: PlanProps) {
       style={feature.color ? { ["--c" as string]: feature.color } : undefined}
       onPointerDown={event => beginDrag({ kind: "feature", id: feature.id }, { kind: "feature", id: feature.id }, event)}>
       <g className="p-body">{body}</g>
-      {(feature.kind === "lamp" || feature.kind === "mast" || feature.kind === "pillar" || feature.kind === "fence" || feature.kind === "sidewalk") && <circle r={Math.max(Math.max(w, d) / 2, 9 * inv)} className="p-device-hit" />}
+      {(feature.kind === "lamp" || feature.kind === "mast" || feature.kind === "pillar" || feature.kind === "fence" || feature.kind === "sidewalk" || SMALL_EXTRA_KINDS.has(feature.kind)) && <circle r={Math.max(Math.max(w, d) / 2, 9 * inv)} className="p-device-hit" />}
       {chosen && (roundish ? <circle r={Math.max(w, 0.3) * 2.6} className="p-selection" /> : <rect x={-w / 2 - 0.1} y={-d / 2 - 0.1} width={w + 0.2} height={d + 0.2} className="p-selection" />)}
     </g>;
   };

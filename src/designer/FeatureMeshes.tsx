@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import * as THREE from "three";
 import type { SiteFeature } from "../domain";
 import { shade } from "./colors";
+import { ExtraBody } from "./ExtraFeatures";
 
 type Glow = { emissive: string; emissiveIntensity: number };
 type Props = { feature: SiteFeature; glow: Glow };
@@ -222,7 +223,7 @@ export function FeatureBody(props: Props) {
     case "pool": return <Pool {...props} />;
     case "planter": return <Planter {...props} />;
     case "terrace": return <Terrace {...props} />;
-    default: return null;
+    default: return <ExtraBody {...props} />;
   }
 }
-export const NEW_FEATURE_KINDS: ReadonlySet<SiteFeature["kind"]> = new Set(["tree", "fence", "gate", "fountain", "kennel", "coop", "sidewalk", "pool", "planter", "terrace"]);
+export const NEW_FEATURE_KINDS: ReadonlySet<SiteFeature["kind"]> = new Set(["tree", "fence", "gate", "fountain", "kennel", "coop", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car"]);

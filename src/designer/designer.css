@@ -171,3 +171,5 @@
 .check-row { display: flex; align-items: center; gap: .45rem; margin: .35rem 0; font-size: .78rem; } .mast-part { border-top: 1px solid rgba(120, 180, 190, .25); padding-top: .4rem; }
 
 .p-gutter { fill: #8d9aa1; stroke: #cfd9de; stroke-width: 1; } .p-gutter-line { stroke: #4b585f; stroke-width: 1; fill: none; } .p-downpipe { fill: #8d9aa1; stroke: #cfd9de; stroke-width: 1; } .p-downpipe-hole { fill: #263238; }
+
+.p-x { stroke: rgba(255, 255, 255, .6); stroke-width: 1; vector-effect: non-scaling-stroke; } .p-x-dark { fill: #1d2a31; stroke: rgba(255, 255, 255, .3); } .p-x-line { fill: none; stroke: rgba(8, 20, 26, .65); stroke-width: 1; vector-effect: non-scaling-stroke; } .p-x-open { fill: rgba(154, 116, 72, .12); stroke: rgba(255, 255, 255, .55); stroke-width: 1; stroke-dasharray: 6 4; vector-effect: non-scaling-stroke; }

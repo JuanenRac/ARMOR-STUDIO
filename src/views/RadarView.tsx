@@ -177,7 +177,7 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
         {unmapped.map(item => <p key={item.node} className="muted small warn-line"><b>{item.node}</b> {t("unmappedNode")}</p>)}
         {!nodes.length && <p className="muted">{t("noRadar")}</p>}
       </article>}
-      {side === "nodes" && <NodeFinder t={t} origin={origin} network={network} knownIds={nodes.map(node => node.node_id)} knownIps={nodes.flatMap(node => (node.panel ? [node.panel.ip] : []))} />}
+      {side === "nodes" && <NodeFinder t={t} origin={origin} network={network} wantKind="radar" knownIds={nodes.map(node => node.node_id)} knownIps={nodes.flatMap(node => (node.panel ? [node.panel.ip] : []))} />}
     </div>
   </section>;
 }

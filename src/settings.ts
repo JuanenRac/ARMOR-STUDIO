@@ -63,7 +63,7 @@ function readSensor(raw: unknown): Sensor | null {
 
 const COORDINATE_LIMIT = 5000;
 const ROOF_STYLES: readonly RoofStyle[] = ["flat", "shed", "gable", "hip", "pyramid"];
-const FEATURE_KINDS = ["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace"] as const;
+const FEATURE_KINDS = ["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car"] as const;
 const ROOF_ITEM_KINDS = ["chimney", "solar", "antenna", "vent", "gutter", "downpipe"] as const;
 const num = (raw: Record<string, unknown>, key: string, fallback: number, low: number, high: number) => finite(raw[key]) ? clamp(raw[key] as number, low, high) : fallback;
 const integer = (raw: Record<string, unknown>, key: string, high: number): number | null => finite(raw[key]) && Number.isInteger(raw[key]) && (raw[key] as number) >= 0 && (raw[key] as number) <= high ? (raw[key] as number) : null;

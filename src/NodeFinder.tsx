@@ -9,12 +9,27 @@ import { sendNetworkOrder } from "./api";
 import type { Translate } from "./components/camera";
 import type { NetworkOverview } from "./networkModel";
 
-export type NodeCandidate = { ip: string; mac?: string; hostname?: string; vendor?: string; online: boolean; /** The node id its host name says (a node is called "armor-" and its id), when it does. */ nodeId?: string };
+export type NodeKind = "radar" | "solar" | "electrical";
+export type NodeCandidate = {
+  ip: string; mac?: string; hostname?: string; vendor?: string; online: boolean; /** The node id its host name says (a node is called "armor-" and its id), when it does. */ nodeId?: string;
+  /** What its own panel says it is (its page title is "A.R.M.O.R. radar/solar/electrical"), when the network node has read it; undefined when it hasn't yet or the answer did not say. */
+  kind?: NodeKind;
+};
+
+/** The kind a device's web panel says it is, from the title banner the network node reads when it probes port 80 or 443 ("A.R.M.O.R. radar", "...solar", "...electrical"). */
+function kindOf(device: { ports?: readonly { banner?: string }[] }): NodeKind | undefined {
+  const banners = (device.ports ?? []).map(port => port.banner ?? "").join(" ").toLowerCase();
+  if (banners.includes("radar")) return "radar";
+  if (banners.includes("solar")) return "solar";
+  if (banners.includes("electrical")) return "electrical";
+  return undefined;
+}
 
 const HOST_PREFIX = "armor-";
 
 /** The devices of the network that look like ARMOR nodes and are not among the ones already known (by id or by address). */
-export function findNodeCandidates(network: NetworkOverview | null, knownIds: Iterable<string>, knownIps: Iterable<string> = []): NodeCandidate[] {
+/** `wantKind`, when given, leaves out a candidate whose panel clearly says a DIFFERENT kind - one whose panel has not answered yet, or did not say, is kept (better to show a maybe than hide a real node). */
+export function findNodeCandidates(network: NetworkOverview | null, knownIds: Iterable<string>, knownIps: Iterable<string> = [], wantKind?: NodeKind): NodeCandidate[] {
   const ids = new Set([...knownIds].map(id => id.toLowerCase())), ips = new Set(knownIps);
   const seen = new Set<string>(), found: NodeCandidate[] = [];
   for (const node of network?.nodes ?? []) {
@@ -25,18 +40,22 @@ export function findNodeCandidates(network: NetworkOverview | null, knownIds: It
       const nodeId = named && hostname ? hostname.slice(HOST_PREFIX.length) : undefined;
       if (ips.has(device.ip) || (nodeId && ids.has(nodeId)) || seen.has(device.ip)) continue;
       seen.add(device.ip);
-      found.push({ ip: device.ip, mac: device.mac, hostname: device.hostname, vendor: device.vendor, online: device.online, ...(nodeId ? { nodeId } : {}) });
+      const kind = kindOf(device);
+      if (wantKind && kind && kind !== wantKind) continue;
+      found.push({ ip: device.ip, mac: device.mac, hostname: device.hostname, vendor: device.vendor, online: device.online, ...(nodeId ? { nodeId } : {}), ...(kind ? { kind } : {}) });
     }
   }
   return found.sort((a, b) => Number(b.online) - Number(a.online) || a.ip.localeCompare(b.ip, undefined, { numeric: true }));
 }
 
-export function NodeFinder({ t, origin, network, knownIds, knownIps, onUse }: {
+export function NodeFinder({ t, origin, network, knownIds, knownIps, wantKind, onUse }: {
   t: Translate; origin: string; network: NetworkOverview | null; knownIds: Iterable<string>; knownIps?: Iterable<string>;
+  /** Leaves out a candidate whose panel clearly says a different kind than this one. */
+  wantKind?: NodeKind;
   /** Solar menus: put the node in the form of a new equipment. */
   onUse?: (nodeId: string) => void;
 }) {
-  const candidates = useMemo(() => findNodeCandidates(network, knownIds, knownIps), [network, knownIds, knownIps]);
+  const candidates = useMemo(() => findNodeCandidates(network, knownIds, knownIps, wantKind), [network, knownIds, knownIps, wantKind]);
   const [state, setState] = useState<"idle" | "searching" | "failed">("idle");
   const hasWatcher = Boolean(network?.nodes.some(node => !node.stale));
   const search = async () => {
