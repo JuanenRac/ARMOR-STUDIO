@@ -290,7 +290,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
       t={t} origin={origin} setOrigin={setOrigin} theme={theme} themes={THEMES}
       setTheme={value => { setTheme(value as Theme); savePreferences(origin, { theme: value }).catch(() => { /* kept locally at least */ }); }} language={language} languages={LANGUAGES}
       setLanguage={value => { setLanguage(value as LanguageCode); savePreferences(origin, { language: value }).catch(() => { /* kept locally at least */ }); }} isAdmin={isAdmin}
-      connection={connection}
+      connection={connection} network={networkPoll.data ?? null}
       savePreferences={saveSettings} exportSite={exportSettings} operatorUnlocked={operatorUnlocked}
     />,
   };
