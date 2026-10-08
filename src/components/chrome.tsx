@@ -1,13 +1,16 @@
 /**
- * The Studio shell: sidebar, top bar and the About dialog.
+ * The Studio shell: sidebar, top bar, and the About and Help dialogs.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { useState } from "react";
 import type { ServerInfo } from "../api";
 import { NAV_GROUPS, type View } from "../domain";
 import { useClock } from "../hooks";
 import { formatUptime } from "../history";
 import type { Translate } from "./camera";
 import { ArmorMark } from "../menuLogos";
+import { HELP_SECTIONS } from "../helpText";
+import "../help.css";
 
 export function Sidebar({ view, setView, sidebarOpen, toggle, connection, alarmBadge, t }: {
   view: View; setView: (view: View) => void; sidebarOpen: boolean; toggle: () => void; connection: string; /** Alarms waiting for a person. */ alarmBadge: number; t: Translate;
@@ -23,14 +26,15 @@ export function Sidebar({ view, setView, sidebarOpen, toggle, connection, alarmB
   </aside>;
 }
 
-export function TopBar({ view, revision, mode, demo, siteStatus, fullScreen, isFullScreen, openAbout, toggleMode, t }: {
-  view: View; revision: number; mode: "armed" | "disarmed"; demo: boolean; /** Whether the design is kept on the server. */ siteStatus: "idle" | "saved" | "saving" | "offline"; fullScreen: () => void; /** True while the page is fullscreen: the same button then leaves it. */ isFullScreen: boolean; openAbout: () => void; /** Arm when disarmed, disarm when armed (after asking). */ toggleMode: () => void; t: Translate;
+export function TopBar({ view, revision, mode, demo, siteStatus, fullScreen, isFullScreen, openAbout, openHelp, toggleMode, t }: {
+  view: View; revision: number; mode: "armed" | "disarmed"; demo: boolean; /** Whether the design is kept on the server. */ siteStatus: "idle" | "saved" | "saving" | "offline"; fullScreen: () => void; /** True while the page is fullscreen: the same button then leaves it. */ isFullScreen: boolean; openAbout: () => void; openHelp: () => void; /** Arm when disarmed, disarm when armed (after asking). */ toggleMode: () => void; t: Translate;
 }) {
   return <header className="topbar">
     <div className="top-left"><div><p className="eyebrow">AUTONOMOUS RADAR &amp; MULTIMODAL OBSERVATION RANGE</p><h1>{t(view)}</h1></div></div>
     <div className="top-status">
       {demo && <span className="demo-badge" title={t("offlineDemo")}>{t("offlineDemo")}</span>}
       <button className={`icon-button ${isFullScreen ? "active" : ""}`} title={isFullScreen ? t("exitFullscreen") : t("fullscreen")} aria-label={isFullScreen ? t("exitFullscreen") : t("fullscreen")} aria-pressed={isFullScreen} onClick={fullScreen}>{isFullScreen ? "🗗" : "⛶"}</button>
+      <button className="icon-button help-button" title={t("helpButton")} aria-label={t("helpButton")} onClick={openHelp}>?</button>
       <button className="icon-button about-button" title={t("about")} onClick={openAbout}>i</button>
       {siteStatus !== "idle" && <span className={`site-sync ${siteStatus}`} title={t(`siteSync_${siteStatus}`)}>{siteStatus === "saved" ? "☁✓" : siteStatus === "saving" ? "☁…" : "☁!"}</span>}
       <span>REV {revision}</span>
@@ -53,6 +57,24 @@ export function AboutDialog({ version, revision, close, t }: { version: string; 
         <div><dt>{t("author")}</dt><dd>JuanenRac · Electro Hobby 3D</dd></div>
         <div><dt>{t("license")}</dt><dd>GPL-3.0-or-later</dd></div>
       </dl>
+      <button className="primary" onClick={close}>{t("returnConsole")}</button>
+    </section>
+  </div>;
+}
+
+/** The Help window: every menu explained, a list of sections on the left and the chosen one on the right. */
+export function HelpDialog({ close, initial, t }: { close: () => void; initial?: string; t: Translate }) {
+  const [current, setCurrent] = useState(initial && HELP_SECTIONS.some(section => section.id === initial) ? initial : HELP_SECTIONS[0].id);
+  return <div className="modal-backdrop" role="presentation" onMouseDown={close} onKeyDown={event => { if (event.key === "Escape") close(); }}>
+    <section className="about-dialog help-dialog" role="dialog" aria-modal="true" aria-labelledby="help-title" onMouseDown={event => event.stopPropagation()}>
+      <button className="modal-close" onClick={close} aria-label={t("close")}>×</button>
+      <p className="eyebrow">A.R.M.O.R. STUDIO</p>
+      <h2 id="help-title">{t("helpTitle")}</h2>
+      <p className="muted">{t("helpIntro")}</p>
+      <div className="help-body">
+        <nav className="help-nav" aria-label={t("helpSections")}>{HELP_SECTIONS.map(section => <button key={section.id} className={current === section.id ? "active" : ""} onClick={() => setCurrent(section.id)}>{t(`help_s_${section.id}`)}</button>)}</nav>
+        <article className="help-text" tabIndex={0}><h3>{t(`help_s_${current}`)}</h3>{t(`help_b_${current}`).split("\n\n").map((paragraph, index) => <p key={index}>{paragraph}</p>)}</article>
+      </div>
       <button className="primary" onClick={close}>{t("returnConsole")}</button>
     </section>
   </div>;

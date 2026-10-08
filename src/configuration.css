@@ -22,3 +22,25 @@
 .top-status .mode-button { cursor: pointer; padding: .35rem .75rem; border-radius: 8px; font: 800 .68rem "DM Mono", ui-monospace, monospace; letter-spacing: .12em; border: 1px solid transparent; }
 .top-status .mode-button.armed { background: rgba(255, 77, 94, .16); border-color: #ff4d5e; color: #ffd3d8; } .top-status .mode-button.disarmed { background: rgba(0, 229, 255, .1); border-color: #2d7583; color: #b9f4ff; }
 .top-status .mode-button:hover:not(:disabled) { filter: brightness(1.25); } .top-status .mode-button:disabled { opacity: .5; cursor: default; }
+
+/* Administration: services, the broker's accounts and the settings files */
+.adm-card { display: grid; gap: .7rem; }
+.adm-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.adm-service, .adm-account { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; padding: .65rem .8rem; border: 1px solid #234b59; border-radius: 10px; background: rgba(6, 20, 29, .6); }
+.adm-service .state-dot { flex: 0 0 auto; width: 10px; height: 10px; border-radius: 50%; background: #5d7480; }
+.adm-service.on .state-dot { background: #4be29a; box-shadow: 0 0 8px #4be29a; } .adm-service.bad .state-dot { background: #ff5d6c; }
+.adm-service-main { display: grid; gap: .1rem; flex: 1 1 200px; min-width: 0; } .adm-service-main small { color: #85a9b3; }
+.adm-actions { display: flex; gap: .4rem; flex-wrap: wrap; }
+.adm-foot { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: flex-end; }
+.adm-form { display: grid; gap: .6rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); align-items: end; }
+.adm-form label { display: grid; gap: .25rem; font-size: .72rem; color: #a9d0d6; }
+.adm-editor { width: 100%; font: 500 .78rem "DM Mono", ui-monospace, Consolas, monospace; line-height: 1.5; padding: .7rem; border: 1px solid #285363; border-radius: 8px; background: #051018; color: #d6f3f5; resize: vertical; tab-size: 2; }
+.adm-topics { flex-basis: 100%; margin: 0; padding: .6rem; border-radius: 8px; background: #051018; color: #b8d6dc; font: 500 .72rem "DM Mono", ui-monospace, Consolas, monospace; white-space: pre-wrap; }
+.adm-secret { border-color: #6a9a3f; background: rgba(40, 70, 20, .35); }
+.adm-files { display: grid; gap: 1rem; grid-template-columns: minmax(220px, 280px) minmax(0, 1fr); align-items: start; }
+.adm-file-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
+.adm-file-list button { width: 100%; text-align: left; display: grid; gap: .1rem; padding: .55rem .7rem; border-radius: 8px; }
+.adm-file-list button.active { border-color: #4fcac4; background: #123b46; } .adm-file-list small { color: #85a9b3; }
+.adm-broker { display: grid; gap: 1rem; }
+@media (max-width: 800px) { .adm-files { grid-template-columns: 1fr; } }
+.adopt-form { flex-basis: 100%; padding: .6rem 0 0; border-top: 1px dashed #285363; }

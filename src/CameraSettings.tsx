@@ -9,7 +9,7 @@ import "./configuration.css";
 
 export type StudioCamera = {
   id: string; name: string; host: string; snapshotUrl: string; enabled: boolean; x: number; y: number;
-  username?: string; onvifPort?: number; rtspPort?: number; rtspPath?: string; hasCredentials?: boolean; liveVideoAvailable?: boolean;
+  username?: string; onvifPort?: number; rtspPort?: number; rtspPath?: string; previewPath?: string; hasCredentials?: boolean; liveVideoAvailable?: boolean;
 };
 type Props = {
   t: (key: string) => string; origin: string;
@@ -18,7 +18,7 @@ type Props = {
   discovered: DiscoveredCamera[]; discover: () => void;
 };
 
-const emptyConnection = (): CameraConnection => ({ id: "", name: "", host: "", snapshotUrl: "", rtspPath: "", username: "", password: "", onvifPort: 80, rtspPort: 554 });
+const emptyConnection = (): CameraConnection => ({ id: "", name: "", host: "", snapshotUrl: "", rtspPath: "", previewPath: "", username: "", password: "", onvifPort: 80, rtspPort: 554 });
 const sessionCredentials = new Map<string, Pick<CameraConnection, "username" | "password">>();
 
 export function CameraSettings(props: Props) {
@@ -36,7 +36,7 @@ export function CameraSettings(props: Props) {
     if (!selected) return;
     const credentials = sessionCredentials.get(selected.id);
     setForm({ id: selected.id, name: selected.name, host: selected.host === "Not configured" ? "" : selected.host,
-      snapshotUrl: selected.snapshotUrl, rtspPath: selected.rtspPath ?? "", username: credentials?.username ?? selected.username ?? "", password: credentials?.password ?? "", onvifPort: selected.onvifPort ?? 80, rtspPort: selected.rtspPort ?? 554 });
+      snapshotUrl: selected.snapshotUrl, rtspPath: selected.rtspPath ?? "", previewPath: selected.previewPath ?? "", username: credentials?.username ?? selected.username ?? "", password: credentials?.password ?? "", onvifPort: selected.onvifPort ?? 80, rtspPort: selected.rtspPort ?? 554 });
   }, [selectedId, selected?.id]);   // eslint-disable-line react-hooks/exhaustive-deps
 
   const update = <K extends keyof CameraConnection>(key: K, value: CameraConnection[K]) => setForm(current => ({ ...current, [key]: value }));
@@ -59,7 +59,7 @@ export function CameraSettings(props: Props) {
     try {
       const result = await discoverCameraStreams(props.origin, form.id);
       if (!result.paths.length) { setMessage(t("rtspNotFound")); return; }
-      setForm(current => ({ ...current, rtspPath: result.paths[0] }));
+      setForm(current => ({ ...current, rtspPath: result.paths[0], previewPath: result.camera.previewPath ?? current.previewPath }));
       props.onCameraSaved({ ...result.camera, enabled: selected?.enabled ?? true, x: selected?.x ?? 50, y: selected?.y ?? 50 });
       setMessage(`${t("rtspFound")}: ${result.paths.join(", ")}`);
     } catch { setMessage(t("rtspDiscoverFailed")); }
@@ -85,6 +85,7 @@ export function CameraSettings(props: Props) {
       <div className="camera-field"><label><span>{t("onvifPort")}</span><input type="number" min="1" max="65535" value={form.onvifPort} onChange={event => update("onvifPort", Number(event.target.value))} /></label></div>
       <div className="camera-field"><label><span>{t("rtspPort")}</span><input type="number" min="1" max="65535" value={form.rtspPort} onChange={event => update("rtspPort", Number(event.target.value))} /></label></div>
       <div className="camera-field camera-field-wide"><label><span>{t("rtspPath")}</span><input placeholder="Streaming/Channels/101" value={form.rtspPath} onChange={event => update("rtspPath", event.target.value)} /></label><p className="field-help">{t("rtspPathHelp")}</p></div>
+      <div className="camera-field camera-field-wide"><label><span>{t("previewPath")}</span><input placeholder="12" value={form.previewPath ?? ""} onChange={event => update("previewPath", event.target.value)} /></label><p className="field-help">{t("previewPathHelp")}</p></div>
       <div className="camera-field"><label><span>{t("cameraUser")}</span><input autoComplete="username" value={form.username} onChange={event => update("username", event.target.value)} /></label></div>
       <div className="camera-field"><label><span>{t("cameraPassword")}</span><input type="password" autoComplete="current-password" placeholder={selected?.hasCredentials && !form.password ? "••••••••" : undefined} value={form.password} onChange={event => update("password", event.target.value)} /></label><p className="field-help">{selected?.hasCredentials && !form.password ? t("credentialsStored") : t("credentialNotice")}</p></div>
       <div className="camera-field camera-field-wide"><label><span>{t("snapshotUrl")}</span><input placeholder="http://camera/snapshot.jpg" value={form.snapshotUrl} onChange={event => update("snapshotUrl", event.target.value)} /></label></div>

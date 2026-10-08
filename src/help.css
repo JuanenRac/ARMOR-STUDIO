@@ -1,0 +1,17 @@
+/* The Help window: a list of sections on the left, the chosen one on the right. */
+.help-dialog { width: min(980px, 100%); max-height: calc(100vh - 2rem); display: flex; flex-direction: column; gap: .5rem; text-align: left; padding: 1.6rem 1.8rem; }
+.help-dialog h2 { margin: .1rem 0 .1rem; font-size: 1.6rem; }
+.help-dialog .muted { margin: 0 0 .4rem; color: #85a9b3; font-size: .82rem; }
+.help-body { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 1rem; min-height: 0; flex: 1; overflow: hidden; }
+.help-nav { display: flex; flex-direction: column; gap: .2rem; overflow-y: auto; padding-right: .3rem; }
+.help-nav button { text-align: left; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #a7c4cc; padding: .5rem .65rem; font-size: .82rem; }
+.help-nav button:hover { background: #0e2632; color: #eafcff; }
+.help-nav button.active { background: linear-gradient(90deg, #123b46, #0e2632); border-color: #276272; color: #e9ffff; font-weight: 600; }
+.help-text { overflow-y: auto; padding: .2rem .5rem .5rem .2rem; border-left: 1px solid #1e4854; padding-left: 1rem; }
+.help-text h3 { margin: 0 0 .6rem; font-size: 1.15rem; color: #e9ffff; }
+.help-text p { margin: 0 0 .8rem; line-height: 1.6; font-size: .86rem; color: #c3dde3; }
+@media (max-width: 760px) {
+  .help-body { grid-template-columns: 1fr; overflow-y: auto; }
+  .help-nav { flex-direction: row; flex-wrap: wrap; overflow: visible; }
+  .help-text { border-left: 0; padding-left: 0; overflow: visible; }
+}

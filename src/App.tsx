@@ -6,9 +6,10 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
-import { AboutDialog, ConfirmDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
+import { AboutDialog, ConfirmDialog, HelpDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
 import { DesignVersionsDialog } from "./DesignVersionsDialog";
 import { SessionUserContext } from "./sessionContext";
+import { StreamRenewContext } from "./streamContext";
 import { CameraFullscreen } from "./components/camera";
 import { ElectricalView } from "./views/ElectricalView";
 import { ConfigurationPanel } from "./ConfigurationPanel";
@@ -65,6 +66,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const [view, setView] = useState<View>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [expandedCameraId, setExpandedCameraId] = useState("");
   const [theme, setTheme] = useState<Theme>(DEFAULT_THEME);
   const [language, setLanguage] = useState<LanguageCode>("en");
@@ -100,7 +102,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
 
   const { state, connection: connectionState, latencyMs, apply: applyState } = useServerStatus(origin);
   const serverInfo = useServerInfo(origin);
-  const streamUrls = useStreamUrls(origin, cameras);
+  const { urls: streamUrls, renew: renewStream } = useStreamUrls(origin, cameras);
   const reachability = useCameraReachability(origin);
   const operatorUnlocked = useServerCameras(origin, setCameras);
   const connection = connectionState === "synced" ? t("serverSynchronized") : t("offlineDemo");
@@ -294,13 +296,14 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   };
 
   const serverName = (() => { try { return new URL(origin).host; } catch { return origin; } })();
-  return <SessionUserContext.Provider value={sessionUser}><div className="studio-frame"><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
+  return <SessionUserContext.Provider value={sessionUser}><StreamRenewContext.Provider value={renewStream}><div className="studio-frame"><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
     <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} connection={connection} alarmBadge={alarmsPending} t={t} />
     <section className="main-stage">
-      <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} toggleMode={toggleMode} t={t} />
+      <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} t={t} />
       {panels[view]}
     </section>
     {expandedCamera && <CameraFullscreen camera={expandedCamera} cameras={cameras} origin={origin} recording={recordingCameraIds.includes(expandedCamera.id)} t={t} close={() => setExpandedCameraId("")} fullScreen={fullScreen} step={stepExpanded} snapshot={() => void saveSnapshot(expandedCamera)} toggleRecording={() => void toggleRecording(expandedCamera)} invokePtz={command => commandPtz(expandedCamera, command)} />}
+    {helpOpen && <HelpDialog initial={view} close={() => setHelpOpen(false)} t={t} />}
     {aboutOpen && <AboutDialog version={studioVersion} revision={state.revision} close={() => setAboutOpen(false)} t={t} />}
     {versionsOf && <DesignVersionsDialog kind={versionsOf} origin={origin} t={t} close={() => setVersionsOf(null)}
       draft={versionsOf === "site" ? siteSync.draft : null} restoreDraft={siteSync.restoreDraft}
@@ -312,7 +315,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     camerasReachable={cameras.filter(camera => reachability[camera.id] === "online").length} camerasTotal={cameras.length}
     highAlerts={nodes.filter(node => node.alert_level === "high").length}
     info={serverInfo} latencyMs={latencyMs} revision={state.revision} onSignOut={onSignOut} t={t} />
-  </div></SessionUserContext.Provider>;
+  </div></StreamRenewContext.Provider></SessionUserContext.Provider>;
 }
 
 export default function App() {

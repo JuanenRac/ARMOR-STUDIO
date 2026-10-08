@@ -57,7 +57,10 @@ export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mo
   const [confirming, setConfirming] = useState<Confirming>(null);
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
   const [severity, setSeverity] = useState("all"), [source, setSource] = useState("all"), [query, setQuery] = useState("");
-  const active = alarms?.active ?? [], recent = alarms?.recent ?? [];
+  // What somebody has acknowledged is dealt with: it is not shown again as an alarm, whether its cause has ended or not; it is kept in the record below.
+  const everyActive = alarms?.active ?? [];
+  const active = everyActive.filter(alarm => !alarm.acknowledged_at);
+  const recent = [...(alarms?.recent ?? []), ...everyActive.filter(alarm => alarm.acknowledged_at)].sort((a, b) => b.raised_at.localeCompare(a.raised_at));
   const pending = active.filter(alarm => !alarm.acknowledged_at).length;
   const stateOf = (alarm: Alarm) => !alarm.acknowledged_at ? (alarm.cleared_at ? "ended" : "active") : "going";
   const worst = active.some(alarm => alarm.severity === "critical" && !alarm.acknowledged_at) ? "critical" : active.some(alarm => !alarm.acknowledged_at) ? "warning" : "clear";
@@ -147,7 +150,7 @@ export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mo
           {open.has(alarm.id) && <div className="alarm-record-facts"><AlarmFacts alarm={alarm} t={t} /></div>}
         </li>)}
       </ul>}
-      {(recent.length > 0 || active.some(alarm => alarm.acknowledged_at)) && <div className="users-actions"><button className="danger-button" onClick={() => setConfirming({ kind: "clear" })}>{t("clearRecord")}</button></div>}
+      {recent.length > 0 && <div className="users-actions"><button className="danger-button" onClick={() => setConfirming({ kind: "clear" })}>{t("clearRecord")}</button></div>}
     </article>
 
     {confirming && <ConfirmDialog t={t} danger
