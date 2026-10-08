@@ -2,7 +2,7 @@
  * Studio data hooks: everything that talks to ARMOR-SERVER on a timer.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { createCameraStreamUrl, listCameraStatus, listCameraViews, listConfiguredCameras, readInfo, readStatus, sessionUserState, type Reachability, type ServerInfo, type StudioUser } from "./api";
 import { mergeServerCameras } from "./cameras";
 import { DEMO_STATE, type Camera } from "./domain";
@@ -50,7 +50,7 @@ export function useServerStatus(origin: string): { state: SystemState; connectio
  * every minute, and asking again each time gave every picture a new address, so all the streams were dropped and started over (slow, and the pictures blinked).
  * A camera whose address cannot be had does not take the others with it.
  */
-export function useStreamUrls(origin: string, cameras: readonly Camera[]): Record<string, string> {
+export function useStreamUrls(origin: string, cameras: readonly Camera[]): { urls: Record<string, string>; renew: (id: string) => void } {
   const [urls, setUrls] = useState<Record<string, string>>({});
   const liveIds = cameras.filter(camera => camera.enabled && camera.liveVideoAvailable).map(camera => camera.id).sort().join(",");
   useEffect(() => {
@@ -64,7 +64,11 @@ export function useStreamUrls(origin: string, cameras: readonly Camera[]): Recor
     }
     return () => { cancelled = true; };
   }, [origin, liveIds]);
-  return urls;
+  // A new address for one camera whose picture stopped (the old one may have expired); the picture switches over when the new stream shows its first frame.
+  const renew = useCallback((id: string) => {
+    void createCameraStreamUrl(origin, id).then(url => setUrls(current => ({ ...current, [id]: url }))).catch(() => undefined);
+  }, [origin]);
+  return { urls, renew };
 }
 
 /**

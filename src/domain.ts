@@ -10,7 +10,7 @@ export const GRID_SIZES: readonly GridSize[] = [1, 2, 4, 6, 8, 9, 12, 16];
 
 export type Camera = {
   id: string; name: string; host: string; snapshotUrl: string; enabled: boolean; x: number; y: number;
-  username?: string; onvifPort?: number; rtspPort?: number; rtspPath?: string; hasCredentials?: boolean; liveVideoAvailable?: boolean;
+  username?: string; onvifPort?: number; rtspPort?: number; rtspPath?: string; previewPath?: string; hasCredentials?: boolean; liveVideoAvailable?: boolean;
   /** Where it faces, in degrees anticlockwise from east; unset means toward the middle of the site. */
   heading?: number;
   /** Degrees it looks down from the horizontal (0 = level). */

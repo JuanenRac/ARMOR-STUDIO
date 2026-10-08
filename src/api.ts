@@ -2,7 +2,7 @@ import type { SolarCatalog, SolarDeviceView, SolarKind, SolarRegistration, Solar
 import type { SystemState } from "./types";
 import type { DeviceNote, NetworkOverview, NetworkPort, NetworkSample } from "./networkModel";
 export type DiscoveredCamera = { host: string; ports: number[] };
-export type CameraConnection = { id: string; name: string; host: string; snapshotUrl: string; rtspPath: string; username: string; password: string; onvifPort: number; rtspPort: number };
+export type CameraConnection = { id: string; name: string; host: string; snapshotUrl: string; rtspPath: string; previewPath?: string; username: string; password: string; onvifPort: number; rtspPort: number };
 export type PublicCameraConnection = Omit<CameraConnection, "password"> & { hasCredentials: boolean; liveVideoAvailable: boolean };
 export type CameraView = Omit<PublicCameraConnection, "username">;
 export type MediaItem = { id: string; cameraId: string; kind: "snapshot" | "recording"; file: string; createdAt: string; bytes: number };
@@ -261,7 +261,9 @@ async function userCall<T>(origin: string, method: string, route: string, body?:
   });
   if (response.status === 204) return undefined as T;
   const parsed = await response.json().catch(() => ({})) as { code?: string; error?: string } & T;
-  if (!response.ok) throw new ApiError(response.status, parsed.code ?? (response.status === 403 || response.status === 401 ? "forbidden" : "generic"));
+  // The administration answers `{ error: "a_code" }` (some of them with a line number, "invalid_line:3"); the users' answers carry a separate `code`.
+  const machine = typeof parsed.error === "string" && /^[a-z_]+(:\d+)?$/.test(parsed.error) ? parsed.error : undefined;
+  if (!response.ok) throw new ApiError(response.status, parsed.code ?? machine ?? (response.status === 403 || response.status === 401 ? "forbidden" : "generic"));
   return parsed;
 }
 /** Who is signed in: the user, nobody (the server said so), or unknown (it could not be asked - never to be taken as "not an administrator"). */
@@ -283,6 +285,22 @@ export const listUsers = (origin: string) => userCall<{ users: ListedUser[]; min
 export const createUser = (origin: string, user: { username: string; password: string; role: Role }) => userCall<StudioUser>(origin, "POST", "/api/v1/users", user);
 export const updateUser = (origin: string, id: string, change: { username?: string; password?: string; role?: Role }) => userCall<StudioUser>(origin, "PATCH", `/api/v1/users/${encodeURIComponent(id)}`, change);
 export const deleteUser = (origin: string, id: string) => userCall<void>(origin, "DELETE", `/api/v1/users/${encodeURIComponent(id)}`);
+// ---- administration (an administrator): services, settings files, the broker's accounts, adopting a node ----
+export type AdminService = { id: string; unit: string; description: string; installed: boolean; active: string; sub: string; enabled: string; pid: number; since: string };
+export type AdminFileInfo = { id: string; path: string; format: string; description: string; units: string[]; exists: boolean; mtime: number };
+export type AdminFile = AdminFileInfo & { content: string; masked?: boolean };
+export type BrokerAccount = { user: string; role: string; name: string; manageable: boolean; topics: string[] };
+export type ProvisionResult = { ok: boolean; written: boolean; why: string; broker: { uri: string; username: string; password: string } };
+export const adminStatus = (origin: string) => userCall<{ available: boolean; reason?: string; hint?: string }>(origin, "GET", "/api/v1/admin/status");
+export const adminServices = (origin: string) => userCall<{ services: AdminService[] }>(origin, "GET", "/api/v1/admin/services");
+export const adminServiceAction = (origin: string, id: string, action: "start" | "stop" | "restart" | "reload") => userCall<{ ok: boolean }>(origin, "POST", `/api/v1/admin/services/${encodeURIComponent(id)}/${action}`);
+export const adminFiles = (origin: string) => userCall<{ files: AdminFileInfo[] }>(origin, "GET", "/api/v1/admin/files");
+export const adminFile = (origin: string, id: string) => userCall<AdminFile>(origin, "GET", `/api/v1/admin/files/${encodeURIComponent(id)}`);
+export const adminSaveFile = (origin: string, id: string, change: { content: string; restart: boolean; expect_mtime?: number }) => userCall<{ ok: boolean; restarted: string[]; mtime: number }>(origin, "PUT", `/api/v1/admin/files/${encodeURIComponent(id)}`, change);
+export const adminAccounts = (origin: string) => userCall<{ accounts: BrokerAccount[]; installed?: boolean }>(origin, "GET", "/api/v1/admin/mqtt/accounts");
+export const adminAddAccount = (origin: string, role: string, name: string) => userCall<{ ok: boolean; user: string; password: string }>(origin, "POST", "/api/v1/admin/mqtt/accounts", { role, name });
+export const adminRemoveAccount = (origin: string, user: string) => userCall<{ ok: boolean }>(origin, "DELETE", `/api/v1/admin/mqtt/accounts/${encodeURIComponent(user)}`);
+export const adminProvisionNode = (origin: string, request: { node_id: string; address: string; broker_host: string; broker_port?: number; panel_user?: string; panel_password?: string }) => userCall<ProvisionResult>(origin, "POST", "/api/v1/admin/nodes/provision", request);
 export const changeAccount = (origin: string, change: { currentPassword: string; username?: string; newPassword?: string }) => userCall<StudioUser>(origin, "PATCH", "/api/v1/account", change);
 
 /** Arm or disarm the system (an operator, from Studio). Answers with the new state of the perimeter. */

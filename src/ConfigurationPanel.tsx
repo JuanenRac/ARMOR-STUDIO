@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { readConnection, saveConnection, type ConnectionState } from "./api";
 import { UsersPanel } from "./UsersPanel";
+import { BrokerPanel, FilesPanel, ServicesPanel } from "./AdminPanel";
 import "./configuration.css";
 import { MenuTitle } from "./menuLogos";
 
-type Tab = "general" | "users" | "server";
+type Tab = "general" | "users" | "server" | "services" | "broker" | "files";
 type Props = {
   t: (key: string) => string;
   origin: string; setOrigin: (value: string) => void;
@@ -14,7 +15,7 @@ type Props = {
   operatorUnlocked: boolean; isAdmin: boolean;
 };
 
-const tabs: Tab[] = ["general", "users", "server"];
+const tabs: Tab[] = ["general", "users", "server", "services", "broker", "files"];
 
 /** Can the browser reach something at this address at all? (no-cors: only a network failure rejects, which is what a wrong scheme or port gives.) */
 async function reachable(url: string): Promise<boolean> {
@@ -84,5 +85,8 @@ export function ConfigurationPanel(props: Props) {
     </div>}
     {tab === "users" && <UsersPanel t={t} origin={props.origin} />}
     {tab === "server" && <ServerSettings t={t} origin={props.origin} isAdmin={props.isAdmin} />}
+    {tab === "services" && <ServicesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
+    {tab === "broker" && <BrokerPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
+    {tab === "files" && <FilesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
   </section>;
 }

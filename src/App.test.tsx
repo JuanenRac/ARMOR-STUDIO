@@ -24,3 +24,17 @@ describe("Studio internationalisation", () => {
     }
   });
 });
+
+describe("Studio help", () => {
+  it("explains every menu in all seven languages", async () => {
+    const { HELP_SECTIONS } = await import("./helpText");
+    const { NAV } = await import("./domain");
+    for (const [view] of NAV) expect(HELP_SECTIONS.some(section => section.id === view), view).toBe(true);
+    for (const section of HELP_SECTIONS) {
+      expect(section.title).toHaveLength(7);
+      expect(section.body).toHaveLength(7);
+      for (const body of section.body) expect(body.length, section.id).toBeGreaterThan(150);
+    }
+    for (const locale of locales) expect(text(locale, "help_b_start").length).toBeGreaterThan(150);
+  });
+});

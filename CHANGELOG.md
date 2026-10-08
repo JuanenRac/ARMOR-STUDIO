@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.1] - Help, hints on everything, administration and live video that reconnects
+
+- **Alarms:** what somebody has acknowledged leaves the list and stays in the Record below, whether its cause has ended or not (the whole story stays in History); if it is deleted while the cause goes on, it does not come back until the cause happens again.
+- **Hints on everything:** pausing the pointer over a button, field or menu entry shows a short explanation, in the language of the interface; a new screen needs only a row in the catalogue.
+- **Help:** a new button next to *About* opens a window that explains every menu in detail (a list of sections and the chosen one), in all seven languages, and opens on the section of the screen you are in.
+- **Configuration > Services, MQTT broker and Settings files (administrators):** see the A.R.M.O.R. services and start, stop or restart them; give each node, device or consumer its own broker account (any number, any kind; the password is shown once) and edit the broker's settings and permissions; read and change every settings file of the system, with secrets hidden and a copy of the old file kept. They need the admin agent (`install_cm5.sh --with-admin`); without it they say so.
+- **Adopt a node:** in the list of nodes found on the network, *Add to the system* makes the node's broker account and writes it into the node with the login of its own panel (used once, never kept), so it starts reporting by itself; if the panel cannot be written to, the account is shown to type in by hand.
+- **Camera video:** the full-screen picture now asks for its address the same way the tiles do (it did not, and could fail where the tiles worked); a picture whose stream stops asks for a new address by itself, 1.5 s later, then 3, 6, up to 15 s; the camera form has a field for the lighter stream used for the live picture.
+
 ## [0.6.0] - Language and the weather place now follow the account, not the browser
 
 - **Language, theme and the saved weather place were only in this browser's own storage:** signing in from a different address (another network, a new fixed IP after moving the server) looked like every one of them had been reset, because a browser keeps that storage separate for every address it visits. They are now also kept server-side (`GET`/`PUT /api/v1/preferences`, ARMOR-SERVER 0.4.1), tied to the account; the browser's own copy stays as the first paint and the offline fallback, but the server's value wins once it answers.
