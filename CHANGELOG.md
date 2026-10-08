@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.2] - Node firmware, from Studio
+
+- **Configuration > Node firmware (administrators):** choose a type of node (radar, solar, electrical, touch panel), tick the nodes found on the network (a button ticks all of that type, and another asks each for its version), type the login of the nodes' own panel (used for the update only, never kept), choose the source - the newest release on GitHub (checked against the hash it publishes) or a `.bin` file of this computer - and update them one after another. Each node shows where it is (signing in, sending the image, restarting, updated) and its version before and after, or why it failed. It confirms first, in the seven languages, with hover hints and a paragraph in the help.
+
 ## [0.6.1] - Help, hints on everything, administration and live video that reconnects
 
 - **Alarms:** what somebody has acknowledged leaves the list and stays in the Record below, whether its cause has ended or not (the whole story stays in History); if it is deleted while the cause goes on, it does not come back until the cause happens again.

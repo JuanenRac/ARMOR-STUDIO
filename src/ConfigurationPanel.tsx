@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { readConnection, saveConnection, type ConnectionState } from "./api";
 import { UsersPanel } from "./UsersPanel";
 import { BrokerPanel, FilesPanel, ServicesPanel } from "./AdminPanel";
+import { FirmwarePanel } from "./FirmwarePanel";
+import type { NetworkOverview } from "./networkModel";
 import "./configuration.css";
 import { MenuTitle } from "./menuLogos";
 
-type Tab = "general" | "users" | "server" | "services" | "broker" | "files";
+type Tab = "general" | "users" | "server" | "services" | "broker" | "files" | "firmware";
 type Props = {
   t: (key: string) => string;
   origin: string; setOrigin: (value: string) => void;
@@ -13,9 +15,11 @@ type Props = {
   language: string; languages: readonly { code: string; name: string }[]; setLanguage: (value: string) => void;
   connection: string; savePreferences: () => void; exportSite: () => void;
   operatorUnlocked: boolean; isAdmin: boolean;
+  /** What the network node has found: the nodes to update are picked from it. */
+  network?: NetworkOverview | null;
 };
 
-const tabs: Tab[] = ["general", "users", "server", "services", "broker", "files"];
+const tabs: Tab[] = ["general", "users", "server", "services", "broker", "files", "firmware"];
 
 /** Can the browser reach something at this address at all? (no-cors: only a network failure rejects, which is what a wrong scheme or port gives.) */
 async function reachable(url: string): Promise<boolean> {
@@ -88,5 +92,6 @@ export function ConfigurationPanel(props: Props) {
     {tab === "services" && <ServicesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "broker" && <BrokerPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "files" && <FilesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
+    {tab === "firmware" && <FirmwarePanel t={t} origin={props.origin} isAdmin={props.isAdmin} network={props.network ?? null} />}
   </section>;
 }
