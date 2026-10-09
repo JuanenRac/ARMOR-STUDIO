@@ -308,7 +308,7 @@ export type FirmwareTargetState = "waiting" | "checking" | "signing_in" | "uploa
 export type FirmwareTarget = { address: string; node_id?: string; state: FirmwareTargetState; version_before?: string; version_after?: string; error?: string; progress?: number; sent?: number; total?: number; waited_s?: number };
 export type FirmwareJob = { id: string; kind: FirmwareKind; source: "github" | "upload"; state: "preparing" | "running" | "done" | "failed"; version?: string; bytes?: number; sha256?: string; error?: string; targets: FirmwareTarget[] };
 export type FirmwareRelease = { kind: FirmwareKind; repo: string; version: string; bytes: number; checksum: boolean };
-export type FirmwareProbe = { address: string; reachable: boolean; node_id?: string; version?: string; board?: string };
+export type FirmwareProbe = { address: string; reachable: boolean; node_id?: string; version?: string; board?: string; /** radar, solar, electrical or hmi, from the firmware that says it. */ kind?: string };
 export type FirmwareUpload = { id: string; name: string; bytes: number; sha256: string };
 export const firmwareRelease = (origin: string, kind: FirmwareKind) => userCall<FirmwareRelease>(origin, "GET", `/api/v1/admin/firmware/releases/${kind}`);
 export const firmwareProbe = (origin: string, addresses: string[]) => userCall<{ nodes: FirmwareProbe[] }>(origin, "POST", "/api/v1/admin/firmware/probe", { addresses });
