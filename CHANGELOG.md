@@ -4,7 +4,7 @@ All notable changes to this project are documented here.
 
 ## [0.6.6] - A wider Help window, and Studio in a real browser
 
-- **The Help window is twice as wide** (up to the width of the screen) and its list of sections is wider too, so the text no longer reads as a narrow column.
+- **The Help window is twice as wide** (980 px instead of 480 px, or the width of the screen if that is smaller). Its width had never applied: the generic dialog rule (480 px) was loaded after it and won, so the Help window was as narrow as the About window; the rule now names both classes.
 - **Browser tests, optional** (`e2e/`, Playwright): a script that opens Studio in the Edge that Windows already has, checks the login screen and, given an administrator's name and password, opens every menu of the sidebar and fails on any script error. It is run by hand against a running Studio and is not part of the CI; see `e2e/README.md`.
 
 ## [0.6.5] - The alarm of a camera that saw movement
