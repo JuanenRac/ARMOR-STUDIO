@@ -17,6 +17,17 @@ describe("finding nodes on the network", () => {
     const found = findNodeCandidates(network, ["radar-1"]);
     expect(found.map(item => [item.ip, item.nodeId])).toEqual([["192.168.0.50", "solar-1"], ["192.168.0.52", undefined], ["192.168.0.54", "solar-2"]]);
   });
+  it("tells a radar node from a solar one by its name when its panel cannot answer, and keeps a switched-off device of unknown kind out of the menus", () => {
+    const off = { nodes: [{ stale: false, devices: [
+      device("192.168.0.70", { hostname: "armor-nodo-radar-1", online: false }),
+      device("192.168.0.71", { hostname: "armor-solar-2", online: false }),
+      device("192.168.0.72", { hostname: "armor-56318f", online: false }),
+      device("192.168.0.73", { hostname: "armor-56318f", online: true }),
+    ] }] } as unknown as NetworkOverview;
+    expect(findNodeCandidates(off, [], [], "solar").map(item => item.ip)).toEqual(["192.168.0.73", "192.168.0.71"]);
+    expect(findNodeCandidates(off, [], [], "radar").map(item => item.ip)).toEqual(["192.168.0.73", "192.168.0.70"]);
+    expect(findNodeCandidates(off, [], [], "electrical").map(item => item.ip)).toEqual(["192.168.0.73"]);
+  });
   it("leaves out a node known by its address, and handles no network", () => {
     expect(findNodeCandidates(network, [], ["192.168.0.50"]).map(item => item.ip)).not.toContain("192.168.0.50");
     expect(findNodeCandidates(null, [])).toEqual([]);

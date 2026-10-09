@@ -4,9 +4,10 @@
  * opened, and in the solar menus its name goes into the form of a new equipment.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import { useContext, useMemo, useState, type FormEvent } from "react";
-import { adminProvisionNode, ApiError, sendNetworkOrder, type ProvisionResult } from "./api";
+import { useContext, useEffect, useMemo, useState, type FormEvent } from "react";
+import { adminProvisionNode, ApiError, firmwareProbe, sendNetworkOrder, type ProvisionResult } from "./api";
 import { SessionUserContext } from "./sessionContext";
+import { KnownNodesContext } from "./knownNodes";
 import type { Translate } from "./components/camera";
 import type { NetworkOverview } from "./networkModel";
 
@@ -18,12 +19,15 @@ export type NodeCandidate = {
 };
 
 /** The kind a device's web panel says it is, from the title banner the network node reads when it probes port 80 or 443 ("A.R.M.O.R. radar", "...solar", "...electrical"). */
-function kindOf(device: { ports?: readonly { banner?: string }[] }): NodeKind | undefined {
-  const banners = (device.ports ?? []).map(port => port.banner ?? "").join(" ").toLowerCase();
-  if (banners.includes("radar")) return "radar";
-  if (banners.includes("solar")) return "solar";
-  if (banners.includes("electrical")) return "electrical";
+function kindIn(text: string): NodeKind | undefined {
+  if (text.includes("radar")) return "radar";
+  if (text.includes("solar")) return "solar";
+  if (text.includes("electric") || text.includes("elec-")) return "electrical";
   return undefined;
+}
+/** The kind of a node: what its own panel says (the banner), and failing that what its name says ("nodo-radar-1" is a radar node) - a node switched off has no banner. */
+function kindOf(device: { hostname?: string; ports?: readonly { banner?: string }[] }): NodeKind | undefined {
+  return kindIn((device.ports ?? []).map(port => port.banner ?? "").join(" ").toLowerCase()) ?? kindIn((device.hostname ?? "").toLowerCase());
 }
 
 const HOST_PREFIX = "armor-";
@@ -43,6 +47,7 @@ export function findNodeCandidates(network: NetworkOverview | null, knownIds: It
       seen.add(device.ip);
       const kind = kindOf(device);
       if (wantKind && kind && kind !== wantKind) continue;
+      if (wantKind && !kind && !device.online) continue;   // a device that is off and says nothing about its kind cannot be told from a node of another menu, and cannot be adopted now anyway
       found.push({ ip: device.ip, mac: device.mac, hostname: device.hostname, vendor: device.vendor, online: device.online, ...(nodeId ? { nodeId } : {}), ...(kind ? { kind } : {}) });
     }
   }
@@ -91,7 +96,19 @@ export function NodeFinder({ t, origin, network, knownIds, knownIps, wantKind, o
   /** Solar menus: put the node in the form of a new equipment. */
   onUse?: (nodeId: string) => void;
 }) {
-  const candidates = useMemo(() => findNodeCandidates(network, knownIds, knownIps, wantKind), [network, knownIds, knownIps, wantKind]);
+  const everywhere = useContext(KnownNodesContext);
+  const listed = useMemo(() => findNodeCandidates(network, [...knownIds, ...everywhere.ids], [...(knownIps ?? []), ...everywhere.ips], wantKind), [network, knownIds, knownIps, everywhere, wantKind]);
+  // A node whose panel title could not be read is asked for its kind (its own session answer says it), so a radar node never shows in the solar menu or the other way round.
+  const [asked, setAsked] = useState<Record<string, string>>({});
+  const toAsk = listed.filter(item => item.online && !item.kind && asked[item.ip] === undefined).map(item => item.ip).join(",");
+  const mayAsk = useContext(SessionUserContext)?.user?.role === "admin";
+  useEffect(() => {
+    if (!toAsk || !mayAsk) return;
+    let cancelled = false;
+    void firmwareProbe(origin, toAsk.split(",")).then(reply => { if (!cancelled) setAsked(current => ({ ...current, ...Object.fromEntries(reply.nodes.map(node => [node.address, node.kind ?? ""])) })); }).catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [toAsk, origin, mayAsk]);
+  const candidates = useMemo(() => listed.filter(item => !(wantKind && !item.kind && asked[item.ip] && asked[item.ip] !== wantKind)), [listed, asked, wantKind]);
   const [state, setState] = useState<"idle" | "searching" | "failed">("idle");
   const isAdmin = useContext(SessionUserContext)?.user?.role === "admin";
   const [adopting, setAdopting] = useState("");
