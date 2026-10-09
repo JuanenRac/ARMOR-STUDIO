@@ -58,6 +58,7 @@ const TOOL_ICONS: Record<Tool, ReactNode> = {
   device: frame(<><circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" strokeWidth="1.3" /><path d="M8 3h8M8 21h8" strokeWidth="1.2" /></>),
   camera: frame(<><rect x="3" y="7" width="13" height="10" rx="2" /><path d="M16 11l5-3v8l-5-3" /><circle cx="9.5" cy="12" r="2.2" /></>),
   sensor: frame(<><circle cx="6" cy="18" r="1.8" fill="currentColor" /><path d="M9 14a6 6 0 0 1 6-6M9 10a10 10 0 0 1 10-6" /><path d="M12 18a6 6 0 0 0 6-6" /></>),
+  floor: frame(<><path d="M3 18l4-9h10l4 9z" /><path d="M4.5 14.5h15M8.5 9L7 18M12 9v9M15.5 9L17 18" strokeWidth="1.2" /></>),
   wall: frame(<><path d="M3 6h18v12H3z" /><path d="M3 12h18M9 6v6M15 12v6" /></>),
   fireplace: frame(<><path d="M4 20V8h16v12z" /><path d="M8 20v-5a4 4 0 0 1 8 0v5" /><path d="M12 19c-1.6-1-1.2-2.6 0-4.2 1.2 1.6 1.6 3.2 0 4.2z" fill="currentColor" fillOpacity=".3" /><path d="M2 8h20" /></>),
   stairs: frame(<><path d="M3 20h5v-4h5v-4h5V8h3" /><path d="M3 20h18" /></>),

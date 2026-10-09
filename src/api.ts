@@ -391,6 +391,9 @@ export const updateAutomation = (origin: string, id: string, input: AutomationIn
 export const deleteAutomation = (origin: string, id: string) => userCall<void>(origin, "DELETE", `/api/v1/automations/${encodeURIComponent(id)}`);
 export const runAutomation = (origin: string, id: string) => userCall<{ ok: boolean }>(origin, "POST", `/api/v1/automations/${encodeURIComponent(id)}/run`);
 export const readSystem = (origin: string) => userCall<SystemSummary>(origin, "GET", "/api/v1/system");
+/** What the nodes sent that the server took, refused or partly ignored, per topic. */
+export type IngestTopic = { topic: string; accepted: number; rejected: number; ignored_fields: string[]; last_ok_at: string | null; last_error: string | null; last_error_at: string | null; last_payload: string | null };
+export const readIngest = (origin: string) => userCall<{ topics: IngestTopic[] }>(origin, "GET", "/api/v1/system/ingest");
 export const readAudit = (origin: string, limit = 100) => userCall<{ entries: AuditEntry[] }>(origin, "GET", `/api/v1/audit?limit=${limit}`);
 export const readSite = (origin: string) => userCall<SiteDocument>(origin, "GET", "/api/v1/site");
 /** Save the design. A 409 (someone saved first) comes back as an ApiError whose `current` holds their version. */
@@ -510,6 +513,16 @@ export async function listSolar(origin: string): Promise<SolarOverview> {
 export const saveSolarDevice = (origin: string, device: { kind: SolarKind; name: string; node_id: string; device?: string; model: string; connection: string; notes: string }) => userCall<SolarRegistration>(origin, "POST", "/api/v1/solar/devices", device);
 export const deleteSolarDevice = (origin: string, node: string, device: string) => userCall<void>(origin, "DELETE", `/api/v1/solar/devices/${encodeURIComponent(node)}/${encodeURIComponent(device)}`);
 export const solarExample = (origin: string, node: string, device: string) => userCall<{ accepted: boolean }>(origin, "POST", `/api/v1/solar/devices/${encodeURIComponent(node)}/${encodeURIComponent(device)}/example`);
+/** The energy of each day, in kilowatt-hours (see the server's /solar/energy). */
+export type SolarEnergyDay = { date: string; pv_kwh: number; load_kwh: number; battery_in_kwh: number; battery_out_kwh: number };
+export const solarEnergy = (origin: string, days: number) => userCall<{ days: SolarEnergyDay[] }>(origin, "GET", `/api/v1/solar/energy?days=${days}`);
+/** The samples of one channel of an electrical node, oldest first. */
+export async function electricalHistory(origin: string, node: string, channel: string, minutes: number): Promise<{ samples: SolarSample[] }> {
+  const query = new URLSearchParams({ node, channel, minutes: String(minutes) });
+  const response = await timedFetch(endpoint(origin, `/api/v1/electrical/history?${query}`), { headers: { Accept: "application/json" }, ...localSession });
+  if (!response.ok) throw new Error(`Electrical history returned ${response.status}`);
+  return response.json() as Promise<{ samples: SolarSample[] }>;
+}
 export async function solarHistory(origin: string, node: string, device: string, minutes: number): Promise<{ samples: SolarSample[] }> {
   const query = new URLSearchParams({ node, device, minutes: String(minutes) });
   const response = await timedFetch(endpoint(origin, `/api/v1/solar/history?${query}`), { headers: { Accept: "application/json" }, ...localSession });

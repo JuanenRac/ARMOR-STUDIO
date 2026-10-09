@@ -9,6 +9,7 @@ import type { Translate } from "../components/camera";
 import "./system.css";
 import { MenuTitle } from "../menuLogos";
 import { MachineMonitor } from "./MachineMonitor";
+import { NodeMessages } from "./NodeMessages";
 
 const size = (bytes: number): string => bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1)} GB` : bytes >= 1e6 ? `${(bytes / 1e6).toFixed(1)} MB` : `${Math.round(bytes / 1e3)} kB`;
 export const uptimeText = (seconds: number, t: Translate): string => {
@@ -51,6 +52,7 @@ export function SystemView({ t, origin, isAdmin }: { t: Translate; origin: strin
         <article className="stack-card"><h3>{t("sysLinks")}</h3>{link(system.mqtt, t("sysMqtt"))}{link(system.live_video, t("sysVideo"))}{link(system.webhook, t("sysWebhook"))}</article>
       </div>
     </>}
+    <NodeMessages t={t} origin={origin} />
     <article className="stack-card audit-card">
       <h3>{t("auditTitle")}</h3>
       {!isAdmin ? <p className="muted">{t("auditOnlyAdmin")}</p> : <>

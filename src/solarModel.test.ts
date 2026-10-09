@@ -90,6 +90,12 @@ describe("history charts", () => {
     const hour = 3_600_000;
     expect(timeTicks(0, hour)).toEqual([0, 600_000, 1_200_000, 1_800_000, 2_400_000, 3_000_000, 3_600_000]);
     expect(timeTicks(hour * 0.5, hour * 6.5)).toEqual([1, 2, 3, 4, 5, 6].map(h => h * hour));
+    // longer windows: a day, a week, a month still have a handful of ticks, never dozens
+    for (const days of [1, 3, 7, 30]) {
+      const ticks = timeTicks(0, days * 24 * hour);
+      expect(ticks.length, `${days} d`).toBeGreaterThan(2);
+      expect(ticks.length, `${days} d`).toBeLessThanOrEqual(13);
+    }
     expect(timeTicks(0, hour * 24)).toHaveLength(7);
   });
 });

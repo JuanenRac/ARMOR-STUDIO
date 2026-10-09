@@ -168,7 +168,7 @@ export function nearestSample(samples: readonly SolarSample[], t: number): Solar
 
 /** Clock ticks for a window: whole hours (or half hours, or ten minutes) that fall inside it. */
 export function timeTicks(from: number, to: number): number[] {
-  const span = to - from, step = span <= 3_600_000 * 1.5 ? 600_000 : span <= 3_600_000 * 8 ? 3_600_000 : 4 * 3_600_000;
+  const hour = 3_600_000, span = to - from, step = span <= hour * 1.5 ? 600_000 : span <= hour * 8 ? hour : span <= hour * 36 ? 4 * hour : span <= hour * 96 ? 12 * hour : span <= hour * 24 * 12 ? 24 * hour : 5 * 24 * hour;
   const first = Math.ceil(from / step) * step, ticks: number[] = [];
   for (let t = first; t <= to; t += step) ticks.push(t);
   return ticks;

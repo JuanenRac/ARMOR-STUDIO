@@ -124,11 +124,11 @@ describe("one tool panel for both views", () => {
     expect(groupOf("fence")).toBe(groupOf("gate")); expect(groupOf("door")).toBe(groupOf("garage")); expect(groupOf("door")).toBe(groupOf("window"));
     expect(groupOf("tree")).toBe(groupOf("planter")); expect(groupOf("pool")).toBe(groupOf("terrace")); expect(groupOf("kennel")).toBe(groupOf("coop"));
     expect(groupOf("path")).toBe(groupOf("road")); expect(groupOf("road")).toBe(groupOf("sidewalk"));
-    expect(groups.flat().length).toBe(61);   // no tool was lost or repeated
-    expect(new Set(groups.flat()).size).toBe(61);
+    expect(groups.flat().length).toBe(62);   // no tool was lost or repeated
+    expect(new Set(groups.flat()).size).toBe(62);
   });
   it("has its own floating panel for the inside of a building, with every piece working in both views", () => {
-    const inside = ["wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv"] as const;
+    const inside = ["floor", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv"] as const;
     const branch = BRANCHES.find(item => item.id === "interior");
     expect(branch?.tools).toEqual(inside);
     for (const tool of inside) {

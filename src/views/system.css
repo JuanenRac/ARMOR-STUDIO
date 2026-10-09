@@ -12,3 +12,12 @@
 .audit-row { display: grid; grid-template-columns: 170px 110px 1fr 90px; gap: .6rem; padding: .45rem .7rem; background: #08171f; font-size: .72rem; align-items: center; } .audit-row.head { position: sticky; top: 0; background: #0d2b36; color: #63e6f2; font: 700 .6rem "DM Mono", ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
 .audit-row.denied { background: #1c1216; } .audit-row.failed { background: #1c1810; } .outcome.allowed { color: #5df0c4; } .outcome.denied { color: #ff8e99; } .outcome.failed { color: #ffcf7d; } .audit-row b { color: #eafcff; }
 @media (max-width: 900px) { .audit-row { grid-template-columns: 1fr; gap: .1rem; } }
+
+.ingest-table { display: grid; gap: .1rem; margin-top: .6rem; }
+.ingest-row { display: grid; grid-template-columns: minmax(0, 3fr) 70px 70px 110px; gap: .6rem; align-items: center; padding: .25rem .4rem; font-size: .72rem; }
+.ingest-row.head { color: var(--t-muted, #8eb1bb); font-size: .62rem; letter-spacing: .06em; text-transform: uppercase; }
+.ingest-row span { overflow-wrap: anywhere; }
+.ingest-row .bad, .ingest-note.bad b { color: #ff8e99; }
+.ingest-item.has-bad { border-left: 2px solid #ff6f79; }
+.ingest-note { margin: 0 0 .3rem; padding: 0 .4rem .2rem; display: grid; gap: .2rem; }
+.ingest-note code { display: block; padding: .3rem .4rem; border-radius: 6px; background: rgba(0, 0, 0, .35); font: .62rem "DM Mono", ui-monospace, monospace; overflow-wrap: anywhere; max-height: 5.5rem; overflow: auto; }

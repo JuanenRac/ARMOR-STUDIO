@@ -5,7 +5,7 @@
  */
 import { readColour } from "./designer/colors";
 import { parseServerOrigin } from "./config";
-import { FEATURE_STYLES, MAST_PART_KINDS, type DevicePlacement, type MastPart, LANGUAGES, THEMES, type Building, type Camera, type Dimensions, type LanguageCode, type Opening, type Point, type Roof, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type Terrain, type Theme, type WallLamp, BUILDING_USES, BUILDING_MATERIALS, OPENING_STYLES, LAMP_KINDS } from "./domain";
+import { FEATURE_STYLES, FLOOR_STYLES, MAST_PART_KINDS, type DevicePlacement, type MastPart, LANGUAGES, THEMES, type Building, type Camera, type Dimensions, type LanguageCode, type Opening, type Point, type Roof, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type Terrain, type Theme, type WallLamp, BUILDING_USES, BUILDING_MATERIALS, OPENING_STYLES, LAMP_KINDS } from "./domain";
 import { isSimplePolygon } from "./designer/geometry";
 
 export const SETTINGS_KEY = "armor-studio-settings-v1";
@@ -71,7 +71,7 @@ function readSensor(raw: unknown): Sensor | null {
 
 const COORDINATE_LIMIT = 5000;
 const ROOF_STYLES: readonly RoofStyle[] = ["flat", "shed", "gable", "hip", "pyramid"];
-const FEATURE_KINDS = ["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv"] as const;
+const FEATURE_KINDS = ["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "floor"] as const;
 const ROOF_ITEM_KINDS = ["chimney", "solar", "antenna", "vent", "gutter", "downpipe"] as const;
 const num = (raw: Record<string, unknown>, key: string, fallback: number, low: number, high: number) => finite(raw[key]) ? clamp(raw[key] as number, low, high) : fallback;
 const integer = (raw: Record<string, unknown>, key: string, high: number): number | null => finite(raw[key]) && Number.isInteger(raw[key]) && (raw[key] as number) >= 0 && (raw[key] as number) <= high ? (raw[key] as number) : null;
@@ -102,12 +102,19 @@ function readRoof(raw: unknown): Roof {
 
 const oneOf = <T extends string>(list: readonly T[], value: unknown): T | undefined => (typeof value === "string" && (list as readonly string[]).includes(value) ? (value as T) : undefined);
 
+/** The finish and colour of each level of a building: only the ones that are known are kept, and nothing at all when no level has one. */
+function readFloorFinish(raw: Record<string, unknown>): Pick<Building, "floorMaterials" | "floorColors"> {
+  const styles = Array.isArray(raw.floorMaterials) ? raw.floorMaterials.slice(0, LIMITS.floors).map(value => (typeof value === "string" && (FLOOR_STYLES as readonly string[]).includes(value) ? value : "")) : [];
+  const colours = Array.isArray(raw.floorColors) ? raw.floorColors.slice(0, LIMITS.floors).map(value => readColour(value) ?? "") : [];
+  return { ...(styles.some(Boolean) ? { floorMaterials: styles } : {}), ...(colours.some(Boolean) ? { floorColors: colours } : {}) };
+}
+
 function readBuilding(raw: unknown): Building | null {
   if (!isRecord(raw) || !id(raw.id)) return null;
   const name = label(raw.name, 80), points = readPoints(raw.points);
   if (name === null || !points) return null;
   const floors = Array.isArray(raw.floors) ? raw.floors.slice(0, LIMITS.floors).filter(finite).map(height => clamp(height, 0.5, 20)) : [];
-  return { id: raw.id, name, points, base: num(raw, "base", 0, -50, 500), floors: floors.length ? floors : [3], roof: readRoof(raw.roof), thickness: num(raw, "thickness", 0.2, 0.05, 1), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}), ...(readColour(raw.roofColor) ? { roofColor: readColour(raw.roofColor) } : {}), ...(raw.roofHidden === true ? { roofHidden: true } : {}) , ...(oneOf(BUILDING_USES, raw.use) ? { use: oneOf(BUILDING_USES, raw.use) } : {}), ...(oneOf(BUILDING_MATERIALS, raw.material) ? { material: oneOf(BUILDING_MATERIALS, raw.material) } : {}) };
+  return { id: raw.id, name, points, base: num(raw, "base", 0, -50, 500), floors: floors.length ? floors : [3], roof: readRoof(raw.roof), thickness: num(raw, "thickness", 0.2, 0.05, 1), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}), ...(readColour(raw.roofColor) ? { roofColor: readColour(raw.roofColor) } : {}), ...(raw.roofHidden === true ? { roofHidden: true } : {}) , ...(oneOf(BUILDING_USES, raw.use) ? { use: oneOf(BUILDING_USES, raw.use) } : {}), ...(oneOf(BUILDING_MATERIALS, raw.material) ? { material: oneOf(BUILDING_MATERIALS, raw.material) } : {}), ...readFloorFinish(raw) };
 }
 
 function readOpening(raw: unknown): Opening | null {

@@ -4,10 +4,10 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useMemo, useState } from "react";
-import { solarHistory } from "../api";
+import { solarEnergy, solarHistory } from "../api";
 import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
-import { FlowDiagram, Gauge, InverterLogo, LineChart, SOLAR_COLOURS } from "../solarGraphics";
+import { EnergyBars, FlowDiagram, Gauge, InverterLogo, LineChart, SOLAR_COLOURS } from "../solarGraphics";
 import { displayName, flowsOf, formatPower, humanize, levelTone, niceScale, type SolarCatalog, type SolarDeviceView, type SolarInverterReading, type SolarRegistration, type SolarTotals } from "../solarModel";
 import { SolarEquipment } from "../SolarEquipment";
 import { SolarNodes } from "../SolarNodes";
@@ -16,7 +16,7 @@ import "./solar.css";
 
 type Props = { t: Translate; origin: string; devices: SolarDeviceView[]; waiting: SolarRegistration[]; catalog: SolarCatalog | null; reload: () => void; totals: SolarTotals | null; now: number; unreachable: boolean; network?: NetworkOverview | null };
 type Inverter = SolarDeviceView & { reading: SolarInverterReading };
-const RANGES = [{ minutes: 60, key: "solarRange1" }, { minutes: 360, key: "solarRange6" }, { minutes: 1440, key: "solarRange24" }] as const;
+const RANGES = [{ minutes: 60, key: "solarRange1" }, { minutes: 360, key: "solarRange6" }, { minutes: 1440, key: "solarRange24" }, { minutes: 10_080, key: "solarRange7" }, { minutes: 43_200, key: "solarRange30" }] as const;
 const TONE = { ok: SOLAR_COLOURS.battery, warn: SOLAR_COLOURS.pv, bad: SOLAR_COLOURS.bad } as const;
 
 export function InvertersView({ t, origin, devices, totals, now, unreachable, waiting, catalog, reload, network }: Props) {
@@ -46,6 +46,7 @@ export function InvertersView({ t, origin, devices, totals, now, unreachable, wa
         return <button key={key} role="tab" aria-selected={item === current} className={item === current ? "active" : ""} onClick={() => setChosen(key)}>{displayName(item)}{item.stale && <i className="solar-stale-dot" title={t("solarStale")} />}</button>;
       })}</div>}
       {current && <InverterPanel t={t} inverter={current} now={now} history={history.data?.samples ?? []} minutes={minutes} setMinutes={setMinutes} />}
+      <EnergyCard t={t} origin={origin} kind="inverter" />
     </>}
   </div>;
 }
@@ -113,4 +114,20 @@ function InverterPanel({ t, inverter, now, history, minutes, setMinutes }: { t: 
       <LineChart t={t} samples={history} from={from} to={now} series={[{ key: "battery_percent", label: t("solarChargeLevel"), color: SOLAR_COLOURS.battery, unit: "%" }]} />
     </section>
   </>;
+}
+
+/** The energy of each day (what the panels made and the load used, or what the battery took and gave): the last week or month, as bars. */
+export function EnergyCard({ t, origin, kind }: { t: Translate; origin: string; kind: "inverter" | "battery" }) {
+  const [days, setDays] = useState(14);
+  const energy = usePolled(() => solarEnergy(origin, days), 60_000, `${origin}/${days}`).data?.days ?? [];
+  const series = kind === "inverter"
+    ? [{ key: "pv_kwh", label: t("enPv"), color: SOLAR_COLOURS.pv }, { key: "load_kwh", label: t("enLoad"), color: SOLAR_COLOURS.load }]
+    : [{ key: "battery_in_kwh", label: t("enIn"), color: SOLAR_COLOURS.battery }, { key: "battery_out_kwh", label: t("enOut"), color: SOLAR_COLOURS.pv }];
+  return <section className="solar-card">
+    <div className="solar-card-head"><h3>{t("enTitle")}</h3>
+      <div className="solar-ranges">{[14, 30, 90].map(count => <button key={count} className={days === count ? "active" : ""} onClick={() => setDays(count)}>{count} {t("daysShort")}</button>)}</div>
+    </div>
+    <p className="muted small">{t("enHelp")}</p>
+    <EnergyBars t={t} days={energy} series={series} />
+  </section>;
 }

@@ -64,9 +64,14 @@ export const BUILDING_USES = ["house", "garage", "workshop", "shed", "barn", "of
 export type BuildingUse = (typeof BUILDING_USES)[number];
 export const BUILDING_MATERIALS = ["plaster", "brick", "stone", "wood", "concrete", "metal"] as const;
 export type BuildingMaterial = (typeof BUILDING_MATERIALS)[number];
+/** What a floor can be made of: wood (parquet, laminate), tile (ceramic, marble, stone, terrazzo), soft (vinyl, carpet) or poured (micro-cement, plain concrete). */
+export const FLOOR_STYLES = ["flParquet", "flLaminate", "flCeramic", "flMarble", "flStone", "flTerrazzo", "flVinyl", "flCarpet", "flMicrocement", "flConcrete"] as const;
+export type FloorStyle = (typeof FLOOR_STYLES)[number];
 export type Building = { id: string; name: string; points: Point[]; base: number; floors: number[]; roof: Roof; thickness: number; /** Wall and roof colours, "#rrggbb"; unset keeps the default. */ color?: string; roofColor?: string; /** The roof is taken off, to see the rooms of the top floor from above. */ roofHidden?: boolean
   /** What the building is used for, and what its walls are made of: they describe it, they do not change the drawing. */
-  use?: BuildingUse; material?: BuildingMaterial };
+  use?: BuildingUse; material?: BuildingMaterial;
+  /** The finish and the colour of the floor of each level (index 0 is the ground floor); "" or missing: the plain concrete slab. */
+  floorMaterials?: string[]; floorColors?: string[] };
 
 /** A door, a window, a garage door (wide, sectional) or a plain opening in a wall (for an awning, an arch). */
 export const OPENING_STYLES: Partial<Record<"door" | "window" | "garage" | "opening", readonly string[]>> = {
@@ -92,11 +97,12 @@ export type WallLamp = { id: string; buildingId: string; edge: number; offset: n
 
 /** Objects standing on the ground. `lamp` is a lamp post (a tube of `height` with the light on top), `mast` an antenna mast. */
 export type SiteFeatureKind = "pillar" | "lamp" | "mast" | "solar" | "canopy" | "entrance" | "path" | "road" | "tree" | "kennel" | "fence" | "fountain" | "coop" | "gate" | "sidewalk" | "pool" | "planter" | "terrace" | "bench" | "table" | "barbecue" | "pergola" | "shed" | "hedge" | "mailbox" | "bins" | "tank" | "ac-unit" | "electrical-box" | "car"
-  | "wall" | "fireplace" | "stairs" | "kitchen" | "bathroom" | "bed" | "wardrobe" | "sofa" | "armchair" | "dining" | "tv";
+  | "floor" | "wall" | "fireplace" | "stairs" | "kitchen" | "bathroom" | "bed" | "wardrobe" | "sofa" | "armchair" | "dining" | "tv";
 /** The objects of the inside of a building (walls, fireplaces, the kitchen, furniture...), drawn on the floor they stand on: their own floating panel. */
-export const INTERIOR_KINDS: ReadonlySet<SiteFeatureKind> = new Set<SiteFeatureKind>(["wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv"]);
+export const INTERIOR_KINDS: ReadonlySet<SiteFeatureKind> = new Set<SiteFeatureKind>(["floor", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv"]);
 /** The looks a kind can have (a tree is an oak, a pine, a palm or a bush; a fence, a gate). */
 export const FEATURE_STYLES: Partial<Record<SiteFeatureKind, readonly string[]>> = {
+  floor: FLOOR_STYLES,
   wall: ["wSolid", "wDoor", "wDoubleDoor", "wWindow", "wWideWindow", "wOpening"],
   fireplace: ["fWall", "fCorner", "fCentral"],
   kitchen: ["kStraight", "kL", "kIsland"],

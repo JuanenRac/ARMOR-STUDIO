@@ -162,7 +162,7 @@ export function LineChart({ samples, series, from, to, t, empty, decimals = 0 }:
   const lines = series.map(item => ({ item, points: seriesPoints(samples, item.key, from, to, scale, inner.width, inner.height) }));
   if (values.length < 2) return <div className="sl-chart-empty">{empty ?? t("solarNoHistory")}</div>;
   const at = cursor === null ? undefined : nearestSample(samples, from + (cursor / inner.width) * (to - from));
-  const clock = (time: number) => new Date(time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const clock = (time: number) => (to - from > 36 * 3_600_000 ? new Date(time).toLocaleDateString([], { day: "2-digit", month: "2-digit" }) : new Date(time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
   const move = (event: React.PointerEvent<SVGSVGElement>) => {
     const box = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - box.left) / box.width) * CHART.width - CHART.left;
@@ -202,5 +202,30 @@ export function CellBars({ cells, t }: { cells: readonly number[]; t: Translate 
         <span className="sl-cell-n">{i + 1}</span>
       </div>;
     })}
+  </div>;
+}
+
+// ---- the energy of each day ---------------------------------------------------------------------------------------------------------
+
+/** Day by day bars, one group per day with one bar for each series (kilowatt-hours); the day is read off the bar under the pointer. */
+export function EnergyBars({ days, series, t }: { days: ReadonlyArray<{ date: string } & Record<string, number | string>>; series: ReadonlyArray<{ key: string; label: string; color: string }>; t: Translate }) {
+  const [at, setAt] = useState<number | null>(null);
+  if (days.length === 0) return <div className="sl-chart-empty">{t("enNone")}</div>;
+  const width = 720, height = 190, left = 40, bottom = 24, top = 8, inner = { width: width - left - 8, height: height - top - bottom };
+  const high = niceScale([0, ...days.flatMap(day => series.map(item => Number(day[item.key]) || 0))]).high || 1;
+  const slot = inner.width / days.length, bar = Math.max(2, Math.min(18, (slot - 4) / series.length));
+  const shown = at === null ? undefined : days[at];
+  return <div className="sl-chart">
+    <div className="sl-chart-legend">{series.map(item => <span key={item.key}><i style={{ background: item.color }} />{item.label}{shown ? <b> {Number(shown[item.key]).toFixed(2)} kWh</b> : null}</span>)}{shown && <span className="muted">{shown.date}</span>}</div>
+    <svg viewBox={`0 0 ${width} ${height}`} role="img" onPointerLeave={() => setAt(null)}>
+      <g transform={`translate(${left} ${top})`}>
+        {[0, 0.25, 0.5, 0.75, 1].map(f => <g key={f}><line x1="0" x2={inner.width} y1={inner.height * (1 - f)} y2={inner.height * (1 - f)} className="sl-grid" /><text x="-6" y={inner.height * (1 - f) + 4} textAnchor="end" className="sl-axis">{(high * f).toFixed(high < 10 ? 1 : 0)}</text></g>)}
+        {days.map((day, index) => <g key={day.date} onPointerMove={() => setAt(index)}>
+          <rect x={index * slot} y="0" width={slot} height={inner.height} fill="transparent" />
+          {series.map((item, k) => { const h = (Math.max(0, Number(day[item.key]) || 0) / high) * inner.height; return <rect key={item.key} x={index * slot + (slot - bar * series.length) / 2 + k * bar} y={inner.height - h} width={Math.max(1.5, bar - 1)} height={h} fill={item.color} rx="1.5" opacity={at === null || at === index ? 1 : 0.55} />; })}
+          {(days.length <= 14 || index % Math.ceil(days.length / 10) === 0) && <text x={index * slot + slot / 2} y={inner.height + 16} textAnchor="middle" className="sl-axis">{String(day.date).slice(5)}</text>}
+        </g>)}
+      </g>
+    </svg>
   </div>;
 }
