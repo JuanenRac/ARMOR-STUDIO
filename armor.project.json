@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "ecosystem": "A.R.M.O.R.",
   "name": "ARMOR-STUDIO",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "role": "Web administration and calibration console",
   "stack": "React 19 / TypeScript / Vite",
   "technologies": [
@@ -16,7 +16,7 @@
   "maturity": "functional",
   "family": "Clients",
   "parent": "ARMOR-SERVER",
-  "native_version": "0.6.2",
+  "native_version": "0.6.3",
   "build": "npm run typecheck && npm test && npm run build",
   "notes": "Operational browser dashboard for the A.R.M.O.R. server API. Credentials are never persisted by Studio."
 }

@@ -44,3 +44,30 @@
 .adm-broker { display: grid; gap: 1rem; }
 @media (max-width: 800px) { .adm-files { grid-template-columns: 1fr; } }
 .adopt-form { flex-basis: 100%; padding: .6rem 0 0; border-top: 1px dashed #285363; }
+
+/* Configuration > Node firmware: two balanced columns (the nodes on the left; the firmware, the access and the start on the right), the progress under both. */
+.fw-page { display: grid; gap: 1rem; }
+.fw-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: start; }
+.fw-col { display: grid; gap: 1rem; min-width: 0; align-content: start; }
+.fw-card.camera-form { grid-template-columns: minmax(0, 1fr); gap: .7rem; }
+.fw-card h3, .fw-head h3 { margin: 0; }
+.fw-choice label { display: flex; align-items: center; gap: .5rem; color: #cfe9ee; font-size: .8rem; padding: .15rem 0; }
+.fw-choice input[type="radio"], .fw-nodes input[type="checkbox"] { width: auto; min-height: 0; }
+.fw-nodes { max-height: 22rem; overflow: auto; }
+.fw-nodes li { display: flex; align-items: center; gap: .6rem; }
+.fw-flow-title { margin: .1rem 0 0; font-size: .8rem; color: #a7c4cc; }
+.fw-flow { margin: 0; padding-left: 1.2rem; display: grid; gap: .3rem; font-size: .78rem; color: #b9d3d9; }
+.fw-bar { height: .6rem; border-radius: 999px; background: #0b202a; border: 1px solid #315e6b; overflow: hidden; }
+.fw-bar > i { display: block; height: 100%; background: linear-gradient(90deg, #27c4b8, #4be29a); transition: width .4s ease; }
+.fw-bar.done > i { background: #4be29a; }
+.fw-bar.failed > i { background: #ff5d6c; }
+.fw-overall { display: flex; justify-content: space-between; gap: .6rem; font-size: .8rem; color: #cfe9ee; }
+.fw-targets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+.fw-target { border: 1px solid #315e6b; border-radius: 10px; padding: .65rem .75rem; display: grid; gap: .45rem; background: rgba(7, 25, 33, .55); min-width: 0; }
+.fw-target.failed { border-color: #ff5d6c; }
+.fw-target.done { border-color: #2f9d74; }
+.fw-target header { display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .6rem; }
+.fw-target header small { color: #8fb1b9; flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.fw-badge { font-size: .68rem; padding: .1rem .5rem; border-radius: 999px; border: 1px solid #315e6b; color: #c7edf0; background: #0b202a; }
+.fw-target p { margin: 0; line-height: 1.35; }
+@media (max-width: 980px) { .fw-grid, .fw-targets { grid-template-columns: minmax(0, 1fr); } }

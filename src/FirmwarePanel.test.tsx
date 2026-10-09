@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { FirmwarePanel, firmwareNodes } from "./FirmwarePanel";
+import { describeStep, fill, FirmwarePanel, firmwareNodes } from "./FirmwarePanel";
 import { locales, requiredUiKeys, text } from "./i18n";
 import type { NetworkOverview } from "./networkModel";
 
@@ -50,5 +50,23 @@ describe("the node firmware screen", () => {
     const reasons = ["node_not_reachable", "panel_login_refused", "panel_login_failed", "upload_failed", "hash_mismatch", "did_not_come_back", "checksum_mismatch", "no_checksum", "no_release", "no_image_in_release", "github_unreachable", "download_failed", "bad_size", "not_firmware", "job_running", "no_panel_login", "invalid_address", "node_wrong_firmware", "node_not_firmware"];
     for (const reason of reasons) expect(requiredUiKeys, reason).toContain(`fw_err_${reason}`);
     for (const state of ["waiting", "checking", "signing_in", "uploading", "restarting", "done", "failed"]) expect(requiredUiKeys).toContain(`fw_state_${state}`);
+  });
+
+  it("says what a node is doing at each step, with the numbers that make it concrete, in every language", () => {
+    expect(fill("{0} of {1} ({2}%)", 5, 10, 50)).toBe("5 of 10 (50%)");
+    for (const locale of locales) {
+      const t = (key: string) => text(locale, key);
+      const uploading = describeStep(t, { address: "10.0.0.2", state: "uploading", sent: 512 * 1024, total: 1024 * 1024 });
+      expect(uploading, locale).toContain("512");
+      expect(uploading, locale).toContain("1024");
+      expect(uploading, locale).toContain("50%");
+      expect(uploading, locale).not.toContain("{");
+      const restarting = describeStep(t, { address: "10.0.0.2", state: "restarting", waited_s: 7 }, "0.5.4");
+      expect(restarting, locale).toContain("0.5.4");
+      expect(restarting, locale).toContain("7");
+      expect(describeStep(t, { address: "10.0.0.2", state: "done", version_after: "0.5.4" }), locale).toContain("0.5.4");
+      expect(describeStep(t, { address: "10.0.0.2", state: "failed", error: "panel_login_refused" }), locale).toContain(text(locale, "fw_err_panel_login_refused"));
+      for (const state of ["waiting", "checking", "signing_in"] as const) expect(describeStep(t, { address: "10.0.0.2", state }), `${locale} ${state}`).toBe(text(locale, `fw_step_${state}`));
+    }
   });
 });

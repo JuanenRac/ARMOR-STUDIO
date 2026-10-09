@@ -305,7 +305,7 @@ export const adminProvisionNode = (origin: string, request: { node_id: string; a
 
 export type FirmwareKind = "radar" | "solar" | "electrical" | "hmi";
 export type FirmwareTargetState = "waiting" | "checking" | "signing_in" | "uploading" | "restarting" | "done" | "failed";
-export type FirmwareTarget = { address: string; node_id?: string; state: FirmwareTargetState; version_before?: string; version_after?: string; error?: string };
+export type FirmwareTarget = { address: string; node_id?: string; state: FirmwareTargetState; version_before?: string; version_after?: string; error?: string; progress?: number; sent?: number; total?: number; waited_s?: number };
 export type FirmwareJob = { id: string; kind: FirmwareKind; source: "github" | "upload"; state: "preparing" | "running" | "done" | "failed"; version?: string; bytes?: number; sha256?: string; error?: string; targets: FirmwareTarget[] };
 export type FirmwareRelease = { kind: FirmwareKind; repo: string; version: string; bytes: number; checksum: boolean };
 export type FirmwareProbe = { address: string; reachable: boolean; node_id?: string; version?: string; board?: string };
