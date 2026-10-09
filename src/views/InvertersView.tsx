@@ -86,6 +86,7 @@ function InverterPanel({ t, inverter, now, history, minutes, setMinutes }: { t: 
         <div><dt>{t("solarPv")}</dt><dd>{r.pv_v.toFixed(1)} V · {r.pv_a.toFixed(1)} A</dd></div>
         {typeof r.pv2_w === "number" && <div><dt>{t("solarPv2")}</dt><dd>{(r.pv2_v ?? 0).toFixed(1)} V · {(r.pv2_a ?? 0).toFixed(1)} A · {formatPower(r.pv2_w)}</dd></div>}
         <div><dt>{t("solarBatteryPower")}</dt><dd>{formatPower(flow.batteryW)}</dd></div>
+        {typeof r.bus_v === "number" && <div><dt>{t("solarBus")}</dt><dd>{r.bus_v.toFixed(1)} V</dd></div>}
       </dl>
       {r.units && r.units.length > 0 && <>
         <small>{t("solarUnits")}{typeof r.total_out_w === "number" ? ` · ${t("solarSystemTotal")}: ${formatPower(r.total_out_w)}${typeof r.total_load_percent === "number" ? ` · ${Math.round(r.total_load_percent)} %` : ""}` : ""}</small>

@@ -13,6 +13,8 @@ export type SolarInverterReading = {
   ac_charging: boolean; pv_charging: boolean; load_on: boolean; warnings: string[];
   /** A second PV input (pv_w is already the sum of both) and, for a parallel system, the totals and the units the node reads. */
   pv2_v?: number; pv2_a?: number; pv2_w?: number;
+  /** The DC bus voltage inside the inverter, when it says it. */
+  bus_v?: number;
   total_out_w?: number; total_out_va?: number; total_load_percent?: number; total_charging_a?: number;
   units?: SolarUnitReading[];
 };
@@ -29,6 +31,8 @@ export type SolarBatteryReading = {
   state?: "charging" | "discharging" | "idle"; voltage_v?: number; current_a?: number; temperature_min_c?: number; temperature_max_c?: number;
   cell_min_v?: number; cell_max_v?: number; soc_percent?: number; alarm?: boolean;
   model?: string; capacity_ah?: number; full_capacity_ah?: number; energy_kwh?: number; cycles?: number; health_percent?: number;
+  /** What a battery management system adds: its own power (negative while discharging), the cells being balanced, a protection active and the status codes of its MOSFETs. */
+  power_w?: number; balancing?: number; protecting?: boolean; charge_mos?: number; discharge_mos?: number;
 };
 export type SolarReading = SolarInverterReading | SolarBatteryReading;
 export type SolarKind = "inverter" | "battery";
