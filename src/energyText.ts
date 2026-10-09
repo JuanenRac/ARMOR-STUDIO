@@ -18,5 +18,10 @@ const ROWS: Record<string, Row> = {
   elPower: ["Power", "Potencia", "Leistung", "Puissance", "Potenza", "電力", "功率"],
   elVoltage: ["Voltage", "Tensión", "Spannung", "Tension", "Tensione", "電圧", "电压"],
   elCurrent: ["Current", "Corriente", "Strom", "Courant", "Corrente", "電流", "电流"],
+  bmsPower: ["Power (the BMS's own reading)", "Potencia (lectura propia del BMS)", "Leistung (eigene Messung des BMS)", "Puissance (mesure propre du BMS)", "Potenza (lettura propria del BMS)", "電力（BMS自身の測定）", "功率（BMS自身读数）"],
+  bmsBalancing: ["Cells being balanced", "Celdas equilibrándose", "Zellen im Ausgleich", "Cellules en équilibrage", "Celle in bilanciamento", "バランス中のセル", "正在均衡的电芯"],
+  bmsProtecting: ["A protection has switched a MOSFET off", "Una protección ha cortado un MOSFET", "Ein Schutz hat einen MOSFET abgeschaltet", "Une protection a coupé un MOSFET", "Una protezione ha spento un MOSFET", "保護機能がMOSFETを遮断しました", "保护已关断一个 MOSFET"],
+  bmsMos: ["MOSFET charge / discharge (status code)", "MOSFET carga / descarga (código de estado)", "MOSFET Laden / Entladen (Statuscode)", "MOSFET charge / décharge (code d'état)", "MOSFET carica / scarica (codice di stato)", "MOSFET 充電／放電（状態コード）", "MOSFET 充电／放电（状态码）"],
+  solarBus: ["DC bus", "Bus de continua", "DC-Zwischenkreis", "Bus continu", "Bus DC", "DCバス", "直流母线"],
 };
 export const energyCatalogues = cataloguesFromRows(ROWS);

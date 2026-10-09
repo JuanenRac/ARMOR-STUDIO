@@ -90,6 +90,10 @@ function StackPanel({ t, stack, now, history, minutes, setMinutes }: { t: Transl
           {r.temperature_min_c !== undefined && r.temperature_max_c !== undefined && <Fact label={t("solarTemperature")} value={`${r.temperature_min_c.toFixed(1)} – ${r.temperature_max_c.toFixed(1)} °C`} />}
           {cells && <Fact label={t("solarCells")} value={`${cells.min.toFixed(3)} – ${cells.max.toFixed(3)} V · Δ ${cells.spreadMv} mV`} tone={spreadTone(cells.spreadMv)} />}
           {!cells && r.cell_min_v !== undefined && r.cell_max_v !== undefined && <Fact label={t("solarCells")} value={`${r.cell_min_v.toFixed(3)} – ${r.cell_max_v.toFixed(3)} V · Δ ${Math.round((r.cell_max_v - r.cell_min_v) * 1000)} mV`} tone={spreadTone((r.cell_max_v - r.cell_min_v) * 1000)} />}
+          {r.power_w !== undefined && <Fact label={t("bmsPower")} value={formatPower(r.power_w)} />}
+          {r.balancing !== undefined && <Fact label={t("bmsBalancing")} value={String(r.balancing)} tone={r.balancing > 0 ? "warn" : undefined} />}
+          {r.protecting === true && <Fact label={t("bmsProtecting")} value={`${r.charge_mos ?? "–"} / ${r.discharge_mos ?? "–"}`} tone="bad" />}
+          {r.protecting !== true && r.charge_mos !== undefined && <Fact label={t("bmsMos")} value={`${r.charge_mos} / ${r.discharge_mos ?? "–"}`} />}
           {r.energy_kwh !== undefined && <Fact label="kWh" value={formatEnergy(r.energy_kwh)} />}
           {r.cycles !== undefined && <Fact label={t("solarCycles")} value={String(r.cycles)} />}
           {r.health_percent !== undefined && <Fact label={t("solarHealth")} value={`${r.health_percent} %`} tone={healthTone(r.health_percent)} />}
