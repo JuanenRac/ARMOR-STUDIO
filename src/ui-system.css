@@ -119,3 +119,12 @@ html[data-armor-theme]:not([data-armor-theme="Armor"]) :is(.svc-stats strong, .h
 html[data-armor-theme]:not([data-armor-theme="Armor"]) .sidebar nav button.active:not(#ui) { color: var(--t-side-active-text, #ffffff); }
 html[data-armor-theme="Professional"] :is(.svc-banner.warn, .notice.warn):not(#ui) { color: #92400e; background: #fef3c7; border-color: #f2c66b; }
 html[data-armor-theme="Professional"] :is(.svc-banner.bad, .notice.bad):not(#ui) { color: #991b1b; background: #fee2e2; border-color: #f5a3a3; }
+
+/* ---- default (secondary) buttons that some menus left at the size of the page text -------------------------------------------------------------- */
+:is(.camera-discovery > button, .modal-backdrop :is(.confirm-dialog, .about-dialog) button:not(.primary):not(.icon-button):not(.help-close):not(.close-button), .history-confirm button:not(.primary):not(.danger-button)):not(#ui) {
+  --c: var(--ui-accent); min-height: var(--ui-h); padding: .35rem 1.1rem; cursor: pointer; font: 700 .8rem var(--ui-font); letter-spacing: .04em; color: var(--c);
+  border: 1px solid color-mix(in srgb, var(--c) 50%, transparent); border-radius: var(--ui-radius);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 16%, transparent), color-mix(in srgb, var(--c) 5%, transparent)), var(--ui-panel); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--c) 25%, transparent);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease;
+}
+:is(.camera-discovery > button, .modal-backdrop :is(.confirm-dialog, .about-dialog) button:not(.primary):not(.icon-button):not(.help-close):not(.close-button), .history-confirm button:not(.primary):not(.danger-button)):not(#ui):hover:not(:disabled) { transform: translateY(-1px); color: #031318; background: var(--c); box-shadow: 0 6px 18px color-mix(in srgb, var(--c) 40%, transparent); }
