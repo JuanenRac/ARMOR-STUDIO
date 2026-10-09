@@ -575,7 +575,7 @@ export default function Viewport3D(props: ViewportProps) {
       <Scene {...props} shadows={shadows} xray={xray} turntable={turntable} layers={layers} request={request} compass={compass} />
     </Canvas>
     <FloatingToolbox storageKey="armor-studio-toolbox-3d-v1" title={t("toolboxTitle3d")} sections={sections} containerRef={host} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 12, y: 12 }} />
-    {tools3d.branches.map((branch, index) => <FloatingToolbox key={branch.id} storageKey={`armor-studio-toolbox-3d-${branch.id}-v1`} title={branch.title} sections={branch.sections} containerRef={host} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 80 + index * 68, y: 12 }} />)}
+    {tools3d.branches.map((branch, index) => <FloatingToolbox key={branch.id} storageKey={`armor-studio-toolbox-3d-${branch.id}-v1`} title={branch.title} sections={branch.sections} containerRef={host} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 150 + index * 140, y: 12 }} />)}
     {layersOpen && <div className="v3d-layers" role="group" aria-label={t("layers")}>
       <strong>{t("layers")}</strong>
       {LAYER_KEYS.map(key => <label key={key}><input type="checkbox" checked={layers[key]} onChange={event => setLayers(current => ({ ...current, [key]: event.target.checked }))} /> {t(`layer_${key}`)}</label>)}

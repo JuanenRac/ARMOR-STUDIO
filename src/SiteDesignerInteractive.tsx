@@ -6,6 +6,7 @@
  */
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { Dimensions, RoofItemKind, SiteFeatureKind } from "./domain";
+import { INTERIOR_KINDS } from "./domain";
 import type { StudioDevice } from "./api";
 import { Inspector } from "./designer/Inspector";
 import { ICON } from "./designer/icons";
@@ -40,7 +41,7 @@ type Props = {
 
 type Snapshot = { model: SiteModel; dimensions: Dimensions };
 const GRID_M = 0.25, HISTORY_LIMIT = 100, COALESCE_MS = 900;
-const FEATURE_TOOLS: ReadonlySet<Tool> = new Set(["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car"]);
+const FEATURE_TOOLS: ReadonlySet<Tool> = new Set(["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv"]);
 const ROOF_ITEM_OF: Partial<Record<Tool, RoofItemKind>> = { chimney: "chimney", "roof-solar": "solar", antenna: "antenna", gutter: "gutter", downpipe: "downpipe" };
 const REPEATING: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp", "chimney", "roof-solar", "antenna", "gutter", "downpipe", "pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road"]);
 const NUDGE = 0.25;
@@ -187,7 +188,8 @@ export function SiteDesignerInteractive(props: Props) {
       return;
     }
     if (FEATURE_TOOLS.has(tool)) {
-      const added = addFeature(current, tool as SiteFeatureKind, point.x, point.y);
+      const floorUnder = INTERIOR_KINDS.has(tool as SiteFeatureKind) ? buildingAt(current, point) : undefined;   // an inside object stands on the ground floor of the building under the click (raise it with its height above ground for the others)
+      const added = addFeature(current, tool as SiteFeatureKind, point.x, point.y, floorUnder?.base ?? 0);
       commit(added.model); select({ kind: "feature", id: added.id }); props.setNotice(`${t(toolLabelKey(tool))} · ${t("objectCreated")}`);
       return;
     }
@@ -402,7 +404,7 @@ export function SiteDesignerInteractive(props: Props) {
                 onSelect={select} onDragStart={beginGesture} onDrag={dragPlan} onPlace={place} onFinishPolygon={finishPolygon} onFinishRect={finishRect} onPlaceLine={placeFence}
                 onInsertVertex={insertVertex} onFloor={setActiveFloor} onNotice={props.setNotice} />
               <FloatingToolbox storageKey="armor-studio-toolbox-2d-v1" title={t("toolboxTitle2d")} sections={planSections} containerRef={canvas} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 32, y: 32 }} />
-              {planTools.branches.map((branch, index) => <FloatingToolbox key={branch.id} storageKey={`armor-studio-toolbox-2d-${branch.id}-v1`} title={branch.title} sections={branch.sections} containerRef={canvas} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 100 + index * 68, y: 32 }} />)}
+              {planTools.branches.map((branch, index) => <FloatingToolbox key={branch.id} storageKey={`armor-studio-toolbox-2d-${branch.id}-v1`} title={branch.title} sections={branch.sections} containerRef={canvas} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 170 + index * 140, y: 32 }} />)}
             </>
           : <Suspense fallback={<div className="viewport-loading">{t("loading")}</div>}>
               <Viewport3D t={t} devices={props.devices} dimensions={dimensions} model={model} selection={selection} tool={tool} onTool={setTool} activeFloor={floorsChosen} floorCount={floorCount} onFloor={setActiveFloor}

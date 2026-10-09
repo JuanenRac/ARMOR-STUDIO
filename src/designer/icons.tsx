@@ -58,6 +58,17 @@ const TOOL_ICONS: Record<Tool, ReactNode> = {
   device: frame(<><circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" strokeWidth="1.3" /><path d="M8 3h8M8 21h8" strokeWidth="1.2" /></>),
   camera: frame(<><rect x="3" y="7" width="13" height="10" rx="2" /><path d="M16 11l5-3v8l-5-3" /><circle cx="9.5" cy="12" r="2.2" /></>),
   sensor: frame(<><circle cx="6" cy="18" r="1.8" fill="currentColor" /><path d="M9 14a6 6 0 0 1 6-6M9 10a10 10 0 0 1 10-6" /><path d="M12 18a6 6 0 0 0 6-6" /></>),
+  wall: frame(<><path d="M3 6h18v12H3z" /><path d="M3 12h18M9 6v6M15 12v6" /></>),
+  fireplace: frame(<><path d="M4 20V8h16v12z" /><path d="M8 20v-5a4 4 0 0 1 8 0v5" /><path d="M12 19c-1.6-1-1.2-2.6 0-4.2 1.2 1.6 1.6 3.2 0 4.2z" fill="currentColor" fillOpacity=".3" /><path d="M2 8h20" /></>),
+  stairs: frame(<><path d="M3 20h5v-4h5v-4h5V8h3" /><path d="M3 20h18" /></>),
+  kitchen: frame(<><path d="M3 11h18v9H3z" /><path d="M3 11V8h18v3" /><circle cx="8" cy="9.5" r=".9" /><circle cx="12" cy="9.5" r=".9" /><path d="M15 16h4" /></>),
+  bathroom: frame(<><path d="M3 12h18v3a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z" /><path d="M6 12V6a2 2 0 0 1 4 0" /></>),
+  bed: frame(<><path d="M3 19V7M3 15h18v4M21 19v-4" /><rect x="5" y="10" width="6" height="4" rx="1" /><path d="M11 12h7a3 3 0 0 1 3 3" /></>),
+  wardrobe: frame(<><rect x="5" y="3" width="14" height="18" rx="1" /><path d="M12 3v18M10 12v1.5M14 12v1.5" /></>),
+  sofa: frame(<><path d="M6 11V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3" /><path d="M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3z" /><path d="M6 18v2M18 18v2" /></>),
+  armchair: frame(<><path d="M7 11V8a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3" /><path d="M5 13a2 2 0 0 1 3 0v2h8v-2a2 2 0 0 1 3 0v5H5z" /><path d="M7 18v2M17 18v2" /></>),
+  dining: frame(<><path d="M5 10h14" /><path d="M7 10v9M17 10v9" /><path d="M3 7h3M18 7h3M3 7v4M21 7v4" strokeWidth="1.3" /></>),
+  tv: frame(<><rect x="3" y="5" width="18" height="12" rx="1.5" /><path d="M9 21h6M12 17v4" /></>),
 };
 
 export const toolIcon = (tool: Tool): ReactNode => TOOL_ICONS[tool];

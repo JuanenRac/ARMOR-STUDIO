@@ -255,6 +255,17 @@ export const FEATURE_DEFAULTS: Record<SiteFeatureKind, Omit<SiteFeature, "id" | 
   "ac-unit": { width: 0.9, depth: 0.4, height: 0.7, rotation: 0, slope: 0 },
   "electrical-box": { width: 0.7, depth: 0.3, height: 1.0, rotation: 0, slope: 0 },
   car: { width: 4.4, depth: 1.9, height: 1.5, rotation: 0, slope: 0 },
+  wall: { width: 3, depth: 0.12, height: 2.6, rotation: 0, slope: 0, style: "wSolid" },
+  fireplace: { width: 1.2, depth: 0.6, height: 2.6, rotation: 0, slope: 0, style: "fWall" },
+  stairs: { width: 1, depth: 3, height: 2.8, rotation: 0, slope: 0 },
+  kitchen: { width: 3, depth: 0.65, height: 0.9, rotation: 0, slope: 0, style: "kStraight" },
+  bathroom: { width: 1.7, depth: 0.75, height: 0.6, rotation: 0, slope: 0, style: "baBath" },
+  bed: { width: 1.6, depth: 2, height: 0.55, rotation: 0, slope: 0, style: "bDouble" },
+  wardrobe: { width: 1.8, depth: 0.6, height: 2.2, rotation: 0, slope: 0 },
+  sofa: { width: 2.1, depth: 0.9, height: 0.85, rotation: 0, slope: 0, style: "sStraight" },
+  armchair: { width: 0.9, depth: 0.9, height: 0.85, rotation: 0, slope: 0 },
+  dining: { width: 1.8, depth: 0.9, height: 0.75, rotation: 0, slope: 0 },
+  tv: { width: 1.2, depth: 0.4, height: 0.7, rotation: 0, slope: 0, style: "tWall" },
 };
 
 export function addFeature(model: SiteModel, kind: SiteFeatureKind, x: number, y: number, z = 0): { model: SiteModel; id: string } {
