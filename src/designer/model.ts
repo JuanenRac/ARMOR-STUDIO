@@ -42,6 +42,15 @@ export const cameraView = (camera: { fov?: number; range?: number; kind?: string
 export const CAMERA_HEIGHT_M = 2.4;
 export const CAMERA_PAN_MIN = 90, CAMERA_PAN_MAX = 360, CAMERA_TILT_SWEEP_MIN = 30, CAMERA_TILT_SWEEP_MAX = 180;
 export const isMotorised = (camera: { kind?: string }): boolean => camera.kind === "ptz";
+/** The optical zoom of a camera: 1 for a fixed lens, and the factor of a varifocal or motorised one. */
+export const cameraZoom = (camera: { lens?: string; opticalZoom?: number }): number => (camera.lens === "varifocal" || camera.lens === "motorised" ? Math.min(60, Math.max(1, camera.opticalZoom ?? 1)) : 1);
+/** The narrowest view of the lens (fully zoomed in), in degrees: the angle whose tangent is the widest one divided by the zoom. */
+export const cameraTeleDeg = (camera: { fov?: number; lens?: string; opticalZoom?: number }): number => {
+  const wide = (camera.fov ?? CAMERA_VIEW.halfAngleDeg * 2) * Math.PI / 360;
+  return Math.round(2 * Math.atan(Math.tan(wide) / cameraZoom(camera)) * 18000 / Math.PI) / 100;
+};
+/** How far it sees fully zoomed in: the reach grows with the zoom (the same detail from further away), as an indication. */
+export const cameraTeleRangeM = (camera: { range?: number; lens?: string; opticalZoom?: number }): number => Math.min(150, (camera.range ?? CAMERA_VIEW.rangeM) * cameraZoom(camera));
 /** The angle of the lens of a camera (its whole horizontal field of view). */
 export const cameraLensDeg = (camera: { fov?: number }): number => camera.fov ?? CAMERA_VIEW.halfAngleDeg * 2;
 /** How far a motorised camera turns sideways in total (never less than 90, never more than 360). */

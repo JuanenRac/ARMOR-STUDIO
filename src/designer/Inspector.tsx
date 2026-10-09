@@ -7,11 +7,11 @@
 import { useEffect, useState } from "react";
 import type { StudioDevice } from "../api";
 import { KindIcon } from "../deviceKinds";
-import { FEATURE_STYLES, MAST_PART_KINDS, type Building, type Camera, type Dimensions, type Opening, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type WallLamp, BUILDING_USES, BUILDING_MATERIALS, OPENING_STYLES, LAMP_KINDS, type BuildingUse, type BuildingMaterial, type LampKind } from "../domain";
+import { FEATURE_STYLES, MAST_PART_KINDS, type Building, type Camera, type Dimensions, type Opening, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type WallLamp, BUILDING_USES, BUILDING_MATERIALS, OPENING_STYLES, LAMP_KINDS, type BuildingUse, type BuildingMaterial, type LampKind, CAMERA_LENSES, type CameraLens } from "../domain";
 import { area, bounds, edgeOf, floorBottom, isSimplePolygon, nearestOnOutline, pointInPolygon, roofRise, signedArea, totalHeight } from "./geometry";
 import { DEFAULT_DOOR_COLOUR, DEFAULT_FEATURE_COLOUR, DEFAULT_LIGHT_COLOUR, DEFAULT_ROOF_COLOUR, DEFAULT_ROOF_ITEM_COLOUR, DEFAULT_TERRAIN_COLOUR, DEFAULT_WALL_COLOUR, DEFAULT_WINDOW_FRAME_COLOUR, featureColourOf } from "./colors";
 import { toolIcon } from "./icons";
-import { clamp, formatMetres, headingOf, radarView, round2, SENSOR_HEIGHT_M, CAMERA_HEIGHT_M, toolLabelKey, type Selection, type Tool } from "./model";
+import { clamp, formatMetres, headingOf, radarView, round2, SENSOR_HEIGHT_M, CAMERA_HEIGHT_M, toolLabelKey, type Selection, type Tool, cameraZoom, cameraTeleDeg, cameraTeleRangeM } from "./model";
 import { addFloor, addMastPart, removeMastPart, updateMastPart, deleteBuilding, insertBuildingVertex, insertVertex, isRectangle, moveVertex, removeBuildingVertex, removeFloor, resizeRectangle, setFootprint, setSideLength, updateBuilding, type SiteModel, FLOOR_HEIGHT_M } from "./ops";
 import type { Point } from "../domain";
 
@@ -301,12 +301,17 @@ export function Inspector(p: InspectorProps) {
         <NumberField label={t("mountHeight")} unit="m" min={0} max={100} step={0.1} value={camera.z ?? CAMERA_HEIGHT_M} onChange={value => setCamera(camera.id, { z: round2(clamp(value, 0, 100)) }, "z")} />
         <label>{t("cameraKind")}<select value={camera.kind === "ptz" ? "ptz" : "fixed"} onChange={event => setCamera(camera.id, event.target.value === "ptz" ? { kind: "ptz" } : { kind: undefined, pan: undefined, tiltSweep: undefined }, "kind")}><option value="fixed">{t("cameraKindFixed")}</option><option value="ptz">{t("cameraKindPtz")}</option></select></label>
         <label>{t("cameraMount")}<select value={camera.mount ?? "wall"} onChange={event => setCamera(camera.id, { mount: event.target.value === "wall" ? undefined : event.target.value as "ceiling" | "pole" | "ground" }, "mount")}>{(["wall", "ceiling", "pole", "ground"] as const).map(mount => <option key={mount} value={mount}>{t("cameraMount_" + mount)}</option>)}</select></label>
+        <label>{t("cameraLens")}<select value={camera.lens ?? "fixed"} onChange={event => setCamera(camera.id, event.target.value === "fixed" ? { lens: undefined, opticalZoom: undefined } : { lens: event.target.value as CameraLens }, "lens")}>{CAMERA_LENSES.map(lens => <option key={lens} value={lens}>{t("cameraLens_" + lens)}</option>)}</select></label>
+        {camera.lens && <NumberField label={t("cameraOpticalZoom")} unit="×" min={1} max={60} step={1} value={camera.opticalZoom ?? 1} onChange={value => setCamera(camera.id, { opticalZoom: clamp(Math.round(value), 1, 60) === 1 ? undefined : clamp(Math.round(value), 1, 60) }, "opticalZoom")} />}
+        <NumberField label={t("cameraDigitalZoom")} unit="×" min={1} max={32} step={1} value={camera.digitalZoom ?? 1} onChange={value => setCamera(camera.id, { digitalZoom: clamp(Math.round(value), 1, 32) === 1 ? undefined : clamp(Math.round(value), 1, 32) }, "digitalZoom")} />
         {camera.kind === "ptz" && <NumberField label={t("cameraPan")} unit="°" min={90} max={360} step={5} value={camera.pan ?? 360} onChange={value => setCamera(camera.id, { pan: clamp(Math.round(value), 90, 360) === 360 ? undefined : clamp(Math.round(value), 90, 360) }, "pan")} />}
         {camera.kind === "ptz" && <NumberField label={t("cameraTiltSweep")} unit="°" min={30} max={180} step={5} value={camera.tiltSweep ?? 90} onChange={value => setCamera(camera.id, { tiltSweep: clamp(Math.round(value), 30, 180) === 90 ? undefined : clamp(Math.round(value), 30, 180) }, "tiltSweep")} />}
-        <NumberField label={t(camera.kind === "ptz" ? "cameraLensFov" : "cameraFov")} unit="°" min={20} max={180} step={5} value={camera.fov ?? 90} onChange={value => setCamera(camera.id, { fov: clamp(Math.round(value), 20, 180) === 90 ? undefined : clamp(Math.round(value), 20, 180) }, "fov")} />
+        <NumberField label={t(camera.lens ? "cameraFovWide" : camera.kind === "ptz" ? "cameraLensFov" : "cameraFov")} unit="°" min={20} max={180} step={5} value={camera.fov ?? 90} onChange={value => setCamera(camera.id, { fov: clamp(Math.round(value), 20, 180) === 90 ? undefined : clamp(Math.round(value), 20, 180) }, "fov")} />
         <NumberField label={t("cameraRange")} unit="m" min={2} max={60} step={1} value={camera.range ?? 12} onChange={value => setCamera(camera.id, { range: clamp(Math.round(value), 2, 60) === 12 ? undefined : clamp(Math.round(value), 2, 60) }, "range")} />
         <NumberField label={t("cameraNight")} unit="m" min={0} max={100} step={1} value={camera.nightRange ?? 0} onChange={value => setCamera(camera.id, { nightRange: clamp(Math.round(value), 0, 100) || undefined }, "nightRange")} />
       </div>
+      {cameraZoom(camera) > 1 && <p className="muted small">{`${t("cameraTele")} ${cameraTeleDeg(camera)}° · ${cameraTeleRangeM(camera)} m`}</p>}
+      {camera.digitalZoom !== undefined && <p className="muted small">{t("cameraDigitalNote")}</p>}
       <p className="muted small">{t(camera.kind === "ptz" ? "cameraPtzNote" : "cameraViewNote")}</p>
     </section>}
 

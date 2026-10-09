@@ -65,6 +65,7 @@
 .p-camera.selected .p-fov { fill: rgba(255, 176, 32, .15); stroke-opacity: 1; }
 .p-fov.ptz { stroke-dasharray: 2 6; fill: rgba(255, 176, 32, .03); }
 .p-camera.selected .p-fov.ptz { fill: rgba(255, 176, 32, .08); }
+.p-fov-tele { fill: rgba(120, 220, 255, .10); stroke: #6fd3ff; stroke-opacity: .8; stroke-width: 1; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
 .p-fov-lens { fill: rgba(255, 190, 60, .20); stroke: #ffc34d; stroke-opacity: .9; stroke-width: 1; vector-effect: non-scaling-stroke; }
 .p-camera-body { fill: #e6eef0; stroke: #0b1418; stroke-width: 1; vector-effect: non-scaling-stroke; } .p-camera.off .p-camera-body { fill: #7d8a90; } .p-camera-lens { fill: #ffb020; stroke: #0b1418; stroke-width: 1; vector-effect: non-scaling-stroke; }
 .p-camera.selected .p-camera-body, .p-sensor.selected .p-sensor-body { stroke: #00e5ff; stroke-width: 2.4; }
