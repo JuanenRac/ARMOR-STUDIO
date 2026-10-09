@@ -30,6 +30,21 @@
 .svc-meta span.warn { color: #ffcf7d; border-color: rgba(242, 182, 64, .4); }
 .svc-empty { margin: 0; padding: 2rem; text-align: center; color: #86a8b3; border: 1px dashed #285a66; border-radius: 12px; }
 .svc-foot { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; color: #6f8e98; font-size: .68rem; }
-.svc-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .7rem; }
-.svc-actions button { padding: .3rem .7rem; font-size: .8rem; }
-.svc-actions button.danger { border-color: #7a3030; color: #ffb4b4; }
+/* The buttons of a program: one picture each, in the colour of what it does (green starts, red stops, the theme's accent restarts, amber pauses). */
+.svc-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .6rem; padding-top: .7rem; border-top: 1px solid var(--t-line, #1d4b56); }
+.svc-act { --c: var(--t-a1, #22d3ee); display: grid; place-items: center; width: 40px; height: 36px; padding: 0; cursor: pointer; color: var(--c); border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); border-radius: var(--t-radius, 10px);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 16%, transparent), color-mix(in srgb, var(--c) 5%, transparent)), var(--t-panel2, #0b202a); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--c) 25%, transparent);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease; }
+.svc-act:hover:not(:disabled) { transform: translateY(-2px); color: #031318; background: var(--c); box-shadow: 0 6px 18px color-mix(in srgb, var(--c) 45%, transparent), 0 0 0 1px var(--c); }
+.svc-act:active:not(:disabled) { transform: translateY(0) scale(.96); }
+.svc-act:focus-visible { outline: 2px solid var(--c); outline-offset: 2px; }
+.svc-act:disabled { opacity: .4; cursor: progress; }
+.svc-act.start, .svc-act.resume { --c: #35d6a6; }
+.svc-act.stop { --c: #ff6f79; }
+.svc-act.restart { --c: var(--t-a1, #22d3ee); }
+.svc-act.pause { --c: #f2b640; }
+.svc-act svg { display: block; }
+/* The themes paint every button the same: these say again, more precisely, that the buttons of a program keep the colour of what they do. */
+html[data-armor-theme]:not([data-armor-theme="Armor"]) .svc-actions .svc-act { color: var(--c); border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); border-radius: var(--t-radius, 10px);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 16%, transparent), color-mix(in srgb, var(--c) 5%, transparent)), var(--t-panel2, #0b202a); }
+html[data-armor-theme]:not([data-armor-theme="Armor"]) .svc-actions .svc-act:hover:not(:disabled) { color: #031318; background: var(--c); border-color: var(--c); }
