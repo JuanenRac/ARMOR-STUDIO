@@ -177,3 +177,9 @@
 .p-gutter { fill: #8d9aa1; stroke: #cfd9de; stroke-width: 1; } .p-gutter-line { stroke: #4b585f; stroke-width: 1; fill: none; } .p-downpipe { fill: #8d9aa1; stroke: #cfd9de; stroke-width: 1; } .p-downpipe-hole { fill: #263238; }
 
 .p-x { stroke: rgba(255, 255, 255, .6); stroke-width: 1; vector-effect: non-scaling-stroke; } .p-x-dark { fill: #1d2a31; stroke: rgba(255, 255, 255, .3); } .p-x-line { fill: none; stroke: rgba(8, 20, 26, .65); stroke-width: 1; vector-effect: non-scaling-stroke; } .p-x-open { fill: rgba(154, 116, 72, .12); stroke: rgba(255, 255, 255, .55); stroke-width: 1; stroke-dasharray: 6 4; vector-effect: non-scaling-stroke; }
+
+/* The side panel of the designer: wide enough for the two columns of fields with their units, and nothing in it may push past its edge. */
+.unified-site-designer .site-designer-grid { grid-template-columns: minmax(0, 1fr) clamp(380px, 31vw, 520px); }
+.building-inspector { min-width: 0; overflow-x: hidden; }
+.building-inspector .inspector-grid > *, .building-inspector .inspector-grid label { min-width: 0; }
+.building-inspector .inspector-grid input, .building-inspector .inspector-grid select { min-width: 0; max-width: 100%; box-sizing: border-box; }

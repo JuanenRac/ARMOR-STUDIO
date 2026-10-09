@@ -25,6 +25,11 @@ describe("cameraIsConfigured", () => {
 });
 
 describe("mergeServerCameras", () => {
+  it("keeps everything the design says about a camera when the server list is read again (a motorised camera does not go back to a fixed one)", () => {
+    const local = camera("a", { x: 5, y: 6, kind: "ptz", pan: 270, tiltSweep: 90, mount: "ceiling", nightRange: 20, lens: "motorised", opticalZoom: 12, digitalZoom: 4, fov: 70, range: 30, heading: 45, tilt: 10, z: 3 });
+    const merged = mergeServerCameras([local], [{ id: "a", name: "Server name", host: "h", snapshotUrl: "", hasCredentials: true }]);
+    expect(merged[0]).toMatchObject({ kind: "ptz", pan: 270, tiltSweep: 90, mount: "ceiling", nightRange: 20, lens: "motorised", opticalZoom: 12, digitalZoom: 4, fov: 70, range: 30, heading: 45, tilt: 10, z: 3, name: "Server name" });
+  });
   it("keeps what only Studio knows: power state and position", () => {
     const merged = mergeServerCameras([camera("a", { enabled: false, x: 5, y: 6 })], [{ id: "a", name: "Server name", host: "h", snapshotUrl: "", hasCredentials: true }]);
     expect(merged).toEqual([{ id: "a", name: "Server name", host: "h", snapshotUrl: "", hasCredentials: true, enabled: false, x: 5, y: 6 }]);

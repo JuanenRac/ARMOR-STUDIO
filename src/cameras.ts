@@ -12,13 +12,17 @@ export const defaultCameraPosition = (index: number): { x: number; y: number } =
  * knows: whether a camera is switched on and where it sits on the plan.
  * An empty server list changes nothing (the server may simply be unreachable).
  */
+/** The parts of a camera that belong to the design and not to the server (how it looks and where it points): kept from the local camera when the server list is read again. */
+const DESIGN_KEYS = ["heading", "tilt", "z", "fov", "range", "kind", "pan", "tiltSweep", "mount", "nightRange", "lens", "opticalZoom", "digitalZoom"] as const;
+const designOf = (local: Camera | undefined): Partial<Camera> => local ? Object.fromEntries(DESIGN_KEYS.filter(key => local[key] !== undefined).map(key => [key, local[key]])) : {};
+
 export function mergeServerCameras(current: readonly Camera[], reported: ReadonlyArray<Omit<Camera, "enabled" | "x" | "y"> & Partial<Pick<Camera, "enabled" | "x" | "y">>>): Camera[] {
   if (!reported.length) return [...current];
   const known = new Map(current.map(camera => [camera.id, camera]));
   return reported.map((camera, index) => {
     const local = known.get(camera.id);
     const fallback = defaultCameraPosition(index);
-    return { ...camera, enabled: local?.enabled ?? true, x: local?.x ?? fallback.x, y: local?.y ?? fallback.y, ...(local?.heading !== undefined ? { heading: local.heading } : {}), ...(local?.tilt !== undefined ? { tilt: local.tilt } : {}), ...(local?.z !== undefined ? { z: local.z } : {}), ...(local?.fov !== undefined ? { fov: local.fov } : {}), ...(local?.range !== undefined ? { range: local.range } : {}) };
+    return { ...camera, enabled: local?.enabled ?? true, x: local?.x ?? fallback.x, y: local?.y ?? fallback.y, ...designOf(local) };
   });
 }
 

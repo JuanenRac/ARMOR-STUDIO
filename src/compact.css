@@ -38,7 +38,7 @@
   .studio-frame .unified-designer-heading > div:first-child { display: none; }
   .studio-frame .designer-heading-actions { display: flex; flex-direction: row; align-items: center; justify-content: space-between; width: 100%; gap: .6rem; justify-items: unset; }
   .studio-frame .designer-view-actions { order: 1; } .studio-frame .designer-status { order: 2; margin-left: auto; }
-  .studio-frame .unified-site-designer .site-designer-grid { grid-template-columns: minmax(0, 1fr) 320px; gap: 4px; margin-top: 4px; }
+  .studio-frame .unified-site-designer .site-designer-grid { grid-template-columns: minmax(0, 1fr) 390px; gap: 4px; margin-top: 4px; }
   .studio-frame .designer-canvas.pro-canvas { min-height: 0; border-radius: 10px; }
   .studio-frame .building-inspector { padding: .5rem .6rem; border-radius: 10px; }
   .inspector-tabs { display: flex; gap: 2px; padding: 2px; margin-bottom: .45rem; border: 1px solid #1d4b56; border-radius: 9px; background: #06131a; position: sticky; top: -.5rem; z-index: 2; }
