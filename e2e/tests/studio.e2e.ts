@@ -46,8 +46,10 @@ test.describe("signed in", () => {
   test("the configuration menu offers the node firmware and the notifications", async ({ page }) => {
     await signIn(page);
     await page.locator(".sidebar nav button", { hasText: /configuraci|configuration/i }).first().click();
-    await expect(page.getByRole("button", { name: /firmware/i }).first()).toBeVisible();
-    await expect(page.getByRole("button", { name: /notificaci|notifications/i }).first()).toBeVisible();
+    const tabs = page.locator(".config-tabs");
+    await expect(tabs.getByText(/firmware/i).first()).toBeVisible();
+    await expect(tabs.getByText(/notificaci|notifications/i).first()).toBeVisible();
+    for (const tab of await tabs.locator("button").all()) { await tab.click(); await page.waitForTimeout(300); await expect(page.locator(".config-tabs")).toBeVisible(); }
   });
 });
 
