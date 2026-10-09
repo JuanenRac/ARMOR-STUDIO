@@ -583,6 +583,7 @@ export default function Viewport3D(props: ViewportProps) {
     <div className="plan-floors" role="group" aria-label={t("floorSelector")}>
       <button className={props.activeFloor < 0 ? "on" : ""} onClick={() => props.onFloor(-1)} title={t("allFloors")}>{t("allFloorsShort")}</button>
       {floors.map(floor => <button key={floor} className={props.activeFloor === floor ? "on" : ""} onClick={() => props.onFloor(floor)} title={`${t("floor")} ${floor + 1}`}>{floor === 0 ? t("groundShort") : floor}</button>)}
+      <button className={`roof-chip ${layers.roofs ? "" : "on"}`} aria-pressed={!layers.roofs} onClick={() => setLayers(current => ({ ...current, roofs: !current.roofs }))} title={layers.roofs ? t("roofsOff") : t("roofsOn")} aria-label={layers.roofs ? t("roofsOff") : t("roofsOn")}>{ICON.roof}</button>
     </div>
     <div ref={compass} className="v3d-compass" aria-label={t("north")} title={t("north")}><svg viewBox="0 0 40 40" width="42" height="42"><circle cx="20" cy="20" r="17" className="n-ring" /><g className="n-rot"><path d="M20 6l5 14H15z" className="n-needle" /><path d="M20 34l-5-14h10z" className="n-tail" /><text x="20" y="4.6" textAnchor="middle" className="n-n">N</text></g></svg></div>
     <p className="v3d-hint">{t("orbitHint")}</p>

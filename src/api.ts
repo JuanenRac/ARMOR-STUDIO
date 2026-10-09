@@ -406,6 +406,16 @@ export type DesignKind = "site" | "electrical" | "network";
 export type DesignVersion = { id: string; revision: number; saved_at: string; updated_by: string | null; counts: Record<string, number> };
 const DESIGN_ROUTE: Record<DesignKind, string> = { site: "/api/v1/site", electrical: "/api/v1/electrical/design", network: "/api/v1/network/design" };
 export const listDesignVersions = (origin: string, kind: DesignKind) => userCall<{ versions: DesignVersion[] }>(origin, "GET", `${DESIGN_ROUTE[kind]}/versions`);
+/** Forget one kept version, or all of them (the current design is not touched); the second returns how many there were. */
+export async function deleteDesignVersion(origin: string, kind: DesignKind, id: string): Promise<void> {
+  const response = await timedFetch(endpoint(origin, `${DESIGN_ROUTE[kind]}/versions/${encodeURIComponent(id)}`), { method: "DELETE", ...localSession });
+  if (!response.ok) throw new ApiError(response.status, "version_delete_failed");
+}
+export async function deleteDesignVersions(origin: string, kind: DesignKind): Promise<number> {
+  const response = await timedFetch(endpoint(origin, `${DESIGN_ROUTE[kind]}/versions`), { method: "DELETE", ...localSession });
+  if (!response.ok) throw new ApiError(response.status, "version_delete_failed");
+  return (await response.json() as { removed: number }).removed;
+}
 export async function readDesignVersion(origin: string, kind: DesignKind, id: string): Promise<Record<string, unknown> | null> {
   const document = await userCall<Record<string, unknown>>(origin, "GET", `${DESIGN_ROUTE[kind]}/versions/${encodeURIComponent(id)}`);
   const design = document[kind];
