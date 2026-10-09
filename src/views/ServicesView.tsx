@@ -31,6 +31,18 @@ export function actionsFor(state: ServiceState, agentId: string): ServiceAction[
     default: return [];
   }
 }
+/** The picture of each action: a power symbol to start, a square to stop, a circular arrow to restart, two bars to pause and a triangle to resume. */
+export function ActionIcon({ action }: { action: ServiceAction }) {
+  const common = { width: 20, height: 20, viewBox: "0 0 24 24", "aria-hidden": true, focusable: false } as const;
+  switch (action) {
+    case "start": return <svg {...common} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v8" /><path d="M6.6 6.8a8 8 0 1 0 10.8 0" /></svg>;
+    case "stop": return <svg {...common} fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2.2" /></svg>;
+    case "restart": return <svg {...common} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 12a8 8 0 1 1-2.7-6" /><path d="M20 4v5.2h-5.2" /></svg>;
+    case "pause": return <svg {...common} fill="currentColor"><rect x="6.2" y="5" width="4" height="14" rx="1.4" /><rect x="13.8" y="5" width="4" height="14" rx="1.4" /></svg>;
+    case "resume": return <svg {...common} fill="currentColor"><path d="M8 5.2v13.6a.8.8 0 0 0 1.2.7l10.6-6.8a.8.8 0 0 0 0-1.4L9.2 4.5A.8.8 0 0 0 8 5.2z" /></svg>;
+  }
+}
+
 /** The units of the agent are `armor-server`, the catalogue's are `armor-server.service`. */
 export const agentIdOf = (unit: string | undefined, agent: readonly AdminService[]): string | undefined => agent.find(item => unit !== undefined && `${item.unit}.service` === unit)?.id;
 
@@ -134,7 +146,7 @@ export function ServicesView({ t, origin }: { t: Translate; origin: string }) {
           {(() => {
             const id = agent ? agentIdOf(service.unit, agent) : undefined;
             if (!id || service.kind !== "systemd") return null;
-            return <div className="svc-actions">{actionsFor(service.state, id).map(action => <button key={action} disabled={busy} className={action === "stop" ? "danger" : ""} onClick={() => ask(service, id, action)}>{t("svcBtn_" + action)}</button>)}</div>;
+            return <div className="svc-actions">{actionsFor(service.state, id).map(action => <button key={action} disabled={busy} className={`svc-act ${action}`} title={t("svcBtn_" + action)} aria-label={`${t("svcBtn_" + action)} ${service.name}`} onClick={() => ask(service, id, action)}><ActionIcon action={action} /></button>)}</div>;
           })()}
         </article>)}
       </div>

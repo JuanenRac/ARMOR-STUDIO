@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { actionsFor, agentIdOf, familyKey, isActive, toneOf } from "./views/ServicesView";
+import { ActionIcon, actionsFor, agentIdOf, familyKey, isActive, toneOf } from "./views/ServicesView";
 import { servicesCatalogues } from "./servicesText";
 import { LANGUAGE_ORDER } from "./catalogueRows";
 
@@ -50,5 +50,11 @@ describe("the buttons of a program", () => {
       }
       for (const key of ["svcAsk_stop", "svcAsk_stop_console", "svcAsk_restart", "svcAsk_restart_console", "svcAsk_pause"]) expect(servicesCatalogues[code][key], `${code} ${key}`).toBeTruthy();
     }
+  });
+});
+
+describe("the pictures of the buttons", () => {
+  it("has one for every action", () => {
+    for (const action of ["start", "stop", "restart", "pause", "resume"] as const) expect(ActionIcon({ action }), action).toBeTruthy();
   });
 });
