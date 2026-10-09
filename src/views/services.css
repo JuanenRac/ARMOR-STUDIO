@@ -30,3 +30,6 @@
 .svc-meta span.warn { color: #ffcf7d; border-color: rgba(242, 182, 64, .4); }
 .svc-empty { margin: 0; padding: 2rem; text-align: center; color: #86a8b3; border: 1px dashed #285a66; border-radius: 12px; }
 .svc-foot { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; color: #6f8e98; font-size: .68rem; }
+.svc-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .7rem; }
+.svc-actions button { padding: .3rem .7rem; font-size: .8rem; }
+.svc-actions button.danger { border-color: #7a3030; color: #ffb4b4; }

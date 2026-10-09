@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.7] - Start, stop, restart and pause each service, and a silent node no longer shows old data
+
+- **Services menu:** an administrator sees, on the card of each program of the machine (the server, Studio, the MQTT broker, the network node, the observation and voice services), the buttons that make sense in its state: *Start*, *Stop*, *Restart*, *Pause* and *Resume*. Stop, restart and pause ask for confirmation, and say so when the console itself is the one affected. A paused program is frozen where it is (it keeps its memory and answers nothing) and shows as *Paused*; the server and Studio cannot be paused, because a paused console could not be used to resume itself. The buttons need the administration agent of the machine, and the menu says when it does not answer. Field nodes are only shown.
+- **A node that is silent no longer shows its last reading** (Radar > Active radar nodes, the overview and the alarm counter): its light is grey, its tracks and level read "—" instead of the last ones (a node switched off could show "3 tracks" with an orange light, another a green one), and a node that went silent while at a high level no longer counts as a high alert.
+
 ## [0.6.6] - A wider Help window, and Studio in a real browser
 
 - **The Help window is twice as wide** (980 px instead of 480 px, or the width of the screen if that is smaller). Its width had never applied: the generic dialog rule (480 px) was loaded after it and won, so the Help window was as narrow as the About window; the rule now names both classes.

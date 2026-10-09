@@ -313,7 +313,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   <StatusBar serverName={serverName} synced={connectionState === "synced"} mode={state.mode}
     nodesOnline={nodes.filter(node => node.online && !node.stale).length} nodesTotal={nodes.length}
     camerasReachable={cameras.filter(camera => reachability[camera.id] === "online").length} camerasTotal={cameras.length}
-    highAlerts={nodes.filter(node => node.alert_level === "high").length}
+    highAlerts={nodes.filter(node => node.online && !node.stale && node.alert_level === "high").length}
     info={serverInfo} latencyMs={latencyMs} revision={state.revision} onSignOut={onSignOut} t={t} />
   </div></StreamRenewContext.Provider></SessionUserContext.Provider>;
 }

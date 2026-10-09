@@ -293,7 +293,7 @@ export type BrokerAccount = { user: string; role: string; name: string; manageab
 export type ProvisionResult = { ok: boolean; written: boolean; why: string; broker: { uri: string; username: string; password: string } };
 export const adminStatus = (origin: string) => userCall<{ available: boolean; reason?: string; hint?: string }>(origin, "GET", "/api/v1/admin/status");
 export const adminServices = (origin: string) => userCall<{ services: AdminService[] }>(origin, "GET", "/api/v1/admin/services");
-export const adminServiceAction = (origin: string, id: string, action: "start" | "stop" | "restart" | "reload") => userCall<{ ok: boolean }>(origin, "POST", `/api/v1/admin/services/${encodeURIComponent(id)}/${action}`);
+export const adminServiceAction = (origin: string, id: string, action: "start" | "stop" | "restart" | "reload" | "pause" | "resume") => userCall<{ ok: boolean }>(origin, "POST", `/api/v1/admin/services/${encodeURIComponent(id)}/${action}`);
 export const adminFiles = (origin: string) => userCall<{ files: AdminFileInfo[] }>(origin, "GET", "/api/v1/admin/files");
 export const adminFile = (origin: string, id: string) => userCall<AdminFile>(origin, "GET", `/api/v1/admin/files/${encodeURIComponent(id)}`);
 export const adminSaveFile = (origin: string, id: string, change: { content: string; restart: boolean; expect_mtime?: number }) => userCall<{ ok: boolean; restarted: string[]; mtime: number }>(origin, "PUT", `/api/v1/admin/files/${encodeURIComponent(id)}`, change);
@@ -457,7 +457,7 @@ export type MachineMetrics = {
   history: Array<{ t: number; cpu: number | null; memory: number; swap: number; temperature: number | null; rx_bps: number; tx_bps: number }>;
 };
 /** The services of the system, running or not: the programs of the machine (from systemd) and the field nodes. */
-export type ServiceState = "running" | "stopped" | "failed" | "starting" | "not_installed" | "online" | "offline" | "unknown";
+export type ServiceState = "running" | "paused" | "stopped" | "failed" | "starting" | "not_installed" | "online" | "offline" | "unknown";
 export type ServiceInfo = {
   id: string; name: string; family: string; description: string; kind: "systemd" | "field-node"; state: ServiceState; sub_state?: string; unit?: string; enabled?: boolean | null;
   pid?: number | null; since_ms?: number | null; memory_bytes?: number | null; restarts?: number | null; port?: number | null;
