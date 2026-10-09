@@ -21,13 +21,13 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-7-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-203%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-302%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
 
 ---
 
-**Controllo di onestà - cosa funziona oggi:** Studio dialoga con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) ed è coperto da 203 test unitari (lettura delle impostazioni, unione delle telecamere, aritmetica dei grafici solari, ogni menu mostrato nelle sette lingue, host statico). **Non** sono provati: il video dal vivo e il PTZ con ogni telecamera reale, i menu solari con un vero inverter o batteria, né una revisione formale di accessibilità o usabilità. Finché il server non è raggiungibile, Studio mostra dati dimostrativi e lo dice nella barra superiore.
+**Controllo di onestà - cosa funziona oggi:** Studio dialoga con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) ed è coperto da 302 test unitari (lettura delle impostazioni, unione delle telecamere, aritmetica dei grafici solari, ogni menu mostrato nelle sette lingue, host statico). **Non** sono provati: il video dal vivo e il PTZ con ogni telecamera reale, i menu solari con un vero inverter o batteria, né una revisione formale di accessibilità o usabilità. Finché il server non è raggiungibile, Studio mostra dati dimostrativi e lo dice nella barra superiore.
 
 ---
 
@@ -63,6 +63,7 @@ flowchart LR
 * **Le impostazioni salvate sono input non attendibile.** Sono lette valore per valore: un'origine, un tema, una lingua o una forma non validi vengono scartati, le posizioni limitate e le liste contenute.
 * **Nessuna richiesta a terzi, tranne il menu Meteo, e solo dopo averlo attivato.** I caratteri sono locali; l'host statico invia `Content-Security-Policy: default-src 'self'` limitata al server configurato, `frame-ancestors 'none'`, `nosniff` e `no-referrer`.
 * Il video dal vivo si mostra solo tramite un indirizzo di flusso che il server rilascia a un operatore.
+* **Firmware dei nodi e avvisi:** *Configurazione > Firmware* aggiorna un nodo o tutti quelli di un tipo da un file o dalla release di GitHub, con una barra di avanzamento per nodo e i passaggi spiegati; *Notifiche* collega gli allarmi a Telegram e Home Assistant e invia una prova. Anche i file di configurazione, i servizi e il broker del sistema si modificano lì, tramite l'agente di amministrazione della macchina.
 
 ## 📂 Struttura del repository
 
@@ -87,7 +88,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 203 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
+npm test            # 302 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```
