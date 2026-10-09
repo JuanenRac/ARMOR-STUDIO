@@ -5,7 +5,7 @@
  */
 import { readColour } from "./designer/colors";
 import { parseServerOrigin } from "./config";
-import { FEATURE_STYLES, MAST_PART_KINDS, type DevicePlacement, type MastPart, LANGUAGES, THEMES, type Building, type Camera, type Dimensions, type LanguageCode, type Opening, type Point, type Roof, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type Terrain, type Theme, type WallLamp } from "./domain";
+import { FEATURE_STYLES, MAST_PART_KINDS, type DevicePlacement, type MastPart, LANGUAGES, THEMES, type Building, type Camera, type Dimensions, type LanguageCode, type Opening, type Point, type Roof, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type Terrain, type Theme, type WallLamp, BUILDING_USES, BUILDING_MATERIALS, OPENING_STYLES, LAMP_KINDS } from "./domain";
 import { isSimplePolygon } from "./designer/geometry";
 
 export const SETTINGS_KEY = "armor-studio-settings-v1";
@@ -44,6 +44,11 @@ function readCamera(raw: unknown): Camera | null {
   if (finite(raw.z)) camera.z = clamp(raw.z, 0, 100);
   if (finite(raw.fov)) camera.fov = clamp(raw.fov, 20, 180);
   if (finite(raw.range)) camera.range = clamp(raw.range, 2, 60);
+  if (raw.kind === "ptz") camera.kind = "ptz";
+  if (finite(raw.pan)) camera.pan = clamp(raw.pan, 90, 360);
+  if (finite(raw.tiltSweep)) camera.tiltSweep = clamp(raw.tiltSweep, 30, 180);
+  if (raw.mount === "wall" || raw.mount === "ceiling" || raw.mount === "pole" || raw.mount === "ground") camera.mount = raw.mount;
+  if (finite(raw.nightRange)) camera.nightRange = clamp(raw.nightRange, 1, 100);
   return camera;
 }
 
@@ -92,12 +97,14 @@ function readRoof(raw: unknown): Roof {
   };
 }
 
+const oneOf = <T extends string>(list: readonly T[], value: unknown): T | undefined => (typeof value === "string" && (list as readonly string[]).includes(value) ? (value as T) : undefined);
+
 function readBuilding(raw: unknown): Building | null {
   if (!isRecord(raw) || !id(raw.id)) return null;
   const name = label(raw.name, 80), points = readPoints(raw.points);
   if (name === null || !points) return null;
   const floors = Array.isArray(raw.floors) ? raw.floors.slice(0, LIMITS.floors).filter(finite).map(height => clamp(height, 0.5, 20)) : [];
-  return { id: raw.id, name, points, base: num(raw, "base", 0, -50, 500), floors: floors.length ? floors : [3], roof: readRoof(raw.roof), thickness: num(raw, "thickness", 0.2, 0.05, 1), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}), ...(readColour(raw.roofColor) ? { roofColor: readColour(raw.roofColor) } : {}), ...(raw.roofHidden === true ? { roofHidden: true } : {}) };
+  return { id: raw.id, name, points, base: num(raw, "base", 0, -50, 500), floors: floors.length ? floors : [3], roof: readRoof(raw.roof), thickness: num(raw, "thickness", 0.2, 0.05, 1), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}), ...(readColour(raw.roofColor) ? { roofColor: readColour(raw.roofColor) } : {}), ...(raw.roofHidden === true ? { roofHidden: true } : {}) , ...(oneOf(BUILDING_USES, raw.use) ? { use: oneOf(BUILDING_USES, raw.use) } : {}), ...(oneOf(BUILDING_MATERIALS, raw.material) ? { material: oneOf(BUILDING_MATERIALS, raw.material) } : {}) };
 }
 
 function readOpening(raw: unknown): Opening | null {
@@ -107,6 +114,9 @@ function readOpening(raw: unknown): Opening | null {
   return {
     id: raw.id, buildingId: raw.buildingId, edge, floor, kind: raw.kind, offset: num(raw, "offset", 0, 0, 1000),
     width: num(raw, "width", 0.9, 0.2, 20), height: num(raw, "height", 2.1, 0.2, 20), sill: num(raw, "sill", 0, 0, 50), ...(raw.arch === true ? { arch: true } : {}), ...(raw.balcony === true ? { balcony: true } : {}), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}),
+    ...(typeof raw.style === "string" && OPENING_STYLES[raw.kind]?.includes(raw.style) ? { style: raw.style } : {}),
+    ...(raw.swing === "out" && (raw.kind === "door" || raw.kind === "garage") ? { swing: "out" as const } : {}), ...(raw.hinge === "right" && raw.kind === "door" ? { hinge: "right" as const } : {}),
+    ...(raw.shutter === true ? { shutter: true } : {}), ...(raw.contact === true ? { contact: true } : {}),
   };
 }
 
@@ -115,13 +125,14 @@ function readRoofItem(raw: unknown): RoofItem | null {
   return {
     id: raw.id, buildingId: raw.buildingId, kind: raw.kind as RoofItem["kind"], x: raw.x, y: raw.y,
     width: num(raw, "width", 0.5, 0.02, 20), depth: num(raw, "depth", 0.5, 0.02, 20), height: num(raw, "height", 1, 0.01, 50), rotation: num(raw, "rotation", 0, -360, 360), tilt: num(raw, "tilt", 0, 0, 80), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}),
+    ...(raw.kind === "solar" && finite(raw.watts) ? { watts: clamp(Math.round(raw.watts), 10, 2000) } : {}), ...(raw.kind === "solar" && finite(raw.count) ? { count: clamp(Math.round(raw.count), 1, 500) } : {}),
   };
 }
 
 function readWallLamp(raw: unknown): WallLamp | null {
   if (!isRecord(raw) || !id(raw.id) || !id(raw.buildingId)) return null;
   const edge = integer(raw, "edge", LIMITS.points);
-  return edge === null ? null : { id: raw.id, buildingId: raw.buildingId, edge, offset: num(raw, "offset", 0, 0, 1000), z: num(raw, "z", 2.4, 0, 100), reach: num(raw, "reach", 0.4, 0, 3), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}) };
+  return edge === null ? null : { id: raw.id, buildingId: raw.buildingId, edge, offset: num(raw, "offset", 0, 0, 1000), z: num(raw, "z", 2.4, 0, 100), reach: num(raw, "reach", 0.4, 0, 3), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}), ...(oneOf(LAMP_KINDS, raw.lampKind) ? { lampKind: oneOf(LAMP_KINDS, raw.lampKind) } : {}), ...(finite(raw.watts) ? { watts: clamp(Math.round(raw.watts), 1, 2000) } : {}), ...(raw.motion === true ? { motion: true } : {}) };
 }
 
 function readPlacement(raw: unknown): DevicePlacement | null {
@@ -148,6 +159,7 @@ function readFeature(raw: unknown): SiteFeature | null {
     ...(typeof raw.label === "string" && raw.label.trim() ? { label: raw.label.trim().slice(0, 40) } : {}),
     ...(typeof raw.style === "string" && FEATURE_STYLES[raw.kind as SiteFeature["kind"]]?.includes(raw.style) ? { style: raw.style } : {}),
     ...(readMastParts(raw.parts) ? { parts: readMastParts(raw.parts) } : {}),
+    ...(raw.kind === "lamp" && finite(raw.watts) ? { watts: clamp(Math.round(raw.watts), 1, 2000) } : {}), ...(raw.kind === "lamp" && raw.motion === true ? { motion: true } : {}), ...(raw.kind === "gate" && raw.automatic === true ? { automatic: true } : {}),
   };
 }
 

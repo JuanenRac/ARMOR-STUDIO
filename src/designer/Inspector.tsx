@@ -7,7 +7,7 @@
 import { useEffect, useState } from "react";
 import type { StudioDevice } from "../api";
 import { KindIcon } from "../deviceKinds";
-import { FEATURE_STYLES, MAST_PART_KINDS, type Building, type Camera, type Dimensions, type Opening, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type WallLamp } from "../domain";
+import { FEATURE_STYLES, MAST_PART_KINDS, type Building, type Camera, type Dimensions, type Opening, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type WallLamp, BUILDING_USES, BUILDING_MATERIALS, OPENING_STYLES, LAMP_KINDS, type BuildingUse, type BuildingMaterial, type LampKind } from "../domain";
 import { area, bounds, edgeOf, floorBottom, isSimplePolygon, nearestOnOutline, pointInPolygon, roofRise, signedArea, totalHeight } from "./geometry";
 import { DEFAULT_DOOR_COLOUR, DEFAULT_FEATURE_COLOUR, DEFAULT_LIGHT_COLOUR, DEFAULT_ROOF_COLOUR, DEFAULT_ROOF_ITEM_COLOUR, DEFAULT_TERRAIN_COLOUR, DEFAULT_WALL_COLOUR, DEFAULT_WINDOW_FRAME_COLOUR, featureColourOf } from "./colors";
 import { toolIcon } from "./icons";
@@ -146,6 +146,8 @@ export function Inspector(p: InspectorProps) {
         <label>{t("deviceName")}<input value={building.name} maxLength={60} onChange={event => setBuilding(building.id, { name: event.target.value }, "name")} /></label>
         <NumberField label={t("groundElevation")} unit="m" step={0.1} min={-5} max={200} value={building.base} onChange={value => setBuilding(building.id, { base: round2(clamp(value, -5, 200)) }, "base")} />
         <NumberField label={t("wallThickness")} unit="m" step={0.05} min={0.1} max={1.5} value={building.thickness} onChange={value => setBuilding(building.id, { thickness: round2(clamp(value, 0.1, 1.5)) }, "thickness")} />
+        <label>{t("buildingUse")}<select value={building.use ?? "house"} onChange={event => setBuilding(building.id, { use: event.target.value === "house" ? undefined : event.target.value as BuildingUse }, "use")}>{BUILDING_USES.map(use => <option key={use} value={use}>{t("buildingUse_" + use)}</option>)}</select></label>
+        <label>{t("buildingMaterial")}<select value={building.material ?? "plaster"} onChange={event => setBuilding(building.id, { material: event.target.value === "plaster" ? undefined : event.target.value as BuildingMaterial }, "material")}>{BUILDING_MATERIALS.map(material => <option key={material} value={material}>{t("buildingMaterial_" + material)}</option>)}</select></label>
       </div>
       <label className="check-row"><input type="checkbox" checked={Boolean(building.roofHidden)} onChange={event => setBuilding(building.id, { roofHidden: event.target.checked || undefined }, "roofHidden")} /> {t("roofHidden")}</label>
       <p className="muted small">{area(building.points).toFixed(1)} m² · {t("totalHeight")} {formatMetres(totalHeight(building.floors))}{building.roof.style !== "flat" && <> · {t("roofRise")} {formatMetres(roofRise(building.points, building.roof))}</>}</p>
@@ -203,6 +205,13 @@ export function Inspector(p: InspectorProps) {
         </div>
         <label className="check-row"><input type="checkbox" checked={Boolean(opening.arch)} onChange={event => setOpening(opening.id, { arch: event.target.checked || undefined }, "arch")} /> {t("openingArch")}</label>
         {(opening.kind === "door" || opening.kind === "window") && <label className="check-row"><input type="checkbox" checked={Boolean(opening.balcony)} onChange={event => setOpening(opening.id, { balcony: event.target.checked || undefined }, "balcony")} /> {t("openingBalcony")}</label>}
+        {OPENING_STYLES[opening.kind] && <div className="inspector-grid">
+          <label>{t("openingStyle")}<select value={opening.style ?? OPENING_STYLES[opening.kind]![0]} onChange={event => setOpening(opening.id, { style: event.target.value === OPENING_STYLES[opening.kind]![0] ? undefined : event.target.value }, "style")}>{OPENING_STYLES[opening.kind]!.map(style => <option key={style} value={style}>{t("openStyle_" + style)}</option>)}</select></label>
+          {(opening.kind === "door" || opening.kind === "garage") && <label>{t("doorSwing")}<select value={opening.swing ?? "in"} onChange={event => setOpening(opening.id, { swing: event.target.value === "out" ? "out" : undefined }, "swing")}><option value="in">{t("doorSwing_in")}</option><option value="out">{t("doorSwing_out")}</option></select></label>}
+          {opening.kind === "door" && <label>{t("doorHinge")}<select value={opening.hinge ?? "left"} onChange={event => setOpening(opening.id, { hinge: event.target.value === "right" ? "right" : undefined }, "hinge")}><option value="left">{t("doorHinge_left")}</option><option value="right">{t("doorHinge_right")}</option></select></label>}
+        </div>}
+        {opening.kind !== "opening" && <label className="check-row"><input type="checkbox" checked={Boolean(opening.shutter)} onChange={event => setOpening(opening.id, { shutter: event.target.checked || undefined }, "shutter")} /> {t("openingShutter")}</label>}
+        {opening.kind !== "opening" && <label className="check-row"><input type="checkbox" checked={Boolean(opening.contact)} onChange={event => setOpening(opening.id, { contact: event.target.checked || undefined }, "contact")} /> {t("openingContact")}</label>}
         <div className="inspector-actions">{remove}</div>
       </section>;
     })()}
@@ -218,7 +227,10 @@ export function Inspector(p: InspectorProps) {
         <NumberField label={t("objectHeight")} unit="m" min={0.02} step={0.05} value={roofItem.height} onChange={value => setRoofItem(roofItem.id, { height: round2(Math.max(0.02, value)) }, "height")} />
         <NumberField label={t("objectRotation")} unit="°" step={5} value={roofItem.rotation} onChange={value => setRoofItem(roofItem.id, { rotation: value }, "rotation")} />
         {roofItem.kind === "solar" && <NumberField label={t("panelTilt")} unit="°" step={5} min={0} max={80} value={roofItem.tilt} onChange={value => setRoofItem(roofItem.id, { tilt: Math.max(0, Math.min(80, value)) }, "tilt")} />}
+        {roofItem.kind === "solar" && <NumberField label={t("panelWatts")} unit="W" min={10} max={2000} step={10} value={roofItem.watts ?? 400} onChange={value => setRoofItem(roofItem.id, { watts: clamp(Math.round(value), 10, 2000) === 400 ? undefined : clamp(Math.round(value), 10, 2000) }, "watts")} />}
+        {roofItem.kind === "solar" && <NumberField label={t("panelCount")} min={1} max={500} step={1} value={roofItem.count ?? 1} onChange={value => setRoofItem(roofItem.id, { count: clamp(Math.round(value), 1, 500) === 1 ? undefined : clamp(Math.round(value), 1, 500) }, "count")} />}
       </div>
+      {roofItem.kind === "solar" && <p className="muted small">{t("panelArrayTotal")} {((roofItem.watts ?? 400) * (roofItem.count ?? 1)).toLocaleString()} W</p>}
       <p className="muted small">{t("roofItemNote")}</p>
       <div className="inspector-actions">{remove}</div>
     </section>}
@@ -230,7 +242,10 @@ export function Inspector(p: InspectorProps) {
         <NumberField label={t("openingPosition")} unit="m" min={0} step={0.05} value={wallLamp.offset} onChange={value => setWallLamp(wallLamp.id, { offset: round2(Math.max(0, value)) }, "offset")} />
         <NumberField label={t("mountHeight")} unit="m" min={0} step={0.1} value={wallLamp.z} onChange={value => setWallLamp(wallLamp.id, { z: round2(Math.max(0, value)) }, "z")} />
         <NumberField label={t("armReach")} unit="m" min={0.1} max={2} step={0.05} value={wallLamp.reach} onChange={value => setWallLamp(wallLamp.id, { reach: round2(clamp(value, 0.1, 2)) }, "reach")} />
+        <label>{t("lampKind")}<select value={wallLamp.lampKind ?? "bulb"} onChange={event => setWallLamp(wallLamp.id, { lampKind: event.target.value === "bulb" ? undefined : event.target.value as LampKind }, "lampKind")}>{LAMP_KINDS.map(kind => <option key={kind} value={kind}>{t("lampKind_" + kind)}</option>)}</select></label>
+        <NumberField label={t("lampWatts")} unit="W" min={1} max={2000} step={1} value={wallLamp.watts ?? 10} onChange={value => setWallLamp(wallLamp.id, { watts: clamp(Math.round(value), 1, 2000) === 10 ? undefined : clamp(Math.round(value), 1, 2000) }, "watts")} />
       </div>
+      <label className="check-row"><input type="checkbox" checked={Boolean(wallLamp.motion)} onChange={event => setWallLamp(wallLamp.id, { motion: event.target.checked || undefined }, "motion")} /> {t("lampMotion")}</label>
       <div className="inspector-actions">{remove}</div>
     </section>}
 
@@ -259,9 +274,12 @@ export function Inspector(p: InspectorProps) {
         <NumberField label={t("turnAboutVertical")} unit="°" step={5} min={-180} max={180} value={feature.rotation} onChange={value => setFeature(feature.id, { rotation: value }, "rotation")} />
         <NumberField label={t("tiltAboutX")} unit="°" step={5} min={-180} max={180} value={feature.pitch ?? 0} onChange={value => setFeature(feature.id, { pitch: clamp(value, -180, 180) || undefined }, "pitch")} />
         <NumberField label={t("tiltAboutZ")} unit="°" step={5} min={-180} max={180} value={feature.roll ?? 0} onChange={value => setFeature(feature.id, { roll: clamp(value, -180, 180) || undefined }, "roll")} />
+        {feature.kind === "lamp" && <NumberField label={t("lampWatts")} unit="W" min={1} max={2000} step={1} value={feature.watts ?? 10} onChange={value => setFeature(feature.id, { watts: clamp(Math.round(value), 1, 2000) === 10 ? undefined : clamp(Math.round(value), 1, 2000) }, "watts")} />}
         {FEATURE_STYLES[feature.kind] && <label>{t("featureStyle")}<select value={feature.style ?? FEATURE_STYLES[feature.kind]![0]} onChange={event => setFeature(feature.id, { style: event.target.value }, "style")}>{FEATURE_STYLES[feature.kind]!.map(style => <option key={style} value={style}>{t(`style_${style}`)}</option>)}</select></label>}
         {["solar", "canopy"].includes(feature.kind) && <NumberField label={t("roofSlope")} unit="°" min={0} max={60} step={1} value={feature.slope} onChange={value => setFeature(feature.id, { slope: clamp(value, 0, 60) }, "slope")} />}
       </div>
+      {feature.kind === "lamp" && <label className="check-row"><input type="checkbox" checked={Boolean(feature.motion)} onChange={event => setFeature(feature.id, { motion: event.target.checked || undefined }, "motion")} /> {t("lampMotion")}</label>}
+      {feature.kind === "gate" && <label className="check-row"><input type="checkbox" checked={Boolean(feature.automatic)} onChange={event => setFeature(feature.id, { automatic: event.target.checked || undefined }, "automatic")} /> {t("gateAutomatic")}</label>}
       {feature.kind === "mast" && <>
         <h4>{t("mastParts")}</h4>
         {(feature.parts ?? []).map((part, index) => <div key={index} className="inspector-grid mast-part">
@@ -281,10 +299,15 @@ export function Inspector(p: InspectorProps) {
         {heading(camera, value => setCamera(camera.id, { heading: value }, "heading"))}
         <NumberField label={t("tiltDown")} unit="°" min={-90} max={90} step={5} value={camera.tilt ?? 0} onChange={value => setCamera(camera.id, { tilt: clamp(value, -90, 90) || undefined }, "tilt")} />
         <NumberField label={t("mountHeight")} unit="m" min={0} max={100} step={0.1} value={camera.z ?? CAMERA_HEIGHT_M} onChange={value => setCamera(camera.id, { z: round2(clamp(value, 0, 100)) }, "z")} />
-        <NumberField label={t("cameraFov")} unit="°" min={20} max={180} step={5} value={camera.fov ?? 90} onChange={value => setCamera(camera.id, { fov: clamp(Math.round(value), 20, 180) === 90 ? undefined : clamp(Math.round(value), 20, 180) }, "fov")} />
+        <label>{t("cameraKind")}<select value={camera.kind === "ptz" ? "ptz" : "fixed"} onChange={event => setCamera(camera.id, event.target.value === "ptz" ? { kind: "ptz" } : { kind: undefined, pan: undefined, tiltSweep: undefined }, "kind")}><option value="fixed">{t("cameraKindFixed")}</option><option value="ptz">{t("cameraKindPtz")}</option></select></label>
+        <label>{t("cameraMount")}<select value={camera.mount ?? "wall"} onChange={event => setCamera(camera.id, { mount: event.target.value === "wall" ? undefined : event.target.value as "ceiling" | "pole" | "ground" }, "mount")}>{(["wall", "ceiling", "pole", "ground"] as const).map(mount => <option key={mount} value={mount}>{t("cameraMount_" + mount)}</option>)}</select></label>
+        {camera.kind === "ptz" && <NumberField label={t("cameraPan")} unit="°" min={90} max={360} step={5} value={camera.pan ?? 360} onChange={value => setCamera(camera.id, { pan: clamp(Math.round(value), 90, 360) === 360 ? undefined : clamp(Math.round(value), 90, 360) }, "pan")} />}
+        {camera.kind === "ptz" && <NumberField label={t("cameraTiltSweep")} unit="°" min={30} max={180} step={5} value={camera.tiltSweep ?? 90} onChange={value => setCamera(camera.id, { tiltSweep: clamp(Math.round(value), 30, 180) === 90 ? undefined : clamp(Math.round(value), 30, 180) }, "tiltSweep")} />}
+        <NumberField label={t(camera.kind === "ptz" ? "cameraLensFov" : "cameraFov")} unit="°" min={20} max={180} step={5} value={camera.fov ?? 90} onChange={value => setCamera(camera.id, { fov: clamp(Math.round(value), 20, 180) === 90 ? undefined : clamp(Math.round(value), 20, 180) }, "fov")} />
         <NumberField label={t("cameraRange")} unit="m" min={2} max={60} step={1} value={camera.range ?? 12} onChange={value => setCamera(camera.id, { range: clamp(Math.round(value), 2, 60) === 12 ? undefined : clamp(Math.round(value), 2, 60) }, "range")} />
+        <NumberField label={t("cameraNight")} unit="m" min={0} max={100} step={1} value={camera.nightRange ?? 0} onChange={value => setCamera(camera.id, { nightRange: clamp(Math.round(value), 0, 100) || undefined }, "nightRange")} />
       </div>
-      <p className="muted small">{t("cameraViewNote")}</p>
+      <p className="muted small">{t(camera.kind === "ptz" ? "cameraPtzNote" : "cameraViewNote")}</p>
     </section>}
 
     {sensor && <section className="object-editor">

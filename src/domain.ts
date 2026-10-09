@@ -19,6 +19,16 @@ export type Camera = {
   z?: number;
   /** Field of view in degrees (the whole angle) and how far it sees in metres; unset means the defaults of the designer (90 degrees, 12 m). */
   fov?: number; range?: number;
+  /** "fixed" (the default) looks one way; "ptz" is motorised and turns. */
+  kind?: "fixed" | "ptz";
+  /** Motorised only: how far it turns sideways in total, 90 to 360 degrees (unset = 360); its coverage is drawn as that sweep and `fov` is the angle of its lens at any moment. */
+  pan?: number;
+  /** Motorised only: how far it tilts up and down in total, 30 to 180 degrees (unset = 90). */
+  tiltSweep?: number;
+  /** Where the mount is: "wall", "ceiling", "pole" or "ground"; it only changes how the camera is described, not what it covers. */
+  mount?: "wall" | "ceiling" | "pole" | "ground";
+  /** Infrared night vision reach in metres (unset = none). */
+  nightRange?: number;
 };
 export type Sensor = {
   id: string; name: string; x: number; y: number; kind: "LD2450" | "LD2461"; heading?: number; tilt?: number;
@@ -42,19 +52,35 @@ export type Roof = { style: RoofStyle; slope: number; overhang: number; ridge: n
  * A building: a closed footprint polygon in metres, the elevation of its ground floor, the height of each storey
  * (one number per floor, bottom first) and a roof over the top.
  */
-export type Building = { id: string; name: string; points: Point[]; base: number; floors: number[]; roof: Roof; thickness: number; /** Wall and roof colours, "#rrggbb"; unset keeps the default. */ color?: string; roofColor?: string; /** The roof is taken off, to see the rooms of the top floor from above. */ roofHidden?: boolean };
+export const BUILDING_USES = ["house", "garage", "workshop", "shed", "barn", "office", "other"] as const;
+export type BuildingUse = (typeof BUILDING_USES)[number];
+export const BUILDING_MATERIALS = ["plaster", "brick", "stone", "wood", "concrete", "metal"] as const;
+export type BuildingMaterial = (typeof BUILDING_MATERIALS)[number];
+export type Building = { id: string; name: string; points: Point[]; base: number; floors: number[]; roof: Roof; thickness: number; /** Wall and roof colours, "#rrggbb"; unset keeps the default. */ color?: string; roofColor?: string; /** The roof is taken off, to see the rooms of the top floor from above. */ roofHidden?: boolean
+  /** What the building is used for, and what its walls are made of: they describe it, they do not change the drawing. */
+  use?: BuildingUse; material?: BuildingMaterial };
 
 /** A door, a window, a garage door (wide, sectional) or a plain opening in a wall (for an awning, an arch). */
+export const OPENING_STYLES: Partial<Record<"door" | "window" | "garage" | "opening", readonly string[]>> = {
+  door: ["single", "double", "sliding", "folding"], window: ["fixed", "casement", "sliding", "tilt"], garage: ["sectional", "roller", "swing"],
+};
 export type OpeningKind = "door" | "window" | "garage" | "opening";
 /** A door or window in one wall (the footprint edge from point `edge` to the next) of one floor, at any height. */
-export type Opening = { id: string; buildingId: string; edge: number; floor: number; kind: OpeningKind; offset: number; width: number; height: number; sill: number; /** Arched at the top. */ arch?: boolean; /** A small balcony outside it (a door or a window of an upper floor). */ balcony?: boolean; /** The door leaf or the window frame, "#rrggbb". */ color?: string };
+export type Opening = { id: string; buildingId: string; edge: number; floor: number; kind: OpeningKind; offset: number; width: number; height: number; sill: number; /** Arched at the top. */ arch?: boolean; /** A small balcony outside it (a door or a window of an upper floor). */ balcony?: boolean; /** The door leaf or the window frame, "#rrggbb". */ color?: string
+  /** How it is made: one of `OPENING_STYLES[kind]` (a door single, double, sliding or folding; a window fixed, casement, sliding or tilting; a garage door sectional, roller or swing). */ style?: string;
+  /** A door or garage door opens outwards (unset = inwards) and hinges on the right (unset = the left). */ swing?: "out"; hinge?: "right";
+  /** A security shutter or blind covers it; an alarm contact is fitted (so the design says which doors and windows the alarm watches). */ shutter?: boolean; contact?: boolean };
 
 export type RoofItemKind = "chimney" | "solar" | "antenna" | "vent" | "gutter" | "downpipe";
 /** Something standing on a roof; its height above the ground follows the roof surface. */
-export type RoofItem = { id: string; buildingId: string; kind: RoofItemKind; x: number; y: number; width: number; depth: number; height: number; rotation: number; tilt: number; color?: string };
+export type RoofItem = { id: string; buildingId: string; kind: RoofItemKind; x: number; y: number; width: number; depth: number; height: number; rotation: number; tilt: number; color?: string;
+  /** A solar array: the rated power of each panel in watts and how many there are; the design adds them up. */ watts?: number; count?: number };
 
+export const LAMP_KINDS = ["bulb", "flood", "spot", "lantern"] as const;
+export type LampKind = (typeof LAMP_KINDS)[number];
 /** A lamp on a building wall: which wall, how far along it, how high, and how far it reaches out. */
-export type WallLamp = { id: string; buildingId: string; edge: number; offset: number; z: number; reach: number; /** The colour of its light, "#rrggbb". */ color?: string };
+export type WallLamp = { id: string; buildingId: string; edge: number; offset: number; z: number; reach: number; /** The colour of its light, "#rrggbb". */ color?: string
+  /** What it is, its power in watts and whether a movement sensor switches it on. */ lampKind?: LampKind; watts?: number; motion?: boolean };
 
 /** Objects standing on the ground. `lamp` is a lamp post (a tube of `height` with the light on top), `mast` an antenna mast. */
 export type SiteFeatureKind = "pillar" | "lamp" | "mast" | "solar" | "canopy" | "entrance" | "path" | "road" | "tree" | "kennel" | "fence" | "fountain" | "coop" | "gate" | "sidewalk" | "pool" | "planter" | "terrace" | "bench" | "table" | "barbecue" | "pergola" | "shed" | "hedge" | "mailbox" | "bins" | "tank" | "ac-unit" | "electrical-box" | "car";
@@ -81,6 +107,8 @@ export type SiteFeature = {
   label?: string;
   /** What a mast carries (up to twelve). */
   parts?: MastPart[];
+  /** A lamp post: its power in watts and whether a movement sensor switches it on. A gate: it opens by itself (a motor). */
+  watts?: number; motion?: boolean; automatic?: boolean;
 };
 
 /** Where a device (a smoke detector, a door contact, a plug...) stands in the design: metres, x east, y north, z up; turned like any object. */
