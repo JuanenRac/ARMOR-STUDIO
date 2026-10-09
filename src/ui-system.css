@@ -1,0 +1,121 @@
+/*
+ * The look of every control of Studio, in one place: buttons, tabs, fields, dropdown lists, scroll bars and the small texts of the menus.
+ * Each menu used to bring its own (grey buttons, white fields, six different corner radii, type from 9 to 16 px); this sheet is loaded last and says what the
+ * "game menu" look is once, in the colours of the theme (--t-*; the default "Armor" look when there is no theme).
+ *
+ *   tokens ........ the colours, the corners and the type every rule below draws from
+ *   tabs .......... every group of switches (view tabs, filters, floors, camera layouts...) is the same segmented strip
+ *   buttons ....... default, primary (solid accent) and danger (red), all with one height and one type
+ *   fields ........ text boxes and text areas, with the glow of the dropdown lists
+ *   details ....... scroll bars, check boxes, the small grey texts
+ *
+ * The selectors end in :not(#ui) on purpose: an id makes them more specific than the rules of every menu and every theme, with no !important.
+ */
+:root {
+  --ui-accent: var(--t-a1, #22d3ee);
+  --ui-accent2: var(--t-a2, #4aa8ff);
+  --ui-line: var(--t-line, #285a66);
+  --ui-panel: var(--t-panel2, #0a1f29);
+  --ui-text: var(--t-text, #d9f6fb);
+  --ui-muted: var(--t-muted, #86a8b3);
+  --ui-radius: var(--t-radius, 10px);
+  --ui-radius-sm: min(var(--ui-radius), 8px);
+  --ui-font: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --ui-mono: "DM Mono", "Cascadia Mono", ui-monospace, Consolas, monospace;
+  --ui-h: 34px;
+}
+
+/* ---- tabs: one segmented strip -------------------------------------------------------------------------------------------------------------- */
+.view-tabs, .grid-picker, .media-filters, .history-actions, .designer-view-toggle, .plan-floors, .inspector-tabs, .ed-tabs, .devices-filters, .svc-chips, .config-tabs { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; }
+:is(.view-tabs, .grid-picker, .media-filters, .history-actions, .designer-view-toggle, .plan-floors, .inspector-tabs, .ed-tabs, .devices-filters, .svc-chips, .config-tabs) > button:not(#ui) {
+  --c: var(--ui-accent);
+  display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 32px; padding: .3rem .85rem; cursor: pointer;
+  font: 700 .7rem var(--ui-font); letter-spacing: .05em; text-transform: none;
+  color: color-mix(in srgb, var(--ui-text) 82%, var(--ui-muted)); border: 1px solid color-mix(in srgb, var(--ui-line) 85%, transparent); border-radius: var(--ui-radius-sm);
+  background: color-mix(in srgb, var(--ui-panel) 88%, transparent); box-shadow: none; transform: none;
+  transition: color .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+:is(.view-tabs, .grid-picker, .media-filters, .history-actions, .designer-view-toggle, .plan-floors, .inspector-tabs, .ed-tabs, .devices-filters, .svc-chips, .config-tabs) > button:not(#ui):hover:not(:disabled) {
+  color: var(--ui-text); border-color: color-mix(in srgb, var(--c) 60%, var(--ui-line)); background: color-mix(in srgb, var(--c) 10%, var(--ui-panel)); transform: none; box-shadow: none;
+}
+:is(.view-tabs, .grid-picker, .media-filters, .history-actions, .designer-view-toggle, .plan-floors, .inspector-tabs, .ed-tabs, .devices-filters, .svc-chips, .config-tabs) > button:is(.active, .on, [aria-pressed="true"], [aria-selected="true"]):not(#ui) {
+  color: var(--ui-active-text, color-mix(in srgb, var(--c) 40%, white)); border-color: var(--c); background: linear-gradient(180deg, color-mix(in srgb, var(--c) 30%, transparent), color-mix(in srgb, var(--c) 14%, transparent)), var(--ui-panel);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--c) 35%, transparent), 0 4px 14px color-mix(in srgb, var(--c) 22%, transparent);
+}
+:is(.view-tabs, .grid-picker, .media-filters, .history-actions, .designer-view-toggle, .plan-floors, .inspector-tabs, .ed-tabs, .devices-filters, .svc-chips, .config-tabs) > button:focus-visible:not(#ui) { outline: 2px solid var(--c); outline-offset: 2px; }
+
+/* ---- buttons: default, primary, danger ------------------------------------------------------------------------------------------------------ */
+:is(main, .modal-backdrop) :is(button.primary, button.designer-save, button.act-btn.solid, a.act-btn.solid):not(#ui) {
+  min-height: var(--ui-h); padding: .4rem 1.1rem; display: inline-flex; align-items: center; justify-content: center; gap: .5rem; cursor: pointer; text-decoration: none;
+  font: 700 .8rem var(--ui-font); letter-spacing: .04em; color: #031318; border: 1px solid transparent; border-radius: var(--ui-radius);
+  background: linear-gradient(135deg, var(--ui-accent), var(--ui-accent2)); box-shadow: 0 4px 14px color-mix(in srgb, var(--ui-accent) 32%, transparent), inset 0 1px 0 rgba(255, 255, 255, .28);
+  transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+}
+:is(main, .modal-backdrop) :is(button.primary, button.designer-save, button.act-btn.solid, a.act-btn.solid):not(#ui):hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.1); box-shadow: 0 8px 22px color-mix(in srgb, var(--ui-accent) 50%, transparent), inset 0 1px 0 rgba(255, 255, 255, .28); }
+:is(main, .modal-backdrop) :is(button.primary, button.designer-save, button.act-btn.solid):not(#ui):disabled { opacity: .5; cursor: not-allowed; transform: none; filter: none; box-shadow: none; }
+
+:is(main, .modal-backdrop) :is(button.danger-button, button.danger, button.tb-tool.danger):not(#ui) {
+  --c: #ff6f79; min-height: var(--ui-h); padding: .35rem .95rem; cursor: pointer; font: 700 .76rem var(--ui-font); letter-spacing: .04em; color: #ffb4bb;
+  border: 1px solid color-mix(in srgb, var(--c) 50%, transparent); border-radius: var(--ui-radius);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 16%, transparent), color-mix(in srgb, var(--c) 5%, transparent)), var(--ui-panel); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--c) 22%, transparent);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease;
+}
+:is(main, .modal-backdrop) :is(button.danger-button, button.danger, button.tb-tool.danger):not(#ui):hover:not(:disabled) { transform: translateY(-1px); color: #1a0508; background: var(--c); box-shadow: 0 6px 18px color-mix(in srgb, var(--c) 45%, transparent); }
+:is(main, .modal-backdrop) :is(button.danger-button, button.danger):not(#ui):disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+/* the buttons that were just a bordered box in some menus: same height and type as the rest */
+:is(main, .modal-backdrop) :is(.rs-actions, .rs-head-actions, .template-row, .node-finder-head, .adm-foot, .designer-view-actions, .devices-stats, .history-filters) > button:not(.primary):not(.danger-button):not(.act-btn):not(#ui) {
+  min-height: var(--ui-h); padding: .35rem .9rem; font: 700 .76rem var(--ui-font); letter-spacing: .04em; border-radius: var(--ui-radius);
+}
+
+/* ---- fields --------------------------------------------------------------------------------------------------------------------------------- */
+:is(main, .modal-backdrop) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]), textarea):not(#ui) {
+  color: var(--ui-text); font: 500 .8rem var(--ui-font); padding: .45rem .7rem; min-height: var(--ui-h);
+  border: 1px solid color-mix(in srgb, var(--ui-accent) 24%, var(--ui-line)); border-radius: var(--ui-radius);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ui-accent) 5%, var(--ui-panel)), var(--ui-panel));
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+:is(main, .modal-backdrop) :is(input, textarea):not(#ui)::placeholder { color: color-mix(in srgb, var(--ui-muted) 80%, transparent); }
+:is(main, .modal-backdrop) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea):not(#ui):hover:not(:disabled) { border-color: color-mix(in srgb, var(--ui-accent) 55%, var(--ui-line)); }
+:is(main, .modal-backdrop) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea):not(#ui):focus { outline: none; border-color: var(--ui-accent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--ui-accent) 55%, transparent), 0 4px 14px color-mix(in srgb, var(--ui-accent) 18%, transparent); }
+:is(main, .modal-backdrop) :is(input, textarea, select):not(#ui):disabled { opacity: .55; cursor: not-allowed; }
+:is(main, .modal-backdrop) textarea:not(#ui) { min-height: 84px; line-height: 1.5; }
+
+/* ---- details -------------------------------------------------------------------------------------------------------------------------------- */
+input[type="checkbox"], input[type="radio"], input[type="range"] { accent-color: var(--ui-accent); }
+* { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--ui-accent) 45%, #1b3a46) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--ui-accent) 40%, #1b3a46); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+*::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--ui-accent) 70%, #1b3a46); background-clip: padding-box; border: 2px solid transparent; }
+:is(main, .modal-backdrop) :is(.muted.small, small.muted, .hint):not(#ui) { font-size: max(.76rem, 11.5px); line-height: 1.5; }
+:is(main) a:not([class]):not(#ui) { color: color-mix(in srgb, var(--ui-accent) 85%, white); text-underline-offset: 3px; }
+:where(h2, h3) { letter-spacing: -.01em; }
+
+/* ---- empty states: the same dashed frame, the same white title, the same grey help ---------------------------------------------------------- */
+:is(.devices-empty, .solar-empty, .svc-empty, .media-empty, .net-empty, .ed-empty, .auto-empty, .site-map-empty):not(#ui) {
+  border: 1px dashed color-mix(in srgb, var(--ui-accent) 28%, var(--ui-line)); border-radius: 14px; color: var(--ui-muted); text-align: center;
+  background: radial-gradient(circle at 50% 0, color-mix(in srgb, var(--ui-accent) 7%, transparent), transparent 70%);
+}
+:is(.devices-empty, .solar-empty, .svc-empty):not(#ui) { display: grid; justify-items: center; gap: .5rem; padding: 2.4rem 1rem; }
+:is(.devices-empty, .solar-empty) :is(h2, h3):not(#ui) { margin: .4rem 0 0; color: #ecf7fb; font-size: 1.15rem; }
+:is(.devices-empty, .solar-empty) p:not(#ui) { margin: 0; max-width: 36rem; font-size: .85rem; color: var(--ui-muted); }
+.template-row { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; }
+.template-row > button:not(#ui) { min-height: 32px; padding: .3rem .9rem; font: 600 .74rem var(--ui-font); letter-spacing: .02em; border-radius: var(--ui-radius-sm); color: color-mix(in srgb, var(--ui-text) 88%, var(--ui-muted)); border: 1px dashed color-mix(in srgb, var(--ui-accent) 45%, var(--ui-line)); background: color-mix(in srgb, var(--ui-accent) 6%, var(--ui-panel)); cursor: pointer; transition: all .15s ease; }
+.template-row > button:not(#ui):hover { color: var(--ui-text); border-style: solid; border-color: var(--ui-accent); background: color-mix(in srgb, var(--ui-accent) 16%, var(--ui-panel)); box-shadow: 0 4px 14px color-mix(in srgb, var(--ui-accent) 20%, transparent); }
+
+/* ---- labels of a field: plain small grey text above it, in every form (some forms drew them as a pill) -------------------------------------------- */
+.camera-field label > span:not(#ui) { display: block; min-height: 0; width: auto; padding: 0; border: 0; border-radius: 0; background: none; color: color-mix(in srgb, var(--ui-text) 70%, var(--ui-muted)); font: 600 .72rem var(--ui-font); letter-spacing: .02em; }
+.camera-field label:not(#ui) { gap: .3rem; font-size: .72rem; }
+
+/* ---- themes: the frame must not paint over the theme's background, and the menu buttons of the sidebar are not boxes --------------------------------------- */
+html[data-armor-theme]:not([data-armor-theme="Armor"]) .studio-frame:not(#ui) { background: transparent; }
+html[data-armor-theme]:not([data-armor-theme="Armor"]) .sidebar nav button:not(.active):not(#ui) { background: transparent; border-color: transparent; box-shadow: none; }
+
+/* A light theme: the active tab reads in the accent colour, and the tiles and chips that some menus painted dark take the theme's panel. */
+html[data-armor-theme="Professional"] { --ui-active-text: #1d4ed8; }
+html[data-armor-theme]:not([data-armor-theme="Armor"]) :is(.svc-stats > div, .svc-meta span, .history-stat, .devices-stats > *, .sys-stat, .metric-strip article, .ov-card):not(#ui) { background: var(--t-panel); border-color: var(--t-line); color: var(--t-text); }
+html[data-armor-theme]:not([data-armor-theme="Armor"]) :is(.svc-stats strong, .history-stat strong, .metric-strip article strong):not(#ui) { color: var(--t-text); }
+html[data-armor-theme]:not([data-armor-theme="Armor"]) .sidebar nav button.active:not(#ui) { color: var(--t-side-active-text, #ffffff); }
+html[data-armor-theme="Professional"] :is(.svc-banner.warn, .notice.warn):not(#ui) { color: #92400e; background: #fef3c7; border-color: #f2c66b; }
+html[data-armor-theme="Professional"] :is(.svc-banner.bad, .notice.bad):not(#ui) { color: #991b1b; background: #fee2e2; border-color: #f5a3a3; }

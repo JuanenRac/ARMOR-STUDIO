@@ -1,0 +1,49 @@
+/*
+ * Every dropdown list (select) of Studio, in the look of the "Clear history" menu of the History: a dark panel with a thin line in the theme's colour, rounded corners, a small
+ * mono type, a chevron, a glow when it is touched, and - where the browser can do it (Chrome and Edge 135 or later) - the open list drawn the same way instead of the system's
+ * grey one. The colours come from the theme (--t-*); without a theme they are the ones of the default "Armor" look.
+ * The selector is written with three ":not" on purpose: it is more specific than the rules of every menu and of every theme, so all the lists look alike.
+ */
+select:not([data-plain]):not([data-plain2]):not([data-plain3]) {
+  --sel-line: var(--t-line, #285a66);
+  --sel-accent: var(--t-a1, #22d3ee);
+  --sel-panel: var(--t-panel2, #06141c);
+  --sel-text: var(--t-text, #d9ffff);
+  color: var(--sel-text);
+  border: 1px solid color-mix(in srgb, var(--sel-accent) 32%, var(--sel-line));
+  border-radius: var(--t-radius, 9px);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--sel-accent) 9%, var(--sel-panel)), var(--sel-panel));
+  font: 600 .74rem "DM Mono", "Cascadia Mono", ui-monospace, Consolas, monospace;
+  padding: .46rem .75rem;
+  cursor: pointer;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+select:not([data-plain]):not([data-plain2]):not([data-plain3]):hover:not(:disabled) { border-color: var(--sel-accent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--sel-accent) 40%, transparent), 0 4px 14px color-mix(in srgb, var(--sel-accent) 18%, transparent); }
+select:not([data-plain]):not([data-plain2]):not([data-plain3]):focus-visible { outline: 2px solid var(--sel-accent); outline-offset: 2px; }
+select:not([data-plain]):not([data-plain2]):not([data-plain3]):disabled { opacity: .5; cursor: not-allowed; }
+select:not([data-plain]):not([data-plain2]):not([data-plain3]) option { background: var(--sel-panel); color: var(--sel-text); }
+
+/* Without the customisable list: our own chevron instead of the system's. */
+@supports not (appearance: base-select) {
+  select:not([data-plain]):not([data-plain2]):not([data-plain3]) {
+    appearance: none; -webkit-appearance: none;
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2367e8f9' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"), linear-gradient(180deg, color-mix(in srgb, var(--sel-accent) 9%, var(--sel-panel)), var(--sel-panel));
+    background-repeat: no-repeat, no-repeat; background-position: right .65rem center, 0 0; background-size: 14px 14px, 100% 100%;
+  }
+}
+
+/* With it: the closed select and the open list are both ours, the list like the menu of "Clear history". */
+@supports (appearance: base-select) {
+  select:not([data-plain]):not([data-plain2]):not([data-plain3]), select:not([data-plain]):not([data-plain2]):not([data-plain3])::picker(select) { appearance: base-select; }
+  select:not([data-plain]):not([data-plain2]):not([data-plain3])::picker-icon { color: color-mix(in srgb, var(--sel-accent) 85%, white); transition: rotate .2s ease; }
+  select:not([data-plain]):not([data-plain2]):not([data-plain3]):open::picker-icon { rotate: 180deg; }
+  select:not([data-plain]):not([data-plain2]):not([data-plain3])::picker(select) {
+    margin-top: 4px; padding: .3rem; border: 1px solid color-mix(in srgb, var(--sel-accent) 32%, var(--sel-line)); border-radius: var(--t-radius, 9px);
+    background: var(--sel-panel); box-shadow: 0 14px 30px rgba(0, 0, 0, .5); color: var(--sel-text);
+  }
+  select:not([data-plain]):not([data-plain2]):not([data-plain3]) option { padding: .5rem .65rem; border-radius: 6px; font: 600 .72rem "DM Mono", "Cascadia Mono", ui-monospace, Consolas, monospace; cursor: pointer; }
+  select:not([data-plain]):not([data-plain2]):not([data-plain3]) option:hover, select:not([data-plain]):not([data-plain2]):not([data-plain3]) option:focus { background: color-mix(in srgb, var(--sel-accent) 20%, var(--sel-panel)); }
+  select:not([data-plain]):not([data-plain2]):not([data-plain3]) option:checked { background: color-mix(in srgb, var(--sel-accent) 30%, var(--sel-panel)); color: #f2ffff; }
+  select:not([data-plain]):not([data-plain2]):not([data-plain3]) option::checkmark { color: var(--sel-accent); }
+}

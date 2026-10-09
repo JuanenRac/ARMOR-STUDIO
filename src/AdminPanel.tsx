@@ -10,6 +10,8 @@ import {
   ApiError, type AdminFile, type AdminFileInfo, type AdminService, type BrokerAccount,
 } from "./api";
 import { ConfirmDialog } from "./components/chrome";
+import { ActionIcon, actionsFor, type ServiceAction } from "./views/ServicesView";
+import type { ServiceState } from "./api";
 
 type Translate = (key: string) => string;
 type Props = { t: Translate; origin: string; isAdmin: boolean };
@@ -42,16 +44,15 @@ function Gate({ t, state }: { t: Translate; state: "checking" | "missing" | "den
 
 // ---- services ----------------------------------------------------------------------------------------------------------------------------------
 
-export function ServiceRow({ t, service, busy, ask }: { t: Translate; service: AdminService; busy: boolean; ask: (action: "start" | "stop" | "restart") => void }) {
+export function ServiceRow({ t, service, busy, ask }: { t: Translate; service: AdminService; busy: boolean; ask: (action: ServiceAction) => void }) {
   const on = service.active === "active";
-  return <li className={`adm-service ${on ? "on" : service.active === "failed" ? "bad" : "off"}`}>
+  const state: ServiceState = on ? (service.paused ? "paused" : "running") : service.active === "failed" ? "failed" : service.active === "activating" ? "starting" : "stopped";
+  return <li className={`adm-service ${on ? (service.paused ? "bad" : "on") : service.active === "failed" ? "bad" : "off"}`}>
     <span className="state-dot" aria-hidden />
     <div className="adm-service-main"><strong>{service.description}</strong><small className="mono">{service.unit}{service.pid ? ` · pid ${service.pid}` : ""}</small></div>
-    <span className={`pill ${on ? "ok" : "off"}`}>{service.installed ? t(`adm_state_${service.active}`) === `adm_state_${service.active}` ? service.active : t(`adm_state_${service.active}`) : t("adm_not_installed")}</span>
-    {service.installed && <div className="adm-actions">
-      <button disabled={busy || on} onClick={() => ask("start")}>{t("adm_start")}</button>
-      <button disabled={busy || !on} onClick={() => ask("restart")}>{t("adm_restart")}</button>
-      <button className="danger-button" disabled={busy || !on} onClick={() => ask("stop")}>{t("adm_stop")}</button>
+    <span className={`pill ${on && !service.paused ? "ok" : "off"}`}>{service.installed ? service.paused ? t("svcState_paused") : t(`adm_state_${service.active}`) === `adm_state_${service.active}` ? service.active : t(`adm_state_${service.active}`) : t("adm_not_installed")}</span>
+    {service.installed && <div className="adm-actions svc-actions">
+      {actionsFor(state, service.id).map(action => <button key={action} disabled={busy} className={`svc-act ${action}`} title={t(`svcBtn_${action}`)} aria-label={`${t(`svcBtn_${action}`)} ${service.description}`} onClick={() => ask(action)}><ActionIcon action={action} /></button>)}
     </div>}
   </li>;
 }
@@ -60,12 +61,12 @@ export function ServicesPanel({ t, origin, isAdmin }: Props) {
   const gate = useAgent(origin, isAdmin);
   const [services, setServices] = useState<AdminService[]>([]);
   const [message, setMessage] = useState<{ text: string; bad: boolean }>({ text: "", bad: false });
-  const [pending, setPending] = useState<{ service: AdminService; action: "start" | "stop" | "restart" } | null>(null);
+  const [pending, setPending] = useState<{ service: AdminService; action: ServiceAction } | null>(null);
   const [busy, setBusy] = useState(false);
   const reload = useCallback(async () => { try { setServices((await adminServices(origin)).services); } catch (error) { setMessage({ text: explain(t, error), bad: true }); } }, [origin]);   // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (gate === "ready") void reload(); }, [gate, reload]);
   if (gate !== "ready") return <Gate t={t} state={gate} />;
-  const run = async (service: AdminService, action: "start" | "stop" | "restart") => {
+  const run = async (service: AdminService, action: ServiceAction) => {
     setPending(null); setBusy(true); setMessage({ text: t("adm_working"), bad: false });
     try { await adminServiceAction(origin, service.id, action); setMessage({ text: t("adm_done"), bad: false }); }
     // Restarting the server cuts the answer: that is not a failure, the list is read again in a moment.
@@ -74,10 +75,10 @@ export function ServicesPanel({ t, origin, isAdmin }: Props) {
   };
   return <article className="stack-card adm-card"><h3>{t("adm_services")}</h3><p className="muted">{t("adm_services_help")}</p>
     {message.text && <p className={`notice ${message.bad ? "bad" : ""}`} role="status">{message.text}</p>}
-    <ul className="adm-list">{services.map(service => <ServiceRow key={service.id} t={t} service={service} busy={busy} ask={action => (action === "start" ? void run(service, action) : setPending({ service, action }))} />)}</ul>
+    <ul className="adm-list">{services.map(service => <ServiceRow key={service.id} t={t} service={service} busy={busy} ask={action => (action === "start" || action === "resume" ? void run(service, action) : setPending({ service, action }))} />)}</ul>
     <div className="adm-foot"><button onClick={() => void reload()}>{t("svcRefresh")}</button></div>
-    {pending && <ConfirmDialog t={t} danger={pending.action === "stop"} title={t(`adm_${pending.action}`)} text={`${pending.service.description} - ${t(`adm_ask_${pending.action}${pending.service.id === "server" ? "_server" : ""}`)}`}
-      confirmLabel={t(`adm_${pending.action}`)} cancel={() => setPending(null)} confirm={() => void run(pending.service, pending.action)} />}
+    {pending && <ConfirmDialog t={t} danger={pending.action === "stop"} title={t(`svcBtn_${pending.action}`)} text={`${pending.service.description} - ${pending.action === "pause" ? t("svcAsk_pause") : t(`adm_ask_${pending.action}${pending.service.id === "server" ? "_server" : ""}`)}`}
+      confirmLabel={t(`svcBtn_${pending.action}`)} cancel={() => setPending(null)} confirm={() => void run(pending.service, pending.action)} />}
   </article>;
 }
 
@@ -158,7 +159,7 @@ export function BrokerPanel({ t, origin, isAdmin }: Props) {
   useEffect(() => { if (gate === "ready") void reload(); }, [gate, reload]);
   if (gate !== "ready") return <Gate t={t} state={gate} />;
 
-  const act = async (action: "start" | "stop" | "restart") => {
+  const act = async (action: ServiceAction) => {
     setBusy(true);
     try { await adminServiceAction(origin, "mosquitto", action); setMessage({ text: t("adm_done"), bad: false }); } catch (error) { setMessage({ text: explain(t, error), bad: true }); }
     window.setTimeout(() => { void reload(); setBusy(false); }, 2000);

@@ -59,6 +59,9 @@ import "./compact.css";
 import "./hover.css";
 import "./dialogs.css";
 import "./themes.css";
+import "./selects.css";
+import "./actionButtons.css";
+import "./ui-system.css";
 
 const studioVersion = manifest.version;
 

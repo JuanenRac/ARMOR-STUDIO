@@ -286,7 +286,7 @@ export const createUser = (origin: string, user: { username: string; password: s
 export const updateUser = (origin: string, id: string, change: { username?: string; password?: string; role?: Role }) => userCall<StudioUser>(origin, "PATCH", `/api/v1/users/${encodeURIComponent(id)}`, change);
 export const deleteUser = (origin: string, id: string) => userCall<void>(origin, "DELETE", `/api/v1/users/${encodeURIComponent(id)}`);
 // ---- administration (an administrator): services, settings files, the broker's accounts, adopting a node ----
-export type AdminService = { id: string; unit: string; description: string; installed: boolean; active: string; sub: string; enabled: string; pid: number; since: string };
+export type AdminService = { id: string; unit: string; description: string; installed: boolean; active: string; sub: string; enabled: string; pid: number; since: string; /** The process is frozen (paused), though systemd still calls the service active. */ paused?: boolean };
 export type AdminFileInfo = { id: string; path: string; format: string; description: string; units: string[]; exists: boolean; mtime: number };
 export type AdminFile = AdminFileInfo & { content: string; masked?: boolean };
 export type BrokerAccount = { user: string; role: string; name: string; manageable: boolean; topics: string[] };

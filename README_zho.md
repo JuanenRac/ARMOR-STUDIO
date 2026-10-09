@@ -21,13 +21,13 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-7-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-307%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-308%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
 
 ---
 
-**诚实性检查 - 今天真正能运行的部分:** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，并有 307 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、每个菜单在七种语言下的渲染、静态主机）。**尚未证实的：** 每种真实摄像头的实时视频和 PTZ、太阳能菜单与真实逆变器或电池的配合，以及正式的无障碍或可用性评审。当服务器无法访问时，Studio 显示演示数据，并在顶部栏中说明。
+**诚实性检查 - 今天真正能运行的部分:** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，并有 308 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、每个菜单在七种语言下的渲染、静态主机）。**尚未证实的：** 每种真实摄像头的实时视频和 PTZ、太阳能菜单与真实逆变器或电池的配合，以及正式的无障碍或可用性评审。当服务器无法访问时，Studio 显示演示数据，并在顶部栏中说明。
 
 ---
 
@@ -88,7 +88,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 307 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
+npm test            # 308 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```

@@ -10,16 +10,25 @@ const render = (locale: (typeof locales)[number], item: AdminService, busy = fal
   renderToStaticMarkup(createElement(ServiceRow, { t: key => text(locale, key), service: item, busy, ask: () => undefined }));
 
 describe("the administration screens", () => {
-  it("offer stop and restart for a running service and start for a stopped one, in every language", () => {
+  it("offer stop, restart and pause for a running service, start for a stopped one and resume for a paused one, as pictures with a name, in every language", () => {
     for (const locale of locales) {
       const running = render(locale, service({}));
       expect(running, locale).toContain(text(locale, "adm_state_active"));
-      expect(running).toMatch(new RegExp(`<button disabled="">${text(locale, "adm_start")}</button>`));
-      expect(running).not.toMatch(new RegExp(`<button disabled="">${text(locale, "adm_stop")}</button>`));
+      for (const action of ["stop", "restart", "pause"]) expect(running).toContain(`class="svc-act ${action}" title="${text(locale, `svcBtn_${action}`)}"`);
+      expect(running).not.toContain('class="svc-act start"');
       const stopped = render(locale, service({ active: "inactive", pid: 0 }));
       expect(stopped).toContain(text(locale, "adm_state_inactive"));
-      expect(stopped).toMatch(new RegExp(`<button disabled="">${text(locale, "adm_restart")}</button>`));
+      expect(stopped).toContain('class="svc-act start"');
+      expect(stopped).not.toContain('class="svc-act stop"');
+      const paused = render(locale, service({ paused: true }));
+      expect(paused).toContain(text(locale, "svcState_paused"));
+      expect(paused).toContain('class="svc-act resume"');
+      expect(paused).not.toContain('class="svc-act pause"');
     }
+  });
+  it("never offers to pause the server or Studio themselves", () => {
+    expect(render("en", service({ id: "server", unit: "armor-server" }))).not.toContain('class="svc-act pause"');
+    expect(render("en", service({ id: "studio", unit: "armor-studio" }))).not.toContain('class="svc-act pause"');
   });
   it("a service that is not installed shows no controls, and nothing is clickable while one is busy", () => {
     const missing = render("en", service({ installed: false, active: "inactive" }));
