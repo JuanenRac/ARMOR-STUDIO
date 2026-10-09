@@ -71,3 +71,5 @@
 .fw-badge { font-size: .68rem; padding: .1rem .5rem; border-radius: 999px; border: 1px solid #315e6b; color: #c7edf0; background: #0b202a; }
 .fw-target p { margin: 0; line-height: 1.35; }
 @media (max-width: 980px) { .fw-grid, .fw-targets { grid-template-columns: minmax(0, 1fr); } }
+/* The same buttons inside a row of Configuration > Services and of the broker card. */
+.adm-actions.svc-actions { margin: 0; padding: 0; border: 0; flex-wrap: nowrap; }

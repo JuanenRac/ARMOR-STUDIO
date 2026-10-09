@@ -1,0 +1,31 @@
+/* Buttons with a picture and a name, in the colour of the theme: "Search now", "Open panel", "Adopt". A solid one is the main action of its block. */
+.act-btn { --c: var(--t-a1, #22d3ee); display: inline-flex; align-items: center; justify-content: center; gap: .5rem; padding: .48rem .95rem; cursor: pointer; text-decoration: none; white-space: nowrap;
+  font: 700 .74rem "Space Grotesk", "Segoe UI", system-ui, sans-serif; letter-spacing: .05em; color: var(--c); border: 1px solid color-mix(in srgb, var(--c) 50%, transparent); border-radius: var(--t-radius, 10px);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 18%, transparent), color-mix(in srgb, var(--c) 5%, transparent)), var(--t-panel2, #0b202a); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--c) 28%, transparent);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease; }
+.act-btn svg { flex: 0 0 auto; display: block; }
+.act-btn:hover:not(:disabled) { transform: translateY(-2px); color: #031318; background: var(--c); box-shadow: 0 6px 18px color-mix(in srgb, var(--c) 45%, transparent), 0 0 0 1px var(--c); }
+.act-btn:active:not(:disabled) { transform: translateY(0) scale(.97); }
+.act-btn:focus-visible { outline: 2px solid var(--c); outline-offset: 2px; }
+.act-btn:disabled { opacity: .55; cursor: progress; }
+.act-btn.solid { color: #031318; border-color: transparent; background: linear-gradient(135deg, var(--t-a1, #22d3ee), var(--t-a2, #4aa8ff)); box-shadow: 0 4px 14px color-mix(in srgb, var(--c) 35%, transparent); }
+.act-btn.solid:hover:not(:disabled) { filter: brightness(1.12); box-shadow: 0 8px 22px color-mix(in srgb, var(--c) 55%, transparent); background: linear-gradient(135deg, var(--t-a1, #22d3ee), var(--t-a2, #4aa8ff)); color: #031318; }
+.act-btn.go { --c: #35d6a6; }
+@keyframes act-sweep { to { transform: rotate(360deg); } }
+.act-btn.busy .act-sweep { animation: act-sweep 1.1s linear infinite; transform-origin: 50% 50%; }
+@media (prefers-reduced-motion: reduce) { .act-btn.busy .act-sweep { animation: none; } .act-btn { transition: none; } }
+/* The themes paint every button and link the same: said again, more precisely, so these keep their colours. */
+html[data-armor-theme]:not([data-armor-theme="Armor"]) .node-finder .act-btn { color: var(--c); border: 1px solid color-mix(in srgb, var(--c) 50%, transparent); border-radius: var(--t-radius, 10px);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 18%, transparent), color-mix(in srgb, var(--c) 5%, transparent)), var(--t-panel2, #0b202a); }
+html[data-armor-theme]:not([data-armor-theme="Armor"]) .node-finder .act-btn.solid { color: #031318; border-color: transparent; background: linear-gradient(135deg, var(--t-a1, #22d3ee), var(--t-a2, #4aa8ff)); }
+html[data-armor-theme]:not([data-armor-theme="Armor"]) .node-finder .act-btn:hover:not(:disabled):not(.solid) { color: #031318; background: var(--c); border-color: var(--c); }
+.node-finder-head { align-items: center; }
+
+/* A button nobody styled (no class) was the browser's light grey: it now takes the look of the theme, with the lowest priority, so any menu that does style its buttons keeps doing it. */
+:where(button:not([class])) { --c: var(--t-a1, #22d3ee); padding: .42rem .85rem; cursor: pointer; font: 700 .74rem "Space Grotesk", "Segoe UI", system-ui, sans-serif; letter-spacing: .04em; color: var(--c);
+  border: 1px solid color-mix(in srgb, var(--c) 50%, transparent); border-radius: var(--t-radius, 10px);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 16%, transparent), color-mix(in srgb, var(--c) 5%, transparent)), var(--t-panel2, #0b202a); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--c) 25%, transparent);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease; }
+:where(button:not([class])):hover:not(:disabled) { transform: translateY(-1px); color: #031318; background: var(--c); box-shadow: 0 5px 16px color-mix(in srgb, var(--c) 40%, transparent); }
+:where(button:not([class])):disabled { opacity: .5; cursor: not-allowed; }
+:where(button:not([class])):focus-visible { outline: 2px solid var(--c); outline-offset: 2px; }

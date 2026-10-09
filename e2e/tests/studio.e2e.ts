@@ -50,3 +50,21 @@ test.describe("signed in", () => {
     await expect(page.getByRole("button", { name: /notificaci|notifications/i }).first()).toBeVisible();
   });
 });
+
+for (const [width, height] of [[1366, 768], [1093, 614]] as const) {
+  test(`every menu fits a ${width}x${height} screen without sideways scrolling`, async ({ page }) => {
+    test.skip(!user || !password, "set ARMOR_STUDIO_USER and ARMOR_STUDIO_PASSWORD");
+    await page.setViewportSize({ width, height });
+    await signIn(page);
+    const buttons = page.locator(".sidebar nav button");
+    const count = await buttons.count();
+    for (let index = 0; index < count; index += 1) {
+      const button = buttons.nth(index);
+      const label = (await button.innerText()).trim();
+      await button.click();
+      await page.waitForTimeout(300);
+      const wider = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      expect(wider, `menu "${label}" at ${width}x${height}`).toBeLessThanOrEqual(1);
+    }
+  });
+}

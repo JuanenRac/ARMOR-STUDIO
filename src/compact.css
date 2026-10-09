@@ -3,7 +3,7 @@
  * between them, the headings that repeat the title in the top bar are gone, and the panels use the height instead of scrolling
  * the page. Loaded after every other stylesheet on purpose; only things that grow the layout are undone here.
  */
-@media (min-width: 1100px) {
+@media (min-width: 900px) {
   /* ---- the frame ---- */
   .studio-frame .studio-shell { grid-template-columns: 200px minmax(0, 1fr); }
   .studio-frame .studio-shell.sidebar-collapsed { grid-template-columns: 66px minmax(0, 1fr); }
@@ -52,7 +52,7 @@
 .view-tabs button { padding: .38rem .9rem; border: 0; border-radius: 7px; background: transparent; color: #9bc4cb; font: 700 .62rem "DM Mono", ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; white-space: nowrap; }
 .view-tabs button.active { background: #0f4a55; color: #f0feff; box-shadow: inset 0 0 0 1px #2a8f9c; }
 
-@media (min-width: 1100px) {
+@media (min-width: 900px) {
   /* ---- overview: everything on one screen ---- */
   .studio-frame .overview { flex: 1 1 0; min-height: 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 4px; }
   .ov-hero { padding: .5rem 1rem; border-radius: 16px; flex-wrap: nowrap; gap: 1rem; }
@@ -103,7 +103,7 @@
   .studio-frame .alarms-view { flex: 1 1 0; min-height: 0; overflow: auto; align-content: start; }
   .studio-frame .device-card { padding: .55rem .7rem; }
 }
-@media (min-width: 1100px) {
+@media (min-width: 900px) {
   .studio-frame .radar-view { grid-template-rows: minmax(0, 1fr); }
   .studio-frame .radar-map-card > p.muted.small { margin: .2rem 0 0; font-size: .62rem; }
   .studio-frame .stack-card h3 { font-size: .95rem; margin: 0 0 .2rem; }
@@ -111,8 +111,8 @@
   .studio-frame .audit-card p.muted { margin: .1rem 0 .3rem; font-size: .72rem; }
   .studio-frame .sys-counts div { padding: .35rem .6rem; } .studio-frame .sys-counts strong { font-size: 1.15rem; }
 }
-@media (min-width: 1100px) { .studio-frame .radar-view { align-items: stretch; } .studio-frame .radar-map-card { height: 100%; } }
-@media (min-width: 1100px) {
+@media (min-width: 900px) { .studio-frame .radar-view { align-items: stretch; } .studio-frame .radar-map-card { height: 100%; } }
+@media (min-width: 900px) {
   /* history: the two panels are full width, and the rows keep their own height */
   .studio-frame .history-workspace { align-items: stretch; } .studio-frame .history-workspace > .view-tabs { align-self: flex-start; }
   .studio-frame .history-list { align-content: start; grid-auto-rows: min-content; }
@@ -139,3 +139,10 @@ button, a.panel-link { transition: transform .08s ease, filter .08s ease, box-sh
 button:not(:disabled):active, a.panel-link:active { transform: translateY(1px) scale(.96) !important; filter: brightness(1.4) saturate(1.15); box-shadow: inset 0 2px 8px rgba(0, 0, 0, .55), 0 0 0 2px rgba(114, 233, 219, .3) !important; }
 button:focus-visible, a.panel-link:focus-visible { outline: 2px solid #72e9db; outline-offset: 2px; }
 button:disabled { filter: grayscale(.4); }
+
+/* A small screen (about 1000 px wide: a 1366x768 laptop at 150 %, or any window this narrow): the tiles of the overview give their words less room so none is cut. */
+@media (min-width: 900px) and (max-width: 1050px) {
+  .studio-frame .metric-strip article { padding-left: .6rem; padding-right: .6rem; }
+  .studio-frame .metric-strip article small, .studio-frame .metric-strip article span { letter-spacing: .02em; font-size: .56rem; overflow-wrap: anywhere; }
+  .studio-frame .studio-shell { grid-template-columns: 176px minmax(0, 1fr); }
+}

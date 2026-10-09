@@ -8,6 +8,7 @@ import { useContext, useEffect, useMemo, useState, type FormEvent } from "react"
 import { adminProvisionNode, ApiError, firmwareProbe, sendNetworkOrder, type ProvisionResult } from "./api";
 import { SessionUserContext } from "./sessionContext";
 import { KnownNodesContext } from "./knownNodes";
+import "./actionButtons.css";
 import type { Translate } from "./components/camera";
 import type { NetworkOverview } from "./networkModel";
 
@@ -52,6 +53,17 @@ export function findNodeCandidates(network: NetworkOverview | null, knownIds: It
     }
   }
   return found.sort((a, b) => Number(b.online) - Number(a.online) || a.ip.localeCompare(b.ip, undefined, { numeric: true }));
+}
+
+/** Pictures of the buttons of the search: a radar sweep for "Search now" (it turns while searching), an arrow out of a box for "Open panel", a plus for "Adopt", a check for "Use". */
+function FinderIcon({ kind }: { kind: "search" | "open" | "adopt" | "use" }) {
+  const common = { width: 17, height: 17, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2.1, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true, focusable: false } as const;
+  switch (kind) {
+    case "search": return <svg {...common}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="4.6" /><path className="act-sweep" d="M12 12 18.4 5.6" /></svg>;
+    case "open": return <svg {...common}><path d="M14 4h6v6" /><path d="M20 4 11 13" /><path d="M18 14v5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 19V8a1.5 1.5 0 0 1 1.5-1.5H10" /></svg>;
+    case "adopt": return <svg {...common}><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" /></svg>;
+    case "use": return <svg {...common}><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>;
+  }
 }
 
 /** The part of the list that adopts a node: its broker account and, with the login of its own panel, the broker written into it. An administrator's. */
@@ -120,7 +132,7 @@ export function NodeFinder({ t, origin, network, knownIds, knownIps, wantKind, o
   return <section className="node-finder" aria-label={t("nodeFinderTitle")}>
     <div className="node-finder-head">
       <h3>{t("nodeFinderTitle")}</h3>
-      <button type="button" onClick={() => void search()} disabled={!hasWatcher || state === "searching"}>{state === "searching" ? t("nodeFinderSearching") : t("nodeFinderScan")}</button>
+      <button type="button" className={`act-btn solid ${state === "searching" ? "busy" : ""}`} onClick={() => void search()} disabled={!hasWatcher || state === "searching"}><FinderIcon kind="search" />{state === "searching" ? t("nodeFinderSearching") : t("nodeFinderScan")}</button>
     </div>
     <p className="muted small">{t("nodeFinderHelp")}</p>
     {!hasWatcher && <p className="muted small">{t("nodeFinderNoNetwork")}</p>}
@@ -130,9 +142,9 @@ export function NodeFinder({ t, origin, network, knownIds, knownIps, wantKind, o
       {candidates.map(item => <li key={item.ip} className={item.online ? "" : "off"}>
         <span className="state-dot" />
         <div><strong>{item.nodeId ?? item.hostname ?? item.ip}</strong><small>{[item.ip, item.mac, item.vendor, item.online ? "" : t("nodeFinderOffline")].filter(Boolean).join(" · ")}</small></div>
-        <a className="panel-link" href={`http://${item.ip}/`} target="_blank" rel="noopener noreferrer">{t("openNodePanel")}</a>
-        {onUse && <button type="button" className="primary" onClick={() => onUse(item.nodeId ?? "")}>{t("nodeFinderUse")}</button>}
-        {isAdmin && <button type="button" onClick={() => setAdopting(adopting === item.ip ? "" : item.ip)}>{t("adm_adopt")}</button>}
+        <a className="act-btn" href={`http://${item.ip}/`} target="_blank" rel="noopener noreferrer"><FinderIcon kind="open" />{t("openNodePanel")}</a>
+        {onUse && <button type="button" className="act-btn go" onClick={() => onUse(item.nodeId ?? "")}><FinderIcon kind="use" />{t("nodeFinderUse")}</button>}
+        {isAdmin && <button type="button" className="act-btn go" onClick={() => setAdopting(adopting === item.ip ? "" : item.ip)}><FinderIcon kind="adopt" />{t("adm_adopt")}</button>}
         {isAdmin && adopting === item.ip && <AdoptForm t={t} origin={origin} candidate={item} close={() => setAdopting("")} />}
       </li>)}
     </ul>}
