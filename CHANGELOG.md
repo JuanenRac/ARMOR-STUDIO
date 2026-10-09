@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.3] - Node firmware: a progress bar and what is happening at every step, in two balanced columns
+
+- **Progress:** a bar for the whole job and one for every node, which move while the image is sent and while the node restarts, and under each node a sentence that says what is happening at that moment (*Sending the firmware to the node: 512 of 1024 KB (50%)*, *Waiting for it to answer again with version 0.5.4... 7 s*, ...), in the seven languages. Before the nodes, the screen says whether it is downloading the release from GitHub or getting your file ready.
+- **What will happen:** the five steps of an update are explained next to the start button.
+- **Layout:** the screen had its sections thrown into the two columns of the camera forms and came out lopsided. Now the nodes are on the left; the firmware, the access and the start are on the right; and the progress goes under both (one column on a narrow window).
+
 ## [0.6.2] - Node firmware, from Studio
 
 - **Configuration > Node firmware (administrators):** choose a type of node (radar, solar, electrical, touch panel), tick the nodes found on the network (a button ticks all of that type, and another asks each for its version), type the login of the nodes' own panel (used for the update only, never kept), choose the source - the newest release on GitHub (checked against the hash it publishes) or a `.bin` file of this computer - and update them one after another. Each node shows where it is (signing in, sending the image, restarting, updated) and its version before and after, or why it failed. It confirms first, in the seven languages, with hover hints and a paragraph in the help.
