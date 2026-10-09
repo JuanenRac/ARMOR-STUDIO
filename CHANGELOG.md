@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.4] - Configuration > Notifications
+
+- A new tab, in the seven languages: which places the alarms are sent to (the signed webhook, MQTT, Telegram, Home Assistant) are set up, the language of the sentences, a **test** button for each and for all of them that says what each answered, and the steps to create the Telegram bot and the Home Assistant webhook with the keys of `armor.env` to fill in.
+
 ## [0.6.3] - Node firmware: a progress bar and what is happening at every step, in two balanced columns
 
 - **Progress:** a bar for the whole job and one for every node, which move while the image is sent and while the node restarts, and under each node a sentence that says what is happening at that moment (*Sending the firmware to the node: 512 of 1024 KB (50%)*, *Waiting for it to answer again with version 0.5.4... 7 s*, ...), in the seven languages. Before the nodes, the screen says whether it is downloading the release from GitHub or getting your file ready.

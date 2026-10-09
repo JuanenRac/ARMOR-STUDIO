@@ -325,6 +325,12 @@ export async function firmwareUpload(origin: string, file: File): Promise<Firmwa
   return parsed;
 }
 
+// ---- Where the alarms are sent ----------------------------------------------------------------------------------------------------------------------
+
+export type NotificationsStatus = { webhook: boolean; mqtt: boolean; telegram: boolean; homeassistant: boolean; language: string };
+export type NotificationTestResult = { channel: string; ok: boolean; detail: string };
+export const notificationsStatus = (origin: string) => userCall<NotificationsStatus>(origin, "GET", "/api/v1/admin/notifications");
+export const notificationsTest = (origin: string, channel?: string) => userCall<{ results: NotificationTestResult[] }>(origin, "POST", "/api/v1/admin/notifications/test", channel ? { channel } : {});
 export const changeAccount = (origin: string, change: { currentPassword: string; username?: string; newPassword?: string }) => userCall<StudioUser>(origin, "PATCH", "/api/v1/account", change);
 
 /** Arm or disarm the system (an operator, from Studio). Answers with the new state of the perimeter. */
