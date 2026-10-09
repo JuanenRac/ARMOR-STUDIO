@@ -1,0 +1,13 @@
+{
+  "name": "armor-studio-e2e",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Optional browser tests for ARMOR-STUDIO, run by hand against a running Studio. Not part of the CI.",
+  "scripts": {
+    "install-browser": "playwright install chromium",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.49.1"
+  }
+}
