@@ -49,6 +49,9 @@ function readCamera(raw: unknown): Camera | null {
   if (finite(raw.tiltSweep)) camera.tiltSweep = clamp(raw.tiltSweep, 30, 180);
   if (raw.mount === "wall" || raw.mount === "ceiling" || raw.mount === "pole" || raw.mount === "ground") camera.mount = raw.mount;
   if (finite(raw.nightRange)) camera.nightRange = clamp(raw.nightRange, 1, 100);
+  if (raw.lens === "varifocal" || raw.lens === "motorised") camera.lens = raw.lens;
+  if (finite(raw.opticalZoom) && camera.lens) camera.opticalZoom = clamp(Math.round(raw.opticalZoom), 1, 60);
+  if (finite(raw.digitalZoom)) camera.digitalZoom = clamp(Math.round(raw.digitalZoom), 1, 32);
   return camera;
 }
 

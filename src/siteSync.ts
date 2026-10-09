@@ -8,7 +8,7 @@ import { parseStudioSettings, type StudioSettings } from "./settings";
 
 export type SiteDesign = Pick<StudioSettings, "dimensions" | "terrain" | "buildings" | "openings" | "roofItems" | "wallLamps" | "features" | "sensors" | "placements" | "cameras">;
 /** The parts of a camera that belong to the design (its place and how it looks); the rest of a camera is the server's own. */
-type CameraPlace = { x: number; y: number; heading?: number; tilt?: number; z?: number; fov?: number; range?: number; kind?: "ptz"; pan?: number; tiltSweep?: number; mount?: string; nightRange?: number };
+type CameraPlace = { x: number; y: number; heading?: number; tilt?: number; z?: number; fov?: number; range?: number; kind?: "ptz"; lens?: string; opticalZoom?: number; digitalZoom?: number; pan?: number; tiltSweep?: number; mount?: string; nightRange?: number };
 
 export const SITE_SCHEMA = "armor-studio/site/1";
 
@@ -19,7 +19,7 @@ const finite = (value: unknown): value is number => typeof value === "number" &&
 export function buildSiteDoc(design: SiteDesign): Record<string, unknown> {
   const cameraPlacements: Record<string, CameraPlace> = {};
   for (const camera of design.cameras) {
-    cameraPlacements[camera.id] = { x: camera.x, y: camera.y, ...(camera.heading !== undefined ? { heading: camera.heading } : {}), ...(camera.tilt !== undefined ? { tilt: camera.tilt } : {}), ...(camera.z !== undefined ? { z: camera.z } : {}), ...(camera.fov !== undefined ? { fov: camera.fov } : {}), ...(camera.kind === "ptz" ? { kind: "ptz" as const } : {}), ...(camera.pan !== undefined ? { pan: camera.pan } : {}), ...(camera.tiltSweep !== undefined ? { tiltSweep: camera.tiltSweep } : {}), ...(camera.mount !== undefined ? { mount: camera.mount } : {}), ...(camera.nightRange !== undefined ? { nightRange: camera.nightRange } : {}), ...(camera.range !== undefined ? { range: camera.range } : {}) };
+    cameraPlacements[camera.id] = { x: camera.x, y: camera.y, ...(camera.heading !== undefined ? { heading: camera.heading } : {}), ...(camera.tilt !== undefined ? { tilt: camera.tilt } : {}), ...(camera.z !== undefined ? { z: camera.z } : {}), ...(camera.fov !== undefined ? { fov: camera.fov } : {}), ...(camera.kind === "ptz" ? { kind: "ptz" as const } : {}), ...(camera.pan !== undefined ? { pan: camera.pan } : {}), ...(camera.tiltSweep !== undefined ? { tiltSweep: camera.tiltSweep } : {}), ...(camera.mount !== undefined ? { mount: camera.mount } : {}), ...(camera.nightRange !== undefined ? { nightRange: camera.nightRange } : {}), ...(camera.lens !== undefined ? { lens: camera.lens } : {}), ...(camera.opticalZoom !== undefined ? { opticalZoom: camera.opticalZoom } : {}), ...(camera.digitalZoom !== undefined ? { digitalZoom: camera.digitalZoom } : {}), ...(camera.range !== undefined ? { range: camera.range } : {}) };
   }
   const { dimensions, terrain, buildings, openings, roofItems, wallLamps, features, sensors, placements } = design;
   return { schema: SITE_SCHEMA, dimensions, terrain, buildings, openings, roofItems, wallLamps, features, sensors, placements, cameraPlacements };
@@ -41,7 +41,7 @@ export function applySiteDoc(document: unknown, current: SiteDesign): SiteDesign
     const place = places[camera.id];
     if (!isRecord(place) || !finite(place.x) || !finite(place.y)) return camera;
     const next: Camera = { ...camera, x: Math.min(100, Math.max(0, place.x)), y: Math.min(100, Math.max(0, place.y)) };
-    delete next.heading; delete next.tilt; delete next.z; delete next.fov; delete next.range; delete next.kind; delete next.pan; delete next.tiltSweep; delete next.mount; delete next.nightRange;
+    delete next.heading; delete next.tilt; delete next.z; delete next.fov; delete next.range; delete next.kind; delete next.pan; delete next.tiltSweep; delete next.mount; delete next.nightRange; delete next.lens; delete next.opticalZoom; delete next.digitalZoom;
     if (finite(place.heading)) next.heading = place.heading;
     if (finite(place.tilt)) next.tilt = place.tilt;
     if (finite(place.z)) next.z = place.z;
@@ -52,6 +52,9 @@ export function applySiteDoc(document: unknown, current: SiteDesign): SiteDesign
     if (finite(place.tiltSweep)) next.tiltSweep = Math.min(180, Math.max(30, place.tiltSweep));
     if (place.mount === "wall" || place.mount === "ceiling" || place.mount === "pole" || place.mount === "ground") next.mount = place.mount;
     if (finite(place.nightRange)) next.nightRange = Math.min(100, Math.max(1, place.nightRange));
+    if (place.lens === "varifocal" || place.lens === "motorised") next.lens = place.lens;
+    if (finite(place.opticalZoom) && next.lens) next.opticalZoom = Math.min(60, Math.max(1, Math.round(place.opticalZoom)));
+    if (finite(place.digitalZoom)) next.digitalZoom = Math.min(32, Math.max(1, Math.round(place.digitalZoom)));
     return next;
   });
   return {

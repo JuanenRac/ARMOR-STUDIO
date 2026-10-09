@@ -239,6 +239,14 @@ describe("the properties of the objects of the site design", () => {
     expect(parsed.features?.[0]).toMatchObject({ watts: 60, motion: true });
     expect(parsed.features?.[1].automatic).toBe(true);
     expect(parsed.cameras?.[0]).toMatchObject({ kind: "ptz", pan: 300, tiltSweep: 120, mount: "pole", nightRange: 30 });
+    const lens = stored({ cameras: [
+      { id: "c3", name: "Zoom", host: "h", snapshotUrl: "", enabled: true, x: 1, y: 1, lens: "motorised", opticalZoom: 25, digitalZoom: 16 },
+      { id: "c4", name: "Fixed", host: "h", snapshotUrl: "", enabled: true, x: 1, y: 1, lens: "fixed", opticalZoom: 25, digitalZoom: 0 },
+      { id: "c5", name: "Odd", host: "h", snapshotUrl: "", enabled: true, x: 1, y: 1, lens: "telescope", opticalZoom: 99 },
+    ] }).cameras ?? [];
+    expect(lens[0]).toMatchObject({ lens: "motorised", opticalZoom: 25, digitalZoom: 16 });
+    expect([lens[1].lens, lens[1].opticalZoom, lens[1].digitalZoom]).toEqual([undefined, undefined, 1]);   // a fixed lens has no optical zoom
+    expect([lens[2].lens, lens[2].opticalZoom]).toEqual([undefined, undefined]);
     expect(stored({ cameras: [{ id: "c2", name: "X", host: "h", snapshotUrl: "", enabled: true, x: 1, y: 1, kind: "ptz", pan: 30, tiltSweep: 999 }] }).cameras?.[0]).toMatchObject({ pan: 90, tiltSweep: 180 });
   });
 });

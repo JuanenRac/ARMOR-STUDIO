@@ -3,7 +3,7 @@ import { INITIAL_BUILDINGS, INITIAL_CAMERAS, INITIAL_FEATURES, INITIAL_OPENINGS,
 import { parseStudioSettings } from "../settings";
 import { applySiteDoc, buildSiteDoc, siteDocKey } from "../siteSync";
 import { DEFAULT_FEATURE_COLOUR, featureColourOf, isColour, readColour, shade } from "./colors";
-import { cameraView, CAMERA_VIEW } from "./model";
+import { cameraView, CAMERA_VIEW, cameraTeleDeg, cameraTeleRangeM, cameraZoom } from "./model";
 
 describe("colours", () => {
   it("accept only #rrggbb and store it in lowercase", () => {
@@ -61,6 +61,14 @@ describe("colours and the new properties in a saved design", () => {
     expect(cameraView({ kind: "ptz", pan: 30 }).halfAngleDeg).toBe(45);
     expect(cameraView({ kind: "ptz", pan: 720 }).halfAngleDeg).toBe(180);
     expect(cameraView({ kind: "fixed", pan: 270, fov: 60 }).halfAngleDeg).toBe(30);
+    // a zoom lens: the fov is the widest view, the narrowest follows from the zoom (the tangent of half the angle divides by it)
+    expect(cameraZoom({})).toBe(1);
+    expect(cameraZoom({ lens: "fixed", opticalZoom: 10 })).toBe(1);
+    expect(cameraZoom({ lens: "motorised", opticalZoom: 4 })).toBe(4);
+    expect(cameraTeleDeg({ fov: 90, lens: "motorised", opticalZoom: 1 })).toBe(90);
+    expect(cameraTeleDeg({ fov: 90, lens: "varifocal", opticalZoom: 2 })).toBeCloseTo(53.13, 1);
+    expect(cameraTeleRangeM({ range: 12, lens: "motorised", opticalZoom: 5 })).toBe(60);
+    expect(cameraTeleRangeM({ range: 60, lens: "motorised", opticalZoom: 60 })).toBe(150);
   });
   it("travel with the design shared through the server", () => {
     const base = { dimensions: { width: 60, depth: 40, height: 3 }, sensors: [], placements: [], ...painted() };

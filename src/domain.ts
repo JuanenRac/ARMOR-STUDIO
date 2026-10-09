@@ -8,6 +8,8 @@ export type View = "overview" | "weather" | "alarms" | "cameras" | "radar" | "in
 export type GridSize = 1 | 2 | 4 | 6 | 8 | 9 | 12 | 16;
 export const GRID_SIZES: readonly GridSize[] = [1, 2, 4, 6, 8, 9, 12, 16];
 
+export const CAMERA_LENSES = ["fixed", "varifocal", "motorised"] as const;
+export type CameraLens = (typeof CAMERA_LENSES)[number];
 export type Camera = {
   id: string; name: string; host: string; snapshotUrl: string; enabled: boolean; x: number; y: number;
   username?: string; onvifPort?: number; rtspPort?: number; rtspPath?: string; previewPath?: string; hasCredentials?: boolean; liveVideoAvailable?: boolean;
@@ -29,6 +31,12 @@ export type Camera = {
   mount?: "wall" | "ceiling" | "pole" | "ground";
   /** Infrared night vision reach in metres (unset = none). */
   nightRange?: number;
+  /** The lens: "fixed" (the default; one angle), "varifocal" (the angle is set by hand when it is installed) or "motorised" (an optical zoom the camera moves by itself, so the angle changes while it works). */
+  lens?: CameraLens;
+  /** The optical zoom of a varifocal or motorised lens: the factor from its widest view to its narrowest (unset = 1, none). `fov` is then the widest view. */
+  opticalZoom?: number;
+  /** The digital zoom the camera offers on top, as a factor (unset = none); it enlarges the picture and adds no detail. */
+  digitalZoom?: number;
 };
 export type Sensor = {
   id: string; name: string; x: number; y: number; kind: "LD2450" | "LD2461"; heading?: number; tilt?: number;
