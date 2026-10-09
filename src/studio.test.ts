@@ -202,3 +202,43 @@ describe("the new parts of a site survive saving and reading", () => {
     expect(parsed.features?.find(item => item.id === "p1")?.style).toBe("oval");
   });
 });
+
+describe("the properties of the objects of the site design", () => {
+  const stored = (extra: Record<string, unknown>) => parseStudioSettings(JSON.stringify(extra));
+  const building = { id: "b1", name: "House", points: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 8 }, { x: 0, y: 8 }], floors: [3], base: 0, thickness: 0.3, roof: { style: "flat", slope: 0, overhang: 0, ridge: 0 } };
+  it("keeps what a building is used for and made of, and drops what is not on the list", () => {
+    const kept = stored({ buildings: [{ ...building, use: "workshop", material: "brick" }] }).buildings?.[0];
+    expect([kept?.use, kept?.material]).toEqual(["workshop", "brick"]);
+    const dropped = stored({ buildings: [{ ...building, use: "palace", material: "gold" }] }).buildings?.[0];
+    expect([dropped?.use, dropped?.material]).toEqual([undefined, undefined]);
+  });
+  it("keeps how a door or a window is made, and only what makes sense for its kind", () => {
+    const openings = stored({ buildings: [building], openings: [
+      { id: "d1", buildingId: "b1", edge: 0, floor: 0, kind: "door", offset: 1, width: 1, height: 2.1, sill: 0, style: "double", swing: "out", hinge: "right", shutter: true, contact: true },
+      { id: "w1", buildingId: "b1", edge: 1, floor: 0, kind: "window", offset: 1, width: 1, height: 1, sill: 1, style: "sectional", swing: "out", hinge: "right" },
+    ] }).openings ?? [];
+    expect(openings[0]).toMatchObject({ style: "double", swing: "out", hinge: "right", shutter: true, contact: true });
+    expect(openings[1].style).toBeUndefined();   // "sectional" is a garage door, not a window
+    expect(openings[1].swing).toBeUndefined();
+    expect(openings[1].hinge).toBeUndefined();
+  });
+  it("keeps the power and the number of the solar panels, and the lamps' type, power and movement sensor", () => {
+    const parsed = stored({ buildings: [building], roofItems: [
+      { id: "r1", buildingId: "b1", kind: "solar", x: 1, y: 1, width: 1, depth: 2, height: 0.05, rotation: 0, tilt: 30, watts: 450, count: 12 },
+      { id: "r2", buildingId: "b1", kind: "chimney", x: 2, y: 2, width: 1, depth: 1, height: 1, rotation: 0, tilt: 0, watts: 450, count: 12 },
+    ], wallLamps: [{ id: "l1", buildingId: "b1", edge: 0, offset: 1, z: 2.4, reach: 0.4, lampKind: "flood", watts: 30, motion: true }] });
+    expect(parsed.roofItems?.[0]).toMatchObject({ watts: 450, count: 12 });
+    expect(parsed.roofItems?.[1].watts).toBeUndefined();   // only a solar panel has a power
+    expect(parsed.wallLamps?.[0]).toMatchObject({ lampKind: "flood", watts: 30, motion: true });
+  });
+  it("keeps a lamp post's power and a gate's motor, and a camera that turns", () => {
+    const parsed = stored({
+      features: [{ id: "f1", kind: "lamp", x: 1, y: 1, z: 0, width: 0.2, depth: 0.2, height: 4, rotation: 0, slope: 0, watts: 60, motion: true }, { id: "f2", kind: "gate", x: 2, y: 2, z: 0, width: 4, depth: 0.2, height: 1.6, rotation: 0, slope: 0, automatic: true }],
+      cameras: [{ id: "c1", name: "Gate", host: "10.0.0.5", snapshotUrl: "", enabled: true, x: 40, y: 40, kind: "ptz", pan: 300, tiltSweep: 120, fov: 70, mount: "pole", nightRange: 30 }],
+    });
+    expect(parsed.features?.[0]).toMatchObject({ watts: 60, motion: true });
+    expect(parsed.features?.[1].automatic).toBe(true);
+    expect(parsed.cameras?.[0]).toMatchObject({ kind: "ptz", pan: 300, tiltSweep: 120, mount: "pole", nightRange: 30 });
+    expect(stored({ cameras: [{ id: "c2", name: "X", host: "h", snapshotUrl: "", enabled: true, x: 1, y: 1, kind: "ptz", pan: 30, tiltSweep: 999 }] }).cameras?.[0]).toMatchObject({ pan: 90, tiltSweep: 180 });
+  });
+});

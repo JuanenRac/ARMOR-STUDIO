@@ -34,8 +34,19 @@ export const SENSOR_HEIGHT_M = 1.5;
 /** A camera's field of view is drawn as an indication only: it depends on the lens, which the site model does not know. */
 export const CAMERA_VIEW = { rangeM: 12, halfAngleDeg: 45 } as const;
 /** What a camera sees: its own field of view and range when the operator set them, else the defaults. */
-export const cameraView = (camera: { fov?: number; range?: number }): { rangeM: number; halfAngleDeg: number } => ({ rangeM: camera.range ?? CAMERA_VIEW.rangeM, halfAngleDeg: (camera.fov ?? CAMERA_VIEW.halfAngleDeg * 2) / 2 });
+export const cameraView = (camera: { fov?: number; range?: number; kind?: string; pan?: number }): { rangeM: number; halfAngleDeg: number } => ({
+  rangeM: camera.range ?? CAMERA_VIEW.rangeM,
+  // a fixed camera covers the angle of its lens; a motorised one covers all it can turn to (the lens angle is drawn apart, see cameraLensDeg)
+  halfAngleDeg: (camera.kind === "ptz" ? Math.min(CAMERA_PAN_MAX, Math.max(CAMERA_PAN_MIN, camera.pan ?? CAMERA_PAN_MAX)) : camera.fov ?? CAMERA_VIEW.halfAngleDeg * 2) / 2,
+});
 export const CAMERA_HEIGHT_M = 2.4;
+export const CAMERA_PAN_MIN = 90, CAMERA_PAN_MAX = 360, CAMERA_TILT_SWEEP_MIN = 30, CAMERA_TILT_SWEEP_MAX = 180;
+export const isMotorised = (camera: { kind?: string }): boolean => camera.kind === "ptz";
+/** The angle of the lens of a camera (its whole horizontal field of view). */
+export const cameraLensDeg = (camera: { fov?: number }): number => camera.fov ?? CAMERA_VIEW.halfAngleDeg * 2;
+/** How far a motorised camera turns sideways in total (never less than 90, never more than 360). */
+export const cameraPanDeg = (camera: { pan?: number }): number => Math.min(CAMERA_PAN_MAX, Math.max(CAMERA_PAN_MIN, camera.pan ?? CAMERA_PAN_MAX));
+
 
 export type ToolMode = "2d" | "3d";
 /** `views` says where the tool works; the panel of both views shows every tool and greys out the ones the other view cannot use. */

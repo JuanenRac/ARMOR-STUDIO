@@ -13,7 +13,7 @@ import { extraShape, SMALL_EXTRA_KINDS } from "./extraShapes";
 import { bounds, centroid, edgeOf, nearestOnOutline, offsetPolygon, pointInPolygon, roofLines, signedArea } from "./geometry";
 import { ICON } from "./icons";
 import {
-  arcPoints, cameraView, clamp, fitTransform, formatMetres, headingOf, niceScaleLength, radarView, round2, sectorPoints, snapTo, toMetres, type Selection, type Tool,
+  arcPoints, cameraLensDeg, cameraView, clamp, isMotorised, fitTransform, formatMetres, headingOf, niceScaleLength, radarView, round2, sectorPoints, snapTo, toMetres, type Selection, type Tool,
 } from "./model";
 import type { SiteModel } from "./ops";
 
@@ -506,9 +506,10 @@ export function Plan2D(props: PlanProps) {
 
   const cameraShape = (camera: Camera) => {
     const at = toMetres(camera, dimensions), heading = headingOf(camera, dimensions), chosen = selected("camera", camera.id);
-    const view = cameraView(camera), cone = sectorPoints(at, heading, view.halfAngleDeg, view.rangeM), tip = { x: at.x + Math.cos(heading * Math.PI / 180) * view.rangeM * 0.7, y: at.y + Math.sin(heading * Math.PI / 180) * view.rangeM * 0.7 };
+    const view = cameraView(camera), motorised = isMotorised(camera), cone = sectorPoints(at, heading, view.halfAngleDeg, view.rangeM), lensCone = motorised ? sectorPoints(at, heading, cameraLensDeg(camera) / 2, view.rangeM) : [], tip = { x: at.x + Math.cos(heading * Math.PI / 180) * view.rangeM * 0.7, y: at.y + Math.sin(heading * Math.PI / 180) * view.rangeM * 0.7 };
     return <g key={camera.id} className={`p-camera ${camera.enabled ? "" : "off"} ${chosen ? "selected" : ""}`}>
-      <path d={path(cone)} className="p-fov" pointerEvents="none" />
+      <path d={path(cone)} className={`p-fov ${motorised ? "ptz" : ""}`} pointerEvents="none" />
+      {motorised && <path d={path(lensCone)} className="p-fov-lens" pointerEvents="none" />}
       <g transform={`translate(${at.x} ${Y(at.y)})`} onPointerDown={event => beginDrag({ kind: "camera", id: camera.id }, { kind: "camera", id: camera.id }, event)}>
         <circle r={13 * inv} className="p-device-hit" />
         <g transform={`rotate(${-heading})`}><rect x={-8 * inv} y={-6 * inv} width={12 * inv} height={12 * inv} rx={2.5 * inv} className="p-camera-body" /><path d={`M${4 * inv} ${-4 * inv}L${10 * inv} ${-7 * inv}V${7 * inv}L${4 * inv} ${4 * inv}Z`} className="p-camera-lens" /></g>

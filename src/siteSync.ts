@@ -8,7 +8,7 @@ import { parseStudioSettings, type StudioSettings } from "./settings";
 
 export type SiteDesign = Pick<StudioSettings, "dimensions" | "terrain" | "buildings" | "openings" | "roofItems" | "wallLamps" | "features" | "sensors" | "placements" | "cameras">;
 /** The parts of a camera that belong to the design (its place and how it looks); the rest of a camera is the server's own. */
-type CameraPlace = { x: number; y: number; heading?: number; tilt?: number; z?: number; fov?: number; range?: number };
+type CameraPlace = { x: number; y: number; heading?: number; tilt?: number; z?: number; fov?: number; range?: number; kind?: "ptz"; pan?: number; tiltSweep?: number; mount?: string; nightRange?: number };
 
 export const SITE_SCHEMA = "armor-studio/site/1";
 
@@ -19,7 +19,7 @@ const finite = (value: unknown): value is number => typeof value === "number" &&
 export function buildSiteDoc(design: SiteDesign): Record<string, unknown> {
   const cameraPlacements: Record<string, CameraPlace> = {};
   for (const camera of design.cameras) {
-    cameraPlacements[camera.id] = { x: camera.x, y: camera.y, ...(camera.heading !== undefined ? { heading: camera.heading } : {}), ...(camera.tilt !== undefined ? { tilt: camera.tilt } : {}), ...(camera.z !== undefined ? { z: camera.z } : {}), ...(camera.fov !== undefined ? { fov: camera.fov } : {}), ...(camera.range !== undefined ? { range: camera.range } : {}) };
+    cameraPlacements[camera.id] = { x: camera.x, y: camera.y, ...(camera.heading !== undefined ? { heading: camera.heading } : {}), ...(camera.tilt !== undefined ? { tilt: camera.tilt } : {}), ...(camera.z !== undefined ? { z: camera.z } : {}), ...(camera.fov !== undefined ? { fov: camera.fov } : {}), ...(camera.kind === "ptz" ? { kind: "ptz" as const } : {}), ...(camera.pan !== undefined ? { pan: camera.pan } : {}), ...(camera.tiltSweep !== undefined ? { tiltSweep: camera.tiltSweep } : {}), ...(camera.mount !== undefined ? { mount: camera.mount } : {}), ...(camera.nightRange !== undefined ? { nightRange: camera.nightRange } : {}), ...(camera.range !== undefined ? { range: camera.range } : {}) };
   }
   const { dimensions, terrain, buildings, openings, roofItems, wallLamps, features, sensors, placements } = design;
   return { schema: SITE_SCHEMA, dimensions, terrain, buildings, openings, roofItems, wallLamps, features, sensors, placements, cameraPlacements };
@@ -41,12 +41,17 @@ export function applySiteDoc(document: unknown, current: SiteDesign): SiteDesign
     const place = places[camera.id];
     if (!isRecord(place) || !finite(place.x) || !finite(place.y)) return camera;
     const next: Camera = { ...camera, x: Math.min(100, Math.max(0, place.x)), y: Math.min(100, Math.max(0, place.y)) };
-    delete next.heading; delete next.tilt; delete next.z; delete next.fov; delete next.range;
+    delete next.heading; delete next.tilt; delete next.z; delete next.fov; delete next.range; delete next.kind; delete next.pan; delete next.tiltSweep; delete next.mount; delete next.nightRange;
     if (finite(place.heading)) next.heading = place.heading;
     if (finite(place.tilt)) next.tilt = place.tilt;
     if (finite(place.z)) next.z = place.z;
     if (finite(place.fov)) next.fov = Math.min(180, Math.max(20, place.fov));
     if (finite(place.range)) next.range = Math.min(60, Math.max(2, place.range));
+    if (place.kind === "ptz") next.kind = "ptz";
+    if (finite(place.pan)) next.pan = Math.min(360, Math.max(90, place.pan));
+    if (finite(place.tiltSweep)) next.tiltSweep = Math.min(180, Math.max(30, place.tiltSweep));
+    if (place.mount === "wall" || place.mount === "ceiling" || place.mount === "pole" || place.mount === "ground") next.mount = place.mount;
+    if (finite(place.nightRange)) next.nightRange = Math.min(100, Math.max(1, place.nightRange));
     return next;
   });
   return {

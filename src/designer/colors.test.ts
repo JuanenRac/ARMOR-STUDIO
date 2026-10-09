@@ -55,6 +55,12 @@ describe("colours and the new properties in a saved design", () => {
   it("a camera's own view falls back to the defaults", () => {
     expect(cameraView({})).toEqual({ rangeM: CAMERA_VIEW.rangeM, halfAngleDeg: CAMERA_VIEW.halfAngleDeg });
     expect(cameraView({ fov: 120, range: 20 })).toEqual({ rangeM: 20, halfAngleDeg: 60 });
+    // a motorised camera covers its whole sweep (90 to 360 degrees), not the angle of its lens
+    expect(cameraView({ kind: "ptz", pan: 270, fov: 60 }).halfAngleDeg).toBe(135);
+    expect(cameraView({ kind: "ptz" }).halfAngleDeg).toBe(180);
+    expect(cameraView({ kind: "ptz", pan: 30 }).halfAngleDeg).toBe(45);
+    expect(cameraView({ kind: "ptz", pan: 720 }).halfAngleDeg).toBe(180);
+    expect(cameraView({ kind: "fixed", pan: 270, fov: 60 }).halfAngleDeg).toBe(30);
   });
   it("travel with the design shared through the server", () => {
     const base = { dimensions: { width: 60, depth: 40, height: 3 }, sensors: [], placements: [], ...painted() };
