@@ -590,6 +590,7 @@ export function Plan2D(props: PlanProps) {
     <div className="plan-floors" role="group" aria-label={t("floorSelector")}>
       <button className={activeFloor < 0 ? "on" : ""} onClick={() => props.onFloor(-1)} title={t("allFloors")}>{t("allFloorsShort")}</button>
       {floors.map(floor => <button key={floor} className={activeFloor === floor ? "on" : ""} onClick={() => props.onFloor(floor)} title={`${t("floor")} ${floor + 1}`}>{floor === 0 ? t("groundShort") : floor}</button>)}
+      <button className={`roof-chip ${roofsOn ? "" : "on"}`} aria-pressed={!roofsOn} onClick={() => setRoofsOn(value => !value)} title={roofsOn ? t("roofsOff") : t("roofsOn")} aria-label={roofsOn ? t("roofsOff") : t("roofsOn")}>{ICON.roof}</button>
     </div>
     {prompt && <div className="plan-prompt" role="status">{prompt}{typed && <b> {typed} m</b>}</div>}
     <div className="plan-north" aria-label={t("north")} title={t("north")}><svg viewBox="0 0 40 40" width="38" height="38"><circle cx="20" cy="20" r="17" className="n-ring" /><path d="M20 6l5 14H15z" className="n-needle" /><path d="M20 34l-5-14h10z" className="n-tail" /><text x="20" y="4.6" textAnchor="middle" className="n-n">N</text></svg></div>

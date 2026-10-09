@@ -183,3 +183,6 @@
 .building-inspector { min-width: 0; overflow-x: hidden; }
 .building-inspector .inspector-grid > *, .building-inspector .inspector-grid label { min-width: 0; }
 .building-inspector .inspector-grid input, .building-inspector .inspector-grid select { min-width: 0; max-width: 100%; box-sizing: border-box; }
+/* The roof chip at the end of the floor bar: lit while the roofs are off. */
+.plan-floors .roof-chip { display: inline-grid; place-items: center; margin-left: .25rem; padding: 0 .4rem; border-left: 1px solid #285a66; border-radius: 0 7px 7px 0; }
+.plan-floors .roof-chip svg { width: 18px; height: 18px; }
