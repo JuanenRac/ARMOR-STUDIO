@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.5] - The alarm of a camera that saw movement
+
+- The new alarm `camera_motion` (from the observation service) has its phrase in the seven languages.
+
 ## [0.6.4] - Configuration > Notifications
 
 - A new tab, in the seven languages: which places the alarms are sent to (the signed webhook, MQTT, Telegram, Home Assistant) are set up, the language of the sentences, a **test** button for each and for all of them that says what each answered, and the steps to create the Telegram bot and the Home Assistant webhook with the keys of `armor.env` to fill in.
