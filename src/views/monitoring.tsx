@@ -23,7 +23,7 @@ export function OverviewView({ nodes, cameras, setView, t }: { nodes: NodeState[
       <article className="overview-map">
         <p className="eyebrow">{t("perimeterOverview")}</p><h2>{t("overview")}</h2>
         <div className="mini-plan">
-          {nodes.map((node, index) => <span key={node.node_id} className={`mini-node ${node.alert_level}`} style={{ left: `${20 + index * 54}%`, top: `${30 + index * 32}%` }}>{node.node_id.slice(0, 2).toUpperCase()}</span>)}
+          {nodes.map((node, index) => <span key={node.node_id} className={`mini-node ${node.online && !node.stale ? node.alert_level : "silent"}`} style={{ left: `${20 + index * 54}%`, top: `${30 + index * 32}%` }}>{node.node_id.slice(0, 2).toUpperCase()}</span>)}
           {cameras.filter(camera => camera.enabled).map(camera => <span key={camera.id} className="mini-camera" style={{ left: `${camera.x}%`, top: `${camera.y}%` }}>⌾</span>)}
         </div>
       </article>

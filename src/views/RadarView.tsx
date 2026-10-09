@@ -168,10 +168,10 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
       {side === "nodes" && <article className="stack-card">
         <p className="eyebrow">{t("radarFusion")}</p><h3>{t("activeRadarNodes")}</h3>
         {nodes.map(node => <div className="node-row" key={node.node_id}>
-          <span className={`state-dot ${node.alert_level}`} />
-          <div><strong>{node.node_id}</strong><small>{node.stale ? t("staleWord") : node.online ? t("online") : t("offlineWord")} · {node.target_count} {t("tracksWord")} · {model.sensors.filter(sensor => sensor.node === node.node_id).length} {t("radarNodeLinked")} · {node.lux ?? "—"} lux{node.panel ? ` · ${t("firmwareWord")} ${node.panel.firmware}` : ""}</small></div>
+          <span className={`state-dot ${node.online && !node.stale ? node.alert_level : "silent"}`} />
+          <div><strong>{node.node_id}</strong><small>{node.stale ? t("staleWord") : node.online ? t("online") : t("offlineWord")} · {node.online && !node.stale ? `${node.target_count} ${t("tracksWord")}` : `— ${t("tracksWord")}`} · {model.sensors.filter(sensor => sensor.node === node.node_id).length} {t("radarNodeLinked")} · {node.lux ?? "—"} lux{node.panel ? ` · ${t("firmwareWord")} ${node.panel.firmware}` : ""}</small></div>
           {node.panel && <a className="panel-link" href={panelUrl(node.panel)} target="_blank" rel="noopener noreferrer" title={`${node.panel.name} · ${node.panel.ip}`}>{t("openNodePanel")}</a>}
-          <b>{node.alert_level}</b>
+          <b>{node.online && !node.stale ? node.alert_level : "—"}</b>
           {(!node.online || node.stale) && <button className="danger-button" title={t("forgetNode")} onClick={() => { if (window.confirm(`${t("confirmForgetNode")} ${node.node_id}`)) forget(node.node_id); }}>{t("forgetNode")}</button>}
         </div>)}
         {unmapped.map(item => <p key={item.node} className="muted small warn-line"><b>{item.node}</b> {t("unmappedNode")}</p>)}

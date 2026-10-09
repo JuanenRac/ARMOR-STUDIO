@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { familyKey, isActive, toneOf } from "./views/ServicesView";
+import { actionsFor, agentIdOf, familyKey, isActive, toneOf } from "./views/ServicesView";
 import { servicesCatalogues } from "./servicesText";
 import { LANGUAGE_ORDER } from "./catalogueRows";
 
@@ -19,7 +19,36 @@ describe("the services menu", () => {
   it("has every phrase in the seven languages, and a state label for every state", () => {
     for (const code of LANGUAGE_ORDER) {
       for (const key of Object.keys(servicesCatalogues.en)) expect(servicesCatalogues[code][key], `${code} ${key}`).toBeTruthy();
-      for (const state of ["running", "stopped", "failed", "starting", "not_installed", "online", "offline", "unknown"]) expect(servicesCatalogues[code][`svcState_${state}`]).toBeTruthy();
+      for (const state of ["running", "paused", "stopped", "failed", "starting", "not_installed", "online", "offline", "unknown"]) expect(servicesCatalogues[code][`svcState_${state}`]).toBeTruthy();
+    }
+  });
+});
+
+describe("the buttons of a program", () => {
+  it("offers what makes sense in each state, and never pauses the console itself", () => {
+    expect(actionsFor("running", "mosquitto")).toEqual(["stop", "restart", "pause"]);
+    expect(actionsFor("paused", "mosquitto")).toEqual(["resume", "stop", "restart"]);
+    expect(actionsFor("stopped", "voice")).toEqual(["start"]);
+    expect(actionsFor("failed", "network")).toEqual(["start"]);
+    expect(actionsFor("starting", "ai")).toEqual(["stop", "restart"]);
+    expect(actionsFor("running", "server")).toEqual(["stop", "restart"]);
+    expect(actionsFor("running", "studio")).toEqual(["stop", "restart"]);
+    expect(actionsFor("not_installed", "voice")).toEqual([]);
+    expect(actionsFor("online", "x")).toEqual([]);
+  });
+  it("finds the administration agent's id of a catalogue unit", () => {
+    const agent = [{ id: "mosquitto", unit: "armor-mosquitto", description: "", installed: true, active: "active", sub: "running", enabled: "enabled", pid: 1, since: "" }];
+    expect(agentIdOf("armor-mosquitto.service", agent)).toBe("mosquitto");
+    expect(agentIdOf("armor-other.service", agent)).toBeUndefined();
+    expect(agentIdOf(undefined, agent)).toBeUndefined();
+  });
+  it("has the words of every button and every confirmation in the seven languages", () => {
+    for (const code of LANGUAGE_ORDER) {
+      for (const action of ["start", "stop", "restart", "pause", "resume"]) {
+        expect(servicesCatalogues[code][`svcBtn_${action}`], `${code} ${action}`).toBeTruthy();
+        expect(servicesCatalogues[code][`svcDone_${action}`], `${code} done ${action}`).toBeTruthy();
+      }
+      for (const key of ["svcAsk_stop", "svcAsk_stop_console", "svcAsk_restart", "svcAsk_restart_console", "svcAsk_pause"]) expect(servicesCatalogues[code][key], `${code} ${key}`).toBeTruthy();
     }
   });
 });
