@@ -13,13 +13,14 @@ import {
   type SolarBatteryReading, type SolarCatalog, type SolarDeviceView, type SolarModuleReading, type SolarRegistration, type SolarTotals,
 } from "../solarModel";
 import { SolarEquipment } from "../SolarEquipment";
+import { EnergyCard } from "./InvertersView";
 import { SolarNodes } from "../SolarNodes";
 import type { NetworkOverview } from "../networkModel";
 import "./solar.css";
 
 type Props = { t: Translate; origin: string; devices: SolarDeviceView[]; waiting: SolarRegistration[]; catalog: SolarCatalog | null; reload: () => void; totals: SolarTotals | null; now: number; unreachable: boolean; network?: NetworkOverview | null };
 type Battery = SolarDeviceView & { reading: SolarBatteryReading };
-const RANGES = [{ minutes: 60, key: "solarRange1" }, { minutes: 360, key: "solarRange6" }, { minutes: 1440, key: "solarRange24" }] as const;
+const RANGES = [{ minutes: 60, key: "solarRange1" }, { minutes: 360, key: "solarRange6" }, { minutes: 1440, key: "solarRange24" }, { minutes: 10_080, key: "solarRange7" }, { minutes: 43_200, key: "solarRange30" }] as const;
 const TONE = { ok: SOLAR_COLOURS.battery, warn: SOLAR_COLOURS.pv, bad: SOLAR_COLOURS.bad } as const;
 
 export function BatteriesView({ t, origin, devices, totals, now, unreachable, waiting, catalog, reload, network }: Props) {
@@ -50,6 +51,7 @@ export function BatteriesView({ t, origin, devices, totals, now, unreachable, wa
         return <button key={key} role="tab" aria-selected={item === current} className={item === current ? "active" : ""} onClick={() => setChosen(key)}>{displayName(item)}{item.stale && <i className="solar-stale-dot" title={t("solarStale")} />}</button>;
       })}</div>}
       {current && <StackPanel t={t} stack={current} now={now} history={history.data?.samples ?? []} minutes={minutes} setMinutes={setMinutes} />}
+      <EnergyCard t={t} origin={origin} kind="battery" />
     </>}
   </div>;
 }

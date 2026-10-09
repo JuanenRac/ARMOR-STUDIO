@@ -226,4 +226,4 @@ export function FeatureBody(props: Props) {
     default: return <ExtraBody {...props} />;
   }
 }
-export const NEW_FEATURE_KINDS: ReadonlySet<SiteFeature["kind"]> = new Set(["tree", "fence", "gate", "fountain", "kennel", "coop", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv"]);
+export const NEW_FEATURE_KINDS: ReadonlySet<SiteFeature["kind"]> = new Set(["tree", "fence", "gate", "fountain", "kennel", "coop", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "floor"]);

@@ -4,7 +4,10 @@
  * Read only: nothing here sends a command. It belongs with the Electrical Designer, where the same nodes are drawn into the diagram of the house.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { electricalHistory } from "../api";
+import { usePolled } from "../hooks";
+import { LineChart, SOLAR_COLOURS } from "../solarGraphics";
 import type { ElectricalChannelReading, ElectricalNodeReading, ElectricalReadings, ElectricalSwitchReading } from "../api";
 import type { Translate } from "../components/camera";
 import type { Design } from "../electrical/model";
@@ -52,7 +55,7 @@ export function ElectricalView({ t, origin, readings, unreachable, design, openD
     </section>
     <NodeFinder t={t} origin={origin} network={network} wantKind="electrical" knownIds={nodes.map(node => node.node_id)} />
     {nodes.length === 0 ? <div className="solar-empty"><span className="el-live-logo big" aria-hidden="true">⌁</span><h3>{t("elLiveNone")}</h3><p>{t("elLiveNoneHelp")}</p></div>
-      : nodes.map(node => <NodeCard key={node.node_id} t={t} node={node} drawn={drawn.has(node.node_id.toLowerCase())} now={now} />)}
+      : nodes.map(node => <NodeCard key={node.node_id} t={t} origin={origin} node={node} drawn={drawn.has(node.node_id.toLowerCase())} now={now} />)}
   </div>;
 }
 
@@ -60,7 +63,7 @@ function Tile({ label, value, bad = false }: { label: string; value: string; bad
   return <div className="solar-tile" style={{ borderColor: bad ? "#ff6f7988" : "#22d3ee55" }}><small>{label}</small><b style={{ color: bad ? "#ff8e99" : "#5df0c4" }}>{value}</b></div>;
 }
 
-function NodeCard({ t, node, drawn, now }: { t: Translate; node: ElectricalNodeReading; drawn: boolean; now: number }) {
+function NodeCard({ t, origin, node, drawn, now }: { t: Translate; origin: string; node: ElectricalNodeReading; drawn: boolean; now: number }) {
   const { channels, switches = [], switching_enabled: switching } = node.reading;
   return <article className={`el-node-card ${node.stale ? "stale" : ""}`}>
     <header>
@@ -73,6 +76,7 @@ function NodeCard({ t, node, drawn, now }: { t: Translate; node: ElectricalNodeR
       <div className="el-row head" role="row"><span>{t("elLiveChannel")}</span><span>V</span><span>A</span><span>W</span><span>kWh</span><span>Hz</span><span>PF</span><span>{t("elLiveState")}</span></div>
       {channels.map(channel => <Channel key={channel.id} t={t} channel={channel} />)}
     </div>
+    <ChannelHistory t={t} origin={origin} node={node} now={now} />
     {switches.length > 0 && <div className="el-switches">{switches.map(item => <Switch key={item.id} t={t} item={item} />)}</div>}
   </article>;
 }
@@ -94,5 +98,27 @@ function Switch({ t, item }: { t: Translate; item: ElectricalSwitchReading }) {
     <span>A: {item.a_closed ? t("elLive_closed") : t("elLive_open")} · B: {item.b_closed ? t("elLive_closed") : t("elLive_open")}</span>
     {item.closing && <span className="el-pill warn">{t("elLiveClosing")}</span>}
     {fault && <span className="el-pill bad">{t(`elLiveFault_${item.fault}`)}</span>}
+  </div>;
+}
+
+const HISTORY_RANGES = [{ minutes: 60, key: "solarRange1" }, { minutes: 360, key: "solarRange6" }, { minutes: 1440, key: "solarRange24" }, { minutes: 10_080, key: "solarRange7" }, { minutes: 43_200, key: "solarRange30" }] as const;
+
+/** The history of one channel of a node: power, voltage and current, over the last hour up to the last month. */
+function ChannelHistory({ t, origin, node, now }: { t: Translate; origin: string; node: ElectricalNodeReading; now: number }) {
+  const channels = node.reading.channels;
+  const [chosen, setChosen] = useState("");
+  const [minutes, setMinutes] = useState<number>(60);
+  const channel = channels.find(item => item.id === chosen) ?? channels.find(item => item.id === "grid") ?? channels[0];
+  const history = usePolled(() => (channel ? electricalHistory(origin, node.node_id, channel.id, minutes) : Promise.resolve(null)), 15_000, `${node.node_id}/${channel?.id}/${minutes}/${origin}`).data?.samples ?? [];
+  if (!channel) return null;
+  const from = now - minutes * 60_000;
+  return <div className="el-history">
+    <div className="solar-card-head"><h4>{t("elHistory")}</h4>
+      {channels.length > 1 && <select value={channel.id} aria-label={t("elLiveChannel")} onChange={event => setChosen(event.target.value)}>{channels.map(item => <option key={item.id} value={item.id}>{item.label ?? item.id}</option>)}</select>}
+      <div className="solar-ranges">{HISTORY_RANGES.map(range => <button key={range.minutes} className={minutes === range.minutes ? "active" : ""} onClick={() => setMinutes(range.minutes)}>{t(range.key)}</button>)}</div>
+    </div>
+    <LineChart t={t} samples={history} from={from} to={now} series={[{ key: "power_w", label: t("elPower"), color: SOLAR_COLOURS.pv, unit: "W" }]} />
+    <LineChart t={t} samples={history} from={from} to={now} decimals={1} series={[{ key: "voltage_v", label: t("elVoltage"), color: SOLAR_COLOURS.load, unit: "V" }]} />
+    <LineChart t={t} samples={history} from={from} to={now} decimals={2} series={[{ key: "current_a", label: t("elCurrent"), color: SOLAR_COLOURS.battery, unit: "A" }]} />
   </div>;
 }

@@ -6,6 +6,7 @@
 import type { ReactNode } from "react";
 import type { SiteFeature } from "../domain";
 import { DEFAULT_FEATURE_COLOUR } from "./colors";
+import { floorColourOf, floorPatternId, isFloorStyle } from "./floors";
 import { wallGap } from "./InteriorFeatures";
 
 export function interiorShape(feature: SiteFeature): ReactNode {
@@ -13,6 +14,10 @@ export function interiorShape(feature: SiteFeature): ReactNode {
   const body = { className: "p-x", style: { fill } }, dark = { className: "p-x p-x-dark" }, line = { className: "p-x-line" }, open = { className: "p-x-open" };
   const style = feature.style ?? "";
   switch (feature.kind) {
+    case "floor": {
+      const finish = isFloorStyle(feature.style) ? feature.style : "flParquet", colour = feature.color ?? floorColourOf(finish);
+      return <><rect x={-w / 2} y={-d / 2} width={w} height={d} fill={`url(#${floorPatternId(finish, colour)})`} className="p-x-floor" /><rect x={-w / 2} y={-d / 2} width={w} height={d} className="p-x-floor-edge" /></>;
+    }
     case "wall": {
       const gap = wallGap(feature), half = gap ? gap.width / 2 : 0, door = gap && gap.sill === 0 && style !== "wOpening", glass = gap && gap.sill > 0;
       const pick = <rect x={-w / 2} y={-Math.max(d, 0.5) / 2} width={w} height={Math.max(d, 0.5)} style={{ fill: "transparent" }} />;

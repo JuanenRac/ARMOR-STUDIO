@@ -15,7 +15,7 @@ export type Tool =
   | "pillar" | "lamp" | "mast" | "solar" | "canopy" | "entrance" | "path" | "road"
   | "tree" | "kennel" | "fence" | "fountain" | "coop" | "gate" | "sidewalk" | "pool" | "planter" | "terrace"
   | "bench" | "table" | "barbecue" | "pergola" | "shed" | "hedge" | "mailbox" | "bins" | "tank" | "ac-unit" | "electrical-box" | "car"
-  | "wall" | "fireplace" | "stairs" | "kitchen" | "bathroom" | "bed" | "wardrobe" | "sofa" | "armchair" | "dining" | "tv"
+  | "floor" | "wall" | "fireplace" | "stairs" | "kitchen" | "bathroom" | "bed" | "wardrobe" | "sofa" | "armchair" | "dining" | "tv"
   | "camera" | "sensor" | "device";
 
 export const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
@@ -76,7 +76,7 @@ export const TOOL_GROUPS: ReadonlyArray<readonly ToolSpec[]> = [
   [{ tool: "bench", key: "", labelKey: "toolBench", views: BOTH }, { tool: "table", key: "", labelKey: "toolTable", views: BOTH }, { tool: "barbecue", key: "", labelKey: "toolBarbecue", views: BOTH }, { tool: "pergola", key: "", labelKey: "toolPergola", views: BOTH }],
   [{ tool: "shed", key: "", labelKey: "toolShed", views: BOTH }, { tool: "hedge", key: "", labelKey: "toolHedge", views: BOTH }, { tool: "car", key: "", labelKey: "toolCar", views: BOTH }, { tool: "bins", key: "", labelKey: "toolBins", views: BOTH }, { tool: "mailbox", key: "", labelKey: "toolMailbox", views: BOTH }],
   [{ tool: "tank", key: "", labelKey: "toolTank", views: BOTH }, { tool: "ac-unit", key: "", labelKey: "toolAcUnit", views: BOTH }, { tool: "electrical-box", key: "", labelKey: "toolElectricalBox", views: BOTH }],
-  [{ tool: "wall", key: "", labelKey: "toolI_wall", views: BOTH }, { tool: "fireplace", key: "", labelKey: "toolI_fireplace", views: BOTH }, { tool: "stairs", key: "", labelKey: "toolI_stairs", views: BOTH }],
+  [{ tool: "floor", key: "", labelKey: "toolI_floor", views: BOTH }, { tool: "wall", key: "", labelKey: "toolI_wall", views: BOTH }, { tool: "fireplace", key: "", labelKey: "toolI_fireplace", views: BOTH }, { tool: "stairs", key: "", labelKey: "toolI_stairs", views: BOTH }],
   [{ tool: "kitchen", key: "", labelKey: "toolI_kitchen", views: BOTH }, { tool: "bathroom", key: "", labelKey: "toolI_bathroom", views: BOTH }],
   [{ tool: "bed", key: "", labelKey: "toolI_bed", views: BOTH }, { tool: "wardrobe", key: "", labelKey: "toolI_wardrobe", views: BOTH }, { tool: "sofa", key: "", labelKey: "toolI_sofa", views: BOTH }, { tool: "armchair", key: "", labelKey: "toolI_armchair", views: BOTH }, { tool: "dining", key: "", labelKey: "toolI_dining", views: BOTH }, { tool: "tv", key: "", labelKey: "toolI_tv", views: BOTH }],
   [{ tool: "camera", key: "K", labelKey: "toolCamera", views: BOTH }, { tool: "sensor", key: "L", labelKey: "toolSensor", views: BOTH }, { tool: "device", key: "9", labelKey: "toolDevice", views: BOTH }],
@@ -86,7 +86,7 @@ export const TOOL_GROUPS: ReadonlyArray<readonly ToolSpec[]> = [
  * the things of one system of ARMOR that are placed in the house; its tools are still part of TOOL_GROUPS (keys, 2D and 3D work, texts), only the panel they are shown in changes.
  */
 export const BRANCHES: ReadonlyArray<{ id: string; titleKey: string; tools: readonly Tool[] }> = [
-  { id: "interior", titleKey: "toolboxTitleInterior", tools: ["wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv"] },
+  { id: "interior", titleKey: "toolboxTitleInterior", tools: ["floor", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv"] },
   { id: "armor", titleKey: "toolboxTitleArmor", tools: ["camera", "sensor", "device"] },
 ];
 const inView = (mode: ToolMode) => TOOL_GROUPS.map(group => group.filter(spec => spec.views.includes(mode))).filter(group => group.length > 0);

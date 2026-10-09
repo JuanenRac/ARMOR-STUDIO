@@ -7,8 +7,9 @@
 import { useEffect, useState } from "react";
 import type { StudioDevice } from "../api";
 import { KindIcon } from "../deviceKinds";
-import { FEATURE_STYLES, MAST_PART_KINDS, type Building, type Camera, type Dimensions, type Opening, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type WallLamp, BUILDING_USES, BUILDING_MATERIALS, OPENING_STYLES, LAMP_KINDS, type BuildingUse, type BuildingMaterial, type LampKind, CAMERA_LENSES, type CameraLens } from "../domain";
+import { FEATURE_STYLES, FLOOR_STYLES, MAST_PART_KINDS, type Building, type Camera, type Dimensions, type Opening, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type WallLamp, BUILDING_USES, BUILDING_MATERIALS, OPENING_STYLES, LAMP_KINDS, type BuildingUse, type BuildingMaterial, type LampKind, CAMERA_LENSES, type CameraLens } from "../domain";
 import { area, bounds, edgeOf, floorBottom, isSimplePolygon, nearestOnOutline, pointInPolygon, roofRise, signedArea, totalHeight } from "./geometry";
+import { floorFinish } from "./floors";
 import { DEFAULT_DOOR_COLOUR, DEFAULT_FEATURE_COLOUR, DEFAULT_LIGHT_COLOUR, DEFAULT_ROOF_COLOUR, DEFAULT_ROOF_ITEM_COLOUR, DEFAULT_TERRAIN_COLOUR, DEFAULT_WALL_COLOUR, DEFAULT_WINDOW_FRAME_COLOUR, featureColourOf } from "./colors";
 import { toolIcon } from "./icons";
 import { clamp, formatMetres, headingOf, radarView, round2, SENSOR_HEIGHT_M, CAMERA_HEIGHT_M, toolLabelKey, type Selection, type Tool, cameraZoom, cameraTeleDeg, cameraTeleRangeM } from "./model";
@@ -55,7 +56,7 @@ function CornerTable({ t, points, selected, onSelect, onMove, onInsert, onRemove
 }
 
 const ROOF_STYLES: readonly RoofStyle[] = ["flat", "shed", "gable", "hip", "pyramid"];
-const FEATURE_TOOL: Record<SiteFeature["kind"], Tool> = { pillar: "pillar", lamp: "lamp", mast: "mast", solar: "solar", canopy: "canopy", entrance: "entrance", path: "path", road: "road", tree: "tree", kennel: "kennel", fence: "fence", fountain: "fountain", coop: "coop", gate: "gate", sidewalk: "sidewalk", pool: "pool", planter: "planter", terrace: "terrace", bench: "bench", table: "table", barbecue: "barbecue", pergola: "pergola", shed: "shed", hedge: "hedge", mailbox: "mailbox", bins: "bins", tank: "tank", "ac-unit": "ac-unit", "electrical-box": "electrical-box", car: "car", wall: "wall", fireplace: "fireplace", stairs: "stairs", kitchen: "kitchen", bathroom: "bathroom", bed: "bed", wardrobe: "wardrobe", sofa: "sofa", armchair: "armchair", dining: "dining", tv: "tv" };
+const FEATURE_TOOL: Record<SiteFeature["kind"], Tool> = { pillar: "pillar", lamp: "lamp", mast: "mast", solar: "solar", canopy: "canopy", entrance: "entrance", path: "path", road: "road", tree: "tree", kennel: "kennel", fence: "fence", fountain: "fountain", coop: "coop", gate: "gate", sidewalk: "sidewalk", pool: "pool", planter: "planter", terrace: "terrace", bench: "bench", table: "table", barbecue: "barbecue", pergola: "pergola", shed: "shed", hedge: "hedge", mailbox: "mailbox", bins: "bins", tank: "tank", "ac-unit": "ac-unit", "electrical-box": "electrical-box", car: "car", wall: "wall", fireplace: "fireplace", stairs: "stairs", kitchen: "kitchen", bathroom: "bathroom", bed: "bed", wardrobe: "wardrobe", sofa: "sofa", armchair: "armchair", dining: "dining", tv: "tv", floor: "floor" };
 const ROOF_ITEM_TOOL: Record<RoofItem["kind"], Tool> = { chimney: "chimney", solar: "roof-solar", antenna: "antenna", vent: "chimney", gutter: "gutter", downpipe: "downpipe" };
 
 export function Inspector(p: InspectorProps) {
@@ -161,6 +162,29 @@ export function Inspector(p: InspectorProps) {
         </div>)}
       </div>
       <div className="inspector-actions"><button onClick={() => edit(m => addFloor(m, building.id, FLOOR_HEIGHT_M))}>{t("addFloor")}</button></div>
+
+      <h4>{t("floorFinish")}</h4>
+      <p className="muted small">{t("floorFinishHelp")}</p>
+      <div className="floor-finish-list">
+        {building.floors.map((_, floor) => {
+          const finish = floorFinish(building, floor);
+          const put = (list: string[] | undefined, value: string): string[] | undefined => {   // the list of a level, with its place set, and gone when nothing is left in it
+            const next = [...(list ?? [])];
+            while (next.length <= floor) next.push("");
+            next[floor] = value;
+            while (next.length > 0 && next[next.length - 1] === "") next.pop();
+            return next.length ? next : undefined;
+          };
+          return <div key={floor} className="floor-finish-row">
+            <span>{floor === 0 ? t("groundFloor") : `${t("floor")} ${floor + 1}`}</span>
+            <select value={finish.chosen ? finish.style : ""} aria-label={`${t("floorFinish")} ${floor + 1}`} onChange={event => setBuilding(building.id, { floorMaterials: put(building.floorMaterials, event.target.value), ...(event.target.value === "" ? { floorColors: put(building.floorColors, "") } : {}) }, `floorMaterial${floor}`)}>
+              <option value="">{t("floorDefault")}</option>
+              {FLOOR_STYLES.map(style => <option key={style} value={style}>{t(`style_${style}`)}</option>)}
+            </select>
+            {finish.chosen && <ColorField t={t} label={t("colorLabel")} value={building.floorColors?.[floor] || undefined} fallback={finish.colour} onChange={value => setBuilding(building.id, { floorColors: put(building.floorColors, value ?? "") }, `floorColor${floor}`)} />}
+          </div>;
+        })}
+      </div>
 
       <h4>{t("roof")}</h4>
       <div className="inspector-grid">

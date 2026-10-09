@@ -186,3 +186,12 @@
 /* The roof chip at the end of the floor bar: lit while the roofs are off. */
 .plan-floors .roof-chip { display: inline-grid; place-items: center; margin-left: .25rem; padding: 0 .4rem; border-left: 1px solid #285a66; border-radius: 0 7px 7px 0; }
 .plan-floors .roof-chip svg { width: 18px; height: 18px; }
+
+/* floors: the finish of a level in the plan, and the floor of a room */
+.p-floor-finish { opacity: .55; }
+.p-x-floor { stroke: none; }
+.p-x-floor-edge { fill: none; stroke: rgba(10, 30, 36, .55); stroke-width: .03; vector-effect: non-scaling-stroke; }
+.p-feature.other-floor { opacity: .22; pointer-events: none; }
+.floor-finish-list { display: grid; gap: .4rem; }
+.floor-finish-row { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.4fr) auto; align-items: center; gap: .4rem; font-size: .72rem; }
+.floor-finish-row select { min-width: 0; width: 100%; }

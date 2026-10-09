@@ -6,10 +6,13 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
+import { INTERIOR_KINDS } from "../domain";
 import type { Building, Camera, Dimensions, Point, Sensor, SiteFeature } from "../domain";
 import type { StudioDevice } from "../api";
 import { deviceProblem, KIND_COLOUR, kindGlyph, MAIN_FIELD } from "../deviceKinds";
 import { extraShape, SMALL_EXTRA_KINDS } from "./extraShapes";
+import { floorPatternDefs } from "./floorLooks";
+import { floorAt, floorColourOf, floorFinish, floorPatternId, isFloorStyle } from "./floors";
 import { bounds, centroid, edgeOf, nearestOnOutline, offsetPolygon, pointInPolygon, roofLines, signedArea } from "./geometry";
 import { ICON } from "./icons";
 import {
@@ -340,6 +343,16 @@ export function Plan2D(props: PlanProps) {
     </>}
   </g>;
 
+  // the finishes of floors in use (of the levels of the buildings and of the floors of rooms): one pattern each
+  const usedFloors = useMemo(() => [
+    ...model.buildings.flatMap(building => building.floors.map((_, floor) => floorFinish(building, floor)).filter(finish => finish.chosen)),
+    ...model.features.filter(feature => feature.kind === "floor").map(feature => { const style = isFloorStyle(feature.style) ? feature.style : "flParquet"; return { style, colour: feature.color ?? floorColourOf(style) }; }),
+  ], [model.buildings, model.features]);
+  const otherLevel = (feature: SiteFeature): boolean => {
+    if (activeFloor < 0 || !INTERIOR_KINDS.has(feature.kind)) return false;
+    const at = floorAt(model.buildings, { x: feature.x, y: feature.y }, feature.z);
+    return (at?.floor ?? 0) !== activeFloor;
+  };
   const featureShape = (feature: SiteFeature) => {
     const w = feature.width, d = feature.depth, chosen = selected("feature", feature.id);
     const body = (() => {
@@ -393,7 +406,7 @@ export function Plan2D(props: PlanProps) {
       }
     })();
     const roundish = feature.kind === "lamp" || feature.kind === "mast" || feature.kind === "tree" || feature.kind === "fountain";
-    return <g key={feature.id} className={`p-feature ${feature.kind} ${feature.color ? "coloured" : ""} ${chosen ? "selected" : ""}`} transform={`translate(${feature.x} ${Y(feature.y)}) rotate(${-feature.rotation})`}
+    return <g key={feature.id} className={`p-feature ${feature.kind} ${feature.color ? "coloured" : ""} ${chosen ? "selected" : ""} ${otherLevel(feature) ? "other-floor" : ""}`} transform={`translate(${feature.x} ${Y(feature.y)}) rotate(${-feature.rotation})`}
       style={feature.color ? { ["--c" as string]: feature.color } : undefined}
       onPointerDown={event => beginDrag({ kind: "feature", id: feature.id }, { kind: "feature", id: feature.id }, event)}>
       <g className="p-body">{body}</g>
@@ -412,6 +425,7 @@ export function Plan2D(props: PlanProps) {
     return <g key={building.id} className={`p-building ${chosen ? "selected" : ""}`}>
       <path d={path(building.points)} className="p-floor" data-bg={undefined}
         onPointerDown={event => beginDrag({ kind: "building", id: building.id }, { kind: "building", id: building.id }, event)} />
+      {(() => { const finish = floorFinish(building, Math.min(Math.max(0, activeFloor), building.floors.length - 1)); return finish.chosen ? <path d={path(building.points)} fill={`url(#${floorPatternId(finish.style, finish.colour)})`} className="p-floor-finish" pointerEvents="none" /> : null; })()}
       <path d={`${path(outer)}${path(inner)}`} className="p-wall-ring" fillRule="evenodd" pointerEvents="none" style={building.color ? { fill: building.color } : undefined} />
       {overhang && roofsOn && <path d={path(overhang)} className="p-roof-outline" pointerEvents="none" style={building.roofColor ? { stroke: building.roofColor } : undefined} />}
       {roofPolylines.map((line, index) => <path key={index} d={path(line, false)} className={`p-roof-line ${building.roof.style === "gable" || building.roof.style === "shed" ? "ridge" : ""}`} pointerEvents="none" style={building.roofColor ? { stroke: building.roofColor } : undefined} />)}
@@ -569,11 +583,12 @@ export function Plan2D(props: PlanProps) {
     <svg ref={svg} className="plan2d-svg" width="100%" height="100%" onWheel={onWheel} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={endPointer} onPointerCancel={endPointer}
       onPointerLeave={() => setCursor(null)} onClick={onBackgroundClick} onDoubleClick={event => { if (tool.endsWith("poly")) { if (draft.length >= 3) finishPolygon(); return; } addCornerAt(toSite(event.clientX, event.clientY)); }} onContextMenu={event => event.preventDefault()} role="application" aria-label={t("planClick")}>
       <rect data-bg="1" width="100%" height="100%" className="plan-bg" />
+      <defs>{floorPatternDefs(usedFloors)}</defs>
       <g transform={`translate(${view.x} ${view.y}) scale(${view.scale})`}>
         {gridOn && <><path d={gridPath.minor} className={`p-grid minor ${view.scale >= 22 ? "" : "hidden"}`} /><path d={gridPath.major} className="p-grid major" /></>}
-        {[...model.features].filter(feature => feature.kind === "road" || feature.kind === "path" || feature.kind === "sidewalk").map(featureShape)}
+        {[...model.features].filter(feature => feature.kind === "road" || feature.kind === "path" || feature.kind === "sidewalk" || feature.kind === "floor").map(featureShape)}
         {terrainShape}
-        {[...model.features].filter(feature => feature.kind !== "road" && feature.kind !== "path" && feature.kind !== "sidewalk").map(featureShape)}
+        {[...model.features].filter(feature => feature.kind !== "road" && feature.kind !== "path" && feature.kind !== "sidewalk" && feature.kind !== "floor").map(featureShape)}
         {model.buildings.map(buildingShape)}
         {model.sensors.map(sensorShape)}
         {model.placements.map(deviceShape)}

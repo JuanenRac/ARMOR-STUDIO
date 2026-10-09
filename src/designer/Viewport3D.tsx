@@ -11,6 +11,7 @@ import { Edges, Grid, Html, Line, OrbitControls } from "@react-three/drei";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { INTERIOR_KINDS } from "../domain";
 import type { Building, Camera, Dimensions, Opening, Sensor, SiteFeature } from "../domain";
 import type { StudioDevice } from "../api";
 import { DeviceView as PlacedDevice } from "./DeviceMeshes";
@@ -18,6 +19,8 @@ import { bounds, edgeOf, floorBottom, nearestOnOutline, pointInPolygon, roofFram
 import { ICON } from "./icons";
 import { CAMERA_HEIGHT_M, cameraView, clamp, formatMetres, headingOf, radarView, SENSOR_HEIGHT_M, TOOL_GROUPS, toMetres, type Point, type Selection, type Tool } from "./model";
 import { FeatureBody, NEW_FEATURE_KINDS } from "./FeatureMeshes";
+import { floorTexture } from "./floorLooks";
+import { FLOOR_LOOKS, floorAt, floorFinish } from "./floors";
 import { arrangeToolbox, toolSections } from "./toolItems";
 import type { PlaceHit } from "./Plan2D";
 import { roofSurfaceZ, type SiteModel } from "./ops";
@@ -131,6 +134,24 @@ function OpeningView({ building, opening, selected, hover, xray, hooks }: { buil
   </group>;
 }
 
+/** The slab of one level: plain concrete, or the finish chosen for that level painted on its top at the real size of its planks, tiles or slabs. */
+function FloorSlab({ building, floor, geometry, xray, hooks }: { building: Building; floor: number; geometry: THREE.BufferGeometry; xray: boolean; hooks: Record<string, unknown> }) {
+  const finish = floorFinish(building, floor);
+  const map = useMemo(() => {
+    const base = finish.chosen ? floorTexture(finish.style, finish.colour) : null;
+    if (!base) return null;
+    const texture = base.clone();
+    texture.needsUpdate = true;
+    texture.repeat.set(1 / FLOOR_LOOKS[finish.style].tile, 1 / FLOOR_LOOKS[finish.style].tile);   // the slab's coordinates are metres
+    return texture;
+  }, [finish.chosen, finish.style, finish.colour]);
+  const smooth = finish.style === "flMarble" ? 0.2 : finish.style === "flCeramic" ? 0.3 : 0.9;
+  return <mesh geometry={geometry} position={[0, floorBottom(building.floors, floor) - (floor === 0 ? 0.12 : 0.14), 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow {...hooks}>
+    <meshStandardMaterial attach="material-0" color={map ? "#ffffff" : "#aebcc1"} map={map ?? undefined} roughness={map ? smooth : 0.9} transparent={xray} opacity={xray ? 0.3 : 1} depthWrite={!xray} />
+    <meshStandardMaterial attach="material-1" color="#aebcc1" roughness={0.9} transparent={xray} opacity={xray ? 0.3 : 1} depthWrite={!xray} />
+  </mesh>;
+}
+
 function BuildingView({ building, model, selected, selection, hoverKey, floorLimit, xray, layers, hooks }: {
   building: Building; model: SiteModel; selected: boolean; selection: Selection; hoverKey: string | null; floorLimit: number; xray: boolean; layers: Layers; hooks: Hooks;
 }) {
@@ -158,9 +179,7 @@ function BuildingView({ building, model, selected, selection, hoverKey, floorLim
   const outline = [...building.points, building.points[0]];
   return <group>
     {layers.buildings && <group position={site(0, 0, building.base)}>
-      {building.floors.slice(0, visible).map((_, floor) => <mesh key={floor} geometry={slabs} position={[0, floorBottom(building.floors, floor) - (floor === 0 ? 0.12 : 0.14), 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow {...bodyHooks}>
-        <meshStandardMaterial color="#aebcc1" roughness={0.9} transparent={xray} opacity={xray ? 0.3 : 1} depthWrite={!xray} />
-      </mesh>)}
+      {building.floors.slice(0, visible).map((_, floor) => <FloorSlab key={floor} building={building} floor={floor} geometry={slabs} xray={xray} hooks={bodyHooks} />)}
       {walls.map((geometry, edge) => {
         const { a, ux, uy } = edgeOf(building.points, edge);
         return <group key={edge} position={site(a.x, a.y)} rotation={[0, Math.atan2(uy, ux), 0]}>
@@ -523,7 +542,7 @@ function Scene(props: ViewportProps & { shadows: boolean; xray: boolean; turntab
     {model.buildings.map(building => <BuildingView key={building.id} building={building} model={model} selected={isSelected("building", building.id)} selection={selection} hoverKey={hoverKey} floorLimit={floorLimit} xray={xray} layers={layers} hooks={hooks} />)}
     {layers.buildings && layers.roofs && floorLimit < 0 && model.roofItems.map(item => { const building = model.buildings.find(candidate => candidate.id === item.buildingId); return building ? <RoofItemView key={item.id} item={item} building={building} selected={isSelected("roofItem", item.id)} hover={hoverKey === `roofItem:${item.id}`} hooks={hooks} /> : null; })}
     {layers.buildings && model.wallLamps.map(lamp => { const building = model.buildings.find(candidate => candidate.id === lamp.buildingId); return building ? <WallLampView key={lamp.id} lamp={lamp} building={building} selected={isSelected("wallLamp", lamp.id)} hover={hoverKey === `wallLamp:${lamp.id}`} hooks={hooks} /> : null; })}
-    {layers.features && model.features.map(feature => <FeatureView key={feature.id} feature={feature} selected={isSelected("feature", feature.id)} hover={hoverKey === `feature:${feature.id}`} hooks={hooks} />)}
+    {layers.features && model.features.filter(feature => !(floorLimit >= 0 && INTERIOR_KINDS.has(feature.kind) && (floorAt(model.buildings, { x: feature.x, y: feature.y }, feature.z)?.floor ?? 0) > floorLimit)).map(feature => <FeatureView key={feature.id} feature={feature} selected={isSelected("feature", feature.id)} hover={hoverKey === `feature:${feature.id}`} hooks={hooks} />)}
     {layers.sensors && model.placements.map(placement => {
       const device = props.devices.find(item => item.id === placement.device_id);
       return device ? <PlacedDevice key={placement.device_id} device={device} selected={isSelected("device", placement.device_id)} hover={hoverKey === `device:${placement.device_id}`} hooks={hooks("device", placement.device_id)}

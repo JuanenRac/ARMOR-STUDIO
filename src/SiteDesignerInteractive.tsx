@@ -12,7 +12,7 @@ import { Inspector } from "./designer/Inspector";
 import { ICON } from "./designer/icons";
 import { FloatingToolbox } from "./designer/Toolbox";
 import { actionSections, arrangeToolbox, toolSections, TURN_STEP, type TurnAxis } from "./designer/toolItems";
-import { bounds, edgeOf, isSimplePolygon, nearestOnOutline, pointInPolygon, rectangle } from "./designer/geometry";
+import { bounds, edgeOf, isSimplePolygon, nearestOnOutline, pointInPolygon, rectangle, floorBottom } from "./designer/geometry";
 import { clamp, round2, snapTo, toMetres, toolForKey, toolLabelKey, toolWorksIn, toPercent, type Point, type Selection, type Tool } from "./designer/model";
 import {
   addSidewalkRing, addStrip, addFeature, addOpening, addRoofItem, addWallLamp, buildingAt, createBuilding, duplicateBuilding, fitDimensions, insertBuildingVertex, moveBuilding, moveVertex, rectangularTerrain, removeSelected, rescaleDevices, rotateBuilding, setFootprint,
@@ -41,7 +41,7 @@ type Props = {
 
 type Snapshot = { model: SiteModel; dimensions: Dimensions };
 const GRID_M = 0.25, HISTORY_LIMIT = 100, COALESCE_MS = 900;
-const FEATURE_TOOLS: ReadonlySet<Tool> = new Set(["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv"]);
+const FEATURE_TOOLS: ReadonlySet<Tool> = new Set(["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "floor"]);
 const ROOF_ITEM_OF: Partial<Record<Tool, RoofItemKind>> = { chimney: "chimney", "roof-solar": "solar", antenna: "antenna", gutter: "gutter", downpipe: "downpipe" };
 const REPEATING: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp", "chimney", "roof-solar", "antenna", "gutter", "downpipe", "pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road"]);
 const NUDGE = 0.25;
@@ -188,8 +188,10 @@ export function SiteDesignerInteractive(props: Props) {
       return;
     }
     if (FEATURE_TOOLS.has(tool)) {
-      const floorUnder = INTERIOR_KINDS.has(tool as SiteFeatureKind) ? buildingAt(current, point) : undefined;   // an inside object stands on the ground floor of the building under the click (raise it with its height above ground for the others)
-      const added = addFeature(current, tool as SiteFeatureKind, point.x, point.y, floorUnder?.base ?? 0);
+      // an inside object stands on the floor that is chosen in the floor bar (the ground floor when All is chosen) of the building under the click
+      const floorUnder = INTERIOR_KINDS.has(tool as SiteFeatureKind) ? buildingAt(current, point) : undefined;
+      const level = floorUnder ? Math.min(Math.max(0, floorsChosen), floorUnder.floors.length - 1) : 0;
+      const added = addFeature(current, tool as SiteFeatureKind, point.x, point.y, floorUnder ? round2(floorUnder.base + floorBottom(floorUnder.floors, level)) : 0);
       commit(added.model); select({ kind: "feature", id: added.id }); props.setNotice(`${t(toolLabelKey(tool))} · ${t("objectCreated")}`);
       return;
     }

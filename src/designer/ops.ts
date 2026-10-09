@@ -136,7 +136,7 @@ export function duplicateBuilding(model: SiteModel, id: string, dx = 3, dy = 3):
   const source = model.buildings.find(building => building.id === id);
   if (!source) return null;
   const newId = nextId("building", model.buildings.map(building => building.id));
-  const copy: Building = { ...source, id: newId, name: `${source.name} copy`, points: translatePoints(source.points, dx, dy), floors: [...source.floors], roof: { ...source.roof } };
+  const copy: Building = { ...source, id: newId, name: `${source.name} copy`, points: translatePoints(source.points, dx, dy), floors: [...source.floors], roof: { ...source.roof }, ...(source.floorMaterials ? { floorMaterials: [...source.floorMaterials] } : {}), ...(source.floorColors ? { floorColors: [...source.floorColors] } : {}) };
   const taken = new Set([...model.openings.map(item => item.id), ...model.roofItems.map(item => item.id), ...model.wallLamps.map(item => item.id)]);
   const fresh = (prefix: string) => { const created = nextId(prefix, taken); taken.add(created); return created; };
   const openings = model.openings.filter(item => item.buildingId === id).map(item => ({ ...item, id: fresh(item.kind), buildingId: newId }));
@@ -159,7 +159,8 @@ export function removeFloor(model: SiteModel, buildingId: string, floor: number)
   if (!building || building.floors.length <= 1 || floor < 0 || floor >= building.floors.length) return model;
   const openings = model.openings.filter(item => !(item.buildingId === buildingId && item.floor === floor)).map(item => item.buildingId === buildingId && item.floor > floor ? { ...item, floor: item.floor - 1 } : item);
   const wallLamps = model.wallLamps.map(item => { if (item.buildingId !== buildingId) return item; const drop = building.floors[floor]; return item.z > floorBottom(building.floors, floor) ? { ...item, z: round2(Math.max(0, item.z - drop)) } : item; });
-  return { ...updateBuilding(model, buildingId, { floors: building.floors.filter((_, index) => index !== floor) }), openings, wallLamps };
+  const without = <T,>(list: T[] | undefined): T[] | undefined => (list ? list.filter((_, index) => index !== floor) : undefined);   // the finishes of the floors above come down with them
+  return { ...updateBuilding(model, buildingId, { floors: building.floors.filter((_, index) => index !== floor), floorMaterials: without(building.floorMaterials), floorColors: without(building.floorColors) }), openings, wallLamps };
 }
 
 // ---- doors, windows, lamps ------------------------------------------------------------------------------------------------
@@ -255,6 +256,7 @@ export const FEATURE_DEFAULTS: Record<SiteFeatureKind, Omit<SiteFeature, "id" | 
   "ac-unit": { width: 0.9, depth: 0.4, height: 0.7, rotation: 0, slope: 0 },
   "electrical-box": { width: 0.7, depth: 0.3, height: 1.0, rotation: 0, slope: 0 },
   car: { width: 4.4, depth: 1.9, height: 1.5, rotation: 0, slope: 0 },
+  floor: { width: 4, depth: 3, height: 0.03, rotation: 0, slope: 0, style: "flParquet" },
   wall: { width: 3, depth: 0.12, height: 2.6, rotation: 0, slope: 0, style: "wSolid" },
   fireplace: { width: 1.2, depth: 0.6, height: 2.6, rotation: 0, slope: 0, style: "fWall" },
   stairs: { width: 1, depth: 3, height: 2.8, rotation: 0, slope: 0 },

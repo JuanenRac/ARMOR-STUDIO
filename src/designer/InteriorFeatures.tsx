@@ -8,6 +8,8 @@ import { useMemo } from "react";
 import * as THREE from "three";
 import type { SiteFeature } from "../domain";
 import { shade } from "./colors";
+import { floorTextureFor } from "./floorLooks";
+import { FLOOR_LOOKS, isFloorStyle } from "./floors";
 
 type Glow = { emissive: string; emissiveIntensity: number };
 type Props = { feature: SiteFeature; glow: Glow };
@@ -28,6 +30,13 @@ function Corner({ w, d, height, color, glow }: { w: number; d: number; height: n
     return made;
   }, [w, d, height]);
   return <mesh geometry={geometry} castShadow receiveShadow><meshStandardMaterial color={color} roughness={0.9} {...glow} /></mesh>;
+}
+
+/** The floor of a room: a thin slab with the finish painted on it, repeated at the real size of its planks, tiles or slabs. */
+function RoomFloor({ feature, glow }: Props) {
+  const style = isFloorStyle(feature.style) ? feature.style : "flParquet", colour = feature.color ?? FLOOR_LOOKS[style].colour, w = feature.width, d = feature.depth, h = Math.max(0.02, feature.height);
+  const map = useMemo(() => floorTextureFor(style, colour, w, d), [style, colour, w, d]);
+  return <mesh position={[0, h / 2, 0]} receiveShadow><boxGeometry args={[w, h, d]} /><meshStandardMaterial map={map ?? undefined} color={map ? "#ffffff" : colour} roughness={style === "flMarble" ? 0.2 : style === "flCeramic" ? 0.3 : 0.8} {...glow} /></mesh>;
 }
 
 /** The size of the gap and where it stands for each look of a wall. */
@@ -195,6 +204,7 @@ function Television({ feature, glow }: Props) {
 /** The body of one of the objects of the inside of a building. */
 export function InteriorBody(props: Props) {
   switch (props.feature.kind) {
+    case "floor": return <RoomFloor {...props} />;
     case "wall": return <Wall {...props} />;
     case "fireplace": return <Fireplace {...props} />;
     case "stairs": return <Stairs {...props} />;
