@@ -6,9 +6,10 @@
 import type { ReactNode } from "react";
 import type { SiteFeature } from "../domain";
 import { DEFAULT_FEATURE_COLOUR } from "./colors";
+import { interiorShape } from "./interiorShapes";
 
 /** The kinds this file draws, to show a hit area on the small ones. */
-export const SMALL_EXTRA_KINDS: ReadonlySet<SiteFeature["kind"]> = new Set(["bench", "mailbox", "ac-unit", "electrical-box", "barbecue"]);
+export const SMALL_EXTRA_KINDS: ReadonlySet<SiteFeature["kind"]> = new Set(["bench", "mailbox", "ac-unit", "electrical-box", "barbecue", "tv", "armchair"]);
 
 export function extraShape(feature: SiteFeature): ReactNode {
   const w = feature.width, d = feature.depth, fill = `var(--c, ${DEFAULT_FEATURE_COLOUR[feature.kind]})`;
@@ -35,6 +36,6 @@ export function extraShape(feature: SiteFeature): ReactNode {
     case "electrical-box": return <><rect x={-w / 2} y={-d / 2} width={w} height={d} {...body} /><rect x={-w * 0.2} y={d / 2 - 0.05} width={w * 0.4} height={0.04} {...dark} /><path d={`M${w * 0.05} ${-d * 0.25}l-0.1 0.18h0.1l-0.07 0.16`} {...line} /></>;
     case "car": return <><rect x={-w / 2} y={-d / 2} width={w} height={d} rx={0.35} {...body} /><rect x={-w * 0.31} y={-d * 0.4} width={w * 0.5} height={d * 0.8} rx={0.2} {...dark} /><path d={`M${w * 0.36} ${-d * 0.4}V${d * 0.4}`} {...line} />
       {[[-1, -1], [-1, 1], [1, -1], [1, 1]].map(([sx, sz]) => <rect key={`${sx}${sz}`} x={sx * w * 0.3 - 0.32} y={sz * (d / 2 - 0.02) - 0.07} width={0.64} height={0.14} rx={0.05} {...dark} />)}</>;
-    default: return null;
+    default: return interiorShape(feature);
   }
 }

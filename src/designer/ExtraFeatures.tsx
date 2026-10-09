@@ -5,6 +5,7 @@
  */
 import type { SiteFeature } from "../domain";
 import { shade } from "./colors";
+import { InteriorBody } from "./InteriorFeatures";
 
 type Glow = { emissive: string; emissiveIntensity: number };
 type Props = { feature: SiteFeature; glow: Glow };
@@ -168,6 +169,6 @@ export function ExtraBody(props: Props) {
     case "ac-unit": return <AirConditioner {...props} />;
     case "electrical-box": return <ElectricalBox {...props} />;
     case "car": return <Car {...props} />;
-    default: return null;
+    default: return <InteriorBody {...props} />;
   }
 }

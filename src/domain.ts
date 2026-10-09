@@ -91,9 +91,19 @@ export type WallLamp = { id: string; buildingId: string; edge: number; offset: n
   /** What it is, its power in watts and whether a movement sensor switches it on. */ lampKind?: LampKind; watts?: number; motion?: boolean };
 
 /** Objects standing on the ground. `lamp` is a lamp post (a tube of `height` with the light on top), `mast` an antenna mast. */
-export type SiteFeatureKind = "pillar" | "lamp" | "mast" | "solar" | "canopy" | "entrance" | "path" | "road" | "tree" | "kennel" | "fence" | "fountain" | "coop" | "gate" | "sidewalk" | "pool" | "planter" | "terrace" | "bench" | "table" | "barbecue" | "pergola" | "shed" | "hedge" | "mailbox" | "bins" | "tank" | "ac-unit" | "electrical-box" | "car";
+export type SiteFeatureKind = "pillar" | "lamp" | "mast" | "solar" | "canopy" | "entrance" | "path" | "road" | "tree" | "kennel" | "fence" | "fountain" | "coop" | "gate" | "sidewalk" | "pool" | "planter" | "terrace" | "bench" | "table" | "barbecue" | "pergola" | "shed" | "hedge" | "mailbox" | "bins" | "tank" | "ac-unit" | "electrical-box" | "car"
+  | "wall" | "fireplace" | "stairs" | "kitchen" | "bathroom" | "bed" | "wardrobe" | "sofa" | "armchair" | "dining" | "tv";
+/** The objects of the inside of a building (walls, fireplaces, the kitchen, furniture...), drawn on the floor they stand on: their own floating panel. */
+export const INTERIOR_KINDS: ReadonlySet<SiteFeatureKind> = new Set<SiteFeatureKind>(["wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv"]);
 /** The looks a kind can have (a tree is an oak, a pine, a palm or a bush; a fence, a gate). */
 export const FEATURE_STYLES: Partial<Record<SiteFeatureKind, readonly string[]>> = {
+  wall: ["wSolid", "wDoor", "wDoubleDoor", "wWindow", "wWideWindow", "wOpening"],
+  fireplace: ["fWall", "fCorner", "fCentral"],
+  kitchen: ["kStraight", "kL", "kIsland"],
+  bed: ["bDouble", "bSingle"],
+  sofa: ["sStraight", "sCorner"],
+  tv: ["tWall", "tStand"],
+  bathroom: ["baBath", "baShower", "baToilet", "baBasin"],
   tree: ["oak", "pine", "palm", "bush"], fence: ["mesh", "picket", "rail", "wire", "wall"], gate: ["iron", "wood", "modern", "stone"], sidewalk: ["concrete", "brick", "gravel"],
   pool: ["rectangle", "round", "oval", "l-shape"], planter: ["box", "round", "bed"], terrace: ["open", "railed"],
 };

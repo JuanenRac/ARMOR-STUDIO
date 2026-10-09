@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
-  clampPanel, fitTransform, TOOL_GROUPS, toolWorksIn, formatMetres, headingOf, inSector, niceScaleLength, PLAN_TOOL_GROUPS, RADAR, sameSelection, sectorPoints, snapTo, targetToSite, toMetres, toolForKey, toolKeyOf, toolLabelKey, toPercent, VIEW_TOOL_GROUPS,
+  BRANCHES, clampPanel, fitTransform, TOOL_GROUPS, toolWorksIn, formatMetres, headingOf, inSector, niceScaleLength, PLAN_TOOL_GROUPS, RADAR, sameSelection, sectorPoints, snapTo, targetToSite, toMetres, toolForKey, toolKeyOf, toolLabelKey, toPercent, VIEW_TOOL_GROUPS,
 } from "./model";
+import { FEATURE_STYLES, INTERIOR_KINDS } from "../domain";
+import { FEATURE_DEFAULTS } from "./ops";
+import { wallGap } from "./InteriorFeatures";
 
 const site = { width: 60, depth: 40, height: 3 };
 
@@ -121,7 +124,22 @@ describe("one tool panel for both views", () => {
     expect(groupOf("fence")).toBe(groupOf("gate")); expect(groupOf("door")).toBe(groupOf("garage")); expect(groupOf("door")).toBe(groupOf("window"));
     expect(groupOf("tree")).toBe(groupOf("planter")); expect(groupOf("pool")).toBe(groupOf("terrace")); expect(groupOf("kennel")).toBe(groupOf("coop"));
     expect(groupOf("path")).toBe(groupOf("road")); expect(groupOf("road")).toBe(groupOf("sidewalk"));
-    expect(groups.flat().length).toBe(50);   // no tool was lost or repeated
-    expect(new Set(groups.flat()).size).toBe(50);
+    expect(groups.flat().length).toBe(61);   // no tool was lost or repeated
+    expect(new Set(groups.flat()).size).toBe(61);
+  });
+  it("has its own floating panel for the inside of a building, with every piece working in both views", () => {
+    const inside = ["wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv"] as const;
+    const branch = BRANCHES.find(item => item.id === "interior");
+    expect(branch?.tools).toEqual(inside);
+    for (const tool of inside) {
+      expect(toolWorksIn(tool, "2d"), tool).toBe(true); expect(toolWorksIn(tool, "3d"), tool).toBe(true);
+      expect(INTERIOR_KINDS.has(tool), tool).toBe(true);
+      expect(FEATURE_DEFAULTS[tool].width, tool).toBeGreaterThan(0);
+    }
+    expect(FEATURE_STYLES.wall).toContain("wDoor"); expect(FEATURE_STYLES.fireplace).toEqual(["fWall", "fCorner", "fCentral"]); expect(FEATURE_STYLES.tv).toEqual(["tWall", "tStand"]);
+    // a wall with a door has a gap that fits inside it, and a plain wall has none
+    expect(wallGap({ style: "wWindow", width: 3, height: 2.6 })).toEqual({ width: 1.2, sill: 0.9, top: 2.1 });
+    expect(wallGap({ style: "wDoor", width: 0.8, height: 2.6 })?.width).toBeCloseTo(0.4, 5);
+    expect(wallGap({ style: "wSolid", width: 3, height: 2.6 })).toBeUndefined();
   });
 });
