@@ -7,6 +7,7 @@
 import { useMemo, useState } from "react";
 import { commandDevice, electricalElements, electricalHistory, type ElectricalElement } from "../api";
 import { KindIcon } from "../deviceKinds";
+import { MenuLogo } from "../menuLogos";
 import { usePolled } from "../hooks";
 import { LineChart, SOLAR_COLOURS } from "../solarGraphics";
 import type { ElectricalChannelReading, ElectricalNodeReading, ElectricalReadings, ElectricalSwitchReading } from "../api";
@@ -39,7 +40,7 @@ export function ElectricalView({ openDevices, t, origin, readings, unreachable, 
   const totals = readings?.totals;
   return <div className="solar-view electrical-live">
     <header className="solar-head">
-      <span className="el-live-logo" aria-hidden="true">⌁</span>
+      <MenuLogo kind="electrical" size={68} />
       <div className="solar-title"><p className="eyebrow">{t("navEnergy")}</p><h2>{t("electrical")}</h2><span className="muted">{t("electricalLiveHelp")}</span></div>
       {totals && <div className="solar-totals">
         <Tile label={t("elLiveGrid")} value={totals.grid_w === null ? "–" : formatPower(totals.grid_w)} />
@@ -56,7 +57,7 @@ export function ElectricalView({ openDevices, t, origin, readings, unreachable, 
     </section>
     <ElectricalDevices t={t} origin={origin} openDevices={openDevices} now={now} />
     <NodeFinder t={t} origin={origin} network={network} wantKind="electrical" knownIds={nodes.map(node => node.node_id)} />
-    {nodes.length === 0 ? <div className="solar-empty"><span className="el-live-logo big" aria-hidden="true">⌁</span><h3>{t("elLiveNone")}</h3><p>{t("elLiveNoneHelp")}</p></div>
+    {nodes.length === 0 ? <div className="solar-empty"><MenuLogo kind="electrical" size={92} /><h3>{t("elLiveNone")}</h3><p>{t("elLiveNoneHelp")}</p></div>
       : nodes.map(node => <NodeCard key={node.node_id} t={t} origin={origin} node={node} drawn={drawn.has(node.node_id.toLowerCase())} now={now} />)}
   </div>;
 }
