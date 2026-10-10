@@ -4,7 +4,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useMemo, useState } from "react";
-import { solarEnergy, solarHistory } from "../api";
+import { readEnergyAlarms, saveEnergyAlarms, solarEnergy, solarHistory, type EnergyAlarmSettings } from "../api";
 import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
 import { EnergyBars, FlowDiagram, Gauge, InverterLogo, LineChart, SOLAR_COLOURS } from "../solarGraphics";
@@ -47,6 +47,7 @@ export function InvertersView({ t, origin, devices, totals, now, unreachable, wa
       })}</div>}
       {current && <InverterPanel t={t} inverter={current} now={now} history={history.data?.samples ?? []} minutes={minutes} setMinutes={setMinutes} />}
       <EnergyCard t={t} origin={origin} kind="inverter" />
+      <EnergyAlarmsCard t={t} origin={origin} />
     </>}
   </div>;
 }
@@ -130,5 +131,33 @@ export function EnergyCard({ t, origin, kind }: { t: Translate; origin: string; 
     </div>
     <p className="muted small">{t("enHelp")}</p>
     <EnergyBars t={t} days={energy} series={series} />
+  </section>;
+}
+
+const ALARM_FIELDS: ReadonlyArray<{ key: keyof EnergyAlarmSettings; label: string; min: number; max: number }> = [
+  { key: "soc_low", label: "eaSocLow", min: 1, max: 90 }, { key: "soc_ok", label: "eaSocOk", min: 2, max: 100 }, { key: "cell_spread_mv", label: "eaCells", min: 10, max: 1000 },
+  { key: "battery_temp_high_c", label: "eaHot", min: 30, max: 90 }, { key: "battery_temp_low_c", label: "eaCold", min: -20, max: 15 }, { key: "heatsink_high_c", label: "eaHeatsink", min: 50, max: 120 },
+  { key: "health_low_percent", label: "eaWorn", min: 10, max: 95 },
+];
+
+/** The levels at which batteries and inverters raise alarms: edited here, kept by the server. */
+export function EnergyAlarmsCard({ t, origin }: { t: Translate; origin: string }) {
+  const loaded = usePolled(() => readEnergyAlarms(origin), 300_000, origin);
+  const [draft, setDraft] = useState<EnergyAlarmSettings | null>(null);
+  const [state, setState] = useState<"" | "saved" | "failed">("");
+  const current = draft ?? loaded.data?.settings ?? null;
+  if (!current) return null;
+  const save = async (settings: Partial<EnergyAlarmSettings>) => {
+    try { const answer = await saveEnergyAlarms(origin, settings); setDraft(answer.settings); setState("saved"); } catch { setState("failed"); }
+  };
+  return <section className="solar-card energy-alarms">
+    <div className="solar-card-head"><h3>{t("eaTitle")}</h3></div>
+    <p className="muted small">{t("eaHelp")}</p>
+    <div className="inspector-grid">
+      {ALARM_FIELDS.map(field => <label key={field.key}>{t(field.label)}<input type="number" min={field.min} max={field.max} value={current[field.key]} onChange={event => { setState(""); setDraft({ ...current, [field.key]: Number(event.target.value) }); }} /></label>)}
+    </div>
+    <div className="inspector-actions"><button className="primary" onClick={() => void save(current)}>{t("eaSave")}</button><button onClick={() => void save({})}>{t("eaDefaults")}</button></div>
+    {state === "saved" && <p className="muted small" role="status">{t("eaSaved")}</p>}
+    {state === "failed" && <p className="solar-notice bad" role="alert">{t("eaFailed")}</p>}
   </section>;
 }

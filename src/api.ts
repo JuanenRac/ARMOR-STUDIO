@@ -516,6 +516,10 @@ export const solarExample = (origin: string, node: string, device: string) => us
 /** The energy of each day, in kilowatt-hours (see the server's /solar/energy). */
 export type SolarEnergyDay = { date: string; pv_kwh: number; load_kwh: number; battery_in_kwh: number; battery_out_kwh: number };
 export const solarEnergy = (origin: string, days: number) => userCall<{ days: SolarEnergyDay[] }>(origin, "GET", `/api/v1/solar/energy?days=${days}`);
+/** The levels at which batteries and inverters raise alarms, and their defaults. */
+export type EnergyAlarmSettings = { soc_low: number; soc_ok: number; cell_spread_mv: number; battery_temp_high_c: number; battery_temp_low_c: number; heatsink_high_c: number; health_low_percent: number };
+export const readEnergyAlarms = (origin: string) => userCall<{ settings: EnergyAlarmSettings; defaults: EnergyAlarmSettings }>(origin, "GET", "/api/v1/solar/alarms");
+export const saveEnergyAlarms = (origin: string, settings: Partial<EnergyAlarmSettings>) => userCall<{ settings: EnergyAlarmSettings; defaults: EnergyAlarmSettings }>(origin, "PUT", "/api/v1/solar/alarms", settings);
 /** The samples of one channel of an electrical node, oldest first. */
 export async function electricalHistory(origin: string, node: string, channel: string, minutes: number): Promise<{ samples: SolarSample[] }> {
   const query = new URLSearchParams({ node, channel, minutes: String(minutes) });
