@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here.
 
-## [0.6.7] - Start, stop, restart and pause each service, and a silent node no longer shows old data
+## [0.6.7] - Floors, interior objects, motorised cameras, services control, energy per day and a log of what the nodes send
 
 - **The battery menu shows what a battery management system adds** (its own power reading, the cells being balanced, a protection active and the MOSFET status codes) and the inverter menu shows the DC bus voltage, when the node sends them.
 - **Services menu:** an administrator sees, on the card of each program of the machine (the server, Studio, the MQTT broker, the network node, the observation and voice services), the buttons that make sense in its state: *Start*, *Stop*, *Restart*, *Pause* and *Resume*. The buttons are pictures, each in the colour of what it does (a power symbol in green to start, a red square to stop, a circular arrow in the theme's accent to restart, amber bars to pause, a green triangle to resume), with its name on hover and for screen readers. Stop, restart and pause ask for confirmation, and say so when the console itself is the one affected. A paused program is frozen where it is (it keeps its memory and answers nothing) and shows as *Paused*; the server and Studio cannot be paused, because a paused console could not be used to resume itself. The buttons need the administration agent of the machine, and the menu says when it does not answer. Field nodes are only shown.
