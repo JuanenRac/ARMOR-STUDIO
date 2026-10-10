@@ -5,7 +5,8 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useMemo, useState } from "react";
-import { electricalHistory } from "../api";
+import { commandDevice, electricalElements, electricalHistory, type ElectricalElement } from "../api";
+import { KindIcon } from "../deviceKinds";
 import { usePolled } from "../hooks";
 import { LineChart, SOLAR_COLOURS } from "../solarGraphics";
 import type { ElectricalChannelReading, ElectricalNodeReading, ElectricalReadings, ElectricalSwitchReading } from "../api";
@@ -17,7 +18,7 @@ import { formatEnergy, formatPower } from "../solarModel";
 import "./solar.css";
 import "./electrical-live.css";
 
-type Props = { t: Translate; origin: string; readings: ElectricalReadings | null; unreachable: boolean; design: Design; openDesigner: () => void; network?: NetworkOverview | null; now: number };
+type Props = { openDevices?: () => void; t: Translate; origin: string; readings: ElectricalReadings | null; unreachable: boolean; design: Design; openDesigner: () => void; network?: NetworkOverview | null; now: number };
 
 const number = (value: number | undefined, digits: number, unit: string): string => (typeof value === "number" && Number.isFinite(value) ? `${value.toFixed(digits)} ${unit}` : "–");
 const ago = (iso: string, now: number): string => {
@@ -32,7 +33,7 @@ export function drawnNodeIds(design: Design): Set<string> {
   return ids;
 }
 
-export function ElectricalView({ t, origin, readings, unreachable, design, openDesigner, network = null, now }: Props) {
+export function ElectricalView({ openDevices, t, origin, readings, unreachable, design, openDesigner, network = null, now }: Props) {
   const nodes = readings?.nodes ?? [];
   const drawn = useMemo(() => drawnNodeIds(design), [design]);
   const totals = readings?.totals;
@@ -53,6 +54,7 @@ export function ElectricalView({ t, origin, readings, unreachable, design, openD
       <p className="muted small">{t("elLiveRoleText")}</p>
       <div><button type="button" onClick={openDesigner}>{t("elLiveOpenDesigner")}</button></div>
     </section>
+    <ElectricalDevices t={t} origin={origin} openDevices={openDevices} now={now} />
     <NodeFinder t={t} origin={origin} network={network} wantKind="electrical" knownIds={nodes.map(node => node.node_id)} />
     {nodes.length === 0 ? <div className="solar-empty"><span className="el-live-logo big" aria-hidden="true">⌁</span><h3>{t("elLiveNone")}</h3><p>{t("elLiveNoneHelp")}</p></div>
       : nodes.map(node => <NodeCard key={node.node_id} t={t} origin={origin} node={node} drawn={drawn.has(node.node_id.toLowerCase())} now={now} />)}
@@ -121,4 +123,43 @@ function ChannelHistory({ t, origin, node, now }: { t: Translate; origin: string
     <LineChart t={t} samples={history} from={from} to={now} decimals={1} series={[{ key: "voltage_v", label: t("elVoltage"), color: SOLAR_COLOURS.load, unit: "V" }]} />
     <LineChart t={t} samples={history} from={from} to={now} decimals={2} series={[{ key: "current_a", label: t("elCurrent"), color: SOLAR_COLOURS.battery, unit: "A" }]} />
   </div>;
+}
+
+/** The devices of the house that measure or switch electricity (Zigbee plugs and breakers, meters, lights), next to the channels of the nodes' meters. */
+function ElectricalDevices({ t, origin, openDevices, now }: { t: Translate; origin: string; openDevices?: () => void; now: number }) {
+  const poll = usePolled(() => electricalElements(origin), 5000, origin);
+  const [busy, setBusy] = useState("");
+  const [problem, setProblem] = useState("");
+  const data = poll.data;
+  const send = async (element: ElectricalElement, command: "on" | "off") => {
+    if (element.risk !== "low" && !window.confirm(t(element.risk === "critical" ? "confirmCritical" : "confirmCircuit"))) return;
+    setBusy(element.id); setProblem("");
+    try { await commandDevice(origin, element.id, command, element.risk !== "low"); poll.reload(); } catch (error) { setProblem(error instanceof Error ? error.message : "error"); }
+    setBusy("");
+  };
+  return <section className="solar-nodes el-devices">
+    <div className="solar-card-head"><h3>{t("elDevicesTitle")}</h3>
+      {data && data.totals.elements > 0 && <span className="muted">{data.totals.online}/{data.totals.elements} · {formatPower(data.totals.power_w)} · {formatEnergy(data.totals.energy_kwh)}</span>}
+      {openDevices && <button type="button" onClick={openDevices}>{t("elDevicesOpen")}</button>}
+    </div>
+    <p className="muted small">{t("elDevicesHelp")}</p>
+    {problem && <p className="solar-notice bad" role="alert">{problem}</p>}
+    {data && data.elements.length === 0 ? <p className="muted">{t("elDevicesNone")}</p> : <div className="el-device-list">
+      {data?.elements.map(element => <article key={element.id} className={`el-device ${element.online ? "" : "stale"}`}>
+        <span className="el-device-icon"><KindIcon kind={element.kind} size={22} /></span>
+        <div className="el-device-title"><strong>{element.name}</strong><small>{t(`kind_${element.kind}`)}{element.location ? ` · ${element.location}` : ""} · {element.online ? ago(element.last_seen ?? "", now) : t("deviceOffline")}</small></div>
+        <div className="el-device-values">
+          {typeof element.on === "boolean" && <span className={`el-pill ${element.on ? "good" : "warn"}`}>{element.on ? t("elDevicesOn") : t("elDevicesOff")}</span>}
+          {typeof element.power_w === "number" && <span>{formatPower(element.power_w)}</span>}
+          {typeof element.voltage_v === "number" && <span>{element.voltage_v.toFixed(1)} V</span>}
+          {typeof element.current_a === "number" && <span>{element.current_a.toFixed(2)} A</span>}
+          {typeof element.energy_kwh === "number" && <span>{formatEnergy(element.energy_kwh)}</span>}
+        </div>
+        {element.switchable && <div className="el-device-actions">
+          <button disabled={busy === element.id || !element.online} onClick={() => void send(element, "on")}>{t("elDevicesSwitchOn")}</button>
+          <button className={element.risk === "low" ? "" : "danger"} disabled={busy === element.id || !element.online} onClick={() => void send(element, "off")}>{t("elDevicesSwitchOff")}</button>
+        </div>}
+      </article>)}
+    </div>}
+  </section>;
 }

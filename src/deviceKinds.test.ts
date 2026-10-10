@@ -4,7 +4,7 @@ import { ACTUATOR_KINDS, ALL_KINDS, applyPreset, deviceProblem, mapToText, PRESE
 
 const device = (patch: Partial<StudioDevice>): StudioDevice => ({
   id: "d", name: "D", kind: "smoke", protocol: "zigbee", location: "", category: "sensor", source: { type: "push" }, commands: {}, can_command: false,
-  expected_interval_s: 0, state: {}, online: true, last_seen: null, created_at: "", ...patch,
+  expected_interval_s: 0, risk: "low", state: {}, online: true, last_seen: null, created_at: "", ...patch,
 });
 
 describe("device kinds", () => {

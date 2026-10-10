@@ -19,7 +19,7 @@ import { SystemView } from "./SystemView";
 const NOW = Date.parse("2026-01-01T12:00:00Z");
 const device = (id: string, patch: Partial<StudioDevice>): StudioDevice => ({
   id, name: id, kind: "smoke", protocol: "zigbee", location: "Kitchen", category: "sensor", source: { type: "push" }, commands: {}, can_command: false,
-  expected_interval_s: 0, state: {}, online: true, last_seen: new Date(NOW - 60_000).toISOString(), created_at: "", ...patch,
+  expected_interval_s: 0, risk: "low", state: {}, online: true, last_seen: new Date(NOW - 60_000).toISOString(), created_at: "", ...patch,
 });
 const devices: StudioDevice[] = [
   device("smoke-kitchen", { state: { triggered: true, battery: 80 } }),
