@@ -47,6 +47,7 @@
 * **Seven languages** (English, Spanish, German, French, Italian, Japanese, Chinese) and sixteen themes, the default one called *Armor*.
 * **Declare your equipment:** in the Inverters and Batteries menus you add each inverter or battery stack with its name, model (Voltronic, MPP Solar, Pylontech US2000 / US3000 / US5000, ANT-BMS), connection (RS232, RS485, USB, CAN, Wi-Fi) and gateway node; it waits for its first real reading, and *Show example readings* lets you try the menu meanwhile.
 * **Electrical Designer:** draw the house's electrical diagram (grid, meter, protections, transfer switches, distribution, PV, inverters, batteries and loads, AC and DC) with ports and wires, group it in panels, tie inverters and batteries to the solar devices the server reads to see their live values, and let the checks review it (two sources on one line, breakers and cables against the current, missing protections, DC voltages). The drawing is kept on the server; it is a drawing: nothing switches or measures anything yet.
+* **Alarm panels:** the *Alarm panels* menu shows what each ARMOR-ALARM node says: whether it is guarding (away or at home), its zones and its last events, and it tells a sounding alarm (critical) or a zone in tamper (high) in the Alarms menu. An administrator can arm and disarm a panel from there only when the server (`ARMOR_ALARM_COMMANDS=1`), the node and the broker all allow it; a disarm from the console carries no PIN, so it asks first. Not a certified alarm system.
 
 ## 🔄 Architecture
 

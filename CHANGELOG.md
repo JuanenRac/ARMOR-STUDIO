@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [0.6.8] - In progress
 
+- **Alarm panels menu** (ARMOR-ALARM nodes): one card per node with its phase and mode (guarding, leaving, entry delay, alarm), its zones (kind, closed or open or tamper, left out) and its last events; a sounding alarm and a zone in tamper reach the Alarms menu with their own sentences in seven languages. An administrator can arm (away or at home, optionally leaving out the open zones) and disarm from the card, only when the server (`ARMOR_ALARM_COMMANDS=1`), the node and the broker all allow it; a disarm asks first because it carries no PIN, and the answer of the node is shown. The node finder knows the kind `alarm`.
 - **A relay of an A.R.M.O.R. node is a device you can add.** *Devices* has a new connection, **A.R.M.O.R. node**: the name is `<node>/<relay>` (for example `electrical-1/lights`) and the device listens on `armor/device/<node>/<relay>/state` and is switched through `.../set` with ON, OFF or TOGGLE, with the server's own rules (a risk that asks first, only an administrator for the critical ones). The help says what the node (*Inputs and outputs: the broker moves the relays*) and the broker (`mqtt_identity.sh electrical-relays <node> on`) must allow; in the seven languages.
 
 ## [0.6.7] - The site designer with floors, interior objects and motorised cameras; services control; energy per day, alarm levels and what the nodes send; electrical devices; one look for the whole console

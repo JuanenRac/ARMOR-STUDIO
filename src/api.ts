@@ -360,7 +360,7 @@ export type DeviceRisk = "low" | "circuit" | "critical";
 export type DeviceInput = { risk?: DeviceRisk; id?: string; name?: string; kind?: DeviceKind; protocol?: DeviceProtocol; location?: string; source?: DeviceSource; commands?: DeviceCommandsInput; expected_interval_s?: number };
 export type Severity = "critical" | "high" | "warning";
 export type Alarm = {
-  id: string; key: string; source: { type: "node" | "camera" | "device" | "solar" | "electrical" | "network"; id: string }; severity: Severity; code: string;
+  id: string; key: string; source: { type: "node" | "camera" | "device" | "solar" | "electrical" | "network" | "alarm"; id: string }; severity: Severity; code: string;
   raised_at: string; acknowledged_at?: string; acknowledged_by?: string; cleared_at?: string;
   /** The facts the server attached (which device, which port, what the numbers were). */
   detail?: Record<string, string | number | boolean>;
@@ -459,6 +459,23 @@ export async function listElectricalReadings(origin: string): Promise<Electrical
   if (!response.ok) throw new Error(`Electrical readings returned ${response.status}`);
   return response.json() as Promise<ElectricalReadings>;
 }
+
+// ---- the alarm nodes (ARMOR-ALARM) -------------------------------------------------------------------------------------------------------
+export type AlarmPhase = "disarmed" | "exit_delay" | "armed" | "entry_delay" | "alarm";
+export type AlarmZoneReading = { id: string; name?: string; kind: "instant" | "entry" | "interior" | "always"; state: "normal" | "triggered" | "tamper"; bypassed: boolean };
+export type AlarmEventReading = { ago_s: number; kind: "armed" | "exit_delay_started" | "entry_delay_started" | "alarm" | "siren_timed_out" | "disarmed" | "bad_pin" | "locked_out" | "zone_bypassed"; zone?: string };
+export type AlarmState = {
+  kind: "alarm"; node_id: string; timestamp_ms: number; phase: AlarmPhase; mode: "disarmed" | "away" | "stay"; siren: boolean; locked_out: boolean; commands_enabled: boolean;
+  zones: AlarmZoneReading[]; open_zones: string[]; events: AlarmEventReading[];
+};
+export type AlarmNodeView = { node_id: string; state: AlarmState; received_at: string; stale: boolean };
+export type AlarmNodes = { nodes: AlarmNodeView[]; totals: { nodes: number; stale: number; armed: number; sounding: number } };
+export const listAlarmNodes = (origin: string) => userCall<AlarmNodes>(origin, "GET", "/api/v1/alarm/nodes");
+export type AlarmCommandRecord = { command_id: string; node_id: string; action: "arm" | "disarm"; mode?: "away" | "stay"; accepted: boolean; refusal: string; phase?: AlarmPhase; actor: string; at: string };
+export const alarmCommandsStatus = (origin: string) => userCall<{ enabled: boolean; pending: unknown[]; recent: AlarmCommandRecord[] }>(origin, "GET", "/api/v1/alarm/commands");
+/** Arm (away or stay, optionally leaving out the zones that are open) or disarm a panel. There is no PIN in it: the server, the node and the broker must all have allowed it. */
+export const sendAlarmCommand = (origin: string, node: string, action: "arm" | "disarm", mode?: "away" | "stay", force = false) =>
+  userCall<{ accepted: boolean; command_id: string }>(origin, "POST", "/api/v1/alarm/command", action === "arm" ? { node, action, mode, ...(force ? { force: true } : {}) } : { node, action });
 
 // ---- the local network, as the ARMOR-NETWORK nodes see it -------------------------------------------------------------------------------
 export type NetworkDocument = { revision: number; updated_at: string | null; updated_by: string | null; network: Record<string, unknown> | null };

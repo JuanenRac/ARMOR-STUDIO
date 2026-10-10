@@ -1,0 +1,86 @@
+/**
+ * Interface text of the Alarm panels menu (the ARMOR-ALARM nodes), one row per phrase: English, Spanish, German, French, Italian, Japanese, Chinese.
+ * `apPhase_*`, `apMode_*`, `apKind_*`, `apState_*`, `apEvent_*`, `apRefusal_*` and `apErr_*` are the words of the contract's values and of the codes the server answers with.
+ * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
+ */
+import { cataloguesFromRows, type Row, type RowCatalogues } from "./catalogueRows";
+
+const ROWS: Record<string, Row> = {
+  // menu and headings
+  alarmPanels: ["Alarm panels", "Centrales de alarma", "Alarmzentralen", "Centrales d'alarme", "Centrali d'allarme", "警報盤", "报警主机"],
+  alarmPanelsHelp: ["The alarm nodes (ARMOR-ALARM): whether each one is guarding, its zones and what happened last. Arming and disarming from here is off unless the server, the node and the broker all allow it.", "Los nodos de alarma (ARMOR-ALARM): si cada uno está vigilando, sus zonas y lo último que ha pasado. Armar y desarmar desde aquí está apagado salvo que el servidor, el nodo y el broker lo permitan.", "Die Alarmknoten (ARMOR-ALARM): ob jeder überwacht, seine Zonen und was zuletzt geschah. Scharf- und Unscharfschalten von hier ist aus, außer Server, Knoten und Broker erlauben es.", "Les nœuds d'alarme (ARMOR-ALARM) : si chacun surveille, ses zones et ce qui s'est passé en dernier. Armer et désarmer d'ici est désactivé sauf si le serveur, le nœud et le broker l'autorisent.", "I nodi d'allarme (ARMOR-ALARM): se ognuno sta sorvegliando, le sue zone e cosa è successo per ultimo. Inserire e disinserire da qui è spento salvo che server, nodo e broker lo permettano.", "警報ノード（ARMOR-ALARM）：それぞれが警戒中か、区域、直近の出来事を表示します。ここからの警戒セット・解除は、サーバー、ノード、ブローカーがすべて許可しない限り無効です。", "报警节点（ARMOR-ALARM）：每个节点是否在守护、它的防区以及最近发生的事。只有服务器、节点和代理都允许时，才能从这里布防和撤防。"],
+  apNodes: ["Panels", "Centrales", "Zentralen", "Centrales", "Centrali", "警報盤", "主机"],
+  apArmed: ["Guarding", "Vigilando", "Überwacht", "En surveillance", "In sorveglianza", "警戒中", "守护中"],
+  apSounding: ["Sounding", "Sonando", "Alarm", "En alarme", "In allarme", "鳴動中", "报警中"],
+  apUnreachable: ["The server does not answer the alarm panels.", "El servidor no responde con las centrales de alarma.", "Der Server liefert die Alarmzentralen nicht.", "Le serveur ne répond pas pour les centrales d'alarme.", "Il server non risponde per le centrali d'allarme.", "サーバーが警報盤の情報を返しません。", "服务器没有返回报警主机的信息。"],
+  apNone: ["No alarm node has reported yet", "Ningún nodo de alarma ha informado aún", "Noch kein Alarmknoten hat gemeldet", "Aucun nœud d'alarme n'a encore rapporté", "Nessun nodo d'allarme ha ancora riferito", "報告した警報ノードはまだありません", "尚无报警节点上报"],
+  apNoneHelp: ["Power on an ARMOR-ALARM node on this network: look for it above and open its panel to point it to this server.", "Enciende un nodo ARMOR-ALARM en esta red: búscalo arriba y abre su panel para apuntarlo a este servidor.", "Schalte einen ARMOR-ALARM-Knoten in diesem Netz ein: suche ihn oben und öffne sein Panel, um ihn auf diesen Server zu richten.", "Allume un nœud ARMOR-ALARM sur ce réseau : cherche-le ci-dessus et ouvre son panneau pour le pointer vers ce serveur.", "Accendi un nodo ARMOR-ALARM su questa rete: cercalo sopra e apri il suo pannello per puntarlo a questo server.", "このネットワークで ARMOR-ALARM ノードの電源を入れ、上で見つけてそのパネルを開き、このサーバーを指定してください。", "在此网络上给 ARMOR-ALARM 节点上电：在上方找到它并打开其面板，指向此服务器。"],
+  // the state of a panel
+  apPhase_disarmed: ["disarmed", "desarmada", "unscharf", "désarmée", "disinserita", "解除中", "已撤防"],
+  apPhase_exit_delay: ["leaving: exit delay", "saliendo: retardo de salida", "Verlassen: Ausgangsverzögerung", "sortie : temporisation de sortie", "uscita: ritardo di uscita", "退出遅延中", "离开：退出延时"],
+  apPhase_armed: ["armed", "armada", "scharf", "armée", "inserita", "警戒中", "已布防"],
+  apPhase_entry_delay: ["entry delay: disarm now", "retardo de entrada: desarma ya", "Eingangsverzögerung: jetzt unscharf schalten", "temporisation d'entrée : désarmez maintenant", "ritardo d'ingresso: disinserisci ora", "進入遅延：今すぐ解除", "进入延时：请立即撤防"],
+  apPhase_alarm: ["ALARM", "ALARMA", "ALARM", "ALARME", "ALLARME", "警報", "报警"],
+  apMode_away: ["away", "fuera", "abwesend", "absent", "fuori casa", "外出", "离家"],
+  apMode_stay: ["at home", "en casa", "anwesend", "présent", "in casa", "在宅", "在家"],
+  apMode_disarmed: ["not armed", "sin armar", "nicht scharf", "non armée", "non inserita", "未警戒", "未布防"],
+  apSiren: ["siren sounding", "sirena sonando", "Sirene ertönt", "sirène en marche", "sirena in funzione", "サイレン鳴動中", "警笛响起"],
+  apLockedOut: ["locked out after wrong PINs", "bloqueada tras PIN erróneos", "gesperrt nach falschen PINs", "verrouillée après de mauvais PIN", "bloccata dopo PIN errati", "誤った PIN によりロック中", "因 PIN 错误被锁定"],
+  apCommandsEnabled: ["takes commands from the server", "acepta órdenes del servidor", "nimmt Befehle vom Server an", "accepte les ordres du serveur", "accetta comandi dal server", "サーバーからの命令を受け付ける", "接受服务器的命令"],
+  apCommandsDisabled: ["takes no commands from the server", "no acepta órdenes del servidor", "nimmt keine Befehle vom Server an", "n'accepte pas d'ordres du serveur", "non accetta comandi dal server", "サーバーからの命令を受け付けない", "不接受服务器的命令"],
+  // zones and events
+  apZones: ["Zones", "Zonas", "Zonen", "Zones", "Zone", "区域", "防区"],
+  apNoZones: ["The node guards no zone yet.", "El nodo aún no vigila ninguna zona.", "Der Knoten überwacht noch keine Zone.", "Le nœud ne surveille encore aucune zone.", "Il nodo non sorveglia ancora nessuna zona.", "このノードはまだ区域を監視していません。", "该节点尚未守护任何防区。"],
+  apKind_instant: ["instant", "instantánea", "sofort", "instantanée", "istantanea", "即時", "即时"],
+  apKind_entry: ["entry", "de entrada", "Eingang", "d'entrée", "d'ingresso", "進入", "进入"],
+  apKind_interior: ["interior", "interior", "Innenraum", "intérieure", "interna", "室内", "内部"],
+  apKind_always: ["always", "siempre", "immer", "toujours", "sempre", "常時", "全天"],
+  apState_normal: ["closed", "cerrada", "geschlossen", "fermée", "chiusa", "正常", "正常"],
+  apState_triggered: ["open", "abierta", "offen", "ouverte", "aperta", "作動", "触发"],
+  apState_tamper: ["tamper", "sabotaje", "Sabotage", "sabotage", "manomissione", "改ざん", "防拆"],
+  apBypassed: ["left out", "excluida", "ausgeschlossen", "exclue", "esclusa", "除外中", "已旁路"],
+  apOpenNow: ["Open now", "Abiertas ahora", "Jetzt offen", "Ouvertes maintenant", "Aperte ora", "現在開いている区域", "当前打开"],
+  apEvents: ["Latest events", "Últimos eventos", "Letzte Ereignisse", "Derniers événements", "Ultimi eventi", "直近のイベント", "最近事件"],
+  apNoEvents: ["Nothing has happened since the node started.", "No ha pasado nada desde que arrancó el nodo.", "Seit dem Start des Knotens ist nichts passiert.", "Rien ne s'est passé depuis le démarrage du nœud.", "Non è successo nulla dall'avvio del nodo.", "ノードの起動以降、何も起きていません。", "自节点启动以来没有发生任何事。"],
+  apAgo: ["{0} ago", "hace {0}", "vor {0}", "il y a {0}", "{0} fa", "{0} 前", "{0}前"],
+  apEvent_armed: ["armed", "armada", "scharf geschaltet", "armée", "inserita", "警戒セット", "已布防"],
+  apEvent_exit_delay_started: ["exit delay started", "empezó el retardo de salida", "Ausgangsverzögerung gestartet", "temporisation de sortie lancée", "ritardo di uscita avviato", "退出遅延を開始", "退出延时开始"],
+  apEvent_entry_delay_started: ["entry delay started", "empezó el retardo de entrada", "Eingangsverzögerung gestartet", "temporisation d'entrée lancée", "ritardo d'ingresso avviato", "進入遅延を開始", "进入延时开始"],
+  apEvent_alarm: ["alarm", "alarma", "Alarm", "alarme", "allarme", "警報", "报警"],
+  apEvent_siren_timed_out: ["siren stopped by itself", "la sirena se paró sola", "Sirene hat von selbst aufgehört", "la sirène s'est arrêtée seule", "la sirena si è fermata da sola", "サイレンが自動停止", "警笛自动停止"],
+  apEvent_disarmed: ["disarmed", "desarmada", "unscharf geschaltet", "désarmée", "disinserita", "解除", "已撤防"],
+  apEvent_bad_pin: ["wrong PIN", "PIN erróneo", "falsche PIN", "mauvais PIN", "PIN errato", "PIN 誤り", "PIN 错误"],
+  apEvent_locked_out: ["locked out", "bloqueada", "gesperrt", "verrouillée", "bloccata", "ロック", "已锁定"],
+  apEvent_zone_bypassed: ["left a zone out", "excluyó una zona", "Zone ausgeschlossen", "zone exclue", "zona esclusa", "区域を除外", "旁路了一个防区"],
+  // arming and disarming
+  apArmAway: ["Arm: away", "Armar: fuera", "Scharf: abwesend", "Armer : absent", "Inserisci: fuori casa", "警戒セット：外出", "布防：离家"],
+  apArmStay: ["Arm: at home", "Armar: en casa", "Scharf: anwesend", "Armer : présent", "Inserisci: in casa", "警戒セット：在宅", "布防：在家"],
+  apDisarm: ["Disarm", "Desarmar", "Unscharf schalten", "Désarmer", "Disinserisci", "解除", "撤防"],
+  apForce: ["Leave out the open zones and arm", "Excluir las zonas abiertas y armar", "Offene Zonen ausschließen und scharf schalten", "Exclure les zones ouvertes et armer", "Escludi le zone aperte e inserisci", "開いている区域を除外して警戒セット", "旁路已打开的防区并布防"],
+  apConfirmDisarm: ["Disarm {0} from the server? This carries no PIN: the node, the broker and the server all allowed it.", "¿Desarmar {0} desde el servidor? No lleva PIN: el nodo, el broker y el servidor lo permiten.", "{0} vom Server aus unscharf schalten? Das trägt keine PIN: Knoten, Broker und Server erlauben es.", "Désarmer {0} depuis le serveur ? Cela ne porte aucun PIN : le nœud, le broker et le serveur l'autorisent.", "Disinserire {0} dal server? Non porta alcun PIN: nodo, broker e server lo permettono.", "サーバーから {0} を解除しますか？ PIN は付きません。ノード、ブローカー、サーバーがすべて許可しています。", "要从服务器撤防 {0} 吗？此操作不带 PIN：节点、代理和服务器都已允许。"],
+  apSent: ["Sent. The node's answer appears below.", "Enviada. La respuesta del nodo aparece abajo.", "Gesendet. Die Antwort des Knotens erscheint unten.", "Envoyée. La réponse du nœud apparaît ci-dessous.", "Inviata. La risposta del nodo compare sotto.", "送信しました。ノードの応答は下に表示されます。", "已发送。节点的回复显示在下方。"],
+  apCommandsOff: ["Arming from here is off in the server (ARMOR_ALARM_COMMANDS).", "Armar desde aquí está apagado en el servidor (ARMOR_ALARM_COMMANDS).", "Scharfschalten von hier ist im Server aus (ARMOR_ALARM_COMMANDS).", "Armer d'ici est désactivé dans le serveur (ARMOR_ALARM_COMMANDS).", "Inserire da qui è spento nel server (ARMOR_ALARM_COMMANDS).", "ここからの警戒セットはサーバーで無効です（ARMOR_ALARM_COMMANDS）。", "服务器上已关闭从这里布防（ARMOR_ALARM_COMMANDS）。"],
+  apNodeCommandsOff: ["This node takes no commands from the server (its setting “Let the server arm and disarm the panel”).", "Este nodo no acepta órdenes del servidor (su ajuste «Dejar que el servidor arme y desarme la central»).", "Dieser Knoten nimmt keine Befehle vom Server an (Einstellung „Server darf die Zentrale scharf- und unscharf schalten“).", "Ce nœud n'accepte pas d'ordres du serveur (son réglage « Laisser le serveur armer et désarmer la centrale »).", "Questo nodo non accetta comandi dal server (impostazione «Lascia che il server inserisca e disinserisca la centrale»).", "このノードはサーバーからの命令を受け付けません（設定「サーバーによる警戒セット・解除を許可」）。", "该节点不接受服务器的命令（设置“允许服务器对主机布防和撤防”）。"],
+  apRecent: ["Latest commands", "Últimas órdenes", "Letzte Befehle", "Dernières commandes", "Ultimi comandi", "直近のコマンド", "最近的命令"],
+  apAccepted: ["accepted", "aceptada", "angenommen", "acceptée", "accettato", "受理", "已接受"],
+  apRefusal_not_disarmed: ["it was already armed", "ya estaba armada", "war schon scharf", "elle était déjà armée", "era già inserita", "すでに警戒中でした", "已处于布防状态"],
+  apRefusal_zones_open: ["a zone that matters is open", "hay una zona abierta que importa", "eine relevante Zone ist offen", "une zone qui compte est ouverte", "una zona che conta è aperta", "重要な区域が開いています", "有一个重要的防区处于打开状态"],
+  apRefusal_not_armed: ["it was not armed", "no estaba armada", "war nicht scharf", "elle n'était pas armée", "non era inserita", "警戒中ではありませんでした", "未处于布防状态"],
+  apRefusal_bad_pin: ["wrong PIN", "PIN erróneo", "falsche PIN", "mauvais PIN", "PIN errato", "PIN 誤り", "PIN 错误"],
+  apRefusal_locked_out: ["locked out", "bloqueada", "gesperrt", "verrouillée", "bloccata", "ロック中", "已锁定"],
+  apRefusal_timeout: ["the node did not answer", "el nodo no respondió", "der Knoten hat nicht geantwortet", "le nœud n'a pas répondu", "il nodo non ha risposto", "ノードが応答しませんでした", "节点没有回复"],
+  apErr_commands_disabled: ["Arming from here is off in the server.", "Armar desde aquí está apagado en el servidor.", "Scharfschalten von hier ist im Server aus.", "Armer d'ici est désactivé dans le serveur.", "Inserire da qui è spento nel server.", "ここからの警戒セットはサーバーで無効です。", "服务器上已关闭从这里布防。"],
+  apErr_unknown_node: ["The server does not know that node.", "El servidor no conoce ese nodo.", "Der Server kennt diesen Knoten nicht.", "Le serveur ne connaît pas ce nœud.", "Il server non conosce quel nodo.", "サーバーはそのノードを知りません。", "服务器不认识该节点。"],
+  apErr_node_unavailable: ["The node has not reported lately.", "El nodo no ha informado últimamente.", "Der Knoten hat zuletzt nicht gemeldet.", "Le nœud n'a pas rapporté récemment.", "Il nodo non ha riferito di recente.", "ノードは最近報告していません。", "该节点最近没有上报。"],
+  apErr_node_commands_off: ["The node takes no commands from the server.", "El nodo no acepta órdenes del servidor.", "Der Knoten nimmt keine Befehle vom Server an.", "Le nœud n'accepte pas d'ordres du serveur.", "Il nodo non accetta comandi dal server.", "ノードはサーバーからの命令を受け付けません。", "该节点不接受服务器的命令。"],
+  apErr_busy: ["Another command to this node is still waiting for its answer.", "Otra orden a este nodo aún espera su respuesta.", "Ein anderer Befehl an diesen Knoten wartet noch auf seine Antwort.", "Une autre commande vers ce nœud attend encore sa réponse.", "Un altro comando a questo nodo attende ancora la risposta.", "このノードへの別のコマンドがまだ応答待ちです。", "对该节点的另一条命令仍在等待回复。"],
+  apErr_mqtt_unavailable: ["The server is not connected to the broker.", "El servidor no está conectado al broker.", "Der Server ist nicht mit dem Broker verbunden.", "Le serveur n'est pas connecté au broker.", "Il server non è connesso al broker.", "サーバーはブローカーに接続されていません。", "服务器未连接到代理。"],
+  apErr_other: ["The command could not be sent.", "No se pudo enviar la orden.", "Der Befehl konnte nicht gesendet werden.", "La commande n'a pas pu être envoyée.", "Non è stato possibile inviare il comando.", "コマンドを送信できませんでした。", "命令无法发送。"],
+  // alarms the server raises
+  alarm_alarm_sounding: ["The alarm is sounding", "La alarma está sonando", "Die Alarmanlage schlägt Alarm", "L'alarme sonne", "L'allarme sta suonando", "警報が鳴っています", "报警正在响"],
+  alarm_alarm_tamper: ["A zone of the alarm shows tamper (a cut or shorted wire)", "Una zona de la alarma indica sabotaje (cable cortado o en cortocircuito)", "Eine Zone der Alarmanlage meldet Sabotage (Draht durchtrennt oder kurzgeschlossen)", "Une zone de l'alarme signale un sabotage (fil coupé ou en court-circuit)", "Una zona dell'allarme segnala manomissione (filo tagliato o in cortocircuito)", "警報の区域で改ざんを検出（断線またはショート）", "报警防区显示被拆（线路被剪断或短路）"],
+  alarm_alarm_locked_out: ["The alarm panel is locked out after wrong PINs", "La central de alarma está bloqueada tras PIN erróneos", "Die Alarmzentrale ist nach falschen PINs gesperrt", "La centrale d'alarme est verrouillée après de mauvais PIN", "La centrale d'allarme è bloccata dopo PIN errati", "警報盤が誤った PIN によりロックされています", "报警主机因 PIN 错误被锁定"],
+  alarm_alarm_offline: ["An alarm node stopped reporting", "Un nodo de alarma ha dejado de informar", "Ein Alarmknoten meldet sich nicht mehr", "Un nœud d'alarme a cessé de rapporter", "Un nodo d'allarme ha smesso di riferire", "警報ノードが報告しなくなりました", "报警节点停止上报"],
+};
+
+export const alarmPanelsCatalogues: RowCatalogues = cataloguesFromRows(ROWS);

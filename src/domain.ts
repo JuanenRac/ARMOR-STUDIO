@@ -4,7 +4,7 @@
  */
 import type { SystemState } from "./types";
 
-export type View = "overview" | "weather" | "alarms" | "cameras" | "radar" | "inverters" | "batteries" | "electrical" | "devices" | "automations" | "record" | "history" | "network" | "services" | "siteDesigner" | "electricalDesigner" | "networkDesigner" | "system" | "configuration";
+export type View = "overview" | "weather" | "alarms" | "alarmPanels" | "cameras" | "radar" | "inverters" | "batteries" | "electrical" | "devices" | "automations" | "record" | "history" | "network" | "services" | "siteDesigner" | "electricalDesigner" | "networkDesigner" | "system" | "configuration";
 export type GridSize = 1 | 2 | 4 | 6 | 8 | 9 | 12 | 16;
 export const GRID_SIZES: readonly GridSize[] = [1, 2, 4, 6, 8, 9, 12, 16];
 
@@ -140,7 +140,7 @@ export type DevicePlacement = { device_id: string; x: number; y: number; z: numb
 
 /** The menus, in groups: what is happening now, what the system controls, the design, and administration. */
 export const NAV_GROUPS: ReadonlyArray<{ title: string; items: ReadonlyArray<readonly [View, string]> }> = [
-  { title: "navMonitor", items: [["overview", "⌂"], ["weather", "☁"], ["alarms", "!"], ["cameras", "◉"], ["radar", "◌"]] },
+  { title: "navMonitor", items: [["overview", "⌂"], ["weather", "☁"], ["alarms", "!"], ["alarmPanels", "▣"], ["cameras", "◉"], ["radar", "◌"]] },
   { title: "navEnergy", items: [["inverters", "☀"], ["batteries", "▮"], ["electrical", "⌁"]] },
   { title: "navNetwork", items: [["network", "⇄"]] },
   { title: "navControl", items: [["devices", "◈"], ["automations", "⚡"]] },

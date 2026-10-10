@@ -1,0 +1,16 @@
+/* The Alarm panels menu (the ARMOR-ALARM nodes), on the same look as the Electrical menu. */
+.alarm-panels { display: grid; gap: 1rem; align-content: start; }
+.ap-card { gap: .8rem; }
+.ap-card.sounding { border-color: #ff6f79; box-shadow: 0 0 0 1px #ff6f7955, 0 0 24px #ff6f7933; }
+.ap-card h4 { margin: 0 0 .4rem; color: #86a8b3; font: 600 .62rem "DM Mono", ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
+.ap-zone-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: .5rem; }
+.ap-zone { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .7rem; padding: .5rem .7rem; border: 1px solid #1f4452; border-radius: 10px; background: #0a1c25; }
+.ap-zone b { color: #f2feff; font-weight: 600; }
+.ap-zone small { color: #86a8b3; }
+.ap-zone.triggered { border-color: #8a6a1c; }
+.ap-zone.tamper { border-color: #9a3c47; background: rgba(255, 111, 121, .08); }
+.ap-open { margin: .5rem 0 0; color: #ffcf7d; font-size: .85rem; }
+.ap-events ul, .ap-recent ul { margin: 0; padding: 0; list-style: none; display: grid; gap: .25rem; font-size: .82rem; color: #d9f6fb; }
+.ap-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.ap-force { display: inline-flex; align-items: center; gap: .4rem; font-size: .8rem; color: #a9d0d6; }
+@media (max-width: 760px) { .ap-zone-list { grid-template-columns: 1fr; } }
