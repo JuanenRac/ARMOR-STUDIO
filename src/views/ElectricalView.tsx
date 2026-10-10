@@ -8,6 +8,7 @@ import { useMemo, useState } from "react";
 import { commandDevice, electricalElements, electricalHistory, type ElectricalElement } from "../api";
 import { KindIcon } from "../deviceKinds";
 import { MenuLogo } from "../menuLogos";
+import { DesignerLink } from "../components/DesignerLink";
 import { usePolled } from "../hooks";
 import { LineChart, SOLAR_COLOURS } from "../solarGraphics";
 import type { ElectricalChannelReading, ElectricalNodeReading, ElectricalReadings, ElectricalSwitchReading } from "../api";
@@ -50,11 +51,7 @@ export function ElectricalView({ openDevices, t, origin, readings, unreachable, 
       </div>}
     </header>
     {unreachable && <p className="solar-notice bad">{t("elLiveUnreachable")}</p>}
-    <section className="solar-nodes">
-      <h3>{t("elLiveRole")}</h3>
-      <p className="muted small">{t("elLiveRoleText")}</p>
-      <div><button type="button" onClick={openDesigner}>{t("elLiveOpenDesigner")}</button></div>
-    </section>
+    <DesignerLink title={t("elLiveRole")} text={t("elLiveRoleText")} button={t("elLiveOpenDesigner")} open={openDesigner} />
     <ElectricalDevices t={t} origin={origin} openDevices={openDevices} now={now} />
     <NodeFinder t={t} origin={origin} network={network} wantKind="electrical" knownIds={nodes.map(node => node.node_id)} />
     {nodes.length === 0 ? <div className="solar-empty"><MenuLogo kind="electrical" size={92} /><h3>{t("elLiveNone")}</h3><p>{t("elLiveNoneHelp")}</p></div>
