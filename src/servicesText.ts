@@ -66,6 +66,7 @@ const ROWS: Record<string, Row> = {
   svcMemory: ["Memory", "Memoria", "Speicher", "Mémoire", "Memoria", "メモリ", "内存"],
   svcRestarts: ["Restarts", "Reinicios", "Neustarts", "Redémarrages", "Riavvii", "再起動", "重启次数"],
   svcSince: ["Up for", "Activo desde hace", "Läuft seit", "Actif depuis", "Attivo da", "稼働時間", "已运行"],
+  svcVersion: ["Version", "Versión", "Version", "Version", "Versione", "バージョン", "版本"],
   svcLastSeen: ["Last heard", "Última señal", "Zuletzt gehört", "Dernier signal", "Ultimo segnale", "最終受信", "最后收到"],
   svcAtBoot: ["Starts at boot", "Arranca con el equipo", "Startet beim Booten", "Démarre au boot", "Parte all'avvio", "起動時に開始", "开机启动"],
   svcNotAtBoot: ["Not at boot", "No arranca con el equipo", "Nicht beim Booten", "Pas au boot", "Non all'avvio", "起動時は開始しない", "不开机启动"],
