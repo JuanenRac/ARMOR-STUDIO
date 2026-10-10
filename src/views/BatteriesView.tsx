@@ -13,7 +13,7 @@ import {
   type SolarBatteryReading, type SolarCatalog, type SolarDeviceView, type SolarModuleReading, type SolarRegistration, type SolarTotals,
 } from "../solarModel";
 import { SolarEquipment } from "../SolarEquipment";
-import { EnergyCard } from "./InvertersView";
+import { EnergyAlarmsCard, EnergyCard } from "./InvertersView";
 import { SolarNodes } from "../SolarNodes";
 import type { NetworkOverview } from "../networkModel";
 import "./solar.css";
@@ -52,6 +52,7 @@ export function BatteriesView({ t, origin, devices, totals, now, unreachable, wa
       })}</div>}
       {current && <StackPanel t={t} stack={current} now={now} history={history.data?.samples ?? []} minutes={minutes} setMinutes={setMinutes} />}
       <EnergyCard t={t} origin={origin} kind="battery" />
+      <EnergyAlarmsCard t={t} origin={origin} />
     </>}
   </div>;
 }
