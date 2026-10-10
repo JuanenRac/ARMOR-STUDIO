@@ -3,7 +3,7 @@ import type { Building, Opening } from "../domain";
 import { INITIAL_TERRAIN } from "../domain";
 import { edgeOf } from "./geometry";
 import { keepsSharedWall, mergeBuildings, mergeCandidates, partnersOf, separateBuildings, sharedSegments, wallPlan } from "./merge";
-import { deleteBuilding, isRectangle, moveEdge, moveSide, type SiteModel } from "./ops";
+import { deleteBuilding, isRectangle, moveEdge, moveSide, resizeFeatureSide, type SiteModel } from "./ops";
 
 const box = (id: string, x0: number, y0: number, x1: number, y1: number, floors = [2.8]): Building => ({
   id, name: id, points: [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 }], base: 0, floors, roof: { style: "flat", slope: 0, overhang: 0, ridge: 0 }, thickness: 0.25,
@@ -140,5 +140,33 @@ describe("the walls two merged buildings share", () => {
     const plan = wallPlan(m, get(m, "a"));
     expect(plan.cuts).toEqual([]);
     expect(plan.borrowed).toEqual([]);
+  });
+});
+
+describe("pulling one side of an object", () => {
+  const pool = (rotation = 0): SiteModel => ({ ...model([]), features: [{ id: "pool-1", kind: "pool", x: 10, y: 20, z: 0, width: 4, depth: 2, height: 1, rotation, slope: 0 }] });
+  const of = (m: SiteModel) => m.features[0];
+  it("moves the side that is pulled and leaves the opposite one where it was", () => {
+    const east = of(resizeFeatureSide(pool(), "pool-1", "east", { x: 14, y: 20 }));      // the east side from x = 12 to x = 14; the west stays at x = 8
+    expect([east.width, east.depth, east.x, east.y]).toEqual([6, 2, 11, 20]);
+    const west = of(resizeFeatureSide(pool(), "pool-1", "west", { x: 7, y: 20 }));
+    expect([west.width, west.x]).toEqual([5, 9.5]);
+    const north = of(resizeFeatureSide(pool(), "pool-1", "north", { x: 10, y: 23 }));    // the north side from y = 21 to y = 23; the south stays at y = 19
+    expect([north.depth, north.y, north.width]).toEqual([4, 21, 4]);
+    const south = of(resizeFeatureSide(pool(), "pool-1", "south", { x: 10, y: 18 }));
+    expect([south.depth, south.y]).toEqual([3, 19.5]);
+  });
+  it("reads the point in the object's own axes when it is turned", () => {
+    const turned = of(resizeFeatureSide(pool(90), "pool-1", "east", { x: 10, y: 24 }));  // turned a quarter, its east side looks north: pulled to y = 24, the west side stays at y = 18
+    expect(turned.width).toBeCloseTo(6, 5);
+    expect(turned.x).toBeCloseTo(10, 5);
+    expect(turned.y).toBeCloseTo(21, 5);
+  });
+  it("never lets a side pass the opposite one, and leaves the model alone for an unknown object", () => {
+    const squeezed = of(resizeFeatureSide(pool(), "pool-1", "east", { x: 0, y: 20 }));
+    expect(squeezed.width).toBe(0.1);
+    expect(squeezed.x).toBeCloseTo(8.05, 5);
+    const m = pool();
+    expect(resizeFeatureSide(m, "nothing", "east", { x: 1, y: 1 })).toBe(m);
   });
 });

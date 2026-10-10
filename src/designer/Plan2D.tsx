@@ -21,7 +21,7 @@ import {
 import type { SiteModel } from "./ops";
 
 export type DragTarget =
-  | { kind: "terrain" } | { kind: "terrain-vertex"; index: number } | { kind: "terrain-edge"; edge: number } | { kind: "building-edge"; id: string; edge: number }
+  | { kind: "terrain" } | { kind: "terrain-vertex"; index: number } | { kind: "terrain-edge"; edge: number } | { kind: "feature-side"; id: string; side: "east" | "west" | "north" | "south" } | { kind: "building-edge"; id: string; edge: number }
   | { kind: "building"; id: string } | { kind: "building-vertex"; id: string; index: number } | { kind: "building-rotate"; id: string }
   | { kind: "opening" | "wall-lamp" | "roof-item" | "feature" | "camera" | "sensor" | "device" | "heading-camera" | "heading-sensor"; id: string };
 
@@ -413,6 +413,12 @@ export function Plan2D(props: PlanProps) {
       <g className="p-body">{body}</g>
       {(feature.kind === "lamp" || feature.kind === "mast" || feature.kind === "pillar" || feature.kind === "fence" || feature.kind === "sidewalk" || SMALL_EXTRA_KINDS.has(feature.kind)) && <circle r={Math.max(Math.max(w, d) / 2, 9 * inv)} className="p-device-hit" />}
       {chosen && (roundish ? <circle r={Math.max(w, 0.3) * 2.6} className="p-selection" /> : <rect x={-w / 2 - 0.1} y={-d / 2 - 0.1} width={w + 0.2} height={d + 0.2} className="p-selection" />)}
+      {chosen && !roundish && (["east", "west", "north", "south"] as const).map(side => {
+        // a handle in the middle of each side pulls that side and leaves the opposite one where it is (the group is drawn turned, so these are in the object's own axes; y is drawn downwards)
+        const at = side === "east" ? { x: w / 2, y: 0 } : side === "west" ? { x: -w / 2, y: 0 } : side === "north" ? { x: 0, y: -d / 2 } : { x: 0, y: d / 2 };
+        return <rect key={side} x={at.x - 4 * inv} y={at.y - 4 * inv} width={8 * inv} height={8 * inv} className="p-side-handle"
+          onPointerDown={event => beginDrag({ kind: "feature-side", id: feature.id, side }, { kind: "feature", id: feature.id }, event)}><title>{t("resizeSide")}</title></rect>;
+      })}
     </g>;
   };
 

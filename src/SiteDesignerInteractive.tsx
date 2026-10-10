@@ -15,7 +15,7 @@ import { actionSections, arrangeToolbox, toolSections, TURN_STEP, type TurnAxis 
 import { bounds, edgeOf, isSimplePolygon, nearestOnOutline, pointInPolygon, rectangle, floorBottom } from "./designer/geometry";
 import { clamp, round2, snapTo, toMetres, toolForKey, toolLabelKey, toolWorksIn, toPercent, type Point, type Selection, type Tool } from "./designer/model";
 import {
-  addSidewalkRing, addStrip, addFeature, addOpening, addRoofItem, addWallLamp, buildingAt, createBuilding, duplicateBuilding, fitDimensions, insertBuildingVertex, moveBuilding, moveEdge, moveSide, moveVertex, rectangularTerrain, removeSelected, rescaleDevices, rotateBuilding, setFootprint,
+  addSidewalkRing, addStrip, addFeature, addOpening, addRoofItem, addWallLamp, buildingAt, createBuilding, duplicateBuilding, fitDimensions, insertBuildingVertex, moveBuilding, moveEdge, moveSide, moveVertex, resizeFeatureSide, rectangularTerrain, removeSelected, rescaleDevices, rotateBuilding, setFootprint,
   translatePoints, nextId, turnSelected, canTurnAbout, placeDevice, DEVICE_HEIGHT, type SiteModel,
 } from "./designer/ops";
 import { Plan2D, type DragTarget, type PlaceHit } from "./designer/Plan2D";
@@ -270,6 +270,7 @@ export function SiteDesignerInteractive(props: Props) {
     const current = modelRef.current;
     switch (target.kind) {
       case "terrain-vertex": commit({ ...current, terrain: { points: moveVertex(current.terrain.points, target.index, point) } }, { history: false }); break;
+      case "feature-side": commit(resizeFeatureSide(current, target.id, target.side, point), { history: false }); break;
       case "terrain-edge": { const e = edgeOf(current.terrain.points, target.edge); commit({ ...current, terrain: { points: moveEdge(current.terrain.points, target.edge, (point.x - e.a.x) * e.nx + (point.y - e.a.y) * e.ny) } }, { history: false }); break; }
       case "building-edge": { const building = current.buildings.find(item => item.id === target.id); if (building && target.edge < building.points.length) { const e = edgeOf(building.points, target.edge); commit(moveSide(current, target.id, target.edge, (point.x - e.a.x) * e.nx + (point.y - e.a.y) * e.ny), { history: false }); } break; }
       case "building-vertex": { const building = current.buildings.find(item => item.id === target.id); if (building) commit(setFootprint(current, target.id, moveVertex(building.points, target.index, point)), { history: false }); break; }
