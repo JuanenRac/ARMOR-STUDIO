@@ -342,7 +342,7 @@ export async function setSystemMode(origin: string, mode: "armed" | "disarmed"):
 
 // ---- Devices, alarms, automations, the system, and the site design kept on the server -------------------------------------------
 
-export type DeviceKind = "smoke" | "co" | "gas" | "water_leak" | "panic_button" | "door" | "window" | "motion" | "glass_break" | "vibration" | "climate" | "temperature" | "humidity" | "light_level" | "smart_plug" | "smart_light" | "smart_switch" | "siren" | "lock" | "valve";
+export type DeviceKind = "smoke" | "co" | "gas" | "water_leak" | "panic_button" | "door" | "window" | "motion" | "glass_break" | "vibration" | "climate" | "temperature" | "humidity" | "light_level" | "smart_plug" | "smart_light" | "smart_switch" | "smart_breaker" | "energy_meter" | "siren" | "lock" | "valve";
 export type DeviceProtocol = "wifi" | "bluetooth" | "zigbee" | "zwave" | "thread" | "lora" | "rf433" | "wired" | "other";
 export type DeviceState = Record<string, boolean | number>;
 export type MapEntry = { field: string; path: string; invert?: boolean };
@@ -352,9 +352,12 @@ export type DeviceCommandsInput = { mqtt?: { topic: string; on?: string; off?: s
 export type StudioDevice = {
   id: string; name: string; kind: DeviceKind; protocol: DeviceProtocol; location: string; category: "sensor" | "actuator";
   source: DeviceSource; commands: DeviceCommandsView; can_command: boolean; expected_interval_s: number;
+  /** How much it matters to switch it from afar: a circuit of the board asks for a confirmation, a critical one an administrator too. */
+  risk: DeviceRisk;
   state: DeviceState; online: boolean; last_seen: string | null; created_at: string;
 };
-export type DeviceInput = { id?: string; name?: string; kind?: DeviceKind; protocol?: DeviceProtocol; location?: string; source?: DeviceSource; commands?: DeviceCommandsInput; expected_interval_s?: number };
+export type DeviceRisk = "low" | "circuit" | "critical";
+export type DeviceInput = { risk?: DeviceRisk; id?: string; name?: string; kind?: DeviceKind; protocol?: DeviceProtocol; location?: string; source?: DeviceSource; commands?: DeviceCommandsInput; expected_interval_s?: number };
 export type Severity = "critical" | "high" | "warning";
 export type Alarm = {
   id: string; key: string; source: { type: "node" | "camera" | "device" | "solar" | "electrical" | "network"; id: string }; severity: Severity; code: string;
@@ -378,7 +381,11 @@ export const listDevices = (origin: string) => userCall<{ devices: StudioDevice[
 export const createDevice = (origin: string, input: DeviceInput) => userCall<StudioDevice>(origin, "POST", "/api/v1/devices", input);
 export const updateDevice = (origin: string, id: string, input: DeviceInput) => userCall<StudioDevice>(origin, "PATCH", `/api/v1/devices/${encodeURIComponent(id)}`, input);
 export const deleteDevice = (origin: string, id: string) => userCall<void>(origin, "DELETE", `/api/v1/devices/${encodeURIComponent(id)}`);
-export const commandDevice = (origin: string, id: string, command: "on" | "off" | "toggle") => userCall<{ ok: boolean; device: StudioDevice }>(origin, "POST", `/api/v1/devices/${encodeURIComponent(id)}/command`, { command });
+export const commandDevice = (origin: string, id: string, command: "on" | "off" | "toggle", confirm = false) => userCall<{ ok: boolean; device: StudioDevice }>(origin, "POST", `/api/v1/devices/${encodeURIComponent(id)}/command`, { command, ...(confirm ? { confirm: true } : {}) });
+/** A device of the house that measures or switches electricity (a Zigbee plug or breaker, a meter...), as the Electrical menu lists it. */
+export type ElectricalElement = { id: string; name: string; kind: DeviceKind; protocol: DeviceProtocol; location: string; online: boolean; last_seen: string | null; risk: DeviceRisk; on?: boolean; power_w?: number; voltage_v?: number; current_a?: number; energy_kwh?: number; switchable: boolean };
+export type ElectricalElements = { elements: ElectricalElement[]; totals: { elements: number; online: number; on: number; power_w: number; energy_kwh: number } };
+export const electricalElements = (origin: string) => userCall<ElectricalElements>(origin, "GET", "/api/v1/electrical/devices");
 export const setDeviceState = (origin: string, id: string, state: DeviceState) => userCall<StudioDevice>(origin, "POST", `/api/v1/devices/${encodeURIComponent(id)}/state`, { state });
 export const listAlarms = (origin: string) => userCall<{ active: Alarm[]; recent: Alarm[] }>(origin, "GET", "/api/v1/alarms");
 export const acknowledgeAlarm = (origin: string, id: string) => userCall<Alarm>(origin, "POST", `/api/v1/alarms/${encodeURIComponent(id)}/acknowledge`);

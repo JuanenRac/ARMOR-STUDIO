@@ -7,15 +7,15 @@
 import type { ReactNode } from "react";
 import type { DeviceCommandsInput, DeviceKind, DeviceProtocol, DeviceSource, DeviceState, StudioDevice } from "./api";
 
-export const SENSOR_KINDS: readonly DeviceKind[] = ["smoke", "co", "gas", "water_leak", "panic_button", "door", "window", "motion", "glass_break", "vibration", "climate", "temperature", "humidity", "light_level"];
-export const ACTUATOR_KINDS: readonly DeviceKind[] = ["smart_plug", "smart_light", "smart_switch", "siren", "lock", "valve"];
+export const SENSOR_KINDS: readonly DeviceKind[] = ["smoke", "co", "gas", "water_leak", "panic_button", "door", "window", "motion", "glass_break", "vibration", "climate", "temperature", "humidity", "light_level", "energy_meter"];
+export const ACTUATOR_KINDS: readonly DeviceKind[] = ["smart_plug", "smart_light", "smart_switch", "smart_breaker", "siren", "lock", "valve"];
 export const ALL_KINDS: readonly DeviceKind[] = [...SENSOR_KINDS, ...ACTUATOR_KINDS];
 export const PROTOCOLS: readonly DeviceProtocol[] = ["wifi", "zigbee", "bluetooth", "zwave", "thread", "lora", "rf433", "wired", "other"];
 
 /** The main state field of a kind: what the card shows and what an automation waits for. */
 export const MAIN_FIELD: Record<DeviceKind, string | null> = {
   smoke: "triggered", co: "triggered", gas: "triggered", water_leak: "triggered", panic_button: "triggered", door: "open", window: "open", motion: "triggered", glass_break: "triggered", vibration: "triggered",
-  climate: null, temperature: null, humidity: null, light_level: null, smart_plug: "on", smart_light: "on", smart_switch: "on", siren: "on", lock: "locked", valve: "open",
+  climate: null, temperature: null, humidity: null, light_level: null, smart_plug: "on", smart_light: "on", smart_switch: "on", smart_breaker: "on", energy_meter: null, siren: "on", lock: "locked", valve: "open",
 };
 /** The kinds that raise an alarm, and when: at any time (fire, gas, flood, panic) or while armed (intrusion). */
 export const ALARM_KIND: Partial<Record<DeviceKind, "always" | "armed">> = { smoke: "always", co: "always", gas: "always", water_leak: "always", panic_button: "always", door: "armed", window: "armed", motion: "armed", glass_break: "armed", vibration: "armed" };
@@ -23,7 +23,7 @@ export const ALARM_KIND: Partial<Record<DeviceKind, "always" | "armed">> = { smo
 /** The colour a kind wears (the same in the list, the plan and the overview). */
 export const KIND_COLOUR: Record<DeviceKind, string> = {
   smoke: "#ff7a45", co: "#ff9b45", gas: "#ffb020", water_leak: "#38bdf8", panic_button: "#ff4d5e", door: "#f5c04a", window: "#7dd3fc", motion: "#a78bfa", glass_break: "#f472b6", vibration: "#c4b5fd",
-  climate: "#2dd4bf", temperature: "#fb923c", humidity: "#22d3ee", light_level: "#fde047", smart_plug: "#34d399", smart_light: "#facc15", smart_switch: "#4ade80", siren: "#fb7185", lock: "#60a5fa", valve: "#5eead4",
+  climate: "#2dd4bf", temperature: "#fb923c", humidity: "#22d3ee", light_level: "#fde047", smart_plug: "#34d399", smart_light: "#facc15", smart_switch: "#4ade80", smart_breaker: "#22d3ee", energy_meter: "#a3e635", siren: "#fb7185", lock: "#60a5fa", valve: "#5eead4",
 };
 
 const svg = (children: ReactNode, size: number) => <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">{children}</svg>;
@@ -44,6 +44,8 @@ const GLYPHS: Record<DeviceKind, ReactNode> = {
   light_level: <><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.500 5.500L7 7M17 17l1.500 1.500M18.500 5.500L17 7M7 17l-1.500 1.500" strokeWidth="1.3" /></>,
   smart_plug: <><path d="M8 3v5M16 3v5" /><path d="M6 8h12v4a6 6 0 0 1-12 0z" /><path d="M12 18v3" /></>,
   smart_light: <><path d="M9 18h6M10 21h4" /><path d="M12 3a6 6 0 0 0-3.500 10.900c.6.500 1 1.200 1 2.100h5c0-.9.400-1.600 1-2.100A6 6 0 0 0 12 3z" /></>,
+  smart_breaker: <><rect x="6" y="3" width="12" height="18" rx="1.500" /><path d="M9 7h6" /><rect x="10" y="10" width="4" height="6" rx="1" fill="currentColor" fillOpacity=".3" /><path d="M12 17.500v1.500" strokeWidth="1.300" /></>,
+  energy_meter: <><circle cx="12" cy="12" r="8.500" /><path d="M12 12l4-3.500" /><path d="M7 15.500h2M11 17h2M15 15.500h2" strokeWidth="1.300" /></>,
   smart_switch: <><rect x="5" y="3" width="14" height="18" rx="2" /><rect x="10" y="7" width="4" height="7" rx="1" fill="currentColor" fillOpacity=".3" /></>,
   siren: <><path d="M7 20v-6a5 5 0 0 1 10 0v6" /><path d="M5 20h14" /><path d="M12 4V2M4.500 7L3 5.500M19.500 7L21 5.500" strokeWidth="1.3" /></>,
   lock: <><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /><circle cx="12" cy="16" r="1.200" fill="currentColor" /></>,
@@ -72,6 +74,9 @@ export function describeState(kind: DeviceKind, state: DeviceState, t: (key: str
   if (typeof state.lux === "number") parts.push(`${Math.round(state.lux)} lx`);
   if (typeof state.brightness === "number") parts.push(`${Math.round(state.brightness)} %`);
   if (typeof state.power_w === "number") parts.push(`${state.power_w.toFixed(1)} W`);
+  if (typeof state.voltage_v === "number") parts.push(`${state.voltage_v.toFixed(1)} V`);
+  if (typeof state.current_a === "number") parts.push(`${state.current_a.toFixed(2)} A`);
+  if (typeof state.energy_kwh === "number") parts.push(`${state.energy_kwh.toFixed(2)} kWh`);
   if (typeof state.co_ppm === "number") parts.push(`${Math.round(state.co_ppm)} ppm`);
   if (state.tamper === true) parts.push(t("state_tamper"));
   return parts;
@@ -99,7 +104,9 @@ const Z2M_FIELDS: Partial<Record<DeviceKind, Array<{ field: string; path: string
   smoke: [{ field: "triggered", path: "smoke" }], co: [{ field: "triggered", path: "carbon_monoxide" }], gas: [{ field: "triggered", path: "gas" }], water_leak: [{ field: "triggered", path: "water_leak" }],
   motion: [{ field: "triggered", path: "occupancy" }], vibration: [{ field: "triggered", path: "vibration" }], panic_button: [{ field: "triggered", path: "action" }],
   climate: [{ field: "temperature", path: "temperature" }, { field: "humidity", path: "humidity" }], temperature: [{ field: "temperature", path: "temperature" }], humidity: [{ field: "humidity", path: "humidity" }],
-  light_level: [{ field: "lux", path: "illuminance_lux" }], smart_plug: [{ field: "on", path: "state" }, { field: "power_w", path: "power" }], smart_light: [{ field: "on", path: "state" }], smart_switch: [{ field: "on", path: "state" }],
+  light_level: [{ field: "lux", path: "illuminance_lux" }], smart_plug: [{ field: "on", path: "state" }, { field: "power_w", path: "power" }, { field: "voltage_v", path: "voltage" }, { field: "current_a", path: "current" }, { field: "energy_kwh", path: "energy" }],
+  smart_breaker: [{ field: "on", path: "state" }, { field: "power_w", path: "power" }, { field: "voltage_v", path: "voltage" }, { field: "current_a", path: "current" }, { field: "energy_kwh", path: "energy" }],
+  energy_meter: [{ field: "power_w", path: "power" }, { field: "voltage_v", path: "voltage" }, { field: "current_a", path: "current" }, { field: "energy_kwh", path: "energy" }], smart_light: [{ field: "on", path: "state" }], smart_switch: [{ field: "on", path: "state" }],
   lock: [{ field: "locked", path: "state" }],
 };
 

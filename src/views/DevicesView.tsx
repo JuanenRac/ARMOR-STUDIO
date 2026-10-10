@@ -4,7 +4,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useMemo, useState, type FormEvent } from "react";
-import { ApiError, commandDevice, createDevice, deleteDevice, setDeviceState, updateDevice, type DeviceKind, type DeviceProtocol, type StudioDevice } from "../api";
+import { ApiError, commandDevice, createDevice, deleteDevice, setDeviceState, updateDevice, type DeviceKind, type DeviceProtocol, type DeviceRisk, type StudioDevice } from "../api";
 import {
   ACTUATOR_KINDS, ago, ALARM_KIND, applyPreset, describeState, deviceProblem, KIND_COLOUR, KindIcon, MAIN_FIELD, mapToText, PRESETS, PROTOCOLS, slug, textToMap, SENSOR_KINDS, type PresetId, type PresetResult,
 } from "../deviceKinds";
@@ -16,10 +16,10 @@ type Props = { t: Translate; origin: string; devices: StudioDevice[]; reload: ()
 type Filter = "all" | "sensor" | "actuator" | "problem";
 
 type Form = {
-  id: string; name: string; kind: DeviceKind; protocol: DeviceProtocol; location: string; preset: PresetId; presetName: string; host: string; interval: string;
+  id: string; name: string; kind: DeviceKind; protocol: DeviceProtocol; location: string; preset: PresetId; presetName: string; host: string; interval: string; risk: string;
   advanced: boolean; connection: PresetResult | null; mapText: string; urlOn: string; urlOff: string; urlToggle: string; touched: boolean;
 };
-const emptyForm = (): Form => ({ id: "", name: "", kind: "door", protocol: "zigbee", location: "", preset: "zigbee2mqtt", presetName: "", host: "", interval: "0", advanced: false, connection: null, mapText: "", urlOn: "", urlOff: "", urlToggle: "", touched: false });
+const emptyForm = (): Form => ({ id: "", name: "", kind: "door", protocol: "zigbee", location: "", preset: "zigbee2mqtt", presetName: "", host: "", interval: "0", risk: "", advanced: false, connection: null, mapText: "", urlOn: "", urlOff: "", urlToggle: "", touched: false });
 
 export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, now }: Props) {
   const [filter, setFilter] = useState<Filter>("all");
@@ -41,6 +41,11 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
   }), [devices, filter, search, t]);
   const online = devices.filter(device => device.online).length, problems = devices.filter(device => deviceProblem(device)).length;
 
+  /** Sends a command; a circuit of the board (or a critical one) asks first, and the server insists on it. */
+  const switchDevice = (device: StudioDevice, command: "on" | "off" | "toggle") => {
+    if (device.risk !== "low" && !window.confirm(t(device.risk === "critical" ? "confirmCritical" : "confirmCircuit"))) return Promise.resolve(undefined);
+    return commandDevice(origin, device.id, command, device.risk !== "low");
+  };
   const act = async (work: () => Promise<unknown>, done?: string) => { try { await work(); if (done) say(done); reload(); } catch (error) { explain(error); } };
 
   // ---- the form ----
@@ -48,7 +53,7 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
     if (!device) { setForm(emptyForm()); return; }
     const mqtt = device.source.type === "mqtt" ? device.source : undefined;
     setForm({
-      ...emptyForm(), id: device.id, name: device.name, kind: device.kind, protocol: device.protocol, location: device.location, interval: String(device.expected_interval_s),
+      ...emptyForm(), id: device.id, name: device.name, kind: device.kind, protocol: device.protocol, location: device.location, interval: String(device.expected_interval_s), risk: device.risk === defaultRiskOf(device.kind) ? "" : device.risk,
       preset: mqtt ? "native" : "push", presetName: device.id, advanced: false, connection: null, mapText: mapToText(mqtt?.map), touched: false,
     });
   };
@@ -64,7 +69,7 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
     event.preventDefault();
     if (!form) return;
     const interval = Math.max(0, Math.round(Number(form.interval) || 0));
-    const input: Parameters<typeof createDevice>[1] = { name: form.name.trim(), kind: form.kind, protocol: form.protocol, location: form.location.trim(), expected_interval_s: interval };
+    const input: Parameters<typeof createDevice>[1] = { name: form.name.trim(), kind: form.kind, protocol: form.protocol, location: form.location.trim(), expected_interval_s: interval, ...(form.risk ? { risk: form.risk as DeviceRisk } : {}) };
     if (!form.id || form.touched) {
       const base = currentConnection(form);
       const source = base.source.type === "mqtt" ? { ...base.source, map: form.advanced ? textToMap(form.mapText) : base.source.map } : base.source;
@@ -109,6 +114,10 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
         <p className="muted small wide">{t(`presetHelp_${form.preset}`)}</p>
         {(form.preset === "zigbee2mqtt" || form.preset === "tasmota" || form.preset === "shelly" || form.preset === "native") && <label>{t("presetName")}<input value={form.presetName} placeholder={slug(form.name)} onChange={event => edit({ presetName: event.target.value }, true)} /></label>}
         {form.preset === "http" && <label>{t("presetHost")}<input value={form.host} placeholder="192.168.0.50" onChange={event => edit({ host: event.target.value }, true)} /></label>}
+        {ACTUATOR_KINDS.includes(form.kind) && <label>{t("riskLabel")}<select value={form.risk} onChange={event => edit({ risk: event.target.value })}>
+          <option value="">{t(`risk_${defaultRiskOf(form.kind)}`)} · {t("default")}</option>
+          {(["low", "circuit", "critical"] as const).filter(level => level !== defaultRiskOf(form.kind)).map(level => <option key={level} value={level}>{t(`risk_${level}`)}</option>)}
+        </select></label>}
         <label>{t("expectedInterval")}<input type="number" min={0} max={604800} value={form.interval} onChange={event => edit({ interval: event.target.value })} /></label>
         <p className="muted small wide">{t("expectedIntervalHelp")}</p>
       </div>
@@ -151,9 +160,9 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
             {problem && <span className={`pill problem ${problem}`}>{t(`problem_${problem}`)}</span>}</div>
           <div className="device-meta"><span>{t(`protocol_${device.protocol}`)}</span><span>{t("lastSeen")}: {ago(device.last_seen, now, t)}</span></div>
           {device.category === "actuator" && device.can_command && <div className="device-commands">
-            <button onClick={() => void act(() => commandDevice(origin, device.id, "on"))}>{t(onLabel)}</button>
-            <button onClick={() => void act(() => commandDevice(origin, device.id, "off"))}>{t(offLabel)}</button>
-            {device.kind !== "siren" && device.kind !== "lock" && device.kind !== "valve" && <button onClick={() => void act(() => commandDevice(origin, device.id, "toggle"))}>{t("cmdToggle")}</button>}
+            <button onClick={() => void act(() => switchDevice(device, "on"))}>{t(onLabel)}</button>
+            <button onClick={() => void act(() => switchDevice(device, "off"))}>{t(offLabel)}</button>
+            {device.kind !== "siren" && device.kind !== "lock" && device.kind !== "valve" && <button onClick={() => void act(() => switchDevice(device, "toggle"))}>{t("cmdToggle")}</button>}
           </div>}
           <div className="device-actions">
             {ALARM_KIND[device.kind] && main && <button title={t("testHelp")} onClick={() => void act(() => setDeviceState(origin, device.id, { [main]: !isOn }))}>{isOn ? t("testClear") : t("testTrigger")}</button>}
@@ -167,3 +176,6 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
     {devices.length > 0 && shown.length === 0 && <p className="muted">{t("noDevices")}</p>}
   </section>;
 }
+
+/** The risk a kind has when nobody says otherwise: a breaker of the board asks first, the rest is a click (the same rule as the server's). */
+const defaultRiskOf = (kind: DeviceKind): DeviceRisk => (kind === "smart_breaker" ? "circuit" : "low");

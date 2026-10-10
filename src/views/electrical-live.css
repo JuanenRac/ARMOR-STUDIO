@@ -9,3 +9,13 @@
 .el-row:nth-child(even) { background: #0a1d26; } .el-row.head { background: #0b2029; color: #86a8b3; font: 600 .6rem "DM Mono", ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
 .el-row b { display: block; color: #f2feff; font-weight: 600; } .el-row small { color: #86a8b3; } .el-row.alarm { background: rgba(255, 111, 121, .1); } .el-row .ok { color: #5df0c4; } .el-row .warn { color: #ffcf7d; } .el-row .fail { color: #ff8e99; }
 .el-switches { display: grid; gap: .5rem; } .el-switch { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem; padding: .55rem .8rem; border: 1px solid #285a66; border-radius: 10px; background: #0a202a; font-size: .8rem; color: #a9d0d6; } .el-switch strong { font-size: .9rem; } .el-switch b { color: #f2feff; } .el-switch.alarm { border-color: #9a3c47; }
+
+.el-device-list { display: grid; gap: .5rem; margin-top: .6rem; }
+.el-device { display: grid; grid-template-columns: auto minmax(0, 1.2fr) minmax(0, 1.4fr) auto; align-items: center; gap: .8rem; padding: .55rem .8rem; border: 1px solid #1f4452; border-radius: 10px; background: #0a1c25; }
+.el-device.stale { opacity: .55; }
+.el-device-icon { color: #5df0c4; display: grid; place-items: center; }
+.el-device-title { display: grid; min-width: 0; }
+.el-device-title small { color: #8ea7b2; overflow-wrap: anywhere; }
+.el-device-values { display: flex; flex-wrap: wrap; gap: .3rem .8rem; font-variant-numeric: tabular-nums; font-size: .82rem; }
+.el-device-actions { display: flex; gap: .4rem; }
+@media (max-width: 760px) { .el-device { grid-template-columns: auto minmax(0, 1fr); } .el-device-values, .el-device-actions { grid-column: 1 / -1; } }
