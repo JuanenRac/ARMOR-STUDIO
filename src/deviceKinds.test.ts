@@ -37,6 +37,13 @@ describe("connection presets", () => {
     expect(applyPreset("tasmota", "smart_plug", "t", "").commands.mqtt?.topic).toBe("armor/device/t/cmnd/POWER");
     expect(applyPreset("http", "smart_plug", "x", "192.168.0.7").commands.http?.on).toBe("http://192.168.0.7/relay/0?turn=on");
   });
+  it("describes a relay of an A.R.M.O.R. node by its own topics", () => {
+    const relay = applyPreset("armor_node", "smart_switch", "electrical-1/lights", "");
+    expect(relay.protocol).toBe("wired");
+    expect(relay.source).toEqual({ type: "mqtt", topic: "armor/device/electrical-1/lights/state", availability_topic: "armor/device/electrical-1/lights/availability" });
+    expect(relay.commands.mqtt).toEqual({ topic: "armor/device/electrical-1/lights/set", on: "ON", off: "OFF", toggle: "TOGGLE" });
+    expect(applyPreset("armor_node", "door", "electrical-1/contact", "").commands).toEqual({});   // a sensor has nothing to command
+  });
   it("maps a Zigbee2MQTT contact sensor with the door's inverted contact", () => {
     const source = applyPreset("zigbee2mqtt", "door", "front", "").source;
     expect(source.type === "mqtt" && source.map).toContainEqual({ field: "open", path: "contact", invert: true });
