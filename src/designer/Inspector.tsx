@@ -13,7 +13,8 @@ import { floorFinish } from "./floors";
 import { DEFAULT_DOOR_COLOUR, DEFAULT_FEATURE_COLOUR, DEFAULT_LIGHT_COLOUR, DEFAULT_ROOF_COLOUR, DEFAULT_ROOF_ITEM_COLOUR, DEFAULT_TERRAIN_COLOUR, DEFAULT_WALL_COLOUR, DEFAULT_WINDOW_FRAME_COLOUR, featureColourOf } from "./colors";
 import { toolIcon } from "./icons";
 import { clamp, formatMetres, headingOf, radarView, round2, SENSOR_HEIGHT_M, CAMERA_HEIGHT_M, toMetres, toPercent, toolLabelKey, type Selection, type Tool, cameraZoom, cameraTeleDeg, cameraTeleRangeM } from "./model";
-import { addFloor, moveBuilding, addMastPart, removeMastPart, updateMastPart, deleteBuilding, insertBuildingVertex, insertVertex, isRectangle, moveVertex, removeBuildingVertex, removeFloor, resizeRectangle, setFootprint, setSideLength, updateBuilding, type SiteModel, FLOOR_HEIGHT_M } from "./ops";
+import { mergeBuildings, mergeCandidates, partnersOf, separateBuildings } from "./merge";
+import { addFloor, moveBuilding, moveEdge, moveSide, addMastPart, removeMastPart, updateMastPart, deleteBuilding, insertBuildingVertex, insertVertex, isRectangle, moveVertex, removeBuildingVertex, removeFloor, resizeRectangle, setFootprint, setSideLength, updateBuilding, type SiteModel, FLOOR_HEIGHT_M } from "./ops";
 import type { Point } from "../domain";
 
 /** A colour of an object: the picker starts from what is on screen, and "default" goes back to the object's own look. */
@@ -43,6 +44,37 @@ export type InspectorProps = {
 };
 
 /** Every corner of an outline with its coordinates to edit, a button to add a corner after it and one to remove it. */
+/** Push a wall of an outline in or out by a step: the walls beside it follow, so a rectangle keeps its right angles. */
+function WallMover({ t, points, onMove }: { t: (key: string) => string; points: readonly Point[]; onMove: (edge: number, distance: number) => void }) {
+  const [step, setStep] = useState(0.5);
+  return <>
+    <h4>{t("moveWallsTitle")}</h4>
+    <p className="muted small">{t("moveWallsHelp")}</p>
+    <div className="inspector-grid">
+      <NumberField label={t("moveWallStep")} unit="m" min={0.05} max={20} step={0.05} value={step} onChange={value => setStep(round2(clamp(value, 0.05, 20)))} />
+    </div>
+    <div className="wall-mover">
+      {points.map((_, edge) => <div key={edge} className="wall-mover-row">
+        <span>{`${t("side")} ${edge + 1} · ${formatMetres(edgeOf(points, edge).length)}`}</span>
+        <button type="button" onClick={() => onMove(edge, step)}>{t("moveWallOut")}</button>
+        <button type="button" onClick={() => onMove(edge, -step)}>{t("moveWallIn")}</button>
+      </div>)}
+    </div>
+  </>;
+}
+
+/** The buildings merged with this one, the ones that touch it and could be, and the buttons that do it. */
+function MergePanel({ t, building, model, edit }: { t: (key: string) => string; building: Building; model: SiteModel; edit: (change: (model: SiteModel) => SiteModel, key?: string) => void }) {
+  const partners = partnersOf(model, building), candidates = mergeCandidates(model, building);
+  return <>
+    <h4>{t("mergeTitle")}</h4>
+    <p className="muted small">{t("mergeHelp")}</p>
+    {partners.map(other => <div key={other.id} className="wall-mover-row"><span>{t("mergedWith").replace("{0}", other.name)}</span><button type="button" onClick={() => edit(m => separateBuildings(m, building.id, other.id))}>{t("mergeSeparate")}</button></div>)}
+    {candidates.map(other => <div key={other.id} className="wall-mover-row"><span>{other.name}</span><button type="button" onClick={() => edit(m => mergeBuildings(m, building.id, other.id) ?? m)}>{t("mergeWith").replace("{0}", other.name)}</button></div>)}
+    {partners.length === 0 && candidates.length === 0 && <p className="muted small">{t("mergeNone")}</p>}
+  </>;
+}
+
 function CornerTable({ t, points, selected, onSelect, onMove, onInsert, onRemove, keyPrefix }: {
   t: (key: string) => string; points: readonly Point[]; selected?: number; onSelect: (index: number) => void;
   onMove: (index: number, axis: "x" | "y", value: number, key: string) => void; onInsert: (edge: number) => void; onRemove: (index: number) => void; keyPrefix: string;
@@ -139,6 +171,7 @@ export function Inspector(p: InspectorProps) {
           </>
         : <p className="muted small">{t("terrainShapeNote")}</p>}
       <h4>{t("cornersList")}</h4>
+      <WallMover t={t} points={model.terrain.points} onMove={(edge, distance) => edit(m => ({ ...m, terrain: { ...m.terrain, points: moveEdge(m.terrain.points, edge, distance) } }))} />
       <CornerTable t={t} points={model.terrain.points} selected={selection.vertex} keyPrefix="terrain"
         onSelect={index => p.onSelect({ kind: "terrain", vertex: index })}
         onMove={(index, axis, value, key) => edit(m => ({ ...m, terrain: { points: moveVertex(m.terrain.points, index, { ...m.terrain.points[index], [axis]: value }) } }), key)}
@@ -214,6 +247,8 @@ export function Inspector(p: InspectorProps) {
             <NumberField label={t("widthLabel")} unit="m" min={0.5} step={0.1} value={round2(edgeOf(building.points, 1).length)} onChange={value => edit(m => setFootprint(m, building.id, resizeRectangle(building.points, edgeOf(building.points, 0).length, value)), `building:${building.id}:wid`)} />
           </div>
         : <div className="inspector-grid">{building.points.map((_, edge) => <NumberField key={edge} label={`${t("side")} ${edge + 1}`} unit="m" min={0.1} step={0.1} value={round2(edgeOf(building.points, edge).length)} onChange={value => edit(m => setFootprint(m, building.id, setSideLength(building.points, edge, value)), `building:${building.id}:side${edge}`)} />)}</div>}
+      <WallMover t={t} points={building.points} onMove={(edge, distance) => edit(m => moveSide(m, building.id, edge, distance))} />
+      <MergePanel t={t} building={building} model={model} edit={edit} />
       <h4>{t("cornersList")}</h4>
       <CornerTable t={t} points={building.points} selected={selection.kind === "building" ? selection.vertex : undefined} keyPrefix={`building:${building.id}`}
         onSelect={index => p.onSelect({ kind: "building", id: building.id, vertex: index })}

@@ -71,7 +71,9 @@ export type Building = { id: string; name: string; points: Point[]; base: number
   /** What the building is used for, and what its walls are made of: they describe it, they do not change the drawing. */
   use?: BuildingUse; material?: BuildingMaterial;
   /** The finish and the colour of the floor of each level (index 0 is the ground floor); "" or missing: the plain concrete slab. */
-  floorMaterials?: string[]; floorColors?: string[] };
+  floorMaterials?: string[]; floorColors?: string[];
+  /** The buildings this one is merged with: their touching walls are one wall, and what is cut into it works from both sides. */
+  mergedWith?: string[] };
 
 /** A door, a window, a garage door (wide, sectional) or a plain opening in a wall (for an awning, an arch). */
 export const OPENING_STYLES: Partial<Record<"door" | "window" | "garage" | "opening", readonly string[]>> = {

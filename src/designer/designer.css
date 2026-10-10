@@ -195,3 +195,7 @@
 .floor-finish-list { display: grid; gap: .4rem; }
 .floor-finish-row { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.4fr) auto; align-items: center; gap: .4rem; font-size: .72rem; }
 .floor-finish-row select { min-width: 0; width: 100%; }
+
+/* the handle that pushes a wall in or out */
+.p-wall-handle { stroke: #ffb020; stroke-width: 6; stroke-linecap: round; vector-effect: non-scaling-stroke; cursor: move; opacity: .85; } .p-wall-handle:hover { stroke: #ffd27a; opacity: 1; }
+.wall-mover { display: grid; gap: .3rem; margin: .4rem 0; } .wall-mover-row { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; font-size: .8rem; } .wall-mover-row > span { flex: 1 1 8rem; color: #cfe6ec; }
