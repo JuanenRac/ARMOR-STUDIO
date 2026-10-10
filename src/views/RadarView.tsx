@@ -16,6 +16,7 @@ import type { NodeState } from "../types";
 import type { Translate } from "../components/camera";
 import "./radar-map.css";
 import { MenuTitle } from "../menuLogos";
+import { DesignerLink } from "../components/DesignerLink";
 import { NodeFinder } from "../NodeFinder";
 import type { NetworkOverview } from "../networkModel";
 
@@ -104,6 +105,7 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
         <div className="radar-map-stats"><span><b>{placed.length}</b> {t("targetsLive")}</span><span><b>{counted}</b> {t("legendCounted").toLowerCase()}</span></div>
       </header>
       <p className="muted">{t("radarMapHelp")}</p>
+      <DesignerLink title={t("dlRadarTitle")} text={t("dlRadarText")} button={t("dlSiteButton")} open={openDesigner} />
       <div ref={box} className="radar-map" onWheel={event => { event.preventDefault(); const rect = box.current!.getBoundingClientRect(); zoom(event.deltaY < 0 ? 1.15 : 1 / 1.15, event.clientX - rect.left, event.clientY - rect.top); }}
         onPointerDown={event => { drag.current = { x: event.clientX, y: event.clientY, vx: current.x, vy: current.y }; event.currentTarget.setPointerCapture(event.pointerId); }}
         onPointerMove={event => { const start = drag.current; if (start) setView({ scale: current.scale, x: start.vx + event.clientX - start.x, y: start.vy + event.clientY - start.y }); }}

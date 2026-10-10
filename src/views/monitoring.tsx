@@ -10,6 +10,7 @@ import { GRID_SIZES, type Camera, type GridSize, type View } from "../domain";
 import type { Reachability } from "../api";
 import type { NodeState } from "../types";
 import { MenuTitle } from "../menuLogos";
+import { DesignerLink } from "../components/DesignerLink";
 
 export function OverviewView({ nodes, cameras, setView, t }: { nodes: NodeState[]; cameras: readonly Camera[]; setView: (view: View) => void; t: Translate }) {
   return <>
@@ -46,6 +47,8 @@ export type CameraViewProps = {
   slots: readonly string[]; setSlot: (index: number, id: string) => void;
   /** The settings of the cameras, shown in place of the grid when "Configure cameras" is on. */
   settings: ReactNode;
+  /** Opens the site designer, where the cameras are placed on the plan. */
+  openDesigner?: () => void;
 };
 
 const GRID_GAP = 12;
@@ -118,6 +121,7 @@ export function CameraMonitorView(props: CameraViewProps) {
       <MenuTitle kind="cameras"><p className="eyebrow">{t("videoOperations")}</p><h2>{t("cameraMonitor")}</h2><p className="muted">{t("cameraHelp")}</p></MenuTitle>
       <div className="grid-picker">{!configuring && GRID_SIZES.map(size => <button key={size} className={gridSize === size ? "active" : ""} onClick={() => props.setGridSize(size)}>{size} {size > 1 ? t("views") : t("view")}</button>)}{!configuring && gridSize >= 2 && shown.length >= 2 && <button title={t("cam_wall_help")} onClick={() => setWall(true)}>⛶ {t("cam_wall")}</button>}<button className={configuring ? "active" : ""} onClick={() => setConfiguring(value => !value)}>{configuring ? `‹ ${t("cam_back")}` : `⚙ ${t("cam_configure")}`}</button></div>
     </div>
+    {props.openDesigner && <DesignerLink title={t("dlCamerasTitle")} text={t("dlCamerasText")} button={t("dlSiteButton")} open={props.openDesigner} />}
     {configuring ? <div className="camera-config-frame">{props.settings}</div> : <>
     <div ref={frame.ref} className={`camera-frame ${layout.scrolls ? "scrolls" : ""}`}>
       <div className={`camera-grid grid-${gridSize}`} style={layout.tileWidth > 0 ? { gridTemplateColumns: `repeat(${layout.columns}, ${layout.tileWidth}px)`, gridAutoRows: `${layout.tileHeight}px`, gap: GRID_GAP } : undefined}>
