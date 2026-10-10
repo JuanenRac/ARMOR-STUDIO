@@ -4,7 +4,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import type { Building, Camera, DevicePlacement, Dimensions, Opening, Point, Roof, RoofItem, RoofItemKind, Sensor, SiteFeature, SiteFeatureKind, Terrain, WallLamp, MastPart } from "../domain";
-import { area, bounds, centroid, edgeOf, ensureCounterClockwise, nearestOnOutline, floorBottom, isSimplePolygon, pointInPolygon, rectangle, roofFrame, roofHeight, totalHeight } from "./geometry";
+import { area, bounds, centroid, signedArea, edgeOf, ensureCounterClockwise, nearestOnOutline, floorBottom, isSimplePolygon, pointInPolygon, rectangle, roofFrame, roofHeight, totalHeight } from "./geometry";
 import { toMetres, toPercent, type Selection } from "./model";
 
 export type SiteModel = {
@@ -126,7 +126,7 @@ export function removeBuildingVertex(model: SiteModel, buildingId: string, index
 
 export function deleteBuilding(model: SiteModel, id: string): SiteModel {
   return {
-    ...model, buildings: model.buildings.filter(building => building.id !== id), openings: model.openings.filter(item => item.buildingId !== id),
+    ...model, buildings: model.buildings.filter(building => building.id !== id).map(building => building.mergedWith?.includes(id) ? { ...building, mergedWith: building.mergedWith.filter(other => other !== id).length ? building.mergedWith.filter(other => other !== id) : undefined } : building), openings: model.openings.filter(item => item.buildingId !== id),
     roofItems: model.roofItems.filter(item => item.buildingId !== id), wallLamps: model.wallLamps.filter(item => item.buildingId !== id),
   };
 }
@@ -136,7 +136,7 @@ export function duplicateBuilding(model: SiteModel, id: string, dx = 3, dy = 3):
   const source = model.buildings.find(building => building.id === id);
   if (!source) return null;
   const newId = nextId("building", model.buildings.map(building => building.id));
-  const copy: Building = { ...source, id: newId, name: `${source.name} copy`, points: translatePoints(source.points, dx, dy), floors: [...source.floors], roof: { ...source.roof }, ...(source.floorMaterials ? { floorMaterials: [...source.floorMaterials] } : {}), ...(source.floorColors ? { floorColors: [...source.floorColors] } : {}) };
+  const copy: Building = { ...source, mergedWith: undefined, id: newId, name: `${source.name} copy`, points: translatePoints(source.points, dx, dy), floors: [...source.floors], roof: { ...source.roof }, ...(source.floorMaterials ? { floorMaterials: [...source.floorMaterials] } : {}), ...(source.floorColors ? { floorColors: [...source.floorColors] } : {}) };
   const taken = new Set([...model.openings.map(item => item.id), ...model.roofItems.map(item => item.id), ...model.wallLamps.map(item => item.id)]);
   const fresh = (prefix: string) => { const created = nextId(prefix, taken); taken.add(created); return created; };
   const openings = model.openings.filter(item => item.buildingId === id).map(item => ({ ...item, id: fresh(item.kind), buildingId: newId }));
@@ -369,6 +369,54 @@ export function resizeRectangle(points: readonly Point[], along: number, across:
 export function setSideLength(points: readonly Point[], edge: number, length: number): Point[] {
   const { a, ux, uy } = edgeOf(points, edge), next = (edge + 1) % points.length;
   return moveVertex(points, next, { x: a.x + ux * Math.max(0.1, length), y: a.y + uy * Math.max(0.1, length) });
+}
+
+/**
+ * Move one side of an outline outward (positive) or inward (negative) by `distance`, as a wall is pushed: both its corners slide along the neighbouring sides, so a rectangle stays a
+ * rectangle with its right angles and the opposite wall does not move. Refused (the outline is kept) if the outline would cross itself or the side would vanish.
+ */
+export function moveEdge(points: readonly Point[], edge: number, distance: number): Point[] {
+  if (points.length < 3 || edge < 0 || edge >= points.length || !Number.isFinite(distance) || Math.abs(distance) < 1e-9) return [...points];
+  const n = points.length, i = edge, j = (edge + 1) % n, side = edgeOf(points, edge), prev = edgeOf(points, (i + n - 1) % n), next = edgeOf(points, j);
+  // where the pushed wall's line meets the line of each neighbouring side: the corner slides along that side (a rectangle's neighbours are perpendicular, so it slides straight)
+  const line = { x: side.a.x + side.nx * distance, y: side.a.y + side.ny * distance };
+  const meet = (neighbour: ReturnType<typeof edgeOf>, from: Point): Point | null => {
+    const denominator = neighbour.ux * side.uy - neighbour.uy * side.ux;
+    if (Math.abs(denominator) < 1e-6) return { x: from.x + side.nx * distance, y: from.y + side.ny * distance };   // parallel neighbour: the corner just moves with the wall
+    const t = ((line.x - from.x) * side.uy - (line.y - from.y) * side.ux) / denominator;
+    return { x: from.x + neighbour.ux * t, y: from.y + neighbour.uy * t };
+  };
+  const a = meet(prev, prev.a), b = meet(next, next.a);
+  if (!a || !b) return [...points];
+  const moved = points.map((point, index) => index === i ? { x: round2(a.x), y: round2(a.y) } : index === j ? { x: round2(b.x), y: round2(b.y) } : point);
+  if (!isSimplePolygon(moved) || signedArea(moved) * signedArea(points) <= 0) return [...points];   // crossing itself, or turned inside out by a wall pushed past the opposite one
+  // the wall must not turn round or collapse
+  const after = edgeOf(moved, edge);
+  return after.length < 0.1 || after.ux * side.ux + after.uy * side.uy < 0.5 ? [...points] : moved;
+}
+
+/** Keep every door, window and lamp where it stood in the world when the corners of a building have moved (not where its old offset would now put it). */
+function keepAttachmentsInPlace(model: SiteModel, buildingId: string, before: readonly Point[], after: readonly Point[]): SiteModel {
+  const place = (edge: number, offset: number): number => {
+    if (edge >= before.length || edge >= after.length) return offset;
+    const old = edgeOf(before, edge), now = edgeOf(after, edge);
+    const x = old.a.x + old.ux * offset, y = old.a.y + old.uy * offset;
+    return round2((x - now.a.x) * now.ux + (y - now.a.y) * now.uy);
+  };
+  return {
+    ...model,
+    openings: model.openings.map(opening => opening.buildingId === buildingId ? { ...opening, offset: place(opening.edge, opening.offset) } : opening),
+    wallLamps: model.wallLamps.map(lamp => lamp.buildingId === buildingId ? { ...lamp, offset: place(lamp.edge, lamp.offset) } : lamp),
+  };
+}
+
+/** Push one wall of a building outward (positive) or inward (negative): see `moveEdge`. What is on the walls stays where it was. */
+export function moveSide(model: SiteModel, buildingId: string, edge: number, distance: number): SiteModel {
+  const building = model.buildings.find(item => item.id === buildingId);
+  if (!building) return model;
+  const points = moveEdge(building.points, edge, distance);
+  if (points.every((point, index) => point.x === building.points[index].x && point.y === building.points[index].y)) return model;
+  return setFootprint(keepAttachmentsInPlace(model, buildingId, building.points, points), buildingId, points);
 }
 
 /** Move a building with everything standing on its roof. */

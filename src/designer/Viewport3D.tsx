@@ -20,6 +20,7 @@ import { ICON } from "./icons";
 import { CAMERA_HEIGHT_M, cameraView, clamp, formatMetres, headingOf, radarView, SENSOR_HEIGHT_M, TOOL_GROUPS, toMetres, type Point, type Selection, type Tool } from "./model";
 import { FeatureBody, NEW_FEATURE_KINDS } from "./FeatureMeshes";
 import { floorTexture } from "./floorLooks";
+import { wallPlan } from "./merge";
 import { FLOOR_LOOKS, floorAt, floorFinish } from "./floors";
 import { arrangeToolbox, toolSections } from "./toolItems";
 import type { PlaceHit } from "./Plan2D";
@@ -98,21 +99,24 @@ function openingShape(w: number, h: number, arch: boolean): THREE.Shape {
   return shape;
 }
 
-function OpeningView({ building, opening, selected, hover, xray, hooks }: { building: Building; opening: Opening; selected: boolean; hover: boolean; xray: boolean; hooks: Hooks }) {
+function OpeningView({ building, opening, selected, hover, xray, hooks, bothFaces = false }: { building: Building; opening: Opening; selected: boolean; hover: boolean; xray: boolean; hooks: Hooks; bothFaces?: boolean }) {
   const w = opening.width, h = opening.height, z0 = floorBottom(building.floors, opening.floor) + opening.sill;
   const glow = glowOf(selected, hover), frameColor = selected ? SELECT : (opening.color ?? "#eef6f8"), t = building.thickness, arch = Boolean(opening.arch);
   const leaf = useMemo(() => new THREE.ExtrudeGeometry(openingShape(w - 0.06, h - 0.04, arch), { depth: 0.05, bevelEnabled: false }), [w, h, arch]);
   const glass = useMemo(() => new THREE.ShapeGeometry(openingShape(w, h, arch)), [w, h, arch]);
   const rim = useMemo(() => { const shape = openingShape(w, h, arch), pts = shape.getPoints(24); return [...pts, pts[0]].map(point => [point.x, point.y, t / 2 + 0.01] as [number, number, number]); }, [w, h, arch, t]);
+  const rimBack = useMemo(() => rim.map(([x, y]) => [x, y, -t / 2 - 0.01] as [number, number, number]), [rim, t]);   // a wall with a building on each side: the frame shows on both faces
   return <group position={[opening.offset + w / 2, z0 + h / 2, 0]} {...hooks("opening", opening.id)}>
     {opening.kind === "window"
       ? <>
           <mesh geometry={glass}><meshStandardMaterial color="#8fd8ff" transparent opacity={xray ? 0.2 : 0.38} roughness={0.08} metalness={0.3} depthWrite={false} side={THREE.DoubleSide} {...glow} /></mesh>
           <Line points={rim} color={frameColor} lineWidth={3} />
+          {bothFaces && <Line points={rimBack} color={frameColor} lineWidth={3} />}
           {arch ? null : [[0, h / 2, w, 0.05], [0, -h / 2, w, 0.05], [-w / 2, 0, 0.05, h], [w / 2, 0, 0.05, h], [0, 0, 0.03, h], [0, 0, w, 0.03]].map(([x, y, fw, fh], index) =>
             <mesh key={index} position={[x, y, 0]} castShadow><boxGeometry args={[fw, fh, t * 0.85]} /><meshStandardMaterial color={frameColor} roughness={0.5} /></mesh>)}
           {arch && <mesh position={[0, -h / 2, 0]} castShadow><boxGeometry args={[w, 0.05, t * 0.85]} /><meshStandardMaterial color={frameColor} roughness={0.5} /></mesh>}
           <mesh position={[0, -h / 2 - 0.035, t / 2 + 0.05]} castShadow><boxGeometry args={[w + 0.12, 0.05, 0.14]} /><meshStandardMaterial color="#c5d2d6" roughness={0.7} /></mesh>
+          {bothFaces && <mesh position={[0, -h / 2 - 0.035, -t / 2 - 0.05]} castShadow><boxGeometry args={[w + 0.12, 0.05, 0.14]} /><meshStandardMaterial color="#c5d2d6" roughness={0.7} /></mesh>}
         </>
       : opening.kind === "garage"
       ? <>
@@ -147,7 +151,9 @@ function FloorSlab({ building, floor, geometry, xray, hooks }: { building: Build
   }, [finish.chosen, finish.style, finish.colour]);
   const smooth = finish.style === "flMarble" ? 0.2 : finish.style === "flCeramic" ? 0.3 : 0.9;
   return <mesh geometry={geometry} position={[0, floorBottom(building.floors, floor) - (floor === 0 ? 0.12 : 0.14), 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow {...hooks}>
-    <meshStandardMaterial attach="material-0" color={map ? "#ffffff" : "#aebcc1"} map={map ?? undefined} roughness={map ? smooth : 0.9} transparent={xray} opacity={xray ? 0.3 : 1} depthWrite={!xray} />
+    {/* a chosen finish glows a little with its own pattern: inside a small building the walls shade the whole floor, and the colour that was chosen would not be seen */}
+    <meshStandardMaterial attach="material-0" color={map ? "#ffffff" : "#aebcc1"} map={map ?? undefined} roughness={map ? smooth : 0.9} transparent={xray} opacity={xray ? 0.3 : 1} depthWrite={!xray}
+      {...(map ? { emissive: "#ffffff", emissiveMap: map, emissiveIntensity: 0.55 } : {})} />
     <meshStandardMaterial attach="material-1" color="#aebcc1" roughness={0.9} transparent={xray} opacity={xray ? 0.3 : 1} depthWrite={!xray} />
   </mesh>;
 }
@@ -157,9 +163,13 @@ function BuildingView({ building, model, selected, selection, hoverKey, floorLim
 }) {
   const visible = floorLimit < 0 ? building.floors.length : clamp(floorLimit + 1, 1, building.floors.length);
   const complete = visible === building.floors.length;
-  const holes = model.openings.filter(item => item.buildingId === building.id && item.floor < visible);
-  const shapeKey = JSON.stringify([building.points, building.floors, building.thickness, building.roof, holes, visible]);
-  const walls = useMemo(() => building.points.map((_, edge) => wallGeometry(building, edge, holes.filter(item => item.edge === edge), visible)), [shapeKey]);   // eslint-disable-line react-hooks/exhaustive-deps
+  // merged buildings: the walls they share are built once (by the taller one), the other leaves a gap there, and the openings of both are cut through the one wall
+  const plan = wallPlan(model, building);
+  const own = model.openings.filter(item => item.buildingId === building.id && item.floor < visible && !plan.handedOver.has(item.id));
+  const holes = [...own, ...plan.borrowed];
+  const gaps: Opening[] = plan.cuts.map((cut, index) => ({ id: `gap-${index}`, buildingId: building.id, edge: cut.edge, floor: 0, kind: "opening", offset: cut.from, width: cut.to - cut.from, height: 99, sill: 0 }));
+  const shapeKey = JSON.stringify([building.points, building.floors, building.thickness, building.roof, holes, gaps, visible]);
+  const walls = useMemo(() => building.points.map((_, edge) => wallGeometry(building, edge, [...holes, ...gaps].filter(item => item.edge === edge), visible)), [shapeKey]);   // eslint-disable-line react-hooks/exhaustive-deps
   const slabs = useMemo(() => {
     const shape = new THREE.Shape(building.points.map(point => new THREE.Vector2(point.x, point.y)));
     return new THREE.ExtrudeGeometry(shape, { depth: 0.14, bevelEnabled: false });
@@ -184,7 +194,7 @@ function BuildingView({ building, model, selected, selection, hoverKey, floorLim
         const { a, ux, uy } = edgeOf(building.points, edge);
         return <group key={edge} position={site(a.x, a.y)} rotation={[0, Math.atan2(uy, ux), 0]}>
           <mesh geometry={geometry} castShadow receiveShadow {...bodyHooks}>{wallMaterial}{selected && <Edges color={SELECT} threshold={25} />}</mesh>
-          {holes.filter(item => item.edge === edge).map(opening => <OpeningView key={opening.id} building={building} opening={opening} selected={selection.kind === "opening" && selection.id === opening.id} hover={hoverKey === `opening:${opening.id}`} xray={xray} hooks={hooks} />)}
+          {holes.filter(item => item.edge === edge).map(opening => <OpeningView key={opening.id} bothFaces={plan.twoFaced.has(edge)} building={building} opening={opening} selected={selection.kind === "opening" && selection.id === opening.id} hover={hoverKey === `opening:${opening.id}`} xray={xray} hooks={hooks} />)}
         </group>;
       })}
     </group>}

@@ -21,7 +21,7 @@ import {
 import type { SiteModel } from "./ops";
 
 export type DragTarget =
-  | { kind: "terrain" } | { kind: "terrain-vertex"; index: number }
+  | { kind: "terrain" } | { kind: "terrain-vertex"; index: number } | { kind: "terrain-edge"; edge: number } | { kind: "building-edge"; id: string; edge: number }
   | { kind: "building"; id: string } | { kind: "building-vertex"; id: string; index: number } | { kind: "building-rotate"; id: string }
   | { kind: "opening" | "wall-lamp" | "roof-item" | "feature" | "camera" | "sensor" | "device" | "heading-camera" | "heading-sensor"; id: string };
 
@@ -141,8 +141,8 @@ export function Plan2D(props: PlanProps) {
   const skipOf = (): { terrain?: boolean; building?: string } => {
     const target = drag.current?.target;
     if (!target) return {};
-    if (target.kind === "terrain" || target.kind === "terrain-vertex") return { terrain: true };
-    if (target.kind === "building" || target.kind === "building-vertex" || target.kind === "building-rotate") return { building: target.id };
+    if (target.kind === "terrain" || target.kind === "terrain-vertex" || target.kind === "terrain-edge") return { terrain: true };
+    if (target.kind === "building" || target.kind === "building-vertex" || target.kind === "building-edge" || target.kind === "building-rotate") return { building: target.id };
     return {};
   };
 
@@ -338,6 +338,7 @@ export function Plan2D(props: PlanProps) {
     {terrainSelected && <>
       {model.terrain.points.map((_, index) => { const { a, b } = edgeOf(model.terrain.points, index); const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
         return <circle key={`m${index}`} cx={mid.x} cy={Y(mid.y)} r={6 * inv} className="p-add-handle" onPointerDown={event => { event.stopPropagation(); consumed.current = true; props.onInsertVertex({ kind: "terrain" }, index, mid); }}><title>{t("addCorner")}</title></circle>; })}
+      {model.terrain.points.map((_, index) => wallHandle(index, model.terrain.points, "terrain-edge", { kind: "terrain-edge", edge: index }, { kind: "terrain" }))}
       {model.terrain.points.map((p, index) => <circle key={`v${index}`} cx={p.x} cy={Y(p.y)} r={7 * inv} className={`p-vertex ${selection.kind === "terrain" && selection.vertex === index ? "on" : ""}`}
         onPointerDown={event => beginDrag({ kind: "terrain-vertex", index }, { kind: "terrain", vertex: index }, event)} />)}
     </>}
@@ -415,20 +416,17 @@ export function Plan2D(props: PlanProps) {
     </g>;
   };
 
-  const buildingShape = (building: Building) => {
-    const chosen = selection.kind === "building" && selection.id === building.id;
-    const outer = offsetPolygon(building.points, building.thickness / 2), inner = offsetPolygon(building.points, -building.thickness / 2);
-    const centre = centroid(building.points), edges = building.points.length;
-    const roofPolylines = roofsOn ? roofLines(building.points, building.roof) : [];
-    const overhang = building.roof.overhang > 0.05 ? offsetPolygon(building.points, building.roof.overhang) : null;
-    const rotateHandle = { x: centre.x, y: centre.y + Math.max(1.5, Math.sqrt(Math.abs(signedArea(building.points))) * 0.55) };
-    return <g key={building.id} className={`p-building ${chosen ? "selected" : ""}`}>
-      <path d={path(building.points)} className="p-floor" data-bg={undefined}
-        onPointerDown={event => beginDrag({ kind: "building", id: building.id }, { kind: "building", id: building.id }, event)} />
-      {(() => { const finish = floorFinish(building, Math.min(Math.max(0, activeFloor), building.floors.length - 1)); return finish.chosen ? <path d={path(building.points)} fill={`url(#${floorPatternId(finish.style, finish.colour)})`} className="p-floor-finish" pointerEvents="none" /> : null; })()}
-      <path d={`${path(outer)}${path(inner)}`} className="p-wall-ring" fillRule="evenodd" pointerEvents="none" style={building.color ? { fill: building.color } : undefined} />
-      {overhang && roofsOn && <path d={path(overhang)} className="p-roof-outline" pointerEvents="none" style={building.roofColor ? { stroke: building.roofColor } : undefined} />}
-      {roofPolylines.map((line, index) => <path key={index} d={path(line, false)} className={`p-roof-line ${building.roof.style === "gable" || building.roof.style === "shed" ? "ridge" : ""}`} pointerEvents="none" style={building.roofColor ? { stroke: building.roofColor } : undefined} />)}
+  /** The handle that pushes a wall in or out (a short bar along the wall, a quarter of the way along it): dragging it moves the wall across, and the walls beside it follow, so the right angles stay. */
+  const wallHandle = (index: number, points: readonly Point[], keyPrefix: string, target: DragTarget, selectionOf: Selection) => {
+    const { a, ux, uy, length } = edgeOf(points, index), at = { x: a.x + ux * length * 0.25, y: a.y + uy * length * 0.25 }, half = 8 * inv;
+    return <line key={`${keyPrefix}${index}`} x1={at.x - ux * half} y1={Y(at.y - uy * half)} x2={at.x + ux * half} y2={Y(at.y + uy * half)} className="p-wall-handle"
+      onPointerDown={event => beginDrag(target, selectionOf, event)}><title>{t("moveWall")}</title></line>;
+  };
+
+  /** The doors and windows of a building, drawn after every building so that a neighbour's wall never covers them. */
+  const buildingOpenings = (building: Building) => {
+    const edges = building.points.length;
+    return <g key={`o-${building.id}`}>
       {model.openings.filter(item => item.buildingId === building.id).map(opening => {
         if (opening.edge >= edges) return null;
         const { a, ux, uy, nx, ny } = edgeOf(building.points, opening.edge);
@@ -452,6 +450,23 @@ export function Plan2D(props: PlanProps) {
           <title>{`${t(opening.kind)} · ${t("floorShort")} ${opening.floor + 1} · ${formatMetres(opening.width)} × ${formatMetres(opening.height)} · ${t("openingSill")} ${formatMetres(opening.sill)}`}</title>
         </g>;
       })}
+    </g>;
+  };
+
+  const buildingShape = (building: Building) => {
+    const chosen = selection.kind === "building" && selection.id === building.id;
+    const outer = offsetPolygon(building.points, building.thickness / 2), inner = offsetPolygon(building.points, -building.thickness / 2);
+    const centre = centroid(building.points), edges = building.points.length;
+    const roofPolylines = roofsOn ? roofLines(building.points, building.roof) : [];
+    const overhang = building.roof.overhang > 0.05 ? offsetPolygon(building.points, building.roof.overhang) : null;
+    const rotateHandle = { x: centre.x, y: centre.y + Math.max(1.5, Math.sqrt(Math.abs(signedArea(building.points))) * 0.55) };
+    return <g key={building.id} className={`p-building ${chosen ? "selected" : ""}`}>
+      <path d={path(building.points)} className="p-floor" data-bg={undefined}
+        onPointerDown={event => beginDrag({ kind: "building", id: building.id }, { kind: "building", id: building.id }, event)} />
+      {(() => { const finish = floorFinish(building, Math.min(Math.max(0, activeFloor), building.floors.length - 1)); return finish.chosen ? <path d={path(building.points)} fill={`url(#${floorPatternId(finish.style, finish.colour)})`} className="p-floor-finish" pointerEvents="none" /> : null; })()}
+      <path d={`${path(outer)}${path(inner)}`} className="p-wall-ring" fillRule="evenodd" pointerEvents="none" style={building.color ? { fill: building.color } : undefined} />
+      {overhang && roofsOn && <path d={path(overhang)} className="p-roof-outline" pointerEvents="none" style={building.roofColor ? { stroke: building.roofColor } : undefined} />}
+      {roofPolylines.map((line, index) => <path key={index} d={path(line, false)} className={`p-roof-line ${building.roof.style === "gable" || building.roof.style === "shed" ? "ridge" : ""}`} pointerEvents="none" style={building.roofColor ? { stroke: building.roofColor } : undefined} />)}
       {model.wallLamps.filter(item => item.buildingId === building.id && item.edge < edges).map(lamp => {
         const { a, ux, uy, nx, ny } = edgeOf(building.points, lamp.edge), at = { x: a.x + ux * lamp.offset + nx * (building.thickness / 2), y: a.y + uy * lamp.offset + ny * (building.thickness / 2) };
         const tip = { x: at.x + nx * Math.max(0.25, lamp.reach), y: at.y + ny * Math.max(0.25, lamp.reach) };
@@ -480,6 +495,7 @@ export function Plan2D(props: PlanProps) {
         <path d={path(building.points)} className="p-selection" pointerEvents="none" />
         {building.points.map((_, index) => { const { a, b } = edgeOf(building.points, index), mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
           return <circle key={`m${index}`} cx={mid.x} cy={Y(mid.y)} r={4 * inv} className="p-add-handle" onPointerDown={event => { event.stopPropagation(); consumed.current = true; props.onInsertVertex({ kind: "building", id: building.id }, index, mid); }}><title>{t("addCorner")}</title></circle>; })}
+        {building.points.map((_, index) => wallHandle(index, building.points, "building-edge", { kind: "building-edge", id: building.id, edge: index }, { kind: "building", id: building.id }))}
         {building.points.map((p, index) => <circle key={`v${index}`} cx={p.x} cy={Y(p.y)} r={5.5 * inv} className={`p-vertex ${selection.kind === "building" && selection.vertex === index ? "on" : ""}`}
           onPointerDown={event => beginDrag({ kind: "building-vertex", id: building.id, index }, { kind: "building", id: building.id, vertex: index }, event)} />)}
         <line x1={centre.x} y1={Y(centre.y)} x2={rotateHandle.x} y2={Y(rotateHandle.y)} className="p-rotate-line" pointerEvents="none" />
@@ -590,6 +606,7 @@ export function Plan2D(props: PlanProps) {
         {terrainShape}
         {[...model.features].filter(feature => feature.kind !== "road" && feature.kind !== "path" && feature.kind !== "sidewalk" && feature.kind !== "floor").map(featureShape)}
         {model.buildings.map(buildingShape)}
+        {model.buildings.map(buildingOpenings)}
         {model.sensors.map(sensorShape)}
         {model.placements.map(deviceShape)}
         {model.cameras.map(cameraShape)}

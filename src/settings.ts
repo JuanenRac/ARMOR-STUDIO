@@ -109,12 +109,18 @@ function readFloorFinish(raw: Record<string, unknown>): Pick<Building, "floorMat
   return { ...(styles.some(Boolean) ? { floorMaterials: styles } : {}), ...(colours.some(Boolean) ? { floorColors: colours } : {}) };
 }
 
+/** The ids of the buildings a building is merged with: only well-formed ids, and no more than the buildings a design can hold. */
+function readMergedWith(raw: Record<string, unknown>): Pick<Building, "mergedWith"> {
+  const ids = Array.isArray(raw.mergedWith) ? [...new Set(raw.mergedWith.filter(id).filter(other => other !== raw.id))].slice(0, LIMITS.buildings) : [];
+  return ids.length ? { mergedWith: ids } : {};
+}
+
 function readBuilding(raw: unknown): Building | null {
   if (!isRecord(raw) || !id(raw.id)) return null;
   const name = label(raw.name, 80), points = readPoints(raw.points);
   if (name === null || !points) return null;
   const floors = Array.isArray(raw.floors) ? raw.floors.slice(0, LIMITS.floors).filter(finite).map(height => clamp(height, 0.5, 20)) : [];
-  return { id: raw.id, name, points, base: num(raw, "base", 0, -50, 500), floors: floors.length ? floors : [3], roof: readRoof(raw.roof), thickness: num(raw, "thickness", 0.2, 0.05, 1), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}), ...(readColour(raw.roofColor) ? { roofColor: readColour(raw.roofColor) } : {}), ...(raw.roofHidden === true ? { roofHidden: true } : {}) , ...(oneOf(BUILDING_USES, raw.use) ? { use: oneOf(BUILDING_USES, raw.use) } : {}), ...(oneOf(BUILDING_MATERIALS, raw.material) ? { material: oneOf(BUILDING_MATERIALS, raw.material) } : {}), ...readFloorFinish(raw) };
+  return { id: raw.id, name, points, base: num(raw, "base", 0, -50, 500), floors: floors.length ? floors : [3], roof: readRoof(raw.roof), thickness: num(raw, "thickness", 0.2, 0.05, 1), ...(readColour(raw.color) ? { color: readColour(raw.color) } : {}), ...(readColour(raw.roofColor) ? { roofColor: readColour(raw.roofColor) } : {}), ...(raw.roofHidden === true ? { roofHidden: true } : {}) , ...(oneOf(BUILDING_USES, raw.use) ? { use: oneOf(BUILDING_USES, raw.use) } : {}), ...(oneOf(BUILDING_MATERIALS, raw.material) ? { material: oneOf(BUILDING_MATERIALS, raw.material) } : {}), ...readFloorFinish(raw), ...readMergedWith(raw) };
 }
 
 function readOpening(raw: unknown): Opening | null {
