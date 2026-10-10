@@ -94,8 +94,8 @@ export function deviceProblem(device: StudioDevice): "triggered" | "tamper" | "b
 
 // ---- presets: how a device talks -----------------------------------------------------------------------------------------------------
 
-export type PresetId = "native" | "zigbee2mqtt" | "tasmota" | "shelly" | "push" | "http";
-export const PRESETS: readonly PresetId[] = ["native", "zigbee2mqtt", "tasmota", "shelly", "push", "http"];
+export type PresetId = "native" | "armor_node" | "zigbee2mqtt" | "tasmota" | "shelly" | "push" | "http";
+export const PRESETS: readonly PresetId[] = ["native", "armor_node", "zigbee2mqtt", "tasmota", "shelly", "push", "http"];
 /** Every device of the presets below lives under this prefix of the A.R.M.O.R. broker, which is where its access list lets the server listen. */
 export const DEVICE_PREFIX = "armor/device";
 
@@ -133,6 +133,8 @@ export function applyPreset(preset: PresetId, kind: DeviceKind, name: string, ho
     }
     case "push":
       return { source: { type: "push" }, commands: {} };
+    case "armor_node":   // a relay (or a pin) of an A.R.M.O.R. field node: armor/device/<node>/<relay>/state and /set, the name being "<node>/<relay>"
+      return { protocol: "wired", source: { type: "mqtt", topic: `${base}/state`, availability_topic: `${base}/availability` }, commands: actuator ? { mqtt: { topic: `${base}/set`, on: "ON", off: "OFF", toggle: "TOGGLE" } } : {} };
     default:
       return { source: { type: "mqtt", topic: `${base}/state`, availability_topic: `${base}/availability` }, commands: actuator ? { mqtt: { topic: `${base}/set`, on: "ON", off: "OFF", toggle: "TOGGLE" } } : {} };
   }

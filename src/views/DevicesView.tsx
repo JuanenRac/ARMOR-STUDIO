@@ -112,7 +112,7 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
         <label>{t("deviceLocation")}<input value={form.location} maxLength={80} onChange={event => edit({ location: event.target.value })} /></label>
         <label className="wide">{t("deviceConnection")}<select value={form.preset} onChange={event => edit({ preset: event.target.value as PresetId, advanced: false }, true)}>{PRESETS.map(item => <option key={item} value={item}>{t(`preset_${item}`)}</option>)}</select></label>
         <p className="muted small wide">{t(`presetHelp_${form.preset}`)}</p>
-        {(form.preset === "zigbee2mqtt" || form.preset === "tasmota" || form.preset === "shelly" || form.preset === "native") && <label>{t("presetName")}<input value={form.presetName} placeholder={slug(form.name)} onChange={event => edit({ presetName: event.target.value }, true)} /></label>}
+        {(form.preset === "zigbee2mqtt" || form.preset === "tasmota" || form.preset === "shelly" || form.preset === "native" || form.preset === "armor_node") && <label>{t("presetName")}<input value={form.presetName} placeholder={slug(form.name)} onChange={event => edit({ presetName: event.target.value }, true)} /></label>}
         {form.preset === "http" && <label>{t("presetHost")}<input value={form.host} placeholder="192.168.0.50" onChange={event => edit({ host: event.target.value }, true)} /></label>}
         {ACTUATOR_KINDS.includes(form.kind) && <label>{t("riskLabel")}<select value={form.risk} onChange={event => edit({ risk: event.target.value })}>
           <option value="">{t(`risk_${defaultRiskOf(form.kind)}`)} · {t("default")}</option>
