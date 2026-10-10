@@ -419,6 +419,40 @@ export function moveSide(model: SiteModel, buildingId: string, edge: number, dis
   return setFootprint(keepAttachmentsInPlace(model, buildingId, building.points, points), buildingId, points);
 }
 
+/** The sides of an object that has a width and a depth: its own east and west (along its width) and north and south (along its depth), before it is turned. */
+export type FeatureSide = "east" | "west" | "north" | "south";
+export const MIN_FEATURE_SIDE_M = 0.1;
+
+/**
+ * Pull one side of a rectangular object (a pool, a terrace, a shed...) to `point` (in the site's metres) while the opposite side stays where it is: the width or the depth changes and the
+ * centre moves half of that. The object may be turned: the point is read in its own axes. The side never goes past the opposite one.
+ */
+export function resizeFeatureSide(model: SiteModel, id: string, side: FeatureSide, point: Point): SiteModel {
+  const feature = model.features.find(item => item.id === id);
+  if (!feature) return model;
+  const angle = feature.rotation * Math.PI / 180, cos = Math.cos(angle), sin = Math.sin(angle);
+  const dx = point.x - feature.x, dy = point.y - feature.y;
+  const u = dx * cos + dy * sin, v = -dx * sin + dy * cos;   // the point in the object's own axes
+  let width = feature.width, depth = feature.depth, shiftU = 0, shiftV = 0;
+  if (side === "east" || side === "west") {
+    const fixed = side === "east" ? -feature.width / 2 : feature.width / 2;
+    const moved = side === "east" ? Math.max(u, fixed + MIN_FEATURE_SIDE_M) : Math.min(u, fixed - MIN_FEATURE_SIDE_M);
+    width = Math.abs(moved - fixed);
+    shiftU = (moved + fixed) / 2;
+  } else {
+    const fixed = side === "north" ? -feature.depth / 2 : feature.depth / 2;
+    const moved = side === "north" ? Math.max(v, fixed + MIN_FEATURE_SIDE_M) : Math.min(v, fixed - MIN_FEATURE_SIDE_M);
+    depth = Math.abs(moved - fixed);
+    shiftV = (moved + fixed) / 2;
+  }
+  return {
+    ...model,
+    features: model.features.map(item => item.id === id
+      ? { ...item, width: round2(width), depth: round2(depth), x: round2(item.x + shiftU * cos - shiftV * sin), y: round2(item.y + shiftU * sin + shiftV * cos) }
+      : item),
+  };
+}
+
 /** Move a building with everything standing on its roof. */
 export function moveBuilding(model: SiteModel, id: string, dx: number, dy: number): SiteModel {
   const building = model.buildings.find(item => item.id === id);
