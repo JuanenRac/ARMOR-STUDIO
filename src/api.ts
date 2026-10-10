@@ -498,6 +498,8 @@ export type ServiceState = "running" | "paused" | "stopped" | "failed" | "starti
 export type ServiceInfo = {
   id: string; name: string; family: string; description: string; kind: "systemd" | "field-node"; state: ServiceState; sub_state?: string; unit?: string; enabled?: boolean | null;
   pid?: number | null; since_ms?: number | null; memory_bytes?: number | null; restarts?: number | null; port?: number | null;
+  /** The version of the program, or the firmware of a field node; absent when the server could not tell. */
+  version?: string | null;
 };
 export type ServicesOverview = { time_ms: number; systemd: boolean; services: ServiceInfo[] };
 export const readServices = (origin: string) => userCall<ServicesOverview>(origin, "GET", "/api/v1/system/services");

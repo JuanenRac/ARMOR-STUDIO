@@ -54,6 +54,11 @@ function describe(service: ServiceInfo, t: Translate): string {
   return text === key ? service.description : text;
 }
 
+/** The box under the state of a service that says which version it is (nothing when the server could not tell). */
+export function VersionBadge({ t, version }: { t: Translate; version?: string | null }) {
+  return version ? <span className="svc-version" title={t("svcVersion")}><small>{t("svcVersion")}</small><b>{version}</b></span> : null;
+}
+
 export function ServicesView({ t, origin }: { t: Translate; origin: string }) {
   const poll = usePolled(() => readServices(origin), 5000, origin);
   const [search, setSearch] = useState("");
@@ -130,7 +135,10 @@ export function ServicesView({ t, origin }: { t: Translate; origin: string }) {
         {items.map(service => <article key={service.id} className={`svc-card ${toneOf(service.state)}`}>
           <header>
             <div><strong>{service.name}</strong><small>{describe(service, t)}</small></div>
-            <span className={`svc-state ${toneOf(service.state)}`}><i className="state-dot" /> {t(`svcState_${service.state}`)}</span>
+            <div className="svc-badges">
+              <span className={`svc-state ${toneOf(service.state)}`}><i className="state-dot" /> {t(`svcState_${service.state}`)}</span>
+              <VersionBadge t={t} version={service.version} />
+            </div>
           </header>
           <div className="svc-meta">
             {service.unit && <span title={t("svcUnit")}>{service.unit}</span>}
