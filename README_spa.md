@@ -47,6 +47,7 @@
 * **Siete idiomas** (inglés, español, alemán, francés, italiano, japonés y chino) y dieciséis temas, el predeterminado llamado *Armor*.
 * **Declara tu equipo:** en los menús Inversores y Baterías añades cada inversor o pila de baterías con su nombre, modelo (Voltronic, MPP Solar, Pylontech US2000 / US3000 / US5000, ANT-BMS), conexión (RS232, RS485, USB, CAN, Wi-Fi) y nodo pasarela; espera su primera lectura real y *Ver lecturas de ejemplo* te deja probar el menú mientras tanto.
 * **Diseñador eléctrico:** dibuja el esquema eléctrico de la casa (red, contador, protecciones, conmutadores, distribución, FV, inversores, baterías y cargas, en AC y DC) con puertos y cables, agrúpalo en cuadros, une inversores y baterías con los dispositivos solares que lee el servidor para ver sus valores en directo, y deja que las comprobaciones lo revisen (dos fuentes en una línea, magnetotérmicos y cables frente a la corriente, protecciones que faltan, tensiones DC). El dibujo se guarda en el servidor; es un dibujo: de momento nada maniobra ni mide.
+* **Centrales de alarma:** el menú *Centrales de alarma* muestra lo que dice cada nodo ARMOR-ALARM: si vigila (fuera o en casa), sus zonas y sus últimos eventos, y avisa en el menú Alarmas de una alarma sonando (crítica) o de una zona en sabotaje (alta). Un administrador puede armar y desarmar una central desde allí solo si el servidor (`ARMOR_ALARM_COMMANDS=1`), el nodo y el broker lo permiten; desarmar desde la consola no lleva PIN, así que pregunta antes. No es un sistema de alarma certificado.
 
 ## 🔄 Arquitectura
 

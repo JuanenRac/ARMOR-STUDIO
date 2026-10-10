@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
+import { listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
 import { AboutDialog, ConfirmDialog, HelpDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
 import { DesignVersionsDialog } from "./DesignVersionsDialog";
@@ -13,6 +13,7 @@ import { KnownNodesContext } from "./knownNodes";
 import { StreamRenewContext } from "./streamContext";
 import { CameraFullscreen } from "./components/camera";
 import { ElectricalView } from "./views/ElectricalView";
+import { AlarmPanelsView } from "./views/AlarmPanelsView";
 import { ConfigurationPanel } from "./ConfigurationPanel";
 import { CameraSettings } from "./CameraSettings";
 import { loadLayout, saveLayout } from "./cameraLayout";
@@ -117,10 +118,11 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const automationPoll = usePolled(() => listAutomations(origin), 5000, origin);
   const solarPoll = usePolled(() => listSolar(origin), 4000, origin);
   const electricalPoll = usePolled(() => listElectricalReadings(origin), 4000, origin);
+  const alarmNodesPoll = usePolled(() => listAlarmNodes(origin), 3000, origin);
   const knownNodes = useMemo(() => ({
-    ids: [...nodes.map(node => node.node_id), ...(solarPoll.data?.devices ?? []).map(device => device.node_id), ...(solarPoll.data?.waiting ?? []).map(item => item.node_id), ...(electricalPoll.data?.nodes ?? []).map(item => item.node_id)],
+    ids: [...nodes.map(node => node.node_id), ...(solarPoll.data?.devices ?? []).map(device => device.node_id), ...(solarPoll.data?.waiting ?? []).map(item => item.node_id), ...(electricalPoll.data?.nodes ?? []).map(item => item.node_id), ...(alarmNodesPoll.data?.nodes ?? []).map(item => item.node_id)],
     ips: nodes.flatMap(node => (node.panel ? [node.panel.ip] : [])),
-  }), [nodes, solarPoll.data, electricalPoll.data]);
+  }), [nodes, solarPoll.data, electricalPoll.data, alarmNodesPoll.data]);
   const networkPoll = usePolled(() => listNetwork(origin), 5000, origin);
   const devices = devicePoll.data?.devices ?? [];
   const alarms = alarmPoll.data;
@@ -274,6 +276,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const panels: Record<View, ReactNode> = {
     overview: <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} />,
     alarms: <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} />,
+    alarmPanels: <AlarmPanelsView t={t} origin={origin} nodes={alarmNodesPoll.data ?? null} unreachable={alarmNodesPoll.failed} network={networkPoll.data ?? null} isAdmin={isAdmin} now={now} />,
     electrical: <ElectricalView openDevices={() => setView("devices")} t={t} origin={origin} readings={electricalPoll.data ?? null} unreachable={electricalPoll.failed} design={electrical} openDesigner={() => setView("electricalDesigner")} network={networkPoll.data} now={now} />,
     inverters: <InvertersView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} network={networkPoll.data} />,
     batteries: <BatteriesView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} network={networkPoll.data} />,

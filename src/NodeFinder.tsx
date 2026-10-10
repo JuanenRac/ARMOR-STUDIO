@@ -12,7 +12,7 @@ import "./actionButtons.css";
 import type { Translate } from "./components/camera";
 import type { NetworkOverview } from "./networkModel";
 
-export type NodeKind = "radar" | "solar" | "electrical";
+export type NodeKind = "radar" | "solar" | "electrical" | "alarm";
 export type NodeCandidate = {
   ip: string; mac?: string; hostname?: string; vendor?: string; online: boolean; /** The node id its host name says (a node is called "armor-" and its id), when it does. */ nodeId?: string;
   /** What its own panel says it is (its page title is "A.R.M.O.R. radar/solar/electrical"), when the network node has read it; undefined when it hasn't yet or the answer did not say. */
@@ -24,6 +24,7 @@ function kindIn(text: string): NodeKind | undefined {
   if (text.includes("radar")) return "radar";
   if (text.includes("solar")) return "solar";
   if (text.includes("electric") || text.includes("elec-")) return "electrical";
+  if (text.includes("alarm")) return "alarm";
   return undefined;
 }
 /** The kind of a node: what its own panel says (the banner), and failing that what its name says ("nodo-radar-1" is a radar node) - a node switched off has no banner. */
