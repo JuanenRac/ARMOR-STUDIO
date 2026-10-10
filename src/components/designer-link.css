@@ -1,0 +1,6 @@
+/* The card that opens a designer from a menu: the look of the "nodes and the diagram" card of the Electrical menu, in one row. */
+.designer-link { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: .7rem 1rem; border: 1px solid #1d4b56; border-radius: 14px; background: #08171f; }
+.designer-link-text { display: grid; gap: .15rem; min-width: 0; flex: 1 1 22rem; }
+.designer-link h3 { margin: 0; font-size: .9rem; color: #f2feff; }
+.designer-link p { margin: 0; }
+.designer-link button { flex-shrink: 0; }

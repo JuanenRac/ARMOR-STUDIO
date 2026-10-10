@@ -11,6 +11,7 @@ import { ViewTabs } from "../components/ViewTabs";
 import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
 import { MenuTitle } from "../menuLogos";
+import { DesignerLink } from "../components/DesignerLink";
 import {
   KIND_ICON, NETWORK_KINDS, RISKY_PORTS, deviceName, describeEvent, eventTone, filterDevices, formatAgo, formatBps, formatDateTime, formatDateTimeSeconds, formatDuration, formatTime, internetTone, isKnown,
   kindOf, lastOf, linePath, type NetworkDevice, type NetworkNode, type NetworkOverview, type NetworkSample,
@@ -140,7 +141,7 @@ function DeviceDetail({ t, origin, node, device, isAdmin, reload, now, close, st
   </aside>;
 }
 
-export function NetworkView({ t, origin, isAdmin, overview, reload, now }: { t: Translate; origin: string; isAdmin: boolean; overview: NetworkOverview | null; reload: () => void; now: number }) {
+export function NetworkView({ openDesigner, t, origin, isAdmin, overview, reload, now }: { openDesigner?: () => void; t: Translate; origin: string; isAdmin: boolean; overview: NetworkOverview | null; reload: () => void; now: number }) {
   const [tab, setTab] = useState<Tab>("devices");
   const [showOutages, setShowOutages] = useState(false);
   const [query, setQuery] = useState(""), [kind, setKind] = useState(""), [onlyUnknown, setOnlyUnknown] = useState(false), [onlyOffline, setOnlyOffline] = useState(false);
@@ -164,6 +165,7 @@ export function NetworkView({ t, origin, isAdmin, overview, reload, now }: { t: 
 
   return <section className="network-view">
     <header className="devices-head"><MenuTitle kind="network"><p className="eyebrow">{t("net_title")}</p><h2>{t("network")}</h2><p className="muted">{t("net_help")}</p></MenuTitle></header>
+    {openDesigner && <DesignerLink title={t("dlNetworkTitle")} text={t("dlNetworkText")} button={t("dlNetworkButton")} open={openDesigner} />}
     {!node && <p className="muted net-empty">{t("net_no_nodes")}</p>}
     {node && internet && <>
       {node.stale && <p className="net-warning" role="alert">{t("net_node_stale")}</p>}
