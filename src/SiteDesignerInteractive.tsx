@@ -414,7 +414,7 @@ export function SiteDesignerInteractive(props: Props) {
             </Suspense>}
         {props.notice && props.notice !== t("configuration") && <p className="notice canvas-notice">{props.notice}</p>}
       </div>
-      <Inspector t={t} dimensions={dimensions} setDimensions={setWorkArea} model={model} selection={selection} edit={edit} onSelect={select} onRemove={removeCurrent} onDuplicate={duplicateCurrent} onRectTerrain={setRectTerrain} nodeIds={props.nodeIds} onTool={setTool} devices={props.devices} pendingDevice={pending} onPickDevice={id => { setPending(id); setTool("device"); props.setNotice(`${t("clickToPlaceDevice")}: ${props.devices.find(item => item.id === id)?.name ?? id}`); }} onOpenDevices={props.openDevices} />
+      <Inspector t={t} showFloor={setActiveFloor} dimensions={dimensions} setDimensions={setWorkArea} model={model} selection={selection} edit={edit} onSelect={select} onRemove={removeCurrent} onDuplicate={duplicateCurrent} onRectTerrain={setRectTerrain} nodeIds={props.nodeIds} onTool={setTool} devices={props.devices} pendingDevice={pending} onPickDevice={id => { setPending(id); setTool("device"); props.setNotice(`${t("clickToPlaceDevice")}: ${props.devices.find(item => item.id === id)?.name ?? id}`); }} onOpenDevices={props.openDevices} />
     </div>
   </section>;
 }

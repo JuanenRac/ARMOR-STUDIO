@@ -12,8 +12,8 @@ import { area, bounds, edgeOf, floorBottom, isSimplePolygon, nearestOnOutline, p
 import { floorFinish } from "./floors";
 import { DEFAULT_DOOR_COLOUR, DEFAULT_FEATURE_COLOUR, DEFAULT_LIGHT_COLOUR, DEFAULT_ROOF_COLOUR, DEFAULT_ROOF_ITEM_COLOUR, DEFAULT_TERRAIN_COLOUR, DEFAULT_WALL_COLOUR, DEFAULT_WINDOW_FRAME_COLOUR, featureColourOf } from "./colors";
 import { toolIcon } from "./icons";
-import { clamp, formatMetres, headingOf, radarView, round2, SENSOR_HEIGHT_M, CAMERA_HEIGHT_M, toolLabelKey, type Selection, type Tool, cameraZoom, cameraTeleDeg, cameraTeleRangeM } from "./model";
-import { addFloor, addMastPart, removeMastPart, updateMastPart, deleteBuilding, insertBuildingVertex, insertVertex, isRectangle, moveVertex, removeBuildingVertex, removeFloor, resizeRectangle, setFootprint, setSideLength, updateBuilding, type SiteModel, FLOOR_HEIGHT_M } from "./ops";
+import { clamp, formatMetres, headingOf, radarView, round2, SENSOR_HEIGHT_M, CAMERA_HEIGHT_M, toMetres, toPercent, toolLabelKey, type Selection, type Tool, cameraZoom, cameraTeleDeg, cameraTeleRangeM } from "./model";
+import { addFloor, moveBuilding, addMastPart, removeMastPart, updateMastPart, deleteBuilding, insertBuildingVertex, insertVertex, isRectangle, moveVertex, removeBuildingVertex, removeFloor, resizeRectangle, setFootprint, setSideLength, updateBuilding, type SiteModel, FLOOR_HEIGHT_M } from "./ops";
 import type { Point } from "../domain";
 
 /** A colour of an object: the picker starts from what is on screen, and "default" goes back to the object's own look. */
@@ -31,6 +31,8 @@ function NumberField({ label, unit, value, min, max, step = 0.05, onChange }: Fi
 export type InspectorProps = {
   t: (key: string) => string;
   dimensions: Dimensions; setDimensions: (value: Dimensions) => void;
+  /** Puts the floor bar on a level, to see what is being changed on it. */
+  showFloor?: (floor: number) => void;
   model: SiteModel; selection: Selection; edit: Edit; onSelect: (selection: Selection) => void;
   onRemove: () => void; onDuplicate: () => void; onRectTerrain: (width: number, depth: number) => void;
   /** The field nodes the server knows. */
@@ -87,6 +89,15 @@ export function Inspector(p: InspectorProps) {
   const setCamera = (id: string, patch: Partial<Camera>, field: string) => edit(m => ({ ...m, cameras: m.cameras.map(item => item.id === id ? { ...item, ...patch } : item) }), `camera:${id}:${field}`);
   const setSensor = (id: string, patch: Partial<Sensor>, field: string) => edit(m => ({ ...m, sensors: m.sensors.map(item => item.id === id ? { ...item, ...patch } : item) }), `sensor:${id}:${field}`);
   const setBuilding = (id: string, patch: Partial<Building>, field: string) => edit(m => updateBuilding(m, id, patch), `building:${id}:${field}`);
+  /** X and Y in metres of a camera or a radar (stored as a percentage of the work area): the same coordinates as every other object. */
+  const positionFields = (item: Camera | Sensor, apply: (patch: { x: number; y: number }) => void) => {
+    const at = toMetres(item, p.dimensions);
+    const put = (point: { x: number; y: number }) => apply(toPercent(point, p.dimensions));
+    return <>
+      <NumberField label="X" unit="m" step={0.1} min={0} max={p.dimensions.width} value={round2(at.x)} onChange={value => put({ x: clamp(value, 0, p.dimensions.width), y: at.y })} />
+      <NumberField label="Y" unit="m" step={0.1} min={0} max={p.dimensions.depth} value={round2(at.y)} onChange={value => put({ x: at.x, y: clamp(value, 0, p.dimensions.depth) })} />
+    </>;
+  };
   const heading = (item: Camera | Sensor, apply: (value: number) => void) =>
     <NumberField label={t("deviceHeading")} unit="°" step={5} value={Math.round(headingOf(item, p.dimensions))} onChange={value => apply(((value % 360) + 360) % 360)} />;
   const remove = <button className="danger-button" onClick={p.onRemove}>{t("deleteObject")}</button>;
@@ -145,6 +156,8 @@ export function Inspector(p: InspectorProps) {
       <div className="color-row"><ColorField t={t} label={t("colorWalls")} value={building.color} fallback={DEFAULT_WALL_COLOUR} onChange={value => setBuilding(building.id, { color: value }, "color")} /><ColorField t={t} label={t("colorRoof")} value={building.roofColor} fallback={DEFAULT_ROOF_COLOUR} onChange={value => setBuilding(building.id, { roofColor: value }, "roofColor")} /></div>
       <div className="inspector-grid">
         <label>{t("deviceName")}<input value={building.name} maxLength={60} onChange={event => setBuilding(building.id, { name: event.target.value }, "name")} /></label>
+        <NumberField label={`X (${t("centre")})`} unit="m" step={0.1} value={round2((bounds(building.points).minX + bounds(building.points).maxX) / 2)} onChange={value => edit(m => moveBuilding(m, building.id, value - (bounds(building.points).minX + bounds(building.points).maxX) / 2, 0), `building:${building.id}:x`)} />
+        <NumberField label={`Y (${t("centre")})`} unit="m" step={0.1} value={round2((bounds(building.points).minY + bounds(building.points).maxY) / 2)} onChange={value => edit(m => moveBuilding(m, building.id, 0, value - (bounds(building.points).minY + bounds(building.points).maxY) / 2), `building:${building.id}:y`)} />
         <NumberField label={t("groundElevation")} unit="m" step={0.1} min={-5} max={200} value={building.base} onChange={value => setBuilding(building.id, { base: round2(clamp(value, -5, 200)) }, "base")} />
         <NumberField label={t("wallThickness")} unit="m" step={0.05} min={0.1} max={1.5} value={building.thickness} onChange={value => setBuilding(building.id, { thickness: round2(clamp(value, 0.1, 1.5)) }, "thickness")} />
         <label>{t("buildingUse")}<select value={building.use ?? "house"} onChange={event => setBuilding(building.id, { use: event.target.value === "house" ? undefined : event.target.value as BuildingUse }, "use")}>{BUILDING_USES.map(use => <option key={use} value={use}>{t("buildingUse_" + use)}</option>)}</select></label>
@@ -177,11 +190,11 @@ export function Inspector(p: InspectorProps) {
           };
           return <div key={floor} className="floor-finish-row">
             <span>{floor === 0 ? t("groundFloor") : `${t("floor")} ${floor + 1}`}</span>
-            <select value={finish.chosen ? finish.style : ""} aria-label={`${t("floorFinish")} ${floor + 1}`} onChange={event => setBuilding(building.id, { floorMaterials: put(building.floorMaterials, event.target.value), ...(event.target.value === "" ? { floorColors: put(building.floorColors, "") } : {}) }, `floorMaterial${floor}`)}>
+            <select value={finish.chosen ? finish.style : ""} aria-label={`${t("floorFinish")} ${floor + 1}`} onChange={event => { p.showFloor?.(floor); setBuilding(building.id, { floorMaterials: put(building.floorMaterials, event.target.value), ...(event.target.value === "" ? { floorColors: put(building.floorColors, "") } : {}) }, `floorMaterial${floor}`); }}>
               <option value="">{t("floorDefault")}</option>
               {FLOOR_STYLES.map(style => <option key={style} value={style}>{t(`style_${style}`)}</option>)}
             </select>
-            {finish.chosen && <ColorField t={t} label={t("colorLabel")} value={building.floorColors?.[floor] || undefined} fallback={finish.colour} onChange={value => setBuilding(building.id, { floorColors: put(building.floorColors, value ?? "") }, `floorColor${floor}`)} />}
+            {finish.chosen && <ColorField t={t} label={t("colorLabel")} value={building.floorColors?.[floor] || undefined} fallback={finish.colour} onChange={value => { p.showFloor?.(floor); setBuilding(building.id, { floorColors: put(building.floorColors, value ?? "") }, `floorColor${floor}`); }} />}
           </div>;
         })}
       </div>
@@ -321,6 +334,7 @@ export function Inspector(p: InspectorProps) {
       <h4>{t("toolCamera")}</h4>
       <div className="inspector-grid">
         {heading(camera, value => setCamera(camera.id, { heading: value }, "heading"))}
+        {positionFields(camera, patch => setCamera(camera.id, patch, "position"))}
         <NumberField label={t("tiltDown")} unit="°" min={-90} max={90} step={5} value={camera.tilt ?? 0} onChange={value => setCamera(camera.id, { tilt: clamp(value, -90, 90) || undefined }, "tilt")} />
         <NumberField label={t("mountHeight")} unit="m" min={0} max={100} step={0.1} value={camera.z ?? CAMERA_HEIGHT_M} onChange={value => setCamera(camera.id, { z: round2(clamp(value, 0, 100)) }, "z")} />
         <label>{t("cameraKind")}<select value={camera.kind === "ptz" ? "ptz" : "fixed"} onChange={event => setCamera(camera.id, event.target.value === "ptz" ? { kind: "ptz" } : { kind: undefined, pan: undefined, tiltSweep: undefined }, "kind")}><option value="fixed">{t("cameraKindFixed")}</option><option value="ptz">{t("cameraKindPtz")}</option></select></label>
@@ -345,6 +359,7 @@ export function Inspector(p: InspectorProps) {
         <label>{t("deviceName")}<input value={sensor.name} maxLength={80} onChange={event => setSensor(sensor.id, { name: event.target.value }, "name")} /></label>
         <label>{t("sensorModel")}<select value={sensor.kind} onChange={event => setSensor(sensor.id, { kind: event.target.value === "LD2461" ? "LD2461" : "LD2450" }, "kind")}><option value="LD2450">LD2450</option><option value="LD2461">LD2461</option></select></label>
         {heading(sensor, value => setSensor(sensor.id, { heading: value }, "heading"))}
+        {positionFields(sensor, patch => setSensor(sensor.id, patch, "position"))}
         <NumberField label={t("tiltDown")} unit="°" min={-90} max={90} step={5} value={sensor.tilt ?? 0} onChange={value => setSensor(sensor.id, { tilt: clamp(value, -90, 90) || undefined }, "tilt")} />
         <NumberField label={t("mountHeight")} unit="m" min={0} max={100} step={0.1} value={sensor.z ?? SENSOR_HEIGHT_M} onChange={value => setSensor(sensor.id, { z: round2(clamp(value, 0, 100)) }, "z")} />
         <label title={t("sensorNodeHelp")}>{t("sensorNode")}<input list="armor-node-ids" value={sensor.node ?? ""} placeholder={t("noNodeChosen")} maxLength={64} onChange={event => { const value = event.target.value.trim().toLowerCase(); setSensor(sensor.id, { node: value === "" ? undefined : value }, "node"); }} /></label>
