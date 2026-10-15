@@ -1,0 +1,181 @@
+/**
+ * Alarm Designer operations: every edit the designer makes, as a pure function from one design to the next, so they are testable and the undo history is simply the list of
+ * designs.
+ * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
+ */
+import { nextId } from "../designer/ops";
+import type { FrameColour } from "../electrical/model";
+import { GRID, isKind, kindDef, portOf, rotationOf, sizeOf, snap, type Binding, type Design, type Element, type Frame, type PortRef, type PropDef, type PropValue, type Wire } from "./model";
+
+const MAX_ELEMENTS = 400, MAX_WIRES = 800, MAX_FRAMES = 60;
+export const LIMITS = { elements: MAX_ELEMENTS, wires: MAX_WIRES, frames: MAX_FRAMES } as const;
+const clampNumber = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
+
+/** A value for a property, kept inside what the property allows; undefined when it cannot be one. */
+export function cleanProp(def: PropDef, value: unknown): PropValue | undefined {
+  if (def.type === "number") return typeof value === "number" && Number.isFinite(value) ? clampNumber(Math.round(value * 1000) / 1000, def.min, def.max) : undefined;
+  if (def.type === "text") return typeof value === "string" ? value.slice(0, def.max) : undefined;
+  return typeof value === "string" && def.choices.includes(value) ? value : undefined;
+}
+
+export function addElement(design: Design, kind: string, x: number, y: number, name = "", props: Record<string, PropValue> = {}, bind?: Binding): { design: Design; id: string } | undefined {
+  const def = kindDef(kind);
+  if (!def || design.elements.length >= MAX_ELEMENTS) return undefined;
+  const id = nextId(kind, design.elements.map(element => element.id));
+  const clean: Record<string, PropValue> = { ...def.defaults };
+  for (const prop of def.props) { const value = cleanProp(prop, props[prop.key]); if (value !== undefined) clean[prop.key] = value; }
+  const element: Element = { id, kind, x: snap(x), y: snap(y), name: name.slice(0, 60), props: clean, ...(bind && (bind.node || bind.zone) ? { bind } : {}) };
+  return { design: { ...design, elements: [...design.elements, element] }, id };
+}
+
+export function moveElement(design: Design, id: string, x: number, y: number): Design {
+  return { ...design, elements: design.elements.map(element => element.id === id ? { ...element, x: snap(x), y: snap(y) } : element) };
+}
+
+export function nudgeElements(design: Design, ids: readonly string[], dx: number, dy: number): Design {
+  return { ...design, elements: design.elements.map(element => ids.includes(element.id) ? { ...element, x: element.x + dx, y: element.y + dy } : element) };
+}
+
+export function renameElement(design: Design, id: string, name: string): Design {
+  return { ...design, elements: design.elements.map(element => element.id === id ? { ...element, name: name.slice(0, 60) } : element) };
+}
+
+/** Set one property of an element; a value the property does not allow leaves it as it was. */
+export function setProp(design: Design, id: string, key: string, value: unknown): Design {
+  const element = design.elements.find(item => item.id === id), def = element && kindDef(element.kind)?.props.find(prop => prop.key === key);
+  if (!element || !def) return design;
+  const clean = cleanProp(def, value);
+  if (clean === undefined) return design;
+  const changed = { ...design, elements: design.elements.map(item => item.id === id ? { ...item, props: { ...item.props, [key]: clean } } : item) };
+  return dropDeadWires(changed);
+}
+
+/** The links whose port no longer exists (an element turned into another kind) are removed. */
+export function dropDeadWires(design: Design): Design {
+  const byId = new Map(design.elements.map(element => [element.id, element]));
+  const alive = design.wires.filter(wire => { const a = byId.get(wire.from.element), b = byId.get(wire.to.element); return a && b && portOf(a, wire.from.port) && portOf(b, wire.to.port); });
+  return alive.length === design.wires.length ? design : { ...design, wires: alive };
+}
+
+/** Turn an element a quarter turn clockwise; its links stay joined to the same ports. */
+export function rotateElement(design: Design, id: string): Design {
+  return { ...design, elements: design.elements.map(element => element.id === id ? { ...element, rot: (rotationOf(element) + 90) % 360 } : element) };
+}
+
+/**
+ * Put another kind of device in the place of this one: its name, address, maker and notes stay, and every link whose port exists in the new kind with the same medium stays
+ * joined; the others are dropped.
+ */
+export function replaceKind(design: Design, id: string, kind: string): Design {
+  const source = design.elements.find(element => element.id === id), def = kindDef(kind);
+  if (!source || !def || source.kind === kind) return design;
+  const props: Record<string, PropValue> = { ...def.defaults };
+  for (const prop of def.props) { const value = cleanProp(prop, source.props[prop.key]); if (value !== undefined) props[prop.key] = value; }
+  const next: Element = { ...source, kind, props };
+  const elements = design.elements.map(element => element.id === id ? next : element);
+  const before = new Map(design.elements.map(element => [element.id, element]));
+  const wires = design.wires.filter(wire => [wire.from, wire.to].every(ref => {
+    if (ref.element !== id) return true;
+    const was = portOf(source, ref.port), now = portOf(next, ref.port);
+    return Boolean(was && now && was.medium === now.medium);
+  }) && before.has(wire.from.element));
+  return { ...design, elements, wires };
+}
+
+const BIND_ID = /^[a-z0-9][a-z0-9_-]{0,63}$/;
+/**
+ * Tie an element to a real panel (its node id) and, for a sensor, to one of its zones - or untie it. A panel belongs to one central at most, and a zone of a panel to one sensor at most:
+ * tying it again takes it from the element that had it.
+ */
+export function setBinding(design: Design, id: string, node: string | undefined, zone?: string): Design {
+  const cleanNode = node && BIND_ID.test(node) ? node : undefined, cleanZone = cleanNode && zone && BIND_ID.test(zone) ? zone : undefined;
+  return { ...design, elements: design.elements.map(element => {
+    if (element.id === id) { const { bind: _dropped, ...rest } = element; return cleanNode ? { ...rest, bind: { node: cleanNode, ...(cleanZone ? { zone: cleanZone } : {}) } } : rest; }
+    const same = cleanNode && element.bind?.node === cleanNode && (element.bind.zone ?? "") === (cleanZone ?? "");
+    if (same) { const { bind: _taken, ...rest } = element; return rest; }
+    return element;
+  }) };
+}
+
+export function removeElement(design: Design, id: string): Design {
+  return { ...design, elements: design.elements.filter(element => element.id !== id), wires: design.wires.filter(wire => wire.from.element !== id && wire.to.element !== id) };
+}
+
+export function duplicateElement(design: Design, id: string): { design: Design; id: string } | undefined {
+  const source = design.elements.find(element => element.id === id);
+  if (!source || design.elements.length >= MAX_ELEMENTS) return undefined;
+  const copyId = nextId(source.kind, design.elements.map(element => element.id));
+  const copy: Element = { ...source, id: copyId, x: source.x + GRID * 2, y: source.y + GRID * 2, props: { ...source.props } };
+  delete copy.bind;
+  if (typeof copy.props.node_id === "string") copy.props.node_id = "";     // a second panel with the same node would be a mistake
+  return { design: { ...design, elements: [...design.elements, copy] }, id: copyId };
+}
+
+// ---- links --------------------------------------------------------------------------------------------------------------------------
+
+export type ConnectError = "unknown_port" | "same_element" | "medium" | "busy" | "exists" | "too_many";
+const samePort = (a: PortRef, b: PortRef): boolean => a.element === b.element && a.port === b.port;
+
+/** Can these two ports be joined? The reason when they cannot. */
+export function canConnect(design: Design, from: PortRef, to: PortRef): ConnectError | undefined {
+  const a = design.elements.find(element => element.id === from.element), b = design.elements.find(element => element.id === to.element);
+  const pa = a && portOf(a, from.port), pb = b && portOf(b, to.port);
+  if (!a || !b || !pa || !pb) return "unknown_port";
+  if (a.id === b.id) return "same_element";
+  if (pa.medium !== pb.medium) return "medium";
+  if (design.wires.some(wire => (samePort(wire.from, from) && samePort(wire.to, to)) || (samePort(wire.from, to) && samePort(wire.to, from)))) return "exists";
+  const used = (ref: PortRef) => design.wires.some(wire => samePort(wire.from, ref) || samePort(wire.to, ref));
+  if ((!pa.multi && used(from)) || (!pb.multi && used(to))) return "busy";
+  if (design.wires.length >= MAX_WIRES) return "too_many";
+  return undefined;
+}
+
+export function connect(design: Design, from: PortRef, to: PortRef): { ok: true; design: Design; id: string } | { ok: false; error: ConnectError } {
+  const error = canConnect(design, from, to);
+  if (error) return { ok: false, error };
+  const id = nextId("link", design.wires.map(wire => wire.id));
+  const wire: Wire = { id, from, to };
+  return { ok: true, design: { ...design, wires: [...design.wires, wire] }, id };
+}
+
+export function removeWire(design: Design, id: string): Design { return { ...design, wires: design.wires.filter(wire => wire.id !== id) }; }
+
+export function updateWire(design: Design, id: string, patch: { length_m?: number | null; label?: string }): Design {
+  return { ...design, wires: design.wires.map(wire => {
+    if (wire.id !== id) return wire;
+    const next: Wire = { ...wire };
+    if (patch.length_m !== undefined) { if (patch.length_m === null) delete next.length_m; else next.length_m = clampNumber(patch.length_m, 0, 5000); }
+    if (patch.label !== undefined) { if (patch.label === "") delete next.label; else next.label = patch.label.slice(0, 40); }
+    return next;
+  }) };
+}
+
+// ---- frames --------------------------------------------------------------------------------------------------------------------------
+
+export function addFrame(design: Design, x: number, y: number, w = 360, h = 240, name = ""): { design: Design; id: string } | undefined {
+  if (design.frames.length >= MAX_FRAMES) return undefined;
+  const id = nextId("frame", design.frames.map(frame => frame.id));
+  const frame: Frame = { id, name: name.slice(0, 60), x: snap(x), y: snap(y), w: Math.max(80, snap(w)), h: Math.max(60, snap(h)), colour: "cyan" };
+  return { design: { ...design, frames: [...design.frames, frame] }, id };
+}
+export function updateFrame(design: Design, id: string, patch: Partial<Pick<Frame, "name" | "x" | "y" | "w" | "h" | "colour">>): Design {
+  return { ...design, frames: design.frames.map(frame => {
+    if (frame.id !== id) return frame;
+    const next: Frame = { ...frame };
+    if (patch.name !== undefined) next.name = patch.name.slice(0, 60);
+    if (patch.x !== undefined) next.x = snap(patch.x);
+    if (patch.y !== undefined) next.y = snap(patch.y);
+    if (patch.w !== undefined) next.w = Math.max(80, snap(patch.w));
+    if (patch.h !== undefined) next.h = Math.max(60, snap(patch.h));
+    if (patch.colour !== undefined) next.colour = patch.colour as FrameColour;
+    return next;
+  }) };
+}
+export function removeFrame(design: Design, id: string): Design { return { ...design, frames: design.frames.filter(frame => frame.id !== id) }; }
+
+/** The elements whose box lies inside a frame (so moving the frame can carry them along). */
+export function elementsInFrame(design: Design, frame: Frame): string[] {
+  return design.elements.filter(element => { const { w, h } = sizeOf(element); return w > 0 && element.x >= frame.x && element.y >= frame.y && element.x + w <= frame.x + frame.w && element.y + h <= frame.y + frame.h; }).map(element => element.id);
+}
+
+export const isPlaceable = (kind: string): boolean => isKind(kind);

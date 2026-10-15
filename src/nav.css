@@ -1,8 +1,21 @@
 /* The sidebar in groups, and the badge of alarms waiting. */
 .nav-group { display: grid; gap: .3rem; } .sidebar nav { gap: 1rem; }
-.nav-group-title { padding: 0 .8rem; color: #5d8590; font: 700 .55rem "DM Mono", ui-monospace, monospace; letter-spacing: .26em; text-transform: uppercase; }
+.nav-group-title { display: flex; align-items: center; gap: .35rem; width: 100%; padding: .1rem .8rem; border: 0; background: none; cursor: pointer; text-align: left; color: #5d8590; font: 700 .55rem "DM Mono", ui-monospace, monospace; letter-spacing: .26em; text-transform: uppercase; }
+.nav-group-title:hover { color: #9fd8e3; } .nav-group-title i { font-style: normal; width: .8rem; } .nav-group-title .nav-badge { margin-left: auto; letter-spacing: 0; }
+.nav-items { display: grid; gap: .3rem; } .nav-group.folded .nav-items { display: none; }
+/* a collapsed menu (icons only) and the small screens have no titles to unfold with: every screen stays reachable */
+.sidebar-collapsed .nav-group.folded .nav-items { display: grid; }
 nav button { position: relative; } .nav-badge { margin-left: auto; min-width: 20px; padding: .1rem .38rem; border-radius: 999px; background: #e11d48; color: #fff; font-size: .62rem; text-align: center; animation: nav-blink 1.3s ease-in-out infinite; }
 @keyframes nav-blink { 50% { opacity: .55; } } @media (prefers-reduced-motion: reduce) { .nav-badge { animation: none; } }
 .sidebar-collapsed .nav-group-title { display: none; } .sidebar-collapsed .nav-badge { position: absolute; top: 2px; right: 6px; min-width: 16px; padding: 0 .25rem; }
-@media (max-width: 800px) { .sidebar nav { display: flex; overflow-x: auto; gap: .6rem; } .nav-group { display: flex; gap: .3rem; align-items: center; } .nav-group-title { display: none; } }
+@media (max-width: 800px) { .sidebar nav { display: flex; overflow-x: auto; gap: .6rem; } .nav-group { display: flex; gap: .3rem; align-items: center; } .nav-group-title { display: none; } .nav-group.folded .nav-items { display: grid; } .nav-items { display: flex; gap: .3rem; } }
 .site-sync { padding: .35rem .5rem; border-radius: 8px; border: 1px solid #285a66; color: #7ee7ff; } .site-sync.saving { color: #ffcf7d; border-color: #7a5a1c; } .site-sync.offline { color: #ff8e99; border-color: #974b55; }
+
+/* The side menu is a little wider, a name stays on one line (the whole name is in the tooltip), and when the screen is short the list of screens scrolls on its own while the brand and the connection state stay in view. */
+.studio-frame .sidebar { min-height: 0; overflow: hidden; }
+.studio-frame .sidebar nav { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; padding-right: .15rem; }
+.studio-frame .sidebar nav button em { min-width: 0; flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-style: normal; }
+.studio-frame .sidebar nav button { min-width: 0; }
+.studio-frame .sidebar .sidebar-foot { flex: 0 0 auto; }
+.studio-frame .nav-group-title span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 800px) { .studio-frame .sidebar nav { overflow-y: visible; overflow-x: auto; } .studio-frame .sidebar nav button em { overflow: visible; } }

@@ -16,6 +16,8 @@ import { clamp, formatMetres, headingOf, radarView, round2, SENSOR_HEIGHT_M, CAM
 import { mergeBuildings, mergeCandidates, partnersOf, separateBuildings } from "./merge";
 import { addFloor, moveBuilding, moveEdge, moveSide, addMastPart, removeMastPart, updateMastPart, deleteBuilding, insertBuildingVertex, insertVertex, isRectangle, moveVertex, removeBuildingVertex, removeFloor, resizeRectangle, setFootprint, setSideLength, updateBuilding, type SiteModel, FLOOR_HEIGHT_M } from "./ops";
 import type { Point } from "../domain";
+import { FeatureLinkField, type LinkSources } from "./FeatureLink";
+import { BLOCK_LIMITS, blockFits, generateApartmentBlock } from "./block";
 
 /** A colour of an object: the picker starts from what is on screen, and "default" goes back to the object's own look. */
 function ColorField({ t, label, value, fallback, onChange }: { t: (key: string) => string; label: string; value: string | undefined; fallback: string; onChange: (value: string | undefined) => void }) {
@@ -41,6 +43,8 @@ export type InspectorProps = {
   onTool?: (tool: Tool) => void;
   /** The devices, which of them is next to be placed, picking one to place, and the way to the Devices menu. */
   devices?: StudioDevice[]; pendingDevice?: string; onPickDevice?: (id: string) => void; onOpenDevices?: () => void;
+  /** The cameras, the alarm panels and the other menus an object can be tied to (see FeatureLink). */
+  links?: Omit<LinkSources, "devices" | "features">;
 };
 
 /** Every corner of an outline with its coordinates to edit, a button to add a corner after it and one to remove it. */
@@ -90,13 +94,14 @@ function CornerTable({ t, points, selected, onSelect, onMove, onInsert, onRemove
 }
 
 const ROOF_STYLES: readonly RoofStyle[] = ["flat", "shed", "gable", "hip", "pyramid"];
-const FEATURE_TOOL: Record<SiteFeature["kind"], Tool> = { pillar: "pillar", lamp: "lamp", mast: "mast", solar: "solar", canopy: "canopy", entrance: "entrance", path: "path", road: "road", tree: "tree", kennel: "kennel", fence: "fence", fountain: "fountain", coop: "coop", gate: "gate", sidewalk: "sidewalk", pool: "pool", planter: "planter", terrace: "terrace", bench: "bench", table: "table", barbecue: "barbecue", pergola: "pergola", shed: "shed", hedge: "hedge", mailbox: "mailbox", bins: "bins", tank: "tank", "ac-unit": "ac-unit", "electrical-box": "electrical-box", car: "car", wall: "wall", fireplace: "fireplace", stairs: "stairs", kitchen: "kitchen", bathroom: "bathroom", bed: "bed", wardrobe: "wardrobe", sofa: "sofa", armchair: "armchair", dining: "dining", tv: "tv", floor: "floor" };
+const FEATURE_TOOL: Record<SiteFeature["kind"], Tool> = { pillar: "pillar", lamp: "lamp", mast: "mast", solar: "solar", canopy: "canopy", entrance: "entrance", path: "path", road: "road", tree: "tree", kennel: "kennel", fence: "fence", fountain: "fountain", coop: "coop", gate: "gate", sidewalk: "sidewalk", pool: "pool", planter: "planter", terrace: "terrace", bench: "bench", table: "table", barbecue: "barbecue", pergola: "pergola", shed: "shed", hedge: "hedge", mailbox: "mailbox", bins: "bins", tank: "tank", "ac-unit": "ac-unit", "electrical-box": "electrical-box", car: "car", wall: "wall", fireplace: "fireplace", stairs: "stairs", kitchen: "kitchen", bathroom: "bathroom", bed: "bed", wardrobe: "wardrobe", sofa: "sofa", armchair: "armchair", dining: "dining", tv: "tv", floor: "floor", mirror: "mirror", lift: "lift", "stair-light": "stair-light", radiator: "radiator", washer: "washer", fridge: "fridge", desk: "desk", plant: "plant", rug: "rug", intercom: "intercom", "intercom-monitor": "intercom-monitor", "alarm-panel": "alarm-panel", "alarm-keypad": "alarm-keypad" };
 const ROOF_ITEM_TOOL: Record<RoofItem["kind"], Tool> = { chimney: "chimney", solar: "roof-solar", antenna: "antenna", vent: "chimney", gutter: "gutter", downpipe: "downpipe" };
 
 export function Inspector(p: InspectorProps) {
   const { t, model, selection, edit } = p;
   // Two tabs keep the panel short: what is selected, and everything on the site to pick from. Selecting something opens its properties.
   const [tab, setTab] = useState<"objects" | "properties">("objects");
+  const [block, setBlock] = useState({ floors: 6, flats: 4 });
   const selectionKey = `${selection.kind}:${"id" in selection ? selection.id : ""}`;
   useEffect(() => { if (selection.kind !== "none") setTab("properties"); }, [selectionKey]);   // eslint-disable-line react-hooks/exhaustive-deps
   const building = (selection.kind === "building" ? model.buildings.find(item => item.id === selection.id) : undefined) as Building | undefined;
@@ -194,6 +199,14 @@ export function Inspector(p: InspectorProps) {
         <NumberField label={t("groundElevation")} unit="m" step={0.1} min={-5} max={200} value={building.base} onChange={value => setBuilding(building.id, { base: round2(clamp(value, -5, 200)) }, "base")} />
         <NumberField label={t("wallThickness")} unit="m" step={0.05} min={0.1} max={1.5} value={building.thickness} onChange={value => setBuilding(building.id, { thickness: round2(clamp(value, 0.1, 1.5)) }, "thickness")} />
         <label>{t("buildingUse")}<select value={building.use ?? "house"} onChange={event => setBuilding(building.id, { use: event.target.value === "house" ? undefined : event.target.value as BuildingUse }, "use")}>{BUILDING_USES.map(use => <option key={use} value={use}>{t("buildingUse_" + use)}</option>)}</select></label>
+        <div className="block-maker">
+          <h5>{t("site_blockTitle")}</h5>
+          <p className="muted small">{t("site_blockHelp")}</p>
+          <NumberField label={t("site_blockFloors")} min={BLOCK_LIMITS.floors[0]} max={BLOCK_LIMITS.floors[1]} step={1} value={block.floors} onChange={value => setBlock(current => ({ ...current, floors: clamp(Math.round(value), BLOCK_LIMITS.floors[0], BLOCK_LIMITS.floors[1]) }))} />
+          <NumberField label={t("site_blockFlats")} min={BLOCK_LIMITS.flats[0]} max={BLOCK_LIMITS.flats[1]} step={1} value={block.flats} onChange={value => setBlock(current => ({ ...current, flats: clamp(Math.round(value), BLOCK_LIMITS.flats[0], BLOCK_LIMITS.flats[1]) }))} />
+          {!blockFits(building, block) && <p className="muted small" role="status">{t("site_blockNoFit")}</p>}
+          <button disabled={!blockFits(building, block)} onClick={() => edit(m => generateApartmentBlock(m, building.id, block) ?? m)}>{t("site_blockMake")}</button>
+        </div>
         <label>{t("buildingMaterial")}<select value={building.material ?? "plaster"} onChange={event => setBuilding(building.id, { material: event.target.value === "plaster" ? undefined : event.target.value as BuildingMaterial }, "material")}>{BUILDING_MATERIALS.map(material => <option key={material} value={material}>{t("buildingMaterial_" + material)}</option>)}</select></label>
       </div>
       <label className="check-row"><input type="checkbox" checked={Boolean(building.roofHidden)} onChange={event => setBuilding(building.id, { roofHidden: event.target.checked || undefined }, "roofHidden")} /> {t("roofHidden")}</label>
@@ -347,6 +360,7 @@ export function Inspector(p: InspectorProps) {
         <NumberField label={t("tiltAboutX")} unit="°" step={5} min={-180} max={180} value={feature.pitch ?? 0} onChange={value => setFeature(feature.id, { pitch: clamp(value, -180, 180) || undefined }, "pitch")} />
         <NumberField label={t("tiltAboutZ")} unit="°" step={5} min={-180} max={180} value={feature.roll ?? 0} onChange={value => setFeature(feature.id, { roll: clamp(value, -180, 180) || undefined }, "roll")} />
         {feature.kind === "lamp" && <NumberField label={t("lampWatts")} unit="W" min={1} max={2000} step={1} value={feature.watts ?? 10} onChange={value => setFeature(feature.id, { watts: clamp(Math.round(value), 1, 2000) === 10 ? undefined : clamp(Math.round(value), 1, 2000) }, "watts")} />}
+        {p.links && <FeatureLinkField t={t} feature={feature} sources={{ ...p.links, devices: p.devices ?? [], features: model.features, openDevices: p.onOpenDevices }} onChange={link => edit(m => ({ ...m, features: m.features.map(item => { if (item.id !== feature.id) return item; const { link: _dropped, ...rest } = item; return link ? { ...rest, link } : rest; }) }), `feature:${feature.id}:link`)} />}
         {FEATURE_STYLES[feature.kind] && <label>{t("featureStyle")}<select value={feature.style ?? FEATURE_STYLES[feature.kind]![0]} onChange={event => setFeature(feature.id, { style: event.target.value }, "style")}>{FEATURE_STYLES[feature.kind]!.map(style => <option key={style} value={style}>{t(`style_${style}`)}</option>)}</select></label>}
         {["solar", "canopy"].includes(feature.kind) && <NumberField label={t("roofSlope")} unit="°" min={0} max={60} step={1} value={feature.slope} onChange={value => setFeature(feature.id, { slope: clamp(value, 0, 60) }, "slope")} />}
       </div>

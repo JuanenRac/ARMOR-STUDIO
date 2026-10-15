@@ -86,7 +86,10 @@ export function FirmwarePanel({ t, origin, isAdmin, network }: Props) {
   const [job, setJob] = useState<FirmwareJob | null>(null);
   const jobId = useRef("");
 
-  const found = useMemo(() => firmwareNodes(network), [network]);
+  const [manualIps, setManualIps] = useState<string[]>([]);
+  const [typedIp, setTypedIp] = useState("");
+  // The network node only sees what is on its own network: a node can also be added by its address.
+  const found = useMemo(() => [...firmwareNodes(network), ...manualIps.filter(ip => !firmwareNodes(network).some(node => node.ip === ip)).map(ip => ({ ip, online: true } as FoundNode))], [network, manualIps]);
   const candidates = useMemo(() => found.filter(node => !node.kind || node.kind === kind), [found, kind]);
   const running = job !== null && (job.state === "preparing" || job.state === "running");
 
@@ -142,6 +145,9 @@ export function FirmwarePanel({ t, origin, isAdmin, network }: Props) {
             <select value={kind} onChange={event => setKind(event.target.value as FirmwareKind)} disabled={running}>
               {FIRMWARE_KINDS.map(item => <option key={item} value={item}>{t(`fw_kind_${item}`)}</option>)}
             </select></label></div>
+          <div className="camera-field"><label><span>{t("fw_add_ip")}</span>
+            <input value={typedIp} placeholder="192.168.0.50" inputMode="decimal" onChange={event => setTypedIp(event.target.value)} disabled={running} /></label>
+            <button type="button" disabled={running || !/^(?:\d{1,3}\.){3}\d{1,3}$/.test(typedIp.trim()) || typedIp.trim().split(".").some(part => Number(part) > 255)} onClick={() => { setManualIps(current => [...new Set([...current, typedIp.trim()])]); setTypedIp(""); }}>{t("fw_add_ip_button")}</button></div>
           {candidates.length === 0 ? <p className="muted small">{t("fw_none")}</p> : <>
             <div className="camera-form-actions">
               <button type="button" onClick={() => void ask()} disabled={busy !== "" || running}>{busy === "probe" ? "…" : t("fw_ask")}</button>

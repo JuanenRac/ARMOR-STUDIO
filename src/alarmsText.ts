@@ -6,6 +6,7 @@ import { cataloguesFromRows, type Row } from "./catalogueRows";
 
 const ROWS: Record<string, Row> = {
   event_device: ["Device", "Dispositivo", "Gerät", "Appareil", "Dispositivo", "デバイス", "设备"], event_alarm: ["Alarm", "Alarma", "Alarm", "Alarme", "Allarme", "アラーム", "警报"],
+  alarmNewCritical: ["Critical alarm", "Alarma crítica", "Kritischer Alarm", "Alarme critique", "Allarme critico", "重大なアラーム", "严重警报"],
   alarms: ["Alarms", "Alarmas", "Alarme", "Alarmes", "Allarmi", "アラーム", "警报"],
   alarmsTitle: ["What needs a person", "Lo que necesita a una persona", "Was einen Menschen braucht", "Ce qui demande une personne", "Ciò che richiede una persona", "対応が必要なもの", "需要人处理的事项"],
   alarmsHelp: ["An alarm stays here until someone acknowledges it and its cause has ended. Everything is also kept in the history.", "Una alarma se queda aquí hasta que alguien la reconoce y su causa ha terminado. Todo queda además en el historial.", "Ein Alarm bleibt hier, bis ihn jemand quittiert und die Ursache beendet ist. Alles steht auch im Verlauf.", "Une alarme reste ici tant que personne ne l'a acquittée et que sa cause n'a pas cessé. Tout est aussi gardé dans l'historique.", "Un allarme resta qui finché qualcuno non lo conferma e la causa non è cessata. Tutto resta anche nella cronologia.", "アラームは、誰かが確認し原因が解消するまでここに残ります。すべて履歴にも保存されます。", "警报会保留在此，直到有人确认且原因消除。所有内容也会保存在历史记录中。"],

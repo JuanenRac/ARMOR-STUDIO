@@ -5,7 +5,7 @@
  */
 import { readColour } from "./designer/colors";
 import { parseServerOrigin } from "./config";
-import { FEATURE_STYLES, FLOOR_STYLES, MAST_PART_KINDS, type DevicePlacement, type MastPart, LANGUAGES, THEMES, type Building, type Camera, type Dimensions, type LanguageCode, type Opening, type Point, type Roof, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type Terrain, type Theme, type WallLamp, BUILDING_USES, BUILDING_MATERIALS, OPENING_STYLES, LAMP_KINDS } from "./domain";
+import { FEATURE_STYLES, FLOOR_STYLES, MAST_PART_KINDS, type DevicePlacement, type MastPart, LANGUAGES, THEMES, type Building, type Camera, type Dimensions, type LanguageCode, type Opening, type Point, type Roof, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type FeatureLink, type Terrain, type Theme, type WallLamp, BUILDING_USES, BUILDING_MATERIALS, OPENING_STYLES, LAMP_KINDS } from "./domain";
 import { isSimplePolygon } from "./designer/geometry";
 
 export const SETTINGS_KEY = "armor-studio-settings-v1";
@@ -71,7 +71,7 @@ function readSensor(raw: unknown): Sensor | null {
 
 const COORDINATE_LIMIT = 5000;
 const ROOF_STYLES: readonly RoofStyle[] = ["flat", "shed", "gable", "hip", "pyramid"];
-const FEATURE_KINDS = ["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "floor"] as const;
+const FEATURE_KINDS = ["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "floor", "mirror", "lift", "stair-light", "radiator", "washer", "fridge", "desk", "plant", "rug", "intercom", "intercom-monitor", "alarm-panel", "alarm-keypad"] as const;
 const ROOF_ITEM_KINDS = ["chimney", "solar", "antenna", "vent", "gutter", "downpipe"] as const;
 const num = (raw: Record<string, unknown>, key: string, fallback: number, low: number, high: number) => finite(raw[key]) ? clamp(raw[key] as number, low, high) : fallback;
 const integer = (raw: Record<string, unknown>, key: string, high: number): number | null => finite(raw[key]) && Number.isInteger(raw[key]) && (raw[key] as number) >= 0 && (raw[key] as number) <= high ? (raw[key] as number) : null;
@@ -176,7 +176,16 @@ function readFeature(raw: unknown): SiteFeature | null {
     ...(typeof raw.style === "string" && FEATURE_STYLES[raw.kind as SiteFeature["kind"]]?.includes(raw.style) ? { style: raw.style } : {}),
     ...(readMastParts(raw.parts) ? { parts: readMastParts(raw.parts) } : {}),
     ...(raw.kind === "lamp" && finite(raw.watts) ? { watts: clamp(Math.round(raw.watts), 1, 2000) } : {}), ...(raw.kind === "lamp" && raw.motion === true ? { motion: true } : {}), ...(raw.kind === "gate" && raw.automatic === true ? { automatic: true } : {}),
+    ...(readFeatureLink(raw.link) ? { link: readFeatureLink(raw.link) } : {}),
   };
+}
+
+const FEATURE_LINK_KINDS = ["camera", "alarm", "device", "feature"] as const;
+/** What a drawn object is tied to in another menu: a kind from the closed list and an id of plain characters; anything else is dropped. */
+function readFeatureLink(value: unknown): FeatureLink | undefined {
+  if (typeof value !== "object" || value === null) return undefined;
+  const raw = value as Record<string, unknown>;
+  return typeof raw.kind === "string" && (FEATURE_LINK_KINDS as readonly string[]).includes(raw.kind) && typeof raw.id === "string" && /^[A-Za-z0-9][A-Za-z0-9:._-]{0,63}$/.test(raw.id) ? { kind: raw.kind as FeatureLink["kind"], id: raw.id } : undefined;
 }
 
 /**

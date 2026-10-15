@@ -3,8 +3,10 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D)
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+import { ConfirmHost } from "./askConfirm";
+import { useCriticalAlarmAlert } from "./alarmAlert";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
+import { listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
 import { AboutDialog, ConfirmDialog, HelpDialog, PinDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
 import { DesignVersionsDialog } from "./DesignVersionsDialog";
@@ -35,6 +37,10 @@ import { loadLocalElectrical, saveLocalElectrical } from "./electrical/local";
 import { applyElectricalDoc } from "./electrical/sync";
 import { useElectricalSync } from "./electrical/useElectricalSync";
 import { NetworkDesigner } from "./NetworkDesigner";
+import { AlarmDesigner } from "./AlarmDesigner";
+import { EMPTY_DESIGN as EMPTY_ALARM_DESIGN, type Design as AlarmDesign } from "./alarm/model";
+import { applyAlarmDoc, loadLocalAlarmDesign, saveLocalAlarmDesign } from "./alarm/sync";
+import { useAlarmDesignSync } from "./alarm/useAlarmDesignSync";
 import { EMPTY_DESIGN as EMPTY_NETWORK_DESIGN, type Design as NetworkDesign } from "./network/model";
 import { applyNetworkDoc, loadLocalNetwork, saveLocalNetwork } from "./network/sync";
 import { useNetworkSync } from "./network/useNetworkSync";
@@ -88,7 +94,8 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const [wantsToPlace, setWantsToPlace] = useState("");
   const [electrical, setElectrical] = useState<ElectricalDesign>(EMPTY_DESIGN);
   const [networkDesign, setNetworkDesign] = useState<NetworkDesign>(EMPTY_NETWORK_DESIGN);
-  const [versionsOf, setVersionsOf] = useState<"site" | "electrical" | "network" | null>(null);
+  const [alarmDesign, setAlarmDesign] = useState<AlarmDesign>(EMPTY_ALARM_DESIGN);
+  const [versionsOf, setVersionsOf] = useState<"site" | "electrical" | "network" | "alarm" | null>(null);
   const sessionUser = useSessionUser(origin);
   const isAdmin = sessionUser.user?.role === "admin";
   const [pendingMode, setPendingMode] = useState<"armed" | "disarmed" | null>(null);
@@ -115,6 +122,9 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const selected = cameras.find(camera => camera.id === selectedCamera) ?? cameras[0];
   const devicePoll = usePolled(() => listDevices(origin), 2500, origin);
   const alarmPoll = usePolled(() => listAlarms(origin), 2000, origin);
+  // Which cameras are recording is the server's to say: after a reload the console used to think none was.
+  const recordingPoll = usePolled(() => listMedia(origin).then(result => result.activeCameraIds), 15_000, origin);
+  useEffect(() => { if (recordingPoll.data) setRecordingCameraIds(recordingPoll.data); }, [recordingPoll.data]);
   const automationPoll = usePolled(() => listAutomations(origin), 5000, origin);
   const solarPoll = usePolled(() => listSolar(origin), 4000, origin);
   const electricalPoll = usePolled(() => listElectricalReadings(origin), 4000, origin);
@@ -126,6 +136,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const networkPoll = usePolled(() => listNetwork(origin), 5000, origin);
   const devices = devicePoll.data?.devices ?? [];
   const alarms = alarmPoll.data;
+  useCriticalAlarmAlert(alarmPoll.data, t("alarmNewCritical"));
   const alarmsPending = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at).length;
   const cameraNames = useMemo(() => Object.fromEntries(cameras.map(camera => [camera.id, camera.name])), [cameras]);
   useEffect(() => { const timer = window.setInterval(() => setNow(Date.now()), 1000); return () => window.clearInterval(timer); }, []);
@@ -158,6 +169,8 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     if (savedElectrical) setElectrical(savedElectrical);
     const savedNetwork = loadLocalNetwork();
     if (savedNetwork) setNetworkDesign(savedNetwork);
+    const savedAlarm = loadLocalAlarmDesign();
+    if (savedAlarm) setAlarmDesign(savedAlarm);
     setRestored(true);
   }, []);
 
@@ -187,6 +200,8 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   useEffect(() => { if (restored) saveLocalElectrical(electrical); }, [electrical, restored]);
   const networkStatus = useNetworkSync({ origin, enabled: restored && operatorUnlocked, design: networkDesign, apply: setNetworkDesign, onConflict: () => setNotice(t("elConflict")) });
   useEffect(() => { if (restored) saveLocalNetwork(networkDesign); }, [networkDesign, restored]);
+  const alarmDesignStatus = useAlarmDesignSync({ origin, enabled: restored && operatorUnlocked, design: alarmDesign, apply: setAlarmDesign, onConflict: () => setNotice(t("elConflict")) });
+  useEffect(() => { if (restored) saveLocalAlarmDesign(alarmDesign); }, [alarmDesign, restored]);
   const applySite = (next: SiteModel) => {
     if (next.terrain !== site.terrain) setTerrain(next.terrain);
     if (next.buildings !== site.buildings) setBuildings(next.buildings);
@@ -277,7 +292,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const panels: Record<View, ReactNode> = {
     overview: <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} />,
     alarms: <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} />,
-    alarmPanels: <AlarmPanelsView t={t} origin={origin} nodes={alarmNodesPoll.data ?? null} unreachable={alarmNodesPoll.failed} network={networkPoll.data ?? null} isAdmin={isAdmin} now={now} />,
+    alarmPanels: <AlarmPanelsView openDesigner={() => setView("alarmDesigner")} t={t} origin={origin} nodes={alarmNodesPoll.data ?? null} unreachable={alarmNodesPoll.failed} network={networkPoll.data ?? null} isAdmin={isAdmin} now={now} />,
     electrical: <ElectricalView openDevices={() => setView("devices")} t={t} origin={origin} readings={electricalPoll.data ?? null} unreachable={electricalPoll.failed} design={electrical} openDesigner={() => setView("electricalDesigner")} network={networkPoll.data} now={now} />,
     inverters: <InvertersView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} network={networkPoll.data} />,
     batteries: <BatteriesView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} network={networkPoll.data} />,
@@ -294,9 +309,10 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     record: <MediaLibrary origin={origin} cameras={cameras} t={t} />,
     history: <HistoryView origin={origin} t={t} />,
     radar: <RadarView network={networkPoll.data} nodes={nodes} model={site} dimensions={dimensions} origin={origin} openDesigner={() => setView("siteDesigner")} openZones={() => setView("history")} setSensors={setSensors} forget={id => void forgetNode(origin, id).then(() => setNotice(t("nodeForgotten"))).catch(() => setNotice(t("recordingFailed")))} t={t} />,
-    siteDesigner: <SiteDesignerInteractive openVersions={() => setVersionsOf("site")} t={t} dimensions={dimensions} setDimensions={setDimensions} model={site} applyModel={applySite} selectedCamera={selectedCamera} setSelectedCamera={setSelectedCamera} notice={notice} setNotice={setNotice} save={saveSettings} nodeIds={nodes.map(node => node.node_id)} devices={devices} wantsToPlace={wantsToPlace} clearWantsToPlace={() => setWantsToPlace("")} openDevices={() => setView("devices")} />,
+    siteDesigner: <SiteDesignerInteractive openVersions={() => setVersionsOf("site")} t={t} dimensions={dimensions} setDimensions={setDimensions} model={site} applyModel={applySite} selectedCamera={selectedCamera} setSelectedCamera={setSelectedCamera} notice={notice} setNotice={setNotice} save={saveSettings} nodeIds={nodes.map(node => node.node_id)} devices={devices} wantsToPlace={wantsToPlace} clearWantsToPlace={() => setWantsToPlace("")} openDevices={() => setView("devices")} cameras={cameras} alarmNodes={alarmNodesPoll.data?.nodes ?? []} openCameras={() => setView("cameras")} openAlarmPanels={() => setView("alarmPanels")} />,
     electricalDesigner: <ElectricalDesigner t={t} design={electrical} setDesign={setElectrical} status={electricalStatus} nodeIds={nodes.map(node => node.node_id)} solarDevices={solarPoll.data?.devices ?? []} solarWaiting={solarPoll.data?.waiting ?? []} electricalNodes={electricalPoll.data?.nodes ?? []} />,
     network: <NetworkView openDesigner={() => setView("networkDesigner")} t={t} origin={origin} isAdmin={isAdmin} overview={networkPoll.data} reload={networkPoll.reload} now={now} />,
+    alarmDesigner: <AlarmDesigner t={t} design={alarmDesign} setDesign={setAlarmDesign} status={alarmDesignStatus} panels={alarmNodesPoll.data ?? null} openVersions={() => setVersionsOf("alarm")} openPanels={() => setView("alarmPanels")} />,
     networkDesigner: <NetworkDesigner t={t} design={networkDesign} setDesign={setNetworkDesign} status={networkStatus} overview={networkPoll.data} cameras={cameras} />,
     configuration: <ConfigurationPanel
       t={t} origin={origin} setOrigin={setOrigin} theme={theme} themes={THEMES}
@@ -319,7 +335,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     {aboutOpen && <AboutDialog version={studioVersion} revision={state.revision} close={() => setAboutOpen(false)} t={t} />}
     {versionsOf && <DesignVersionsDialog kind={versionsOf} origin={origin} t={t} close={() => setVersionsOf(null)}
       draft={versionsOf === "site" ? siteSync.draft : null} restoreDraft={siteSync.restoreDraft}
-      restore={design => { if (versionsOf === "site") siteSync.restoreDocument(design); else if (versionsOf === "electrical") setElectrical(current => applyElectricalDoc(design, current)); else setNetworkDesign(current => applyNetworkDoc(design, current)); }} />}
+      restore={design => { if (versionsOf === "site") siteSync.restoreDocument(design); else if (versionsOf === "electrical") setElectrical(current => applyElectricalDoc(design, current)); else if (versionsOf === "alarm") setAlarmDesign(current => applyAlarmDoc(design, current)); else setNetworkDesign(current => applyNetworkDoc(design, current)); }} />}
     {pendingMode === "disarmed" && <PinDialog title={t("disarmSystem")} text={t("confirmDisarm")} confirmLabel={t("disarmSystem")} confirm={pin => void changeMode("disarmed", pin)} cancel={() => setPendingMode(null)} t={t} />}
     {pendingMode === "armed" && <ConfirmDialog title={t("armSystem")} text={t("confirmArm")} confirmLabel={t("armSystem")} confirm={() => void changeMode("armed")} cancel={() => setPendingMode(null)} t={t} />}
   </main>
@@ -328,6 +344,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     camerasReachable={cameras.filter(camera => reachability[camera.id] === "online").length} camerasTotal={cameras.length}
     highAlerts={nodes.filter(node => node.online && !node.stale && node.alert_level === "high").length}
     info={serverInfo} latencyMs={latencyMs} revision={state.revision} onSignOut={onSignOut} t={t} />
+  <ConfirmHost />
   </div></StreamRenewContext.Provider></KnownNodesContext.Provider></SessionUserContext.Provider>;
 }
 
@@ -346,14 +363,17 @@ export default function App() {
     if (!originReady) return;
     let cancelled = false;
     // Only "ended" signs out; an unanswered check leaves things as they are and is tried again a minute later.
+    // The first time, a server that is slow to answer must not show the login for a session that is valid: the page keeps checking, and asks again in three seconds.
+    let known = false, retry = 0, tries = 0;
     const checkSession = () => void studioSessionState(origin).then(state => {
       if (cancelled) return;
-      if (state !== "unknown") setAuthenticated(state === "active");
-      setChecking(false);
+      if (state !== "unknown") { known = true; setAuthenticated(state === "active"); setChecking(false); }
+      else if (!known && ++tries < 5) retry = window.setTimeout(checkSession, 3000);
+      else if (!known) setChecking(false);   // after fifteen seconds without an answer the login shows (it is where the server's address is changed)
     });
     checkSession();
     const timer = window.setInterval(checkSession, 60_000);
-    return () => { cancelled = true; window.clearInterval(timer); };
+    return () => { cancelled = true; window.clearInterval(timer); window.clearTimeout(retry); };
   }, [origin, originReady]);
   if (checking) return <main className="studio-login-shell"><p className="login-loading">Comprobando sesión de Studio…</p></main>;
   return authenticated ? <StudioConsole initialOrigin={origin} onSignOut={() => { void closeStudioSession(origin); setAuthenticated(false); }} /> : <StudioLogin origin={origin} onAuthenticated={nextOrigin => { setOrigin(nextOrigin); setAuthenticated(true); }} />;

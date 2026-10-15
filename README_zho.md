@@ -21,13 +21,13 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-7-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-352%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-203%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
 
 ---
 
-**诚实性检查 - 今天真正能运行的部分:** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，并有 352 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、每个菜单在七种语言下的渲染、静态主机）。**尚未证实的：** 每种真实摄像头的实时视频和 PTZ、太阳能菜单与真实逆变器或电池的配合，以及正式的无障碍或可用性评审。当服务器无法访问时，Studio 显示演示数据，并在顶部栏中说明。
+**诚实性检查 - 今天真正能运行的部分:** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，并有 203 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、每个菜单在七种语言下的渲染、静态主机）。**尚未证实的：** 每种真实摄像头的实时视频和 PTZ、太阳能菜单与真实逆变器或电池的配合，以及正式的无障碍或可用性评审。当服务器无法访问时，Studio 显示演示数据，并在顶部栏中说明。
 
 ---
 
@@ -42,15 +42,11 @@
 * **雷达：** 由你的场地设计绘制的实时地图（地形、建筑、摄像头、雷达及其覆盖范围），显示每个雷达报告的目标、其近期路径和忽略区域；实时节点状态，静默节点显示为*过期*；每个节点自己的面板一键即达。
 * **场地设计器：** 绘制地形（矩形或任意形状，可键入长度），放置多层建筑及五种屋顶，任意楼层和高度的门窗，灯、烟囱、太阳能板、天线、立柱、桅杆、道路和小径，然后把摄像头和雷达放在任何位置；CAD 风格的 2D 平面图和可环绕、逐层剖切并编辑的 3D 视图；撤销和重做。
 * **配置：** 服务器地址、摄像头（ONVIF/RTSP）、发现、用户（你的账户，管理员还可看到用户、角色和密码列表）、主题和语言；**不含凭据**的便携式场地导出。
-* **天气与服务：** 服务菜单按分组列出系统的每个程序和每个现场节点，无论是否在运行，每张卡片都显示程序的版本；天气菜单显示您所选地点的天气（现在、下一小时的降雨、根据预报推出的提示、48小时和10天、空气与花粉、太阳和月亮），并附有雨和云的实时雷达。
-* **整套安装配置保存为一个文件：** *配置 > 安装配置* 可下载整套安装配置（绝不含密码、令牌或密钥）并在另一台机器上导入，可勾选要导入的部分并查看结果报告；用户页面提供 `panel` 角色，供壁挂面板使用专用账户。
-* **机器与网络：** *机器实时* 显示运行服务器的计算机的 CPU、内存、磁盘、温度和网络；在网络菜单中，操作员可要求扫描、ping、traceroute、设备的端口或网页，管理员可保存设备的登录（在服务器上加密保存、不再显示），使 *检查* 读取其型号和固件并提醒出厂登录。配置 -> 常规 中有一个检查服务器地址的按钮，可区分 http/https 写错与服务器宕机。
-* **七种语言**（英语、西班牙语、德语、法语、意大利语、日语、中文）和十六种主题，默认主题名为 *Armor*。
+* **七种语言**（英语、西班牙语、德语、法语、意大利语、日语、中文）和十一种主题，默认主题名为 *Armor*。
 * **登记你的设备：** 在“逆变器”和“电池”菜单中，为每台逆变器或电池组添加名称、型号（Voltronic、MPP Solar、Pylontech US2000 / US3000 / US5000、ANT-BMS）、连接方式（RS232、RS485、USB、CAN、Wi-Fi）和网关节点；它会等待第一次真实读数，期间可用“显示示例读数”试用菜单。
 * **电气设计器：** 绘制住宅的电气图（电网、电表、保护装置、转换开关、配电、光伏、逆变器、电池和负载，交流与直流），用端口和导线连接，按配电箱分组，把逆变器和电池与服务器读取的光伏设备关联以查看实时数值，并让检查功能审阅（一条线路上有两个电源、断路器和导线与电流的匹配、缺失的保护、直流电压）。图纸保存在服务器上；这只是一张图：目前不会控制或测量任何设备。
-* **报警主机：** “报警主机”菜单显示每个 ARMOR-ALARM 节点的情况：是否在守护（离家或在家）、防区和最近事件，并在“报警”菜单中提示正在响起的警报（严重）或被拆的防区（高级）。只有服务器（`ARMOR_ALARM_COMMANDS=1`）、节点和代理都允许时，管理员才能在那里布防和撤防；从控制台撤防会要求输入当前登录用户的 PIN，由服务器校验。不是经过认证的报警系统。
-* **场地设计器中的墙体与合并建筑：** 建筑或地块的一面墙可以向内或向外推（所选形状每条边上有一个手柄，或使用“移动墙体”按钮），相邻的墙会跟随，因此长方形保持直角、对面的墙不动；墙体相接的两栋建筑可以**合并**：共用的墙只建一次，开在其上的门或窗（无论属于哪栋建筑）两面都起作用，小型建筑的地面也会以自己的颜色显示。
-* **撤防 PIN 与任意来源的报警：** 撤防（系统，或从卡片上撤防某台报警主机）会在对话框中要求输入 PIN，“配置 > 用户”可设置 PIN 和胁迫 PIN；自动化可由任何报警来源触发（包括正在鸣响的报警主机）；固件界面和节点接入也支持报警主机。
+* **报警设计器：** 绘制住宅的报警系统——主机、扩展、门窗磁、移动/烟雾/燃气/水浸探测器、紧急按钮、警笛、键盘和供电——用有线回路、无线连线、警笛输出、数据总线和供电在端口之间连接。在*报警主机*菜单中把画出的主机关联到真实主机、把传感器关联到它的某个防区，每个元素即可实时显示其主机的上报；“绘制主机已有的内容”会根据主机补全图纸，检查会提示无人接收的传感器、没有警笛/键盘/备用电池的主机，或撤防时不会鸣响的烟雾探测器。图纸连同历史版本保存在服务器上。
+* **分组菜单与相应的帮助：** 监控、安防、能源、住宅与网络、设计和管理，每个分组都可折叠；所有确认都在页面自己的对话框中进行(浏览器无法屏蔽)；新的严重报警会鸣响并以通知显示；证据可免于自动清理；帮助以七种语言说明每个菜单。
 
 ## 🔄 架构
 
@@ -65,9 +61,8 @@ flowchart LR
 
 * **浏览器中没有机密。** 摄像头密码只输入一次，发送到服务器，之后只显示为被遮蔽的“已保存”状态。场地导出会去掉用户名和凭据标志。
 * **保存的设置属于不可信输入。** 它们被逐值解析：无效的源、主题、语言或形状会被丢弃，位置被限制范围，列表被限制大小。
-* **没有第三方请求，天气菜单除外，且仅在您启用后。** 字体来自本地；静态主机发送限于所配置服务器的 `Content-Security-Policy: default-src 'self'`、`frame-ancestors 'none'`、`nosniff` 和 `no-referrer`。
+* **没有第三方请求。** 字体来自本地；静态主机发送限于所配置服务器的 `Content-Security-Policy: default-src 'self'`、`frame-ancestors 'none'`、`nosniff` 和 `no-referrer`。
 * 实时视频只通过服务器发给操作员的视频流地址显示。
-* **节点固件与通知：** *配置 > 固件* 可从文件或 GitHub 发布版更新单个节点或某一类型的全部节点，每个节点带进度条并解释各步骤；*通知* 把警报连接到 Telegram 和 Home Assistant 并发送测试。系统的配置文件、服务和代理（broker）也在这里通过本机的管理代理进行编辑。
 
 ## 📂 仓库结构
 
@@ -92,7 +87,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 352 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
+npm test            # 203 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```
@@ -107,14 +102,12 @@ $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # 
 * **[ARMOR-RADAR](https://github.com/JuanenRac/ARMOR-RADAR)** - 适用于 ESP32-S3 的现场节点固件，带三个雷达和自带网页面板
 * **[ARMOR-SOLAR](https://github.com/JuanenRac/ARMOR-SOLAR)** - 太阳能逆变器与电池的协议，以及网关节点的消息
 * **[ARMOR-ELECTRICAL](https://github.com/JuanenRac/ARMOR-ELECTRICAL)** - 电气节点：电表、电网读数消息和开关规则
-* **[ARMOR-ALARM](https://github.com/JuanenRac/ARMOR-ALARM)** - 报警节点与报警主机：防区、布防、延时、警笛和 PIN，有无服务器均可
 * **[ARMOR-HMI](https://github.com/JuanenRac/ARMOR-HMI)** - 触摸面板：墙面屏幕上的系统状态、布防与确认，以及语音助手的所在
 * **[ARMOR-NETWORK](https://github.com/JuanenRac/ARMOR-NETWORK)** - 本地网络：其设备、互联网以及变化
 * **[ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER)** - 中央协调器：遥测、报警、设备、太阳能读数和摄像头
 * **ARMOR-STUDIO** (本仓库) - 网页控制台：摄像头、雷达、报警、太阳能和 2D/3D 场地设计器
 * **[ARMOR-ANDROID-CONTROL](https://github.com/JuanenRac/ARMOR-ANDROID-CONTROL)** - 带实时 2D/3D 雷达的 Android 操作员客户端
 * **[ARMOR-SERVER-AI](https://github.com/JuanenRac/ARMOR-SERVER-AI)** - 会解释决策且从不执行动作的视觉推理策略
-* **[ARMOR-VISION](https://github.com/JuanenRac/ARMOR-VISION)** - Jetson Orin NX 上的摄像头区域、遮罩与检测规则
 * **[ARMOR-VOICE-AI](https://github.com/JuanenRac/ARMOR-VOICE-AI)** - 带无法伪造确认的离线语音意图
 * **[ARMOR-HARDWARE](https://github.com/JuanenRac/ARMOR-HARDWARE)** - 外壳、电子器件和台架验收矩阵
 * **[ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS)** - 部署、CM5 测试台、备份与 TLS

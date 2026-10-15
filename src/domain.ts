@@ -4,7 +4,7 @@
  */
 import type { SystemState } from "./types";
 
-export type View = "overview" | "weather" | "alarms" | "alarmPanels" | "cameras" | "radar" | "inverters" | "batteries" | "electrical" | "devices" | "automations" | "record" | "history" | "network" | "services" | "siteDesigner" | "electricalDesigner" | "networkDesigner" | "system" | "configuration";
+export type View = "overview" | "weather" | "alarms" | "alarmPanels" | "cameras" | "radar" | "inverters" | "batteries" | "electrical" | "devices" | "automations" | "record" | "history" | "network" | "services" | "siteDesigner" | "electricalDesigner" | "networkDesigner" | "alarmDesigner" | "system" | "configuration";
 export type GridSize = 1 | 2 | 4 | 6 | 8 | 9 | 12 | 16;
 export const GRID_SIZES: readonly GridSize[] = [1, 2, 4, 6, 8, 9, 12, 16];
 
@@ -60,7 +60,7 @@ export type Roof = { style: RoofStyle; slope: number; overhang: number; ridge: n
  * A building: a closed footprint polygon in metres, the elevation of its ground floor, the height of each storey
  * (one number per floor, bottom first) and a roof over the top.
  */
-export const BUILDING_USES = ["house", "garage", "workshop", "shed", "barn", "office", "other"] as const;
+export const BUILDING_USES = ["house", "apartments", "garage", "workshop", "shed", "barn", "office", "other"] as const;
 export type BuildingUse = (typeof BUILDING_USES)[number];
 export const BUILDING_MATERIALS = ["plaster", "brick", "stone", "wood", "concrete", "metal"] as const;
 export type BuildingMaterial = (typeof BUILDING_MATERIALS)[number];
@@ -99,9 +99,10 @@ export type WallLamp = { id: string; buildingId: string; edge: number; offset: n
 
 /** Objects standing on the ground. `lamp` is a lamp post (a tube of `height` with the light on top), `mast` an antenna mast. */
 export type SiteFeatureKind = "pillar" | "lamp" | "mast" | "solar" | "canopy" | "entrance" | "path" | "road" | "tree" | "kennel" | "fence" | "fountain" | "coop" | "gate" | "sidewalk" | "pool" | "planter" | "terrace" | "bench" | "table" | "barbecue" | "pergola" | "shed" | "hedge" | "mailbox" | "bins" | "tank" | "ac-unit" | "electrical-box" | "car"
-  | "floor" | "wall" | "fireplace" | "stairs" | "kitchen" | "bathroom" | "bed" | "wardrobe" | "sofa" | "armchair" | "dining" | "tv";
+  | "floor" | "wall" | "fireplace" | "stairs" | "kitchen" | "bathroom" | "bed" | "wardrobe" | "sofa" | "armchair" | "dining" | "tv"
+  | "mirror" | "lift" | "stair-light" | "radiator" | "washer" | "fridge" | "desk" | "plant" | "rug" | "intercom" | "intercom-monitor" | "alarm-panel" | "alarm-keypad";
 /** The objects of the inside of a building (walls, fireplaces, the kitchen, furniture...), drawn on the floor they stand on: their own floating panel. */
-export const INTERIOR_KINDS: ReadonlySet<SiteFeatureKind> = new Set<SiteFeatureKind>(["floor", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv"]);
+export const INTERIOR_KINDS: ReadonlySet<SiteFeatureKind> = new Set<SiteFeatureKind>(["floor", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "mirror", "lift", "stair-light", "radiator", "washer", "fridge", "desk", "plant", "rug", "intercom", "intercom-monitor", "alarm-panel", "alarm-keypad"]);
 /** The looks a kind can have (a tree is an oak, a pine, a palm or a bush; a fence, a gate). */
 export const FEATURE_STYLES: Partial<Record<SiteFeatureKind, readonly string[]>> = {
   floor: FLOOR_STYLES,
@@ -119,6 +120,9 @@ export const FEATURE_STYLES: Partial<Record<SiteFeatureKind, readonly string[]>>
 export type MastPartKind = "tv" | "satellite" | "wifi";
 export type MastPart = { kind: MastPartKind; z: number; rotation: number; size: number };
 export const MAST_PART_KINDS: readonly MastPartKind[] = ["tv", "satellite", "wifi"];
+/** What a drawn object is tied to in another menu of Studio: a camera of the Cameras menu, a panel of the Alarm panels menu, a device of the Devices menu, or another object of this design. */
+export type FeatureLinkKind = "camera" | "alarm" | "device" | "feature";
+export type FeatureLink = { kind: FeatureLinkKind; id: string };
 export type SiteFeature = {
   id: string; kind: SiteFeatureKind; x: number; y: number; z: number; width: number; depth: number; height: number;
   /** Turn about the vertical axis (degrees); `pitch` tips it about the east-west axis (X) and `roll` about the north-south one (Z). */
@@ -135,19 +139,20 @@ export type SiteFeature = {
   parts?: MastPart[];
   /** A lamp post: its power in watts and whether a movement sensor switches it on. A gate: it opens by itself (a motor). */
   watts?: number; motion?: boolean; automatic?: boolean;
+  /** The thing in another menu this object stands for (a video intercom for a camera, an alarm panel for a real panel, a stair light for a smart light). */
+  link?: FeatureLink;
 };
 
 /** Where a device (a smoke detector, a door contact, a plug...) stands in the design: metres, x east, y north, z up; turned like any object. */
 export type DevicePlacement = { device_id: string; x: number; y: number; z: number; rotation: number; pitch?: number; roll?: number };
 
-/** The menus, in groups: what is happening now, what the system controls, the design, and administration. */
+/** The menus, in groups: what is happening now, the security equipment and its evidence, the energy, the house and its network, the designers, and administration. */
 export const NAV_GROUPS: ReadonlyArray<{ title: string; items: ReadonlyArray<readonly [View, string]> }> = [
-  { title: "navMonitor", items: [["overview", "⌂"], ["weather", "☁"], ["alarms", "!"], ["alarmPanels", "▣"], ["cameras", "◉"], ["radar", "◌"]] },
+  { title: "navMonitor", items: [["overview", "⌂"], ["weather", "☁"], ["alarms", "!"]] },
+  { title: "navSecurity", items: [["alarmPanels", "▣"], ["cameras", "◉"], ["radar", "◌"], ["record", "●"], ["history", "≡"]] },
   { title: "navEnergy", items: [["inverters", "☀"], ["batteries", "▮"], ["electrical", "⌁"]] },
-  { title: "navNetwork", items: [["network", "⇄"]] },
-  { title: "navControl", items: [["devices", "◈"], ["automations", "⚡"]] },
-  { title: "navEvidence", items: [["record", "▣"], ["history", "≡"]] },
-  { title: "navDesign", items: [["siteDesigner", "⌗"], ["electricalDesigner", "⌁"], ["networkDesigner", "⌬"]] },
+  { title: "navHouse", items: [["devices", "◈"], ["automations", "⚡"], ["network", "⇄"]] },
+  { title: "navDesign", items: [["siteDesigner", "⌗"], ["alarmDesigner", "⚑"], ["electricalDesigner", "⌁"], ["networkDesigner", "⌬"]] },
   { title: "navAdmin", items: [["system", "▤"], ["services", "▦"], ["configuration", "⚙"]] },
 ];
 export const NAV: ReadonlyArray<readonly [View, string]> = NAV_GROUPS.flatMap(group => group.items);
@@ -163,14 +168,11 @@ export const LANGUAGES = [
 ] as const;
 export type LanguageCode = (typeof LANGUAGES)[number]["code"];
 
-/** Shown only while the server cannot be reached, and labelled as demonstration data. */
-export const DEMO_STATE: SystemState = {
-  mode: "armed", revision: 7, updated_at: new Date(0).toISOString(),
-  nodes: {
-    "north-east": { node_id: "north-east", online: true, stale: false, timestamp_ms: 0, lux: 14, target_count: 2, alert_level: "high" },
-    "south-west": { node_id: "south-west", online: true, stale: false, timestamp_ms: 0, lux: 1280, target_count: 0, alert_level: "normal" },
-  },
-};
+/**
+ * Shown while the server has not answered yet, or cannot be reached: no nodes and no alarm, never an invented intrusion. The connection state says "demo" (no data) beside it;
+ * a console that showed an armed house with a node in HIGH alert before the first answer would make somebody act on something that never happened.
+ */
+export const DEMO_STATE: SystemState = { mode: "disarmed", revision: 0, updated_at: new Date(0).toISOString(), nodes: {} };
 
 export const INITIAL_CAMERAS: Camera[] = [
   { id: "cam-01", name: "Entrance", host: "Not configured", snapshotUrl: "", enabled: true, x: 25, y: 75 },

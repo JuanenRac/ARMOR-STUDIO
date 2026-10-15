@@ -5,7 +5,7 @@
  */
 @media (min-width: 900px) {
   /* ---- the frame ---- */
-  .studio-frame .studio-shell { grid-template-columns: 200px minmax(0, 1fr); }
+  .studio-frame .studio-shell { grid-template-columns: 236px minmax(0, 1fr); }
   .studio-frame .studio-shell.sidebar-collapsed { grid-template-columns: 66px minmax(0, 1fr); }
   .studio-frame .sidebar { padding: .55rem .45rem; gap: .4rem; }
   .studio-frame .sidebar .brand { gap: .55rem; } .studio-frame .brand-mark { width: 34px; height: 34px; border-radius: 11px; font-size: 1.2rem; }

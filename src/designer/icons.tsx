@@ -70,6 +70,19 @@ const TOOL_ICONS: Record<Tool, ReactNode> = {
   armchair: frame(<><path d="M7 11V8a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3" /><path d="M5 13a2 2 0 0 1 3 0v2h8v-2a2 2 0 0 1 3 0v5H5z" /><path d="M7 18v2M17 18v2" /></>),
   dining: frame(<><path d="M5 10h14" /><path d="M7 10v9M17 10v9" /><path d="M3 7h3M18 7h3M3 7v4M21 7v4" strokeWidth="1.3" /></>),
   tv: frame(<><rect x="3" y="5" width="18" height="12" rx="1.5" /><path d="M9 21h6M12 17v4" /></>),
+  mirror: frame(<><rect x="6" y="3" width="12" height="18" rx="6" /><path d="M9 8l3-2M9 12l5-3" strokeWidth="1.2" /></>),
+  lift: frame(<><rect x="5" y="3" width="14" height="18" rx="1" /><path d="M12 3v18" /><path d="M9 10l-1.500 2L9 14M15 10l1.500 2L15 14" strokeWidth="1.3" /></>),
+  "stair-light": frame(<><path d="M3 20h5v-4h5v-4h5V8h3" /><circle cx="15" cy="5" r="2.400" /><path d="M15 1.500V1M18.500 5H19M11.500 5H11" strokeWidth="1.2" /></>),
+  radiator: frame(<><rect x="4" y="6" width="16" height="12" rx="1.500" /><path d="M8 6v12M12 6v12M16 6v12" /><path d="M6 20v1M18 20v1" /></>),
+  washer: frame(<><rect x="5" y="3" width="14" height="18" rx="1.500" /><circle cx="12" cy="13" r="4" /><path d="M8 6h2" /></>),
+  fridge: frame(<><rect x="6" y="3" width="12" height="18" rx="1.500" /><path d="M6 10h12M9 6v2M9 13v3" /></>),
+  desk: frame(<><path d="M3 9h18" /><path d="M5 9v10M19 9v10M13 9v6h6" /></>),
+  plant: frame(<><path d="M8 21h8l-1-6H9z" /><path d="M12 15V9M12 12c-3 0-4-2-4-4 3 0 4 1 4 4zM12 10c3 0 4-2 4-4-3 0-4 1-4 4z" /></>),
+  rug: frame(<><rect x="3" y="8" width="18" height="8" rx="1" /><path d="M6 8v8M18 8v8M3 12h18" strokeWidth="1.200" /></>),
+  intercom: frame(<><rect x="7" y="2" width="10" height="20" rx="2" /><circle cx="12" cy="7" r="1.800" /><path d="M10 12h4M10 15h4M10 18h4" /></>),
+  "intercom-monitor": frame(<><rect x="5" y="3" width="14" height="18" rx="2" /><rect x="7" y="5" width="10" height="7" rx="1" /><circle cx="12" cy="16" r="1.500" fill="currentColor" /></>),
+  "alarm-panel": frame(<><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M8 7h8M8 11h3M14 11h2" /><path d="M12 14l3 2v2.500c0 1.500-1.500 2-3 2.500-1.500-.5-3-1-3-2.500V16z" strokeWidth="1.200" /></>),
+  "alarm-keypad": frame(<><rect x="7" y="2" width="10" height="20" rx="2" /><path d="M9.500 5.500h5" /><circle cx="10" cy="10" r=".8" fill="currentColor" /><circle cx="12" cy="10" r=".8" fill="currentColor" /><circle cx="14" cy="10" r=".8" fill="currentColor" /><circle cx="10" cy="13" r=".8" fill="currentColor" /><circle cx="12" cy="13" r=".8" fill="currentColor" /><circle cx="14" cy="13" r=".8" fill="currentColor" /><circle cx="12" cy="16.500" r=".8" fill="currentColor" /></>),
 };
 
 export const toolIcon = (tool: Tool): ReactNode => TOOL_ICONS[tool];

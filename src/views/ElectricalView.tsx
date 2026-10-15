@@ -4,6 +4,7 @@
  * Read only: nothing here sends a command. It belongs with the Electrical Designer, where the same nodes are drawn into the diagram of the house.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { askConfirm } from "../askConfirm";
 import { useMemo, useState } from "react";
 import { commandDevice, electricalElements, electricalHistory, type ElectricalElement } from "../api";
 import { KindIcon } from "../deviceKinds";
@@ -130,7 +131,7 @@ function ElectricalDevices({ t, origin, openDevices, now }: { t: Translate; orig
   const [problem, setProblem] = useState("");
   const data = poll.data;
   const send = async (element: ElectricalElement, command: "on" | "off") => {
-    if (element.risk !== "low" && !window.confirm(t(element.risk === "critical" ? "confirmCritical" : "confirmCircuit"))) return;
+    if (element.risk !== "low" && !(await askConfirm(t(element.risk === "critical" ? "confirmCritical" : "confirmCircuit"), t))) return;
     setBusy(element.id); setProblem("");
     try { await commandDevice(origin, element.id, command, element.risk !== "low"); poll.reload(); } catch (error) { setProblem(error instanceof Error ? error.message : "error"); }
     setBusy("");

@@ -3,6 +3,7 @@
  * its gateway node has reported yet, try the menu with example readings, edit and forget. A declared device waits until the first real reading.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { askConfirm } from "./askConfirm";
 import { useState, type FormEvent } from "react";
 import { deleteSolarDevice, saveSolarDevice, solarExample } from "./api";
 import type { Translate } from "./components/camera";
@@ -88,7 +89,7 @@ export function SolarEquipment({ kind, t, origin, catalog, registrations, report
           <div className="solar-declared-actions">
             <button disabled={busy} onClick={() => void act(() => solarExample(origin, item.node_id, item.device), t("solarExampleDone"))}>{t("solarExampleButton")}</button>
             <button disabled={busy} onClick={() => { setMessage(null); setForm({ editing: true, name: item.name, node_id: item.node_id, device: item.device, model: item.model, connection: item.connection, notes: item.notes }); }}>{t("solarEditDevice")}</button>
-            <button disabled={busy} className="danger-button" onClick={() => { if (window.confirm(t("solarConfirmDelete"))) void act(() => deleteSolarDevice(origin, item.node_id, item.device), t("solarDeleted")); }}>{t("solarDelete")}</button>
+            <button disabled={busy} className="danger-button" onClick={async () => { if (await askConfirm(t("solarConfirmDelete"), t)) void act(() => deleteSolarDevice(origin, item.node_id, item.device), t("solarDeleted")); }}>{t("solarDelete")}</button>
           </div>
         </article>;
       })}

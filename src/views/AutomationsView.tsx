@@ -3,6 +3,7 @@
  * (a device reaching a state, an alarm, the mode), an optional mode limit and up to six actions.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { askConfirm } from "../askConfirm";
 import { useState, type FormEvent } from "react";
 import { ApiError, createAutomation, deleteAutomation, runAutomation, updateAutomation, type Automation, type AutomationAction, type AlarmSourceType, type AutomationInput, type StudioDevice, type Trigger } from "../api";
 import { ACTUATOR_KINDS, MAIN_FIELD } from "../deviceKinds";
@@ -131,7 +132,7 @@ export function AutomationsView({ t, origin, automations, reload, devices, now }
         <div className="automation-actions">
           <button onClick={() => void act(() => runAutomation(origin, automation.id), t("runNowDone"))}>{t("runNow")}</button>
           <button onClick={() => setForm({ id: automation.id, name: automation.name, enabled: automation.enabled, trigger: automation.trigger, when_mode: automation.when_mode, actions: automation.actions })}>{t("editUser")}</button>
-          <button className="danger-button" onClick={() => { if (window.confirm(t("confirmDeleteAutomation"))) void act(() => deleteAutomation(origin, automation.id), t("automationDeleted")); }}>{t("deleteUser")}</button>
+          <button className="danger-button" onClick={async () => { if (await askConfirm(t("confirmDeleteAutomation"), t)) void act(() => deleteAutomation(origin, automation.id), t("automationDeleted")); }}>{t("deleteUser")}</button>
         </div>
       </article>)}
     </div>

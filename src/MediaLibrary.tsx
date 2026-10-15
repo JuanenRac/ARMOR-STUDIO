@@ -2,8 +2,9 @@
  * Local camera evidence library. Media files never pass through browser storage:
  * they are served by the loopback ARMOR media gateway on demand.
  */
+import { askConfirm } from "./askConfirm";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { deleteAllMedia, deleteMedia, listMedia, mediaUrl, type MediaItem } from "./api";
+import { deleteAllMedia, deleteMedia, listMedia, mediaUrl, setMediaProtected, type MediaItem } from "./api";
 import { MenuTitle } from "./menuLogos";
 
 type Filter = "all" | "snapshot" | "recording";
@@ -33,14 +34,18 @@ export function MediaLibrary({ origin, cameras, t }: { origin: string; cameras: 
   const visible = useMemo(() => items.filter(item => filter === "all" || item.kind === filter), [items, filter]);
   const selected = visible.find(item => item.id === selectedId) ?? items.find(item => item.id === selectedId) ?? visible[0];
   const cameraName = (id: string) => cameras.find(camera => camera.id === id)?.name ?? id;
+  const toggleProtection = async () => {
+    if (!selected) return;
+    try { await setMediaProtected(origin, selected, !selected.protected); await refresh(); } catch { setMessage(t("mediaFailed")); }
+  };
   const removeSelected = async () => {
-    if (!selected || !window.confirm(t("confirmDeleteMedia"))) return;
+    if (!selected || !(await askConfirm(t("confirmDeleteMedia"), t))) return;
     try { await deleteMedia(origin, selected); setMessage(t("mediaDeleted")); await refresh(); }
     catch { setMessage(t("mediaDeleteFailed")); }
   };
   const clearVisible = async () => {
     const kind = filter === "all" ? "all" : filter;
-    if (!window.confirm(t("confirmDeleteAllMedia"))) return;
+    if (!(await askConfirm(t("confirmDeleteAllMedia"), t))) return;
     try { await deleteAllMedia(origin, kind); setMessage(t("mediaDeletedAll")); await refresh(); }
     catch { setMessage(t("mediaDeleteFailed")); }
   };
@@ -59,7 +64,7 @@ export function MediaLibrary({ origin, cameras, t }: { origin: string; cameras: 
         </button>)}
       </aside>
       <article className="media-preview">
-        {selected ? <><div className="preview-stage">{selected.kind === "snapshot" ? <img src={mediaUrl(origin, selected)} alt={`${t("snapshot")}: ${cameraName(selected.cameraId)}`} /> : <video key={selected.id} src={mediaUrl(origin, selected)} controls preload="metadata" />}</div><footer className="preview-footer"><div><span className={`media-kind ${selected.kind}`}>{selected.kind === "snapshot" ? "PHOTO" : "VIDEO"}</span><h3>{cameraName(selected.cameraId)}</h3><p>{t("createdAt")}: {new Date(selected.createdAt).toLocaleString()} · {t("fileSize")}: {size(selected.bytes)}</p></div><button className="danger-button" onClick={() => void removeSelected()}>{t("deleteMedia")}</button></footer></> : <div className="media-empty preview-empty"><span>◉</span><p>{t("selectMedia")}</p></div>}
+        {selected ? <><div className="preview-stage">{selected.kind === "snapshot" ? <img src={mediaUrl(origin, selected)} alt={`${t("snapshot")}: ${cameraName(selected.cameraId)}`} /> : <video key={selected.id} src={mediaUrl(origin, selected)} controls preload="metadata" />}</div><footer className="preview-footer"><div><span className={`media-kind ${selected.kind}`}>{selected.kind === "snapshot" ? "PHOTO" : "VIDEO"}</span><h3>{cameraName(selected.cameraId)}</h3><p>{t("createdAt")}: {new Date(selected.createdAt).toLocaleString()} · {t("fileSize")}: {size(selected.bytes)}</p></div><button onClick={() => void toggleProtection()} title={t("mediaProtectedNote")}>{selected.protected ? t("mediaUnprotect") : t("mediaProtect")}</button><button className="danger-button" onClick={() => void removeSelected()}>{t("deleteMedia")}</button></footer></> : <div className="media-empty preview-empty"><span>◉</span><p>{t("selectMedia")}</p></div>}
       </article>
     </div>
   </section>;

@@ -3,6 +3,7 @@
  * and the removal of one.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { askConfirm } from "./askConfirm";
 import { useEffect, useState } from "react";
 import { configureCamera, deleteCamera, discoverCameraStreams, type CameraConnection, type DiscoveredCamera } from "./api";
 import "./configuration.css";
@@ -69,7 +70,7 @@ export function CameraSettings(props: Props) {
     setForm({ ...emptyConnection(), host: device.host });
   };
   const removeCamera = async () => {
-    if (!selected || !window.confirm(t("confirmDeleteCamera"))) return;
+    if (!selected || !(await askConfirm(t("confirmDeleteCamera"), t))) return;
     try { await deleteCamera(props.origin, selected.id); props.onCameraDeleted(selected.id); newCamera(); setMessage(t("cameraDeleted")); }
     catch { setMessage(t("cameraDeleteFailed")); }
   };

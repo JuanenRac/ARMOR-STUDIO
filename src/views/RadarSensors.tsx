@@ -4,6 +4,7 @@
  * as a list because a radar is a piece of equipment to set up, not only a symbol on a plan. Adding and deleting work here too.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { askConfirm } from "../askConfirm";
 import { useState } from "react";
 import type { Rules } from "../api";
 import type { Translate } from "../components/camera";
@@ -41,7 +42,7 @@ export function RadarSensors({ t, sensors, dimensions, nodes, rules, targetsBySe
     setSensors([...sensors, ...made]);
     setOpen(made[1].id); setWizard(null);
   };
-  const remove = (sensor: Sensor) => { if (window.confirm(`${t("confirmDeleteSensor")} ${sensor.name}`)) { setSensors(sensors.filter(item => item.id !== sensor.id)); setOpen(""); } };
+  const remove = async (sensor: Sensor) => { if (await askConfirm(`${t("confirmDeleteSensor")} ${sensor.name}`, t)) { setSensors(sensors.filter(item => item.id !== sensor.id)); setOpen(""); } };
   const zonesOf = (sensor: Sensor) => (rules?.zones ?? []).filter(zone => zone.node_id === sensor.node && (zone.sensor_id === undefined || zone.sensor_id === (sensor.channel ?? 0))).length;
 
   return <article className="stack-card radar-sensors">

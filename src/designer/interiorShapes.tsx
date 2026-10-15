@@ -74,6 +74,19 @@ export function interiorShape(feature: SiteFeature): ReactNode {
       return stand ? <><rect x={-w / 2} y={-d / 2} width={w} height={d} rx={0.03} {...body} /><rect x={-w * 0.45} y={-0.03} width={w * 0.9} height={0.06} {...dark} /></>
         : <><rect x={-w / 2} y={-d / 2} width={w} height={0.08} {...dark} /><path d={`M${-w / 2} ${-d / 2 + 0.14}H${w / 2}`} {...line} /></>;
     }
+    case "mirror": return <><rect x={-w / 2} y={-d / 2} width={w} height={Math.max(d, 0.06)} {...body} /><path d={`M${-w * 0.3} 0.02L${w * 0.1} 0.02`} {...line} /></>;
+    case "lift": return <><rect x={-w / 2} y={-d / 2} width={w} height={d} {...body} /><rect x={-w / 2 + 0.1} y={-d / 2 + 0.1} width={w - 0.2} height={d - 0.2} {...open} /><path d={`M${-w / 2 + 0.1} ${-d / 2 + 0.1}L${w / 2 - 0.1} ${d / 2 - 0.1}M${w / 2 - 0.1} ${-d / 2 + 0.1}L${-w / 2 + 0.1} ${d / 2 - 0.1}`} {...line} /><path d={`M${-w / 2} ${d / 2}H${w / 2}`} {...dark} /></>;
+    case "stair-light": return <><rect x={-w / 2} y={-d / 2} width={w} height={d} rx={0.02} {...body} /><circle r={Math.max(w, 0.2) * 0.8} {...open} /></>;
+    case "radiator": return <><rect x={-w / 2} y={-d / 2} width={w} height={d} {...body} />{Array.from({ length: Math.max(3, Math.round(w / 0.1)) }, (_unused, i) => <path key={i} d={`M${-w / 2 + ((i + 1) * w) / (Math.max(3, Math.round(w / 0.1)) + 1)} ${-d / 2}V${d / 2}`} {...line} />)}</>;
+    case "washer": return <><rect x={-w / 2} y={-d / 2} width={w} height={d} rx={0.04} {...body} /><circle r={Math.min(w, d) * 0.3} {...open} /><circle r={Math.min(w, d) * 0.16} {...dark} /></>;
+    case "fridge": return <><rect x={-w / 2} y={-d / 2} width={w} height={d} rx={0.03} {...body} /><path d={`M${-w / 2} ${d * 0.1}H${w / 2}`} {...line} /><path d={`M${w * 0.3} ${d / 2 - 0.03}V${d / 2}`} {...dark} /></>;
+    case "desk": return <><rect x={-w / 2} y={-d / 2} width={w} height={d} rx={0.02} {...body} /><rect x={w / 2 - w * 0.3} y={-d / 2 + 0.05} width={w * 0.28} height={d - 0.1} {...dark} /></>;
+    case "plant": return <><circle r={Math.max(w, d) / 2} {...body} /><circle r={Math.max(w, d) / 4} {...dark} /></>;
+    case "rug": return <><rect x={-w / 2} y={-d / 2} width={w} height={d} rx={0.04} {...body} /><rect x={-w / 2 + 0.12} y={-d / 2 + 0.12} width={w - 0.24} height={d - 0.24} {...open} /></>;
+    case "intercom": return <><rect x={-w / 2} y={-d / 2} width={w} height={Math.max(d, 0.08)} {...dark} /><circle cy={-0.01} r={0.03} {...open} /></>;
+    case "intercom-monitor": return <><rect x={-w / 2} y={-d / 2} width={w} height={Math.max(d, 0.08)} {...body} /><rect x={-w * 0.35} y={-d / 2 + 0.01} width={w * 0.7} height={0.03} {...open} /></>;
+    case "alarm-panel": return <><rect x={-w / 2} y={-d / 2} width={w} height={Math.max(d, 0.1)} {...body} /><circle cx={-w * 0.25} cy={0.02} r={0.025} {...open} /><circle cx={0} cy={0.02} r={0.025} {...open} /><circle cx={w * 0.25} cy={0.02} r={0.025} {...dark} /></>;
+    case "alarm-keypad": return <><rect x={-w / 2} y={-d / 2} width={w} height={Math.max(d, 0.07)} {...body} /><path d={`M${-w * 0.3} 0.01H${w * 0.3}`} {...line} /></>;
     default: return null;
   }
 }

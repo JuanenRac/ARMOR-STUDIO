@@ -201,6 +201,131 @@ function Television({ feature, glow }: Props) {
   </group>;
 }
 
+// ---- the building's common parts, the appliances and the equipment of the intercom and the alarm ---------------------------------------------------------------
+
+function Mirror({ feature, glow }: Props) {
+  const w = feature.width, h = feature.height, frame = feature.color ?? "#b9d6e0";
+  return <group>
+    <Box size={[w + 0.06, h + 0.06, 0.03]} at={[0, h / 2, 0]} color="#7a6a58" glow={glow} />
+    <Box size={[w, h, 0.012]} at={[0, h / 2, 0.016]} color={frame} rough={0.03} metal={0.9} cast={false} />
+  </group>;
+}
+
+/** An elevator: the cabin with its shaft walls, the doors on the front and a call button. */
+function Lift({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, h = feature.height, steel = feature.color ?? "#9aa4ab";
+  return <group>
+    <Box size={[0.08, h, d]} at={[-w / 2 + 0.04, h / 2, 0]} color={shade(steel, -0.25)} glow={glow} />
+    <Box size={[0.08, h, d]} at={[w / 2 - 0.04, h / 2, 0]} color={shade(steel, -0.25)} glow={glow} />
+    <Box size={[w, h, 0.08]} at={[0, h / 2, -d / 2 + 0.04]} color={shade(steel, -0.25)} glow={glow} />
+    <Box size={[w - 0.16, 0.06, d]} at={[0, h - 0.03, 0]} color={shade(steel, -0.35)} cast={false} />
+    {[-1, 1].map(sign => <Box key={sign} size={[(w - 0.16) / 2 - 0.01, h - 0.2, 0.04]} at={[sign * ((w - 0.16) / 4), (h - 0.2) / 2, d / 2 - 0.02]} color={steel} glow={glow} rough={0.25} metal={0.7} />)}
+    <Box size={[0.08, 0.14, 0.02]} at={[w / 2 + 0.02, 1.1, d / 2]} color="#e8f0f4" cast={false} />
+  </group>;
+}
+
+function StairLight({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, h = feature.height, lit = feature.color ?? "#ffe9a8";
+  return <group>
+    <Box size={[w, h, d]} at={[0, h / 2, 0]} color="#d8d2c4" glow={glow} />
+    <Box size={[w - 0.04, h * 0.5, 0.006]} at={[0, h / 2, d / 2 + 0.004]} color={lit} glow={{ emissive: lit, emissiveIntensity: 1.4 }} cast={false} />
+    <pointLight position={[0, h + 0.1, 0.1]} intensity={0.35} distance={2.2} color={lit} />
+  </group>;
+}
+
+function Radiator({ feature, glow }: Props) {
+  const w = feature.width, h = feature.height, d = feature.depth, white = feature.color ?? "#e8e4dc", fins = Math.max(4, Math.round(w / 0.09));
+  return <group>
+    {Array.from({ length: fins }, (_unused, index) => <Box key={index} size={[0.05, h, d]} at={[-w / 2 + ((index + 0.5) * w) / fins, h / 2 + 0.1, 0]} color={white} glow={glow} />)}
+    <Box size={[w, 0.04, d]} at={[0, h + 0.1, 0]} color={shade(white, -0.06)} cast={false} />
+  </group>;
+}
+
+function Washer({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, h = feature.height, white = feature.color ?? "#e9edef";
+  return <group>
+    <Box size={[w, h, d]} at={[0, h / 2, 0]} color={white} glow={glow} rough={0.4} />
+    <Cylinder radius={Math.min(w, h) * 0.3} height={0.03} at={[0, h * 0.45, d / 2 + 0.005]} color="#3b4a54" rough={0.1} metal={0.5} />
+    <Box size={[w - 0.1, 0.1, 0.01]} at={[0, h - 0.1, d / 2 + 0.005]} color="#9aa4ab" cast={false} />
+  </group>;
+}
+
+function Fridge({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, h = feature.height, white = feature.color ?? "#dfe5e8";
+  return <group>
+    <Box size={[w, h, d]} at={[0, h / 2, 0]} color={white} glow={glow} rough={0.35} />
+    <Box size={[w - 0.02, 0.012, 0.01]} at={[0, h * 0.62, d / 2 + 0.005]} color="#7d8a90" cast={false} />
+    <Box size={[0.02, 0.35, 0.03]} at={[w / 2 - 0.08, h * 0.8, d / 2 + 0.02]} color="#9aa4ab" cast={false} />
+    <Box size={[0.02, 0.3, 0.03]} at={[w / 2 - 0.08, h * 0.38, d / 2 + 0.02]} color="#9aa4ab" cast={false} />
+  </group>;
+}
+
+function Desk({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, h = feature.height, wood = feature.color ?? "#a98456";
+  return <group>
+    <Box size={[w, 0.04, d]} at={[0, h, 0]} color={wood} glow={glow} />
+    {[-1, 1].map(sign => <Box key={sign} size={[0.04, h, d - 0.06]} at={[sign * (w / 2 - 0.04), h / 2, 0]} color={shade(wood, -0.15)} glow={glow} />)}
+    <Box size={[w * 0.35, h * 0.5, d - 0.1]} at={[w / 2 - 0.3, h * 0.55, 0]} color={shade(wood, -0.08)} glow={glow} />
+  </group>;
+}
+
+function Plant({ feature, glow }: Props) {
+  const w = feature.width, h = feature.height, leaf = feature.color ?? "#4f8f4a", pot = Math.min(0.35, h * 0.3);
+  return <group>
+    <Cylinder radius={w * 0.32} height={pot} at={[0, pot / 2, 0]} color="#8a5a3c" glow={glow} />
+    <mesh position={[0, pot + (h - pot) / 2, 0]} castShadow><sphereGeometry args={[Math.max(0.2, w * 0.5), 14, 12]} /><meshStandardMaterial color={leaf} roughness={0.9} {...glow} /></mesh>
+  </group>;
+}
+
+function Rug({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, h = Math.max(0.015, feature.height), colour = feature.color ?? "#9b6a63";
+  return <group>
+    <Box size={[w, h, d]} at={[0, h / 2, 0]} color={colour} glow={glow} rough={1} cast={false} />
+    <Box size={[w - 0.2, h + 0.002, d - 0.2]} at={[0, h / 2, 0]} color={shade(colour, 0.18)} rough={1} cast={false} />
+  </group>;
+}
+
+/** The panel of a video intercom at the entrance: a camera, a screen-less speaker grille and the buttons. */
+function Intercom({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, h = feature.height, body = feature.color ?? "#3b4a54";
+  return <group>
+    <Box size={[w, h, d]} at={[0, h / 2, 0]} color={body} glow={glow} rough={0.4} metal={0.5} />
+    <Cylinder radius={0.018} height={0.01} at={[0, h * 0.86, d / 2 + 0.004]} color="#101418" rough={0.1} />
+    <Box size={[w - 0.06, h * 0.22, 0.006]} at={[0, h * 0.62, d / 2 + 0.003]} color="#222a2f" cast={false} />
+    {[0.38, 0.2, 0.06].map(level => <Box key={level} size={[w - 0.1, 0.03, 0.008]} at={[0, h * level, d / 2 + 0.004]} color="#e8f0f4" cast={false} />)}
+  </group>;
+}
+
+/** The indoor video monitor (the "telefonillo"): a small screen with the handset button. */
+function IntercomMonitor({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, h = feature.height, body = feature.color ?? "#2f3b44";
+  return <group>
+    <Box size={[w, h, d]} at={[0, h / 2, 0]} color={body} glow={glow} rough={0.35} />
+    <Box size={[w - 0.04, h * 0.5, 0.006]} at={[0, h * 0.62, d / 2 + 0.003]} color="#2d4a63" rough={0.05} cast={false} />
+    <Box size={[w * 0.5, 0.025, 0.008]} at={[0, h * 0.2, d / 2 + 0.004]} color="#e8f0f4" cast={false} />
+  </group>;
+}
+
+/** The control panel of an alarm: a box with its display and the state lights. */
+function AlarmPanel({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, h = feature.height, body = feature.color ?? "#a78bfa";
+  return <group>
+    <Box size={[w, h, d]} at={[0, h / 2, 0]} color={shade(body, -0.35)} glow={glow} rough={0.5} />
+    <Box size={[w - 0.06, h * 0.3, 0.006]} at={[0, h * 0.72, d / 2 + 0.003]} color="#1d2a33" rough={0.1} cast={false} />
+    {[-1, 0, 1].map(step => <Box key={step} size={[0.03, 0.03, 0.01]} at={[step * (w * 0.25), h * 0.42, d / 2 + 0.005]} color={step === 0 ? "#5df0c4" : "#ffb020"} glow={{ emissive: step === 0 ? "#5df0c4" : "#ffb020", emissiveIntensity: 1 }} cast={false} />)}
+    <Box size={[w - 0.08, h * 0.2, 0.008]} at={[0, h * 0.16, d / 2 + 0.004]} color={body} cast={false} />
+  </group>;
+}
+
+function AlarmKeypad({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, h = feature.height, body = feature.color ?? "#8b7bd8";
+  return <group>
+    <Box size={[w, h, d]} at={[0, h / 2, 0]} color={shade(body, -0.4)} glow={glow} rough={0.5} />
+    <Box size={[w - 0.03, h * 0.18, 0.006]} at={[0, h * 0.85, d / 2 + 0.003]} color="#1d2a33" cast={false} />
+    {Array.from({ length: 12 }, (_unused, index) => <Box key={index} size={[w * 0.2, h * 0.07, 0.008]} at={[(index % 3 - 1) * w * 0.28, h * 0.66 - Math.floor(index / 3) * h * 0.14, d / 2 + 0.004]} color="#e8f0f4" cast={false} />)}
+  </group>;
+}
+
 /** The body of one of the objects of the inside of a building. */
 export function InteriorBody(props: Props) {
   switch (props.feature.kind) {
@@ -216,6 +341,19 @@ export function InteriorBody(props: Props) {
     case "armchair": return <Armchair {...props} />;
     case "dining": return <Dining {...props} />;
     case "tv": return <Television {...props} />;
+    case "mirror": return <Mirror {...props} />;
+    case "lift": return <Lift {...props} />;
+    case "stair-light": return <StairLight {...props} />;
+    case "radiator": return <Radiator {...props} />;
+    case "washer": return <Washer {...props} />;
+    case "fridge": return <Fridge {...props} />;
+    case "desk": return <Desk {...props} />;
+    case "plant": return <Plant {...props} />;
+    case "rug": return <Rug {...props} />;
+    case "intercom": return <Intercom {...props} />;
+    case "intercom-monitor": return <IntercomMonitor {...props} />;
+    case "alarm-panel": return <AlarmPanel {...props} />;
+    case "alarm-keypad": return <AlarmKeypad {...props} />;
     default: return null;
   }
 }

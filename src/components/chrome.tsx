@@ -12,16 +12,35 @@ import { ArmorMark } from "../menuLogos";
 import { HELP_SECTIONS } from "../helpText";
 import "../help.css";
 
+const NAV_CLOSED_KEY = "armor-studio-nav-closed";
+
 export function Sidebar({ view, setView, sidebarOpen, toggle, connection, alarmBadge, t }: {
   view: View; setView: (view: View) => void; sidebarOpen: boolean; toggle: () => void; connection: string; /** Alarms waiting for a person. */ alarmBadge: number; t: Translate;
 }) {
+  // The groups can be folded; which ones are folded is remembered in this browser. The group of the screen you are on never hides it.
+  const [closed, setClosed] = useState<ReadonlySet<string>>(() => { try { return new Set<string>(JSON.parse(window.localStorage.getItem(NAV_CLOSED_KEY) ?? "[]") as string[]); } catch { return new Set<string>(); } });
+  const flip = (title: string) => setClosed(current => {
+    const next = new Set(current);
+    if (next.has(title)) next.delete(title); else next.add(title);
+    try { window.localStorage.setItem(NAV_CLOSED_KEY, JSON.stringify([...next])); } catch { /* storage may be blocked */ }
+    return next;
+  });
   return <aside className="sidebar">
     <div className="brand">
       <span className="brand-mark armor-mark"><ArmorMark /></span>
       <div className="brand-copy"><strong>A.R.M.O.R.</strong><small>STUDIO CONSOLE</small></div>
       <button className="sidebar-toggle" title={sidebarOpen ? t("collapse") : t("expand")} aria-label={sidebarOpen ? t("collapse") : t("expand")} onClick={toggle}>{sidebarOpen ? "‹" : "›"}</button>
     </div>
-    <nav>{NAV_GROUPS.map(group => <div key={group.title} className="nav-group"><small className="nav-group-title">{t(group.title)}</small>{group.items.map(([key, icon]) => <button key={key} className={view === key ? "active" : ""} onClick={() => setView(key)} title={t(key)}><span className="nav-icon">{icon}</span><em>{t(key)}</em>{key === "alarms" && alarmBadge > 0 && <b className="nav-badge">{alarmBadge}</b>}</button>)}</div>)}</nav>
+    <nav>{NAV_GROUPS.map(group => {
+      const folded = closed.has(group.title) && !group.items.some(([key]) => key === view);
+      const waiting = group.items.some(([key]) => key === "alarms") ? alarmBadge : 0;
+      return <div key={group.title} className={`nav-group ${folded ? "folded" : ""}`}>
+        <button type="button" className="nav-group-title" aria-expanded={!folded} title={folded ? t("navGroupUnfold") : t("navGroupFold")} onClick={() => flip(group.title)}>
+          <i aria-hidden="true">{folded ? "▸" : "▾"}</i><span>{t(group.title)}</span>{folded && waiting > 0 && <b className="nav-badge">{waiting}</b>}
+        </button>
+        <div className="nav-items">{group.items.map(([key, icon]) => <button key={key} className={view === key ? "active" : ""} onClick={() => setView(key)} title={t(key)}><span className="nav-icon">{icon}</span><em>{t(key)}</em>{key === "alarms" && alarmBadge > 0 && <b className="nav-badge">{alarmBadge}</b>}</button>)}</div>
+      </div>;
+    })}</nav>
     <div className="sidebar-foot"><span className="state-dot normal" /> <span>{connection}</span></div>
   </aside>;
 }

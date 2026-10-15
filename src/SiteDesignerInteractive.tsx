@@ -7,7 +7,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { Dimensions, RoofItemKind, SiteFeatureKind } from "./domain";
 import { INTERIOR_KINDS } from "./domain";
-import type { StudioDevice } from "./api";
+import type { AlarmNodeView, StudioDevice } from "./api";
 import { Inspector } from "./designer/Inspector";
 import { ICON } from "./designer/icons";
 import { FloatingToolbox } from "./designer/Toolbox";
@@ -37,11 +37,13 @@ type Props = {
   nodeIds: string[];
   /** The devices of the system (with their live state), and a device the Devices menu asked to place. */
   devices: StudioDevice[]; wantsToPlace: string; clearWantsToPlace: () => void; openDevices: () => void;
+  /** What an object can be tied to in the other menus: the cameras, the alarm panels, and the way to those menus. */
+  cameras?: ReadonlyArray<{ id: string; name: string }>; alarmNodes?: readonly AlarmNodeView[]; openCameras?: () => void; openAlarmPanels?: () => void;
 };
 
 type Snapshot = { model: SiteModel; dimensions: Dimensions };
 const GRID_M = 0.25, HISTORY_LIMIT = 100, COALESCE_MS = 900;
-const FEATURE_TOOLS: ReadonlySet<Tool> = new Set(["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "floor"]);
+const FEATURE_TOOLS: ReadonlySet<Tool> = new Set(["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "floor", "mirror", "lift", "stair-light", "radiator", "washer", "fridge", "desk", "plant", "rug", "intercom", "intercom-monitor", "alarm-panel", "alarm-keypad"]);
 const ROOF_ITEM_OF: Partial<Record<Tool, RoofItemKind>> = { chimney: "chimney", "roof-solar": "solar", antenna: "antenna", gutter: "gutter", downpipe: "downpipe" };
 const REPEATING: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp", "chimney", "roof-solar", "antenna", "gutter", "downpipe", "pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road"]);
 const NUDGE = 0.25;
@@ -417,7 +419,7 @@ export function SiteDesignerInteractive(props: Props) {
             </Suspense>}
         {props.notice && props.notice !== t("configuration") && <p className="notice canvas-notice">{props.notice}</p>}
       </div>
-      <Inspector t={t} showFloor={setActiveFloor} dimensions={dimensions} setDimensions={setWorkArea} model={model} selection={selection} edit={edit} onSelect={select} onRemove={removeCurrent} onDuplicate={duplicateCurrent} onRectTerrain={setRectTerrain} nodeIds={props.nodeIds} onTool={setTool} devices={props.devices} pendingDevice={pending} onPickDevice={id => { setPending(id); setTool("device"); props.setNotice(`${t("clickToPlaceDevice")}: ${props.devices.find(item => item.id === id)?.name ?? id}`); }} onOpenDevices={props.openDevices} />
+      <Inspector t={t} showFloor={setActiveFloor} dimensions={dimensions} setDimensions={setWorkArea} model={model} selection={selection} edit={edit} onSelect={select} onRemove={removeCurrent} onDuplicate={duplicateCurrent} onRectTerrain={setRectTerrain} nodeIds={props.nodeIds} onTool={setTool} devices={props.devices} pendingDevice={pending} onPickDevice={id => { setPending(id); setTool("device"); props.setNotice(`${t("clickToPlaceDevice")}: ${props.devices.find(item => item.id === id)?.name ?? id}`); }} onOpenDevices={props.openDevices} links={{ cameras: props.cameras ?? [], alarmNodes: props.alarmNodes ?? [], openCameras: props.openCameras, openAlarmPanels: props.openAlarmPanels }} />
     </div>
   </section>;
 }

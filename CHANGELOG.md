@@ -2,7 +2,27 @@
 
 All notable changes to this project are documented here.
 
-## [0.7.0] - Audit round two: texts of the new service descriptions
+## [0.7.2] - Alarm designer, a menu in groups and a complete help
+
+- **Alarm Designer:** a new menu in Design, like the electrical and network designers, for the house's alarm: panels, expanders, communicator, door and window contacts, motion, dual-technology, outdoor beam, glass-break, vibration, smoke, heat, carbon monoxide, gas and flood detectors, panic buttons, tamper switches, sirens, strobes, relay outputs, keypads, card readers, key fobs, touch panels, power supplies and batteries, joined by wired loops, radio links, the siren output, the data bus and the supply.
+- The Alarm panels menu and the designer are one: a drawn panel is tied to a real panel and a drawn sensor to one of its zones, the element shows live what the panel reports, "draw what the panels have" fills the drawing from the panels (each sensor guessed from the name of its zone), and each menu opens the other.
+- Checks of the drawing: sensors nobody listens to, more loops than zones in use, a panel with no siren, keypad or backup battery, wireless sensors without a battery, smoke and flood sensors that would be silent while disarmed, and what the panels have that the drawing does not.
+- The side menu is reorganised in groups - Monitor, Security, Energy, House and network, Design, Administration - which can be folded (Studio remembers which); a collapsed menu and small screens always reach every screen.
+- The Help is complete again: a section for the Alarm Designer and new texts for the first steps, alarms, alarm panels, recordings, services, configuration and tips, in the seven languages, in the order of the menu.
+- Every question that used the browser's own confirm() (deleting a camera, a user, a device, an automation, a recording, a sensor, forgetting a node, clearing a design, switching a circuit) is now asked in the page, so a browser that blocks dialogs can no longer leave a button doing nothing.
+- A new critical alarm is heard (three beeps) and shown as a browser notification when the browser allows it; the alarms already there when the console opens are not announced again.
+- Evidence can be protected from the automatic pruning, and released, from the media library.
+- Before the first answer of the server the console shows no nodes and no alarm, instead of an invented armed house with a node in high alert.
+- A slow server no longer shows the login to a valid session at start-up (the check is repeated for fifteen seconds); the "force" box of the alarm panels is cleared after arming.
+- A duplicated description in the services text is removed.
+- The console asks the server which cameras are recording (every 15 seconds), so after a reload it knows.
+- The node firmware screen lets a node be added by its address, for the ones the network node does not see.
+- **Site designer: thirteen new objects.** A mirror, an elevator, stair lights, a radiator, a washing machine, a fridge, a desk, a plant and a rug for the inside, and, for the ARMOR equipment, a video intercom (the entrance panel), the intercom monitor of a flat (the "telefonillo"), an alarm panel and an alarm keypad; each with its icon, its 2D symbol and its 3D body.
+- **Site designer: block of flats.** From a rectangular building, one button fills it with floors, a corridor with the flats on both sides, the stairs and the lift, a window for every flat, the street door with its video intercom, a monitor in every flat, the alarm panel and keypad in the hall, stair lights and mailboxes; doing it again replaces what it made, and the buildings can now be used as "block of flats".
+- **Objects tied to other menus:** a video intercom to a camera of the Cameras menu, its monitor to the intercom it answers, an alarm panel or keypad to a real panel of the Alarm panels menu, and a stair light or a lamp to a device of the Devices menu; the object says what the thing it is tied to reports now and a button opens that menu. The tie is kept in the design.
+- The side menu is a little wider, a name stays on one line (the whole name is in the tooltip) and, on a short screen, the list scrolls on its own while the brand and the connection state stay in view.
+
+## [0.7.0] - Texts of the new service descriptions
 
 - The descriptions of the services of the server in the five languages cover the new ones.
 

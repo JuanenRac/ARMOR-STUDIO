@@ -5,6 +5,7 @@
  * keyboard); the model, the operations, the checks and the storage of the drawing are in ./network.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { askConfirm } from "./askConfirm";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { FRAME_COLOURS, type FrameColour } from "./electrical/model";
 import { analyse, type Issue } from "./network/analysis";
@@ -297,8 +298,8 @@ export function NetworkDesigner({ t, design, setDesign, status, overview, camera
     } catch { say(t("elImportBad")); }
     if (fileInput.current) fileInput.current.value = "";
   };
-  const startNew = (example: boolean) => {
-    if (designRef.current.elements.length && !window.confirm(t("elClearConfirm"))) return;
+  const startNew = async (example: boolean) => {
+    if (designRef.current.elements.length && !(await askConfirm(t("elClearConfirm"), t))) return;
     commit(example ? housePreset(t) : emptyDesign()); setSelection(null); setWireFrom(null);
     window.setTimeout(fit, 0);
   };

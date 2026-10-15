@@ -3,6 +3,7 @@
  * the ones that can be switched, a form to add or edit one (with presets for common ecosystems), and a way to try it out by hand.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { askConfirm } from "../askConfirm";
 import { useMemo, useState, type FormEvent } from "react";
 import { ApiError, commandDevice, createDevice, deleteDevice, setDeviceState, updateDevice, type DeviceKind, type DeviceProtocol, type DeviceRisk, type StudioDevice } from "../api";
 import {
@@ -42,8 +43,8 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
   const online = devices.filter(device => device.online).length, problems = devices.filter(device => deviceProblem(device)).length;
 
   /** Sends a command; a circuit of the board (or a critical one) asks first, and the server insists on it. */
-  const switchDevice = (device: StudioDevice, command: "on" | "off" | "toggle") => {
-    if (device.risk !== "low" && !window.confirm(t(device.risk === "critical" ? "confirmCritical" : "confirmCircuit"))) return Promise.resolve(undefined);
+  const switchDevice = async (device: StudioDevice, command: "on" | "off" | "toggle") => {
+    if (device.risk !== "low" && !(await askConfirm(t(device.risk === "critical" ? "confirmCritical" : "confirmCircuit"), t))) return undefined;
     return commandDevice(origin, device.id, command, device.risk !== "low");
   };
   const act = async (work: () => Promise<unknown>, done?: string) => { try { await work(); if (done) say(done); reload(); } catch (error) { explain(error); } };
@@ -168,7 +169,7 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
             {ALARM_KIND[device.kind] && main && <button title={t("testHelp")} onClick={() => void act(() => setDeviceState(origin, device.id, { [main]: !isOn }))}>{isOn ? t("testClear") : t("testTrigger")}</button>}
             <button onClick={() => onPlace(device.id)}>{placedIds.has(device.id) ? t("placedOnDesign") : t("placeOnDesign")}</button>
             <button onClick={() => open(device)}>{t("editUser")}</button>
-            <button className="danger-button" onClick={() => { if (window.confirm(t("confirmDeleteDevice"))) void act(() => deleteDevice(origin, device.id), t("deviceDeleted")); }}>{t("deleteUser")}</button>
+            <button className="danger-button" onClick={async () => { if (await askConfirm(t("confirmDeleteDevice"), t)) void act(() => deleteDevice(origin, device.id), t("deviceDeleted")); }}>{t("deleteUser")}</button>
           </div>
         </article>;
       })}

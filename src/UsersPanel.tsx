@@ -3,6 +3,7 @@
  * with creation, renaming, new passwords, roles and removal. Passwords are only ever typed here; the server keeps a hash.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { askConfirm } from "./askConfirm";
 import { useCallback, useContext, useEffect, useState, type FormEvent } from "react";
 import { ApiError, changeAccount, clearUserPin, createUser, deleteUser, listUsers, setMyPin, setUserPin, updateUser, type ListedUser, type Role } from "./api";
 import { SessionUserContext } from "./sessionContext";
@@ -84,7 +85,7 @@ export function UsersPanel({ t, origin }: Props) {
     catch (error) { explain(error); }
   };
   const remove = async (user: ListedUser) => {
-    if (!window.confirm(`${t("confirmDeleteUser")}\n\n${user.username}`)) return;
+    if (!(await askConfirm(`${t("confirmDeleteUser")}\n\n${user.username}`, t))) return;
     try { await deleteUser(origin, user.id); say(t("userDeleted")); await reload(); } catch (error) { explain(error); }
   };
   const roleName = (role: Role) => t(role === "admin" ? "roleAdmin" : role === "panel" ? "rolePanel" : "roleOperator");

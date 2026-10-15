@@ -16,13 +16,13 @@ import "./solar.css";
 import "./electrical-live.css";
 import "./alarm-panels.css";
 
-type Props = { t: Translate; origin: string; nodes: AlarmNodes | null; unreachable: boolean; network?: NetworkOverview | null; isAdmin: boolean; now: number };
+type Props = { t: Translate; origin: string; nodes: AlarmNodes | null; unreachable: boolean; network?: NetworkOverview | null; isAdmin: boolean; now: number; openDesigner?: () => void };
 
 const ago = (seconds: number): string => (seconds < 90 ? `${seconds} s` : seconds < 5400 ? `${Math.round(seconds / 60)} min` : `${Math.round(seconds / 3600)} h`);
 const sinceIso = (iso: string, now: number): string => { const s = Math.max(0, Math.round((now - Date.parse(iso)) / 1000)); return Number.isFinite(s) ? ago(s) : "–"; };
 const fill = (text: string, value: string): string => text.replace("{0}", value);
 
-export function AlarmPanelsView({ t, origin, nodes, unreachable, network = null, isAdmin, now }: Props) {
+export function AlarmPanelsView({ t, origin, nodes, unreachable, network = null, isAdmin, now, openDesigner }: Props) {
   const list = nodes?.nodes ?? [];
   const totals = nodes?.totals;
   const status = usePolled(() => alarmCommandsStatus(origin), 4000, origin);
@@ -38,6 +38,7 @@ export function AlarmPanelsView({ t, origin, nodes, unreachable, network = null,
       </div>}
     </header>
     {unreachable && <p className="solar-notice bad">{t("apUnreachable")}</p>}
+    {openDesigner && <p className="solar-notice ap-designer"><span>{t("apDesignerHelp")}</span> <button onClick={openDesigner}>{t("apOpenDesigner")}</button></p>}
     {isAdmin && status.data && !enabled && <p className="solar-notice">{t("apCommandsOff")}</p>}
     <NodeFinder t={t} origin={origin} network={network} wantKind="alarm" knownIds={list.map(node => node.node_id)} />
     {list.length === 0 ? <div className="solar-empty"><MenuLogo kind="alarmPanels" size={92} /><h3>{t("apNone")}</h3><p>{t("apNoneHelp")}</p></div>
@@ -63,7 +64,7 @@ function PanelCard({ t, origin, node, now, canCommand, recent, reload }: { t: Tr
   const send = async (action: "arm" | "disarm", mode?: "away" | "stay", pin?: string) => {
     setAskingPin(false);
     setBusy(true); setMessage(null);
-    try { await sendAlarmCommand(origin, node.node_id, action, mode, force, pin); setMessage({ text: t("apSent"), bad: false }); reload(); }
+    try { await sendAlarmCommand(origin, node.node_id, action, mode, force, pin); setMessage({ text: t("apSent"), bad: false }); setForce(false); reload(); }
     catch (error) {
       const code = error instanceof ApiError ? error.code : "other";
       setMessage({ text: t(`apErr_${code}`) !== `apErr_${code}` ? t(`apErr_${code}`) : t("apErr_other"), bad: true });

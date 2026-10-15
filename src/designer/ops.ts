@@ -268,11 +268,27 @@ export const FEATURE_DEFAULTS: Record<SiteFeatureKind, Omit<SiteFeature, "id" | 
   armchair: { width: 0.9, depth: 0.9, height: 0.85, rotation: 0, slope: 0 },
   dining: { width: 1.8, depth: 0.9, height: 0.75, rotation: 0, slope: 0 },
   tv: { width: 1.2, depth: 0.4, height: 0.7, rotation: 0, slope: 0, style: "tWall" },
+  mirror: { width: 0.8, depth: 0.05, height: 1.6, rotation: 0, slope: 0 },
+  lift: { width: 1.6, depth: 1.5, height: 2.6, rotation: 0, slope: 0 },
+  "stair-light": { width: 0.2, depth: 0.08, height: 0.1, rotation: 0, slope: 0 },
+  radiator: { width: 1.0, depth: 0.1, height: 0.6, rotation: 0, slope: 0 },
+  washer: { width: 0.6, depth: 0.6, height: 0.85, rotation: 0, slope: 0 },
+  fridge: { width: 0.7, depth: 0.7, height: 1.85, rotation: 0, slope: 0 },
+  desk: { width: 1.4, depth: 0.7, height: 0.75, rotation: 0, slope: 0 },
+  plant: { width: 0.5, depth: 0.5, height: 1.1, rotation: 0, slope: 0 },
+  rug: { width: 2.0, depth: 1.4, height: 0.02, rotation: 0, slope: 0 },
+  intercom: { width: 0.22, depth: 0.05, height: 0.34, rotation: 0, slope: 0 },
+  "intercom-monitor": { width: 0.2, depth: 0.05, height: 0.26, rotation: 0, slope: 0 },
+  "alarm-panel": { width: 0.3, depth: 0.08, height: 0.4, rotation: 0, slope: 0 },
+  "alarm-keypad": { width: 0.14, depth: 0.04, height: 0.2, rotation: 0, slope: 0 },
 };
+
+/** How high above the floor a thing that hangs on a wall is put when it is placed (a mirror, the panel of an intercom, an alarm keypad); the rest stand on the floor. */
+export const MOUNT_HEIGHT: Partial<Record<SiteFeatureKind, number>> = { mirror: 0.3, intercom: 1.3, "intercom-monitor": 1.4, "alarm-panel": 1.4, "alarm-keypad": 1.3 };
 
 export function addFeature(model: SiteModel, kind: SiteFeatureKind, x: number, y: number, z = 0): { model: SiteModel; id: string } {
   const id = nextId(kind, model.features.map(item => item.id));
-  return { model: { ...model, features: [...model.features, { id, kind, x: round2(x), y: round2(y), z, ...FEATURE_DEFAULTS[kind] }] }, id };
+  return { model: { ...model, features: [...model.features, { id, kind, x: round2(x), y: round2(y), z: round2(z + (MOUNT_HEIGHT[kind] ?? 0)), ...FEATURE_DEFAULTS[kind] }] }, id };
 }
 
 /** A strip (a fence, a sidewalk) between two points: a feature as long as the gap, lying along it. */

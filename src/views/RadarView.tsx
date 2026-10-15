@@ -3,6 +3,7 @@
  * radars report right now drawn where they stand, their recent path, and the ignore zones; and the field nodes beside it.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { askConfirm } from "../askConfirm";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { readRules, readStatus, type Rules } from "../api";
 import { bounds, centroid, offsetPolygon } from "../designer/geometry";
@@ -174,7 +175,7 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
           <div><strong>{node.node_id}</strong><small>{node.stale ? t("staleWord") : node.online ? t("online") : t("offlineWord")} · {node.online && !node.stale ? `${node.target_count} ${t("tracksWord")}` : `— ${t("tracksWord")}`} · {model.sensors.filter(sensor => sensor.node === node.node_id).length} {t("radarNodeLinked")} · {node.lux ?? "—"} lux{node.panel ? ` · ${t("firmwareWord")} ${node.panel.firmware}` : ""}</small></div>
           {node.panel && <a className="panel-link" href={panelUrl(node.panel)} target="_blank" rel="noopener noreferrer" title={`${node.panel.name} · ${node.panel.ip}`}>{t("openNodePanel")}</a>}
           <b>{node.online && !node.stale ? node.alert_level : "—"}</b>
-          {(!node.online || node.stale) && <button className="danger-button" title={t("forgetNode")} onClick={() => { if (window.confirm(`${t("confirmForgetNode")} ${node.node_id}`)) forget(node.node_id); }}>{t("forgetNode")}</button>}
+          {(!node.online || node.stale) && <button className="danger-button" title={t("forgetNode")} onClick={async () => { if (await askConfirm(`${t("confirmForgetNode")} ${node.node_id}`, t)) forget(node.node_id); }}>{t("forgetNode")}</button>}
         </div>)}
         {unmapped.map(item => <p key={item.node} className="muted small warn-line"><b>{item.node}</b> {t("unmappedNode")}</p>)}
         {!nodes.length && <p className="muted">{t("noRadar")}</p>}

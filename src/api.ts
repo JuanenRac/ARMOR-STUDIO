@@ -5,7 +5,7 @@ export type DiscoveredCamera = { host: string; ports: number[] };
 export type CameraConnection = { id: string; name: string; host: string; snapshotUrl: string; rtspPath: string; previewPath?: string; username: string; password: string; onvifPort: number; rtspPort: number };
 export type PublicCameraConnection = Omit<CameraConnection, "password"> & { hasCredentials: boolean; liveVideoAvailable: boolean };
 export type CameraView = Omit<PublicCameraConnection, "username">;
-export type MediaItem = { id: string; cameraId: string; kind: "snapshot" | "recording"; file: string; createdAt: string; bytes: number };
+export type MediaItem = { id: string; cameraId: string; kind: "snapshot" | "recording"; file: string; createdAt: string; bytes: number; protected?: boolean };
 const endpoint = (origin: string, suffix: string) => origin.replace(/\/$/, "") + suffix;
 const localSession = { credentials: "include" as const };
 /**
@@ -142,6 +142,12 @@ export async function deleteMedia(origin: string, item: MediaItem): Promise<void
   const kind = item.kind === "snapshot" ? "snapshots" : "recordings";
   const response = await timedFetch(endpoint(origin, `/api/v1/media/${encodeURIComponent(item.cameraId)}/${kind}/${encodeURIComponent(item.file)}`), { method: "DELETE", ...localSession });
   if (!response.ok) throw new Error("Media delete returned " + response.status);
+}
+/** Keeps a piece of evidence out of the automatic pruning (30 days or 20 GB), or lets it go back in. */
+export async function setMediaProtected(origin: string, item: MediaItem, protect: boolean): Promise<void> {
+  const kind = item.kind === "snapshot" ? "snapshots" : "recordings";
+  const response = await timedFetch(endpoint(origin, `/api/v1/media/${encodeURIComponent(item.cameraId)}/${kind}/${encodeURIComponent(item.file)}/protected`), { method: "PUT", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ protected: protect }) });
+  if (!response.ok) throw new Error("Media protection returned " + response.status);
 }
 export async function deleteAllMedia(origin: string, kind: "snapshot" | "recording" | "all"): Promise<number> {
   const response = await timedFetch(endpoint(origin, "/api/v1/media"), { method: "DELETE", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ kind }) });
@@ -423,9 +429,9 @@ export async function saveSite(origin: string, revision: number, site: Record<st
 }
 
 /** The versions the server keeps of each of the three designs (what it had before the changes), to be taken back from. */
-export type DesignKind = "site" | "electrical" | "network";
+export type DesignKind = "site" | "electrical" | "network" | "alarm";
 export type DesignVersion = { id: string; revision: number; saved_at: string; updated_by: string | null; counts: Record<string, number> };
-const DESIGN_ROUTE: Record<DesignKind, string> = { site: "/api/v1/site", electrical: "/api/v1/electrical/design", network: "/api/v1/network/design" };
+const DESIGN_ROUTE: Record<DesignKind, string> = { site: "/api/v1/site", electrical: "/api/v1/electrical/design", network: "/api/v1/network/design", alarm: "/api/v1/alarm/design" };
 export const listDesignVersions = (origin: string, kind: DesignKind) => userCall<{ versions: DesignVersion[] }>(origin, "GET", `${DESIGN_ROUTE[kind]}/versions`);
 /** Forget one kept version, or all of them (the current design is not touched); the second returns how many there were. */
 export async function deleteDesignVersion(origin: string, kind: DesignKind, id: string): Promise<void> {
@@ -439,7 +445,7 @@ export async function deleteDesignVersions(origin: string, kind: DesignKind): Pr
 }
 export async function readDesignVersion(origin: string, kind: DesignKind, id: string): Promise<Record<string, unknown> | null> {
   const document = await userCall<Record<string, unknown>>(origin, "GET", `${DESIGN_ROUTE[kind]}/versions/${encodeURIComponent(id)}`);
-  const design = document[kind];
+  const design = document[kind === "alarm" ? "alarm_design" : kind];
   return typeof design === "object" && design !== null ? design as Record<string, unknown> : null;
 }
 
@@ -536,6 +542,15 @@ export const forgetDeviceNote = (origin: string, id: string) => userCall<void>(o
 /** The login of the web administration of a device: the password goes in and never comes out (the node only sees it inside one `inspect` order). */
 export const saveDeviceLogin = (origin: string, id: string, login: { user: string; password: string }) => userCall<{ id: string; login: { user: string } }>(origin, "PUT", `/api/v1/network/devices/${encodeURIComponent(id)}/login`, login);
 export const forgetDeviceLogin = (origin: string, id: string) => userCall<void>(origin, "DELETE", `/api/v1/network/devices/${encodeURIComponent(id)}/login`);
+export type AlarmDesignDocument = { revision: number; updated_at: string | null; updated_by: string | null; alarm_design: Record<string, unknown> | null };
+export const readAlarmDesign = (origin: string) => userCall<AlarmDesignDocument>(origin, "GET", "/api/v1/alarm/design");
+/** Save the alarm drawing. A 409 (someone saved first) comes back as `conflict` with their version. */
+export async function saveAlarmDesign(origin: string, revision: number, alarmDesign: Record<string, unknown>): Promise<{ revision: number } | { conflict: AlarmDesignDocument }> {
+  const response = await timedFetch(endpoint(origin, "/api/v1/alarm/design"), { method: "PUT", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ revision, alarm_design: alarmDesign }) });
+  if (response.status === 409) return { conflict: (await response.json() as { current: AlarmDesignDocument }).current };
+  if (!response.ok) throw new ApiError(response.status, "alarm_design_save_failed");
+  return { revision: (await response.json() as { revision: number }).revision };
+}
 export const readNetworkDesign = (origin: string) => userCall<NetworkDocument>(origin, "GET", "/api/v1/network/design");
 /** Save the network drawing. A 409 (someone saved first) comes back as `conflict` with their version. */
 export async function saveNetworkDesign(origin: string, revision: number, network: Record<string, unknown>): Promise<{ revision: number } | { conflict: NetworkDocument }> {

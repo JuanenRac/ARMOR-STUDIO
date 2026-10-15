@@ -5,6 +5,7 @@
  * the checks and the storage of the drawing are in ./electrical.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { askConfirm } from "./askConfirm";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import type { ElectricalNodeReading } from "./api";
 import type { SolarDeviceView, SolarRegistration } from "./solarModel";
@@ -290,9 +291,8 @@ export function ElectricalDesigner({ t, design, setDesign, status, nodeIds, sola
     } catch { say(t("elImportBad")); }
     if (fileInput.current) fileInput.current.value = "";
   };
-  const startNew = (example: boolean) => {
-    if (designRef.current.elements.length && !example && !window.confirm(t("elClearConfirm"))) return;
-    if (designRef.current.elements.length && example && !window.confirm(t("elClearConfirm"))) return;
+  const startNew = async (example: boolean) => {
+    if (designRef.current.elements.length && !(await askConfirm(t("elClearConfirm"), t))) return;
     commit(example ? housePreset(t) : emptyDesign()); setSelection(null); setWireFrom(null);
     window.setTimeout(fit, 0);
   };

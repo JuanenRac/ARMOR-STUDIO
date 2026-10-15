@@ -21,13 +21,13 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-7-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-352%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-203%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
 
 ---
 
-**Vérification d'honnêteté - ce qui fonctionne aujourd'hui:** Studio dialogue avec [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) et est couvert par 352 tests unitaires (lecture des réglages, fusion des caméras, arithmétique des graphiques solaires, chaque menu affiché dans les sept langues, hôte statique). Ne sont **pas** prouvés : la vidéo en direct et le PTZ avec chaque vraie caméra, les menus solaires avec un vrai onduleur ou une vraie batterie, ni une revue formelle d'accessibilité ou d'utilisabilité. Tant que le serveur est injoignable, Studio affiche des données de démonstration et le dit dans la barre supérieure.
+**Vérification d'honnêteté - ce qui fonctionne aujourd'hui:** Studio dialogue avec [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) et est couvert par 203 tests unitaires (lecture des réglages, fusion des caméras, arithmétique des graphiques solaires, chaque menu affiché dans les sept langues, hôte statique). Ne sont **pas** prouvés : la vidéo en direct et le PTZ avec chaque vraie caméra, les menus solaires avec un vrai onduleur ou une vraie batterie, ni une revue formelle d'accessibilité ou d'utilisabilité. Tant que le serveur est injoignable, Studio affiche des données de démonstration et le dit dans la barre supérieure.
 
 ---
 
@@ -42,15 +42,11 @@
 * **Radar :** une carte en direct dessinée à partir de votre plan du site (terrain, bâtiments, caméras, radars et leur couverture) avec les cibles que chaque radar rapporte, leur trajet récent et les zones ignorées ; état des nœuds en direct, les nœuds muets étant *périmés* ; le panneau propre de chaque nœud est à un clic.
 * **Concepteur de site :** dessinez le terrain (rectangle ou forme quelconque, avec longueurs saisies), placez des bâtiments de plusieurs étages avec cinq types de toit, portes et fenêtres à tout étage et hauteur, lampadaires, cheminées, panneaux solaires, antennes, piliers, mâts, routes et chemins, puis caméras et radars où vous voulez ; un plan 2D de type CAO et une vue 3D que l'on peut orbiter, couper étage par étage et modifier ; annuler et rétablir.
 * **Configuration :** adresse du serveur, caméras (ONVIF/RTSP), découverte, utilisateurs (votre compte et, pour un administrateur, la liste des utilisateurs, rôles et mots de passe), thème et langue ; un export portable du site **sans identifiants**.
-* **Météo et services :** le menu Services liste chaque programme du système et chaque nœud de terrain, actif ou non, par famille, chaque carte avec la version du programme ; le menu Météo montre la météo du lieu choisi (maintenant, la pluie de l'heure à venir, des avis déduits des prévisions, 48 heures et 10 jours, l'air et le pollen, le soleil et la lune) avec un radar en direct de la pluie et des nuages.
-* **L'installation dans un fichier :** *Configuration > Installation* télécharge toute l'installation (jamais un mot de passe, un jeton ou une clé) et l'importe sur une autre machine, avec les parties à importer cochées et un rapport de ce qui a été fait ; la page des utilisateurs propose un rôle `panel` pour le compte propre d'un panneau mural.
-* **La machine et le réseau :** *La machine, en direct* montre le CPU, la mémoire, les disques, la température et le réseau de l'ordinateur où tourne le serveur ; dans le menu Réseau un opérateur peut demander un balayage, un ping, un traceroute, les ports ou la page web d'un appareil, et un administrateur peut enregistrer l'accès d'un appareil (chiffré sur le serveur et jamais réaffiché) pour que *Inspecter* lise son modèle et son firmware et signale un accès d'usine. Configuration -> Général a un bouton qui vérifie l'adresse du serveur et distingue un mauvais http/https d'un serveur en panne.
-* **Sept langues** (anglais, espagnol, allemand, français, italien, japonais, chinois) et seize thèmes, celui par défaut s'appelant *Armor*.
+* **Sept langues** (anglais, espagnol, allemand, français, italien, japonais, chinois) et onze thèmes, celui par défaut s'appelant *Armor*.
 * **Déclarez votre équipement :** dans les menus Onduleurs et Batteries, vous ajoutez chaque onduleur ou pile de batteries avec son nom, son modèle (Voltronic, MPP Solar, Pylontech US2000 / US3000 / US5000, ANT-BMS), sa connexion (RS232, RS485, USB, CAN, Wi-Fi) et son nœud passerelle ; il attend son premier relevé réel, et *Voir des relevés d'exemple* permet d'essayer le menu en attendant.
 * **Concepteur électrique :** dessinez le schéma électrique de la maison (réseau, compteur, protections, commutateurs, distribution, PV, onduleurs, batteries et charges, AC et DC) avec ports et câbles, regroupez-le en tableaux, reliez onduleurs et batteries aux appareils solaires lus par le serveur pour voir leurs valeurs en direct, et laissez les contrôles le relire (deux sources sur une ligne, disjoncteurs et câbles face au courant, protections manquantes, tensions DC). Le dessin est conservé sur le serveur ; c'est un dessin : rien ne commande ni ne mesure encore.
-* **Centrales d'alarme :** le menu *Centrales d'alarme* montre ce que dit chaque nœud ARMOR-ALARM : s'il surveille (absent ou présent), ses zones et ses derniers événements, et signale dans le menu Alarmes une alarme qui sonne (critique) ou une zone en sabotage (haute). Un administrateur peut y armer et désarmer une centrale seulement si le serveur (`ARMOR_ALARM_COMMANDS=1`), le nœud et le broker l'autorisent ; désarmer depuis la console demande le code PIN de l'utilisateur connecté, que le serveur vérifie. Pas un système d'alarme certifié.
-* **Murs et bâtiments fusionnés dans le concepteur de site :** un mur d'un bâtiment ou du terrain peut être poussé vers l'intérieur ou l'extérieur (une poignée sur chaque côté de la forme sélectionnée, ou les boutons *Déplacer un mur*) et les murs voisins suivent, de sorte qu'un rectangle garde ses angles droits et que le mur opposé ne bouge pas ; et deux bâtiments dont les murs se touchent peuvent être **fusionnés** : le mur commun est construit une fois, une porte ou fenêtre percée dedans - de l'un ou l'autre - fonctionne des deux côtés, et le sol d'un petit bâtiment se voit dans sa propre couleur.
-* **Code PIN pour désarmer et alarmes de toute origine :** désarmer (le système, ou une centrale depuis sa carte) demande le code dans une boîte de dialogue, Configuration > Utilisateurs définit le code et le code de contrainte, une automatisation peut partir de n'importe quelle origine d'alarme (une centrale qui sonne comprise), et l'écran du micrologiciel et l'adoption des nœuds connaissent les centrales d'alarme.
+* **Concepteur d'alarme :** dessinez l'alarme de la maison - centrales, extensions, contacts de portes et de fenêtres, détecteurs de mouvement, de fumée, de gaz et d'inondation, boutons panique, sirènes, claviers et l'alimentation - avec boucles filaires, liaisons radio, sortie sirène, bus de données et alimentation reliés port à port. Liez dans le menu *Centrales d'alarme* une centrale dessinée à une vraie et un capteur à l'une de ses zones, et chaque élément montre en direct ce que dit sa centrale ; « dessiner ce que les centrales ont » remplit le dessin depuis les centrales, et les contrôles signalent un capteur que personne n'écoute, une centrale sans sirène, clavier ou batterie de secours, ou un détecteur de fumée qui resterait muet système désarmé. Le dessin est conservé sur le serveur avec ses versions précédentes.
+* **Un menu en groupes et une aide à sa mesure :** Surveillance, Sécurité, Énergie, Maison et réseau, Conception et Administration, chaque groupe repliable ; toute question est posée dans une boîte de la page (le navigateur ne peut jamais la faire taire) ; une nouvelle alarme critique sonne et s'affiche en notification ; les preuves peuvent être protégées de l'élagage automatique ; et l'Aide explique chaque menu dans les sept langues.
 
 ## 🔄 Architecture
 
@@ -65,9 +61,8 @@ flowchart LR
 
 * **Aucun secret dans le navigateur.** Les mots de passe des caméras sont saisis une fois, envoyés au serveur et ensuite affichés seulement comme un état « enregistré » masqué. Les exports du site suppriment les noms d'utilisateur et les indicateurs d'identifiants.
 * **Les réglages stockés sont une entrée non fiable.** Ils sont lus valeur par valeur : une origine, un thème, une langue ou une forme invalides sont écartés, les positions sont bornées et les listes plafonnées.
-* **Aucune requête vers un tiers, sauf le menu Météo, et seulement après activation.** Les polices sont locales ; l'hôte statique envoie `Content-Security-Policy: default-src 'self'` limitée au serveur configuré, `frame-ancestors 'none'`, `nosniff` et `no-referrer`.
+* **Aucune requête vers un tiers.** Les polices sont locales ; l'hôte statique envoie `Content-Security-Policy: default-src 'self'` limitée au serveur configuré, `frame-ancestors 'none'`, `nosniff` et `no-referrer`.
 * La vidéo en direct n'est montrée que par une adresse de flux que le serveur délivre à un opérateur.
-* **Micrologiciel des nœuds et avis :** *Configuration > Micrologiciel* met à jour un nœud ou tous ceux d'un type depuis un fichier ou la version GitHub, avec une barre de progression par nœud et les étapes expliquées ; *Notifications* relie les alarmes à Telegram et Home Assistant et envoie un essai . Les fichiers de configuration, les services et le broker du système s'y modifient aussi, via l'agent d'administration de la machine.
 
 ## 📂 Structure du dépôt
 
@@ -92,7 +87,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 352 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
+npm test            # 203 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```
@@ -107,14 +102,12 @@ $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # 
 * **[ARMOR-RADAR](https://github.com/JuanenRac/ARMOR-RADAR)** - Firmware du nœud de terrain pour ESP32-S3 avec trois radars et son propre panneau web
 * **[ARMOR-SOLAR](https://github.com/JuanenRac/ARMOR-SOLAR)** - Protocoles des onduleurs et batteries solaires et messages d'un nœud passerelle
 * **[ARMOR-ELECTRICAL](https://github.com/JuanenRac/ARMOR-ELECTRICAL)** - Nœud électrique : compteurs, le message des mesures du réseau et les règles de commutation
-* **[ARMOR-ALARM](https://github.com/JuanenRac/ARMOR-ALARM)** - Nœud et centrale d'alarme : zones, armement, temporisations, sirène et PIN, avec ou sans le serveur
 * **[ARMOR-HMI](https://github.com/JuanenRac/ARMOR-HMI)** - Panneau tactile : l'état du système sur un écran mural, armer et acquitter, et la maison de l'assistant vocal
 * **[ARMOR-NETWORK](https://github.com/JuanenRac/ARMOR-NETWORK)** - Le réseau local : ses appareils, internet et ce qui change
 * **[ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER)** - Coordinateur central : télémétrie, alarmes, appareils, relevés solaires et caméras
 * **ARMOR-STUDIO** (ce dépôt) - Console web : caméras, radar, alarmes, énergie solaire et concepteur de site 2D/3D
 * **[ARMOR-ANDROID-CONTROL](https://github.com/JuanenRac/ARMOR-ANDROID-CONTROL)** - Client Android de l'opérateur avec radar 2D/3D en direct
 * **[ARMOR-SERVER-AI](https://github.com/JuanenRac/ARMOR-SERVER-AI)** - Politique d'inférence visuelle qui explique ses décisions et n'agit jamais
-* **[ARMOR-VISION](https://github.com/JuanenRac/ARMOR-VISION)** - Zones de caméra, masques et règles de détection pour la Jetson Orin NX
 * **[ARMOR-VOICE-AI](https://github.com/JuanenRac/ARMOR-VOICE-AI)** - Intentions vocales hors ligne avec une confirmation impossible à falsifier
 * **[ARMOR-HARDWARE](https://github.com/JuanenRac/ARMOR-HARDWARE)** - Boîtiers, électronique et matrice d'acceptation sur banc
 * **[ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS)** - Déploiement, banc d'essai CM5, sauvegarde et TLS
