@@ -247,7 +247,7 @@ export async function closeStudioSession(origin: string): Promise<void> {
 
 // ---- Studio users -------------------------------------------------------------------------------------------------------------
 
-export type Role = "admin" | "operator";
+export type Role = "admin" | "operator" | "panel";
 export type StudioUser = { id: string; username: string; role: Role };
 export type ListedUser = StudioUser & { createdAt: string; updatedAt: string; current: boolean };
 /** An answer the server refused, with the stable `code` that says why. */
@@ -281,6 +281,10 @@ export async function sessionUserState(origin: string): Promise<SessionUserState
 export async function readSessionUser(origin: string): Promise<StudioUser | null> {
   try { return (await userCall<{ authenticated: boolean; user?: StudioUser }>(origin, "GET", "/api/v1/studio/session")).user ?? null; } catch { return null; }
 }
+/** What importing an installation file did (see ARMOR-SERVER's installation.ts). */
+export type InstallationReport = { applied: Record<string, string>; skipped: Record<string, string>; failed: Record<string, string>; cameras_need_credentials: string[] };
+export const installationExport = (origin: string) => userCall<unknown>(origin, "GET", "/api/v1/admin/installation");
+export const installationImport = (origin: string, bundle: unknown, parts: string[]) => userCall<InstallationReport>(origin, "POST", "/api/v1/admin/installation", { bundle, parts });
 export const listUsers = (origin: string) => userCall<{ users: ListedUser[]; minPasswordLength: number }>(origin, "GET", "/api/v1/users");
 export const createUser = (origin: string, user: { username: string; password: string; role: Role }) => userCall<StudioUser>(origin, "POST", "/api/v1/users", user);
 export const updateUser = (origin: string, id: string, change: { username?: string; password?: string; role?: Role }) => userCall<StudioUser>(origin, "PATCH", `/api/v1/users/${encodeURIComponent(id)}`, change);

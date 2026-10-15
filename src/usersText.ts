@@ -23,6 +23,7 @@ const ROWS: Record<string, Row> = {
   usersAdminOnly: ["Only an administrator can manage users.", "Solo un administrador puede gestionar usuarios.", "Nur ein Administrator kann Benutzer verwalten.", "Seul un administrateur peut gérer les utilisateurs.", "Solo un amministratore può gestire gli utenti.", "ユーザー管理は管理者のみ可能です。", "只有管理员可以管理用户。"],
   role: ["Role", "Rol", "Rolle", "Rôle", "Ruolo", "役割", "角色"],
   roleAdmin: ["Administrator", "Administrador", "Administrator", "Administrateur", "Amministratore", "管理者", "管理员"],
+  rolePanel: ["Wall panel (least privilege)", "Panel de pared (mínimo privilegio)", "Wandpanel (geringste Rechte)", "Panneau mural (privilège minimal)", "Pannello a muro (privilegio minimo)", "壁面パネル（最小権限）", "壁挂面板（最小权限）"],
   roleOperator: ["Operator", "Operador", "Operator", "Opérateur", "Operatore", "オペレーター", "操作员"],
   addUser: ["Add a user", "Añadir un usuario", "Benutzer hinzufügen", "Ajouter un utilisateur", "Aggiungi un utente", "ユーザーを追加", "添加用户"],
   createUser: ["Create user", "Crear usuario", "Benutzer erstellen", "Créer l'utilisateur", "Crea utente", "ユーザーを作成", "创建用户"],

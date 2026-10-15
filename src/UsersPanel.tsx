@@ -8,7 +8,7 @@ import { ApiError, changeAccount, createUser, deleteUser, listUsers, updateUser,
 import { SessionUserContext } from "./sessionContext";
 
 type Props = { t: (key: string) => string; origin: string };
-const ROLES: readonly Role[] = ["admin", "operator"];
+const ROLES: readonly Role[] = ["admin", "operator", "panel"];
 
 export function UsersPanel({ t, origin }: Props) {
   // Who is signed in comes from the one answer Studio keeps up to date (it asks again by itself), never from a question of this panel's own.
@@ -71,7 +71,7 @@ export function UsersPanel({ t, origin }: Props) {
     if (!window.confirm(`${t("confirmDeleteUser")}\n\n${user.username}`)) return;
     try { await deleteUser(origin, user.id); say(t("userDeleted")); await reload(); } catch (error) { explain(error); }
   };
-  const roleName = (role: Role) => t(role === "admin" ? "roleAdmin" : "roleOperator");
+  const roleName = (role: Role) => t(role === "admin" ? "roleAdmin" : role === "panel" ? "rolePanel" : "roleOperator");
   const day = (iso: string) => { const date = new Date(iso); return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString(); };
   const rule = `${t("passwordMinimum")} ${minimum} ${t("charactersWord")}.`;
 

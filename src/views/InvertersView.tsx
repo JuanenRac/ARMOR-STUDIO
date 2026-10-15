@@ -8,7 +8,7 @@ import { readEnergyAlarms, saveEnergyAlarms, solarEnergy, solarHistory, type Ene
 import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
 import { EnergyBars, FlowDiagram, Gauge, InverterLogo, LineChart, SOLAR_COLOURS } from "../solarGraphics";
-import { displayName, flowsOf, formatPower, humanize, levelTone, niceScale, type SolarCatalog, type SolarDeviceView, type SolarInverterReading, type SolarRegistration, type SolarTotals } from "../solarModel";
+import { displayName, flowsOf, formatEnergy, formatPower, humanize, levelTone, niceScale, ratingRows, type SolarCatalog, type SolarDeviceView, type SolarInverterReading, type SolarRegistration, type SolarTotals } from "../solarModel";
 import { SolarEquipment } from "../SolarEquipment";
 import { SolarNodes } from "../SolarNodes";
 import type { NetworkOverview } from "../networkModel";
@@ -108,6 +108,7 @@ function InverterPanel({ t, inverter, now, history, minutes, setMinutes }: { t: 
         {r.warnings.length === 0 ? <span className="solar-chip ok">{t("solarNoWarnings")}</span> : r.warnings.map(name => <span key={name} className="solar-chip bad">{humanize(name)}</span>)}
       </div>
     </section>
+    <UnitInfoCard t={t} reading={r} />
     <section className="solar-card">
       <div className="solar-card-head"><h3>{t("solarHistory")}</h3>
         <div className="solar-ranges">{RANGES.map(range => <button key={range.minutes} className={minutes === range.minutes ? "active" : ""} onClick={() => setMinutes(range.minutes)}>{t(range.key)}</button>)}</div>
@@ -116,6 +117,25 @@ function InverterPanel({ t, inverter, now, history, minutes, setMinutes }: { t: 
       <LineChart t={t} samples={history} from={from} to={now} series={[{ key: "battery_percent", label: t("solarChargeLevel"), color: SOLAR_COLOURS.battery, unit: "%" }]} />
     </section>
   </>;
+}
+
+/** What the unit says about itself: the serial number and the firmware, the energy the panels have made in all, and its ratings and settings. Nothing when it said none of it. */
+export function UnitInfoCard({ t, reading }: { t: Translate; reading: SolarInverterReading }) {
+  const rows = reading.ratings ? ratingRows(reading.ratings) : [];
+  const text = (value: string) => (value.startsWith("@") ? t(value.slice(1)) : value);
+  if (!reading.serial && !reading.firmware && typeof reading.pv_energy_total_wh !== "number" && rows.length === 0) return null;
+  return <section className="solar-card unit-info">
+    <div className="solar-card-head"><h3>{t("solarUnitInfo")}</h3></div>
+    <dl className="solar-readings">
+      {reading.serial && <div><dt>{t("solarSerial")}</dt><dd className="mono">{reading.serial}</dd></div>}
+      {reading.firmware && <div><dt>{t("solarFirmware")}</dt><dd className="mono">{reading.firmware}</dd></div>}
+      {typeof reading.pv_energy_total_wh === "number" && <div><dt>{t("solarEnergyTotal")}</dt><dd>{formatEnergy(reading.pv_energy_total_wh / 1000)}</dd></div>}
+    </dl>
+    {rows.length > 0 && <>
+      <small>{t("solarRatings")}</small>
+      <dl className="solar-readings">{rows.map(([label, value]) => <div key={label}><dt>{t(label)}</dt><dd>{text(value)}</dd></div>)}</dl>
+    </>}
+  </section>;
 }
 
 /** The energy of each day (what the panels made and the load used, or what the battery took and gave): the last week or month, as bars. */

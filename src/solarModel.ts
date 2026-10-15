@@ -17,7 +17,29 @@ export type SolarInverterReading = {
   bus_v?: number;
   total_out_w?: number; total_out_va?: number; total_load_percent?: number; total_charging_a?: number;
   units?: SolarUnitReading[];
+  /** What the unit says about itself: its serial number and firmware, the energy the panels have made in all (Wh) and what it is rated for and how it is set. */
+  serial?: string; firmware?: string; pv_energy_total_wh?: number;
+  ratings?: SolarRatingsReading;
 };
+export type SolarRatingsReading = {
+  grid_rating_v?: number; out_rating_v?: number; out_rating_hz?: number; out_rating_va?: number; out_rating_w?: number;
+  battery_rating_v?: number; battery_recharge_v?: number; battery_under_v?: number; battery_bulk_v?: number; battery_float_v?: number;
+  max_charge_a?: number; max_ac_charge_a?: number;
+  battery_type?: string; input_range?: string; output_priority?: string; charger_priority?: string;
+};
+
+/** The rows of the ratings table: what the unit said, as [label key, text]. A member the unit did not say is not a row. */
+export function ratingRows(r: SolarRatingsReading): Array<[string, string]> {
+  const rows: Array<[string, string]> = [];
+  const number = (key: keyof SolarRatingsReading, label: string, unit: string, digits = 1) => { const v = r[key]; if (typeof v === "number") rows.push([label, `${v.toFixed(digits).replace(/\.0+$/, "")} ${unit}`]); };
+  number("out_rating_va", "rt_out_rating_va", "VA", 0); number("out_rating_w", "rt_out_rating_w", "W", 0);
+  number("out_rating_v", "rt_out_rating_v", "V"); number("out_rating_hz", "rt_out_rating_hz", "Hz"); number("grid_rating_v", "rt_grid_rating_v", "V");
+  number("battery_rating_v", "rt_battery_rating_v", "V"); number("battery_bulk_v", "rt_battery_bulk_v", "V"); number("battery_float_v", "rt_battery_float_v", "V");
+  number("battery_under_v", "rt_battery_under_v", "V"); number("battery_recharge_v", "rt_battery_recharge_v", "V");
+  number("max_charge_a", "rt_max_charge_a", "A", 0); number("max_ac_charge_a", "rt_max_ac_charge_a", "A", 0);
+  for (const key of ["battery_type", "input_range", "output_priority", "charger_priority"] as const) { const v = r[key]; if (typeof v === "string") rows.push([`rt_${key}`, `@rt_${key}_${v}`]); }
+  return rows;
+}
 export type SolarUnitReading = {
   unit: number; mode: SolarMode; serial?: string; fault_code?: string; grid_v?: number; out_v?: number; out_va?: number; out_w?: number;
   load_percent?: number; battery_v?: number; battery_percent?: number; pv_v?: number; charging_a?: number;
