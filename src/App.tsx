@@ -5,6 +5,10 @@
  */
 import { ConfirmHost } from "./askConfirm";
 import { useCriticalAlarmAlert } from "./alarmAlert";
+import { getPrefs, openingView, setPrefs, usePrefs } from "./prefs";
+import { TourHost } from "./tour/TourHost";
+import { RichTooltips } from "./tour/RichTooltips";
+import { shouldAutoStart, startTour } from "./tour/tourStore";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
@@ -74,7 +78,8 @@ const studioVersion = manifest.version;
 
 function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; onSignOut: () => void }) {
   const [origin, setOrigin] = useState(initialOrigin);
-  const [view, setView] = useState<View>("overview");
+  const [view, setView] = useState<View>(() => openingView(getPrefs()));
+  const prefs = usePrefs();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -136,7 +141,10 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const networkPoll = usePolled(() => listNetwork(origin), 5000, origin);
   const devices = devicePoll.data?.devices ?? [];
   const alarms = alarmPoll.data;
-  useCriticalAlarmAlert(alarmPoll.data, t("alarmNewCritical"));
+  useCriticalAlarmAlert(alarmPoll.data, t("alarmNewCritical"), true, { sound: prefs.alertSound, notification: prefs.alertNotifications });
+  // the menu the person is in is remembered for "open where I was"; the first visit starts the welcome tour
+  useEffect(() => { if (getPrefs().lastView !== view) setPrefs({ lastView: view }); }, [view]);
+  useEffect(() => { if (!shouldAutoStart()) return undefined; const timer = window.setTimeout(() => { if (shouldAutoStart()) startTour("welcome"); }, 1400); return () => window.clearTimeout(timer); }, []);
   const alarmsPending = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at).length;
   const cameraNames = useMemo(() => Object.fromEntries(cameras.map(camera => [camera.id, camera.name])), [cameras]);
   useEffect(() => { const timer = window.setInterval(() => setNow(Date.now()), 1000); return () => window.clearInterval(timer); }, []);
@@ -310,7 +318,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     history: <HistoryView origin={origin} t={t} />,
     radar: <RadarView network={networkPoll.data} nodes={nodes} model={site} dimensions={dimensions} origin={origin} openDesigner={() => setView("siteDesigner")} openZones={() => setView("history")} setSensors={setSensors} forget={id => void forgetNode(origin, id).then(() => setNotice(t("nodeForgotten"))).catch(() => setNotice(t("recordingFailed")))} t={t} />,
     siteDesigner: <SiteDesignerInteractive openVersions={() => setVersionsOf("site")} t={t} dimensions={dimensions} setDimensions={setDimensions} model={site} applyModel={applySite} selectedCamera={selectedCamera} setSelectedCamera={setSelectedCamera} notice={notice} setNotice={setNotice} save={saveSettings} nodeIds={nodes.map(node => node.node_id)} devices={devices} wantsToPlace={wantsToPlace} clearWantsToPlace={() => setWantsToPlace("")} openDevices={() => setView("devices")} cameras={cameras} alarmNodes={alarmNodesPoll.data?.nodes ?? []} openCameras={() => setView("cameras")} openAlarmPanels={() => setView("alarmPanels")} />,
-    electricalDesigner: <ElectricalDesigner t={t} design={electrical} setDesign={setElectrical} status={electricalStatus} nodeIds={nodes.map(node => node.node_id)} solarDevices={solarPoll.data?.devices ?? []} solarWaiting={solarPoll.data?.waiting ?? []} electricalNodes={electricalPoll.data?.nodes ?? []} />,
+    electricalDesigner: <ElectricalDesigner t={t} design={electrical} setDesign={setElectrical} status={electricalStatus} nodeIds={nodes.map(node => node.node_id)} solarDevices={solarPoll.data?.devices ?? []} solarWaiting={solarPoll.data?.waiting ?? []} electricalNodes={electricalPoll.data?.nodes ?? []} site={{ openings, features, roofItems }} />,
     network: <NetworkView openDesigner={() => setView("networkDesigner")} t={t} origin={origin} isAdmin={isAdmin} overview={networkPoll.data} reload={networkPoll.reload} now={now} />,
     alarmDesigner: <AlarmDesigner t={t} design={alarmDesign} setDesign={setAlarmDesign} status={alarmDesignStatus} panels={alarmNodesPoll.data ?? null} openVersions={() => setVersionsOf("alarm")} openPanels={() => setView("alarmPanels")} />,
     networkDesigner: <NetworkDesigner t={t} design={networkDesign} setDesign={setNetworkDesign} status={networkStatus} overview={networkPoll.data} cameras={cameras} />,
@@ -331,6 +339,8 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
       {panels[view]}
     </section>
     {expandedCamera && <CameraFullscreen camera={expandedCamera} cameras={cameras} origin={origin} recording={recordingCameraIds.includes(expandedCamera.id)} t={t} close={() => setExpandedCameraId("")} fullScreen={fullScreen} step={stepExpanded} snapshot={() => void saveSnapshot(expandedCamera)} toggleRecording={() => void toggleRecording(expandedCamera)} invokePtz={command => commandPtz(expandedCamera, command)} />}
+    <TourHost t={t} view={view} setView={setView} />
+    <RichTooltips t={t} />
     {helpOpen && <HelpDialog initial={view} close={() => setHelpOpen(false)} t={t} />}
     {aboutOpen && <AboutDialog version={studioVersion} revision={state.revision} close={() => setAboutOpen(false)} t={t} />}
     {versionsOf && <DesignVersionsDialog kind={versionsOf} origin={origin} t={t} close={() => setVersionsOf(null)}

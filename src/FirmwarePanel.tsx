@@ -6,6 +6,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { CopyButton } from "./components/CopyButton";
 import {
   ApiError, firmwareJob, firmwareProbe, firmwareRelease, firmwareStart, firmwareUpload,
   type FirmwareJob, type FirmwareKind, type FirmwareProbe, type FirmwareRelease, type FirmwareTarget,
@@ -209,6 +210,7 @@ export function FirmwarePanel({ t, origin, isAdmin, network }: Props) {
             : job.error && job.error !== "some_nodes_failed" ? explain(t, new ApiError(0, job.error)) : t("fw_job_failed")}
         {job.version && <> · <b>{job.version}</b></>}
       </p>
+      <div className="log-head"><span /><CopyButton t={t} text={() => [`${job.kind ?? ""} ${job.version ?? ""} ${job.state}${job.error ? " " + job.error : ""}`.trim(), ...job.targets.map(target => `${target.address} ${target.state} ${Math.round(target.progress ?? 0)}% ${describeStep(t, target, job.version)}${target.error ? " " + target.error : ""}`)].join("\n")} /></div>
       <div className="fw-overall"><span>{t("fw_overall")}: {done} {t("fw_of")} {job.targets.length} {t("fw_overall_count")}</span><b>{Math.round(overall)}%</b></div>
       <Bar percent={job.state === "done" ? 100 : overall} state={job.state === "done" ? "done" : job.state === "failed" ? "failed" : "working"} />
       <div className="fw-targets">

@@ -49,7 +49,7 @@ const SELECT = "#00e5ff";
 /** Light cones and rings are only drawn: they never take a click meant for what is behind them. */
 const NO_PICK = () => null;
 const site = (x: number, y: number, z = 0): [number, number, number] => [x, z, -y];
-const ROOF_TOOLS: ReadonlySet<Tool> = new Set(["chimney", "roof-solar", "antenna", "gutter", "downpipe"]);
+const ROOF_TOOLS: ReadonlySet<Tool> = new Set(["chimney", "roof-solar", "roof-heater", "antenna", "gutter", "downpipe"]);
 const WALL_TOOLS: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp"]);
 /** Every tool that puts something where you click in the 3D view: all of them except selecting, moving, lifting and drawing outlines. */
 const PLACING: ReadonlySet<Tool> = new Set(TOOL_GROUPS.flat().filter(spec => spec.views.includes("3d") && !["select", "move", "elevate"].includes(spec.tool)).map(spec => spec.tool));
@@ -121,7 +121,10 @@ function OpeningView({ building, opening, selected, hover, xray, hooks, bothFace
       : opening.kind === "garage"
       ? <>
           <mesh castShadow position={[0, 0, 0.02]}><boxGeometry args={[w - 0.06, h - 0.04, 0.06]} /><meshStandardMaterial color={selected ? "#3bd9ee" : (opening.color ?? "#d7dde0")} roughness={0.6} metalness={0.25} {...glow} /></mesh>
-          {Array.from({ length: Math.max(3, Math.round(h / 0.5)) - 1 }, (_, index) => <mesh key={index} position={[0, -h / 2 + (index + 1) * h / Math.max(3, Math.round(h / 0.5)), 0.056]}><boxGeometry args={[w - 0.08, 0.018, 0.012]} /><meshStandardMaterial color="#7d8b93" roughness={0.7} /></mesh>)}
+          {(opening.style === "slide" || opening.style === "bifold" || opening.style === "sidesect") && Array.from({ length: opening.style === "slide" ? 2 : Math.max(3, Math.round(w / 0.6)) }, (_, index) => <mesh key={`v${index}`} position={[-w / 2 + (index + 1) * w / ((opening.style === "slide" ? 2 : Math.max(3, Math.round(w / 0.6))) + 1), 0, 0.058]}><boxGeometry args={[0.02, h - 0.08, 0.012]} /><meshStandardMaterial color="#7d8b93" roughness={0.7} /></mesh>)}
+          {opening.style === "slide" && <mesh position={[0, h / 2 + 0.02, 0.07]}><boxGeometry args={[w + 0.1, 0.05, 0.05]} /><meshStandardMaterial color="#5c6a70" metalness={0.6} roughness={0.4} /></mesh>}
+          {opening.style === "upover" && <mesh position={[0, 0, 0.062]}><boxGeometry args={[0.3, 0.06, 0.014]} /><meshStandardMaterial color="#3b4a54" metalness={0.6} roughness={0.35} /></mesh>}
+          {(opening.style ?? "sectional") !== "slide" && (opening.style ?? "sectional") !== "bifold" && (opening.style ?? "sectional") !== "sidesect" && (opening.style ?? "sectional") !== "upover" && Array.from({ length: Math.max(3, Math.round(h / 0.5)) - 1 }, (_, index) => <mesh key={index} position={[0, -h / 2 + (index + 1) * h / Math.max(3, Math.round(h / 0.5)), 0.056]}><boxGeometry args={[w - 0.08, 0.018, 0.012]} /><meshStandardMaterial color="#7d8b93" roughness={0.7} /></mesh>)}
           {Array.from({ length: 4 }, (_, index) => <mesh key={index} position={[-w / 2 + (index + 0.5) * (w / 4), h / 2 - 0.3, 0.06]}><boxGeometry args={[w / 4 - 0.1, 0.18, 0.012]} /><meshStandardMaterial color="#8fd8ff" roughness={0.1} metalness={0.3} /></mesh>)}
         </>
       : opening.kind === "opening"
@@ -130,6 +133,17 @@ function OpeningView({ building, opening, selected, hover, xray, hooks, bothFace
           <mesh geometry={leaf} position={[0, 0, -0.025]} castShadow><meshStandardMaterial color={selected ? "#3bd9ee" : (opening.color ?? "#6f8f9a")} roughness={0.45} metalness={0.25} {...glow} /></mesh>
           <mesh position={[w / 2 - 0.14, -0.05, 0.06]}><sphereGeometry args={[0.035, 12, 12]} /><meshStandardMaterial color="#e6eef1" metalness={0.8} roughness={0.25} /></mesh>
         </>}
+    {opening.shutter && opening.kind !== "opening" && opening.kind !== "garage" && <group>
+      {/* the roller-shutter box above the opening, the slats let down a third of the way and, when it has one, the motor at the end of the axle */}
+      <mesh position={[0, h / 2 + 0.09, t / 2 + 0.08]} castShadow><boxGeometry args={[w + 0.1, 0.18, 0.16]} /><meshStandardMaterial color="#c9d1d4" roughness={0.6} /></mesh>
+      <mesh position={[0, h / 2 - h / 6, t / 2 + 0.03]}><boxGeometry args={[w - 0.04, h / 3, 0.014]} /><meshStandardMaterial color="#b8c2c6" roughness={0.5} metalness={0.3} /></mesh>
+      {opening.motor && <mesh position={[w / 2 + 0.11, h / 2 + 0.09, t / 2 + 0.08]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.05, 0.05, 0.12, 12]} /><meshStandardMaterial color="#f59e0b" roughness={0.4} metalness={0.4} /></mesh>}
+    </group>}
+    {opening.kind === "garage" && opening.motor && <group>
+      {/* the opener under the ceiling, inside, with its rail towards the door */}
+      <mesh position={[0, h / 2 - 0.12, -t / 2 - 0.25]} castShadow><boxGeometry args={[0.3, 0.14, 0.24]} /><meshStandardMaterial color="#f59e0b" roughness={0.45} metalness={0.3} /></mesh>
+      <mesh position={[0, h / 2 - 0.2, -t / 2 - 0.9]}><boxGeometry args={[0.05, 0.05, 1.3]} /><meshStandardMaterial color="#5c6a70" metalness={0.6} roughness={0.4} /></mesh>
+    </group>}
     {opening.balcony && <group position={[0, -(opening.sill + h / 2) - 0.06, t / 2 + 0.55]}>
       <mesh castShadow receiveShadow><boxGeometry args={[w + 0.8, 0.12, 1.1]} /><meshStandardMaterial color="#aebcc1" roughness={0.9} /></mesh>
       {[[-1, 0], [1, 0]].map(([side]) => <mesh key={side} position={[side * (w / 2 + 0.38), 0.52, 0]} castShadow><boxGeometry args={[0.04, 1.0, 1.06]} /><meshStandardMaterial color="#6f7d84" metalness={0.5} roughness={0.5} transparent opacity={0.55} /></mesh>)}
@@ -233,6 +247,14 @@ function RoofItemView({ item, building, selected, hover, hooks }: { item: SiteMo
       <group position={[0, Math.sin(panelTilt) * d / 2, 0]} rotation={[-panelTilt, 0, 0]}>
         <mesh position={[0, 0.08, 0]} castShadow><boxGeometry args={[w, Math.max(h, 0.05), d]} /><meshStandardMaterial color={item.color ?? "#173f7a"} metalness={0.65} roughness={0.28} {...glow} /><Edges color="#9fc9ee" /></mesh>
         <mesh position={[0, 0.035, 0]}><boxGeometry args={[w * 0.92, 0.04, d * 0.92]} /><meshStandardMaterial color="#7d8b93" roughness={0.6} /></mesh>
+      </group>
+    </group></group>}
+    {item.kind === "solar-heater" && <group quaternion={quaternion}><group rotation={[0, yaw, 0]}>
+      {/* a flat collector raised by its tilt, with the horizontal tank of a thermosyphon along its upper edge */}
+      <group position={[0, Math.sin(panelTilt) * d / 2, 0]} rotation={[-panelTilt, 0, 0]}>
+        <mesh position={[0, 0.06, 0]} castShadow><boxGeometry args={[w, 0.1, d]} /><meshStandardMaterial color={item.color ?? "#12294d"} metalness={0.5} roughness={0.25} {...glow} /><Edges color="#c8d9e8" /></mesh>
+        {[1, 2, 3, 4, 5].map(i => <mesh key={i} position={[-w / 2 + w * i / 6, 0.115, 0]}><boxGeometry args={[0.012, 0.01, d * 0.94]} /><meshStandardMaterial color="#b87333" metalness={0.7} roughness={0.4} /></mesh>)}
+        <mesh position={[0, 0.2, -d / 2 - 0.12]} rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[0.17, 0.17, w * 0.92, 20]} /><meshStandardMaterial color="#e8eef0" metalness={0.2} roughness={0.35} /></mesh>
       </group>
     </group></group>}
     {item.kind === "antenna" && <group>

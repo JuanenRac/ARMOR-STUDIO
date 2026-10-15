@@ -68,7 +68,7 @@ export function keyFor(words: readonly string[], locale: Locale, inMenu: boolean
 
 function apply(element: Element, locale: Locale): void {
   const html = element as HTMLElement;
-  if (html.dataset.noHint !== undefined) return;
+  if (html.dataset.noHint !== undefined || html.dataset.tip !== undefined) return;   // a control whose hint is on show (the rich hints take its title off for a moment)
   const owned = html.dataset.hintKey !== undefined;   // a title this file wrote earlier (the element may now say something else)
   let key: string | undefined;
   const words = wordsOf(element);

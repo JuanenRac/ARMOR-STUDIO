@@ -51,7 +51,7 @@ const MIN_SCALE = 4, MAX_SCALE = 260, RULER = 22;
 const isPlacing = (tool: Tool) => tool !== "select" && tool !== "move" && tool !== "elevate";
 const isDrawing = (tool: Tool) => tool === "terrain-rect" || tool === "terrain-poly" || tool === "building-rect" || tool === "building-poly";
 const EDGE_TOOLS: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp"]);
-const ROOF_TOOLS: ReadonlySet<Tool> = new Set(["chimney", "roof-solar", "antenna", "gutter", "downpipe"]);
+const ROOF_TOOLS: ReadonlySet<Tool> = new Set(["chimney", "roof-solar", "roof-heater", "antenna", "gutter", "downpipe"]);
 
 /** The nearest corner of any outline, if one is within `tolerance`; what is being dragged is never snapped to itself. */
 function nearestCorner(model: SiteModel, point: Point, tolerance: number, skip: { terrain?: boolean; building?: string } = {}): Point | null {
@@ -398,6 +398,15 @@ export function Plan2D(props: PlanProps) {
         case "terrace": return <><rect x={-w / 2} y={-d / 2} width={w} height={d} className="p-terrace" />{(feature.style ?? "railed") === "railed" && <path d={`M${-w / 2} ${d / 2}V${-d / 2}H${w / 2}V${d / 2}`} className="p-terrace-rail" />}</>;
         case "coop": return <><rect x={-w / 2} y={-d / 2} width={w * 0.62} height={d} className="p-coop" /><rect x={-w / 2 + w * 0.62} y={-d * 0.28} width={w * 0.38} height={d * 0.56} className="p-coop-run" /><path d={`M${-w * 0.1} ${d / 2}L${-w * 0.1} ${d / 2 + 0.55}`} className="p-coop-ramp" /></>;
         case "gate": {
+          if (feature.style === "farm" || feature.style === "slide" || feature.style === "cantilever") {
+            // a single leaf between two posts: it swings (farm) or slides sideways along the fence (slide, and cantilever with its tail)
+            const post = 0.3, inner = w - 2 * post, sliding = feature.style !== "farm";
+            return <><rect x={-w / 2} y={-post / 2} width={post} height={post} className="p-gate-pillar" /><rect x={w / 2 - post} y={-post / 2} width={post} height={post} className="p-gate-pillar" />
+              <path d={`M${-w / 2 + post} 0H${w / 2 - post}`} className="p-gate-leaf" />
+              {sliding ? <><path d={`M${-w / 2 + post} ${post}H${w / 2 - post + inner * 0.5}`} className="p-gate-track" /><path d={`M${w / 2 - post + inner * 0.5 - 0.3} ${post - 0.15}l0.3 0.15l-0.3 0.15`} className="p-gate-track" /></>
+                : <path d={`M${-w / 2 + post} 0A${inner} ${inner} 0 0 1 ${-w / 2 + post + inner} ${inner}`} className="p-door-swing" />}
+              {feature.automatic && <circle cx={-w / 2 + post + 0.1} cy={-post} r={0.16} className="p-motor" />}</>;
+          }
           const pillar = feature.style === "stone" ? 0.7 : 0.55, leaf = Math.max(1, w - 2 * pillar) / 2;
           return <><rect x={-w / 2} y={-pillar / 2} width={pillar} height={pillar} className="p-gate-pillar" /><rect x={w / 2 - pillar} y={-pillar / 2} width={pillar} height={pillar} className="p-gate-pillar" />
             <path d={`M${-w / 2 + pillar} 0H${-w / 2 + pillar + leaf * 2}`} className="p-gate-leaf" /><path d={`M${-w / 2 + pillar} 0A${leaf} ${leaf} 0 0 1 ${-w / 2 + pillar + leaf} ${leaf}M${w / 2 - pillar} 0A${leaf} ${leaf} 0 0 0 ${w / 2 - pillar - leaf} ${leaf}`} className="p-door-swing" /></>;
@@ -444,6 +453,7 @@ export function Plan2D(props: PlanProps) {
         return <g key={opening.id} className={`p-opening ${opening.kind} ${opening.color ? "coloured" : ""} ${chosenOpening ? "selected" : ""} ${onFloor ? "" : "other-floor"}`} style={opening.color ? { ["--c" as string]: opening.color } : undefined}
           onPointerDown={event => beginDrag({ kind: "opening", id: opening.id }, { kind: "opening", id: opening.id }, event)}>
           <path d={path([{ x: start.x + ox, y: start.y + oy }, { x: end.x + ox, y: end.y + oy }, { x: end.x - ox, y: end.y - oy }, { x: start.x - ox, y: start.y - oy }])} className="p-opening-gap" />
+          {opening.motor && <circle cx={(start.x + end.x) / 2} cy={Y((start.y + end.y) / 2)} r={0.2} className="p-motor" />}
           {opening.kind === "garage"
             ? <><line x1={start.x} y1={Y(start.y)} x2={end.x} y2={Y(end.y)} className="p-garage-line" />{Array.from({ length: 4 }, (_, i) => { const f = (i + 1) / 5, px = start.x + ux * opening.width * f, py = start.y + uy * opening.width * f; return <line key={i} x1={px - nx * 0.18} y1={Y(py - ny * 0.18)} x2={px + nx * 0.18} y2={Y(py + ny * 0.18)} className="p-garage-tick" />; })}</>
             : opening.kind === "opening"
@@ -486,6 +496,7 @@ export function Plan2D(props: PlanProps) {
         return <g key={item.id} className={`p-roof-item ${item.kind} ${item.color ? "coloured" : ""} ${chosenItem ? "selected" : ""}`} style={item.color ? { ["--c" as string]: item.color } : undefined} transform={`translate(${item.x} ${Y(item.y)}) rotate(${-item.rotation})`} onPointerDown={event => beginDrag({ kind: "roof-item", id: item.id }, { kind: "roofItem", id: item.id }, event)}>
           {item.kind === "chimney" && <><rect x={-w / 2} y={-d / 2} width={w} height={d} className="p-chimney" /><path d={`M${-w / 2} ${-d / 2}L${w / 2} ${d / 2}M${-w / 2} ${d / 2}L${w / 2} ${-d / 2}`} className="p-chimney-line" /></>}
           {item.kind === "solar" && <><rect x={-w / 2} y={-d / 2} width={w} height={d} className="p-solar" />{[1, 2, 3].map(i => <path key={i} d={`M${-w / 2 + w * i / 4} ${-d / 2}V${d / 2}`} className="p-solar-line" />)}<path d={`M${-w / 2} 0H${w / 2}`} className="p-solar-line" /></>}
+          {item.kind === "solar-heater" && <><rect x={-w / 2} y={-d / 2} width={w} height={d} className="p-solar-heater" />{[1, 2, 3, 4, 5].map(i => <path key={i} d={`M${-w / 2 + w * i / 6} ${-d / 2}V${d / 2}`} className="p-solar-line" />)}<rect x={-w / 2} y={d / 2 - d * 0.18} width={w} height={d * 0.18} rx={d * 0.09} className="p-solar-heater-tank" /></>}
           {item.kind === "antenna" && <><circle r={Math.max(w, 0.12)} className="p-mast" /><circle r={0.45} className="p-mast-ring" /><path d="M-0.6 0H0.6M0 -0.6V0.6" className="p-mast-line" /></>}
           {item.kind === "vent" && <><rect x={-w / 2} y={-d / 2} width={w} height={d} className="p-vent" /><circle r={Math.min(w, d) * 0.32} className="p-vent-hole" /></>}
           {item.kind === "gutter" && <><rect x={-w / 2} y={-d / 2} width={w} height={d} rx={d / 2} className="p-gutter" /><path d={`M${-w / 2 + d / 2} 0H${w / 2 - d / 2}`} className="p-gutter-line" /></>}

@@ -77,16 +77,17 @@ export type Building = { id: string; name: string; points: Point[]; base: number
 
 /** A door, a window, a garage door (wide, sectional) or a plain opening in a wall (for an awning, an arch). */
 export const OPENING_STYLES: Partial<Record<"door" | "window" | "garage" | "opening", readonly string[]>> = {
-  door: ["single", "double", "sliding", "folding"], window: ["fixed", "casement", "sliding", "tilt"], garage: ["sectional", "roller", "swing"],
+  door: ["single", "double", "sliding", "folding"], window: ["fixed", "casement", "sliding", "tilt"], garage: ["sectional", "roller", "swing", "upover", "slide", "bifold", "sidesect"],
 };
 export type OpeningKind = "door" | "window" | "garage" | "opening";
 /** A door or window in one wall (the footprint edge from point `edge` to the next) of one floor, at any height. */
 export type Opening = { id: string; buildingId: string; edge: number; floor: number; kind: OpeningKind; offset: number; width: number; height: number; sill: number; /** Arched at the top. */ arch?: boolean; /** A small balcony outside it (a door or a window of an upper floor). */ balcony?: boolean; /** The door leaf or the window frame, "#rrggbb". */ color?: string
   /** How it is made: one of `OPENING_STYLES[kind]` (a door single, double, sliding or folding; a window fixed, casement, sliding or tilting; a garage door sectional, roller or swing). */ style?: string;
   /** A door or garage door opens outwards (unset = inwards) and hinges on the right (unset = the left). */ swing?: "out"; hinge?: "right";
-  /** A security shutter or blind covers it; an alarm contact is fitted (so the design says which doors and windows the alarm watches). */ shutter?: boolean; contact?: boolean };
+  /** A security shutter or blind covers it; an alarm contact is fitted (so the design says which doors and windows the alarm watches). */ shutter?: boolean; contact?: boolean;
+  /** A motor opens and closes it (a garage door opener, the motor of a roller shutter), and the device of the Devices menu that stands for it. */ motor?: boolean; link?: FeatureLink };
 
-export type RoofItemKind = "chimney" | "solar" | "antenna" | "vent" | "gutter" | "downpipe";
+export type RoofItemKind = "chimney" | "solar" | "antenna" | "vent" | "gutter" | "downpipe" | "solar-heater";
 /** Something standing on a roof; its height above the ground follows the roof surface. */
 export type RoofItem = { id: string; buildingId: string; kind: RoofItemKind; x: number; y: number; width: number; depth: number; height: number; rotation: number; tilt: number; color?: string;
   /** A solar array: the rated power of each panel in watts and how many there are; the design adds them up. */ watts?: number; count?: number };
@@ -100,9 +101,10 @@ export type WallLamp = { id: string; buildingId: string; edge: number; offset: n
 /** Objects standing on the ground. `lamp` is a lamp post (a tube of `height` with the light on top), `mast` an antenna mast. */
 export type SiteFeatureKind = "pillar" | "lamp" | "mast" | "solar" | "canopy" | "entrance" | "path" | "road" | "tree" | "kennel" | "fence" | "fountain" | "coop" | "gate" | "sidewalk" | "pool" | "planter" | "terrace" | "bench" | "table" | "barbecue" | "pergola" | "shed" | "hedge" | "mailbox" | "bins" | "tank" | "ac-unit" | "electrical-box" | "car"
   | "floor" | "wall" | "fireplace" | "stairs" | "kitchen" | "bathroom" | "bed" | "wardrobe" | "sofa" | "armchair" | "dining" | "tv"
-  | "mirror" | "lift" | "stair-light" | "radiator" | "washer" | "fridge" | "desk" | "plant" | "rug" | "intercom" | "intercom-monitor" | "alarm-panel" | "alarm-keypad";
+  | "mirror" | "lift" | "stair-light" | "radiator" | "washer" | "fridge" | "desk" | "plant" | "rug" | "intercom" | "intercom-monitor" | "alarm-panel" | "alarm-keypad"
+  | "water-heater" | "hot-tank" | "solar-tank";
 /** The objects of the inside of a building (walls, fireplaces, the kitchen, furniture...), drawn on the floor they stand on: their own floating panel. */
-export const INTERIOR_KINDS: ReadonlySet<SiteFeatureKind> = new Set<SiteFeatureKind>(["floor", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "mirror", "lift", "stair-light", "radiator", "washer", "fridge", "desk", "plant", "rug", "intercom", "intercom-monitor", "alarm-panel", "alarm-keypad"]);
+export const INTERIOR_KINDS: ReadonlySet<SiteFeatureKind> = new Set<SiteFeatureKind>(["floor", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "mirror", "lift", "stair-light", "radiator", "washer", "fridge", "desk", "plant", "rug", "intercom", "intercom-monitor", "alarm-panel", "alarm-keypad", "water-heater", "hot-tank", "solar-tank"]);
 /** The looks a kind can have (a tree is an oak, a pine, a palm or a bush; a fence, a gate). */
 export const FEATURE_STYLES: Partial<Record<SiteFeatureKind, readonly string[]>> = {
   floor: FLOOR_STYLES,
@@ -113,7 +115,7 @@ export const FEATURE_STYLES: Partial<Record<SiteFeatureKind, readonly string[]>>
   sofa: ["sStraight", "sCorner"],
   tv: ["tWall", "tStand"],
   bathroom: ["baBath", "baShower", "baToilet", "baBasin"],
-  tree: ["oak", "pine", "palm", "bush"], fence: ["mesh", "picket", "rail", "wire", "wall"], gate: ["iron", "wood", "modern", "stone"], sidewalk: ["concrete", "brick", "gravel"],
+  tree: ["oak", "pine", "palm", "bush"], fence: ["mesh", "picket", "rail", "wire", "wall"], gate: ["iron", "wood", "modern", "stone", "farm", "slide", "cantilever"], sidewalk: ["concrete", "brick", "gravel"],
   pool: ["rectangle", "round", "oval", "l-shape"], planter: ["box", "round", "bed"], terrace: ["open", "railed"],
 };
 /** Something fixed to a mast: a television antenna, a satellite dish or a Wi-Fi dish, at a height, turned, of a size. */

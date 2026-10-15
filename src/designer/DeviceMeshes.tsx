@@ -39,6 +39,12 @@ function Body({ device, glow }: { device: StudioDevice; glow: string }) {
       return <group><mesh castShadow><boxGeometry args={[0.16, 0.2, 0.08]} />{body}</mesh><mesh position={[0, 0, 0.06]} rotation={[Math.PI / 2, 0, 0]}><coneGeometry args={[0.07, 0.08, 16, 1, true]} /><meshStandardMaterial color={on ? "#ff4d5e" : "#556"} emissive={on ? "#ff4d5e" : "#000000"} emissiveIntensity={on ? 1.6 : 0} side={THREE.DoubleSide} /></mesh></group>;
     case "lock":
       return <group><mesh castShadow><boxGeometry args={[0.05, 0.16, 0.035]} />{body}</mesh><mesh position={[0, 0.02, 0.022]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.022, 0.022, 0.01, 14]} /><meshStandardMaterial color={device.state.locked === true ? "#34d399" : "#ffb020"} emissive={device.state.locked === true ? "#34d399" : "#ffb020"} emissiveIntensity={0.7} /></mesh></group>;
+    case "shutter":
+      return <group><mesh castShadow><boxGeometry args={[0.2, 0.05, 0.06]} />{body}</mesh><mesh position={[0, -0.06, 0]}><boxGeometry args={[0.18, 0.08, 0.01]} />{body}</mesh></group>;
+    case "gate_motor": case "garage_motor":
+      return <group><mesh castShadow><boxGeometry args={[0.16, 0.1, 0.1]} />{body}</mesh><mesh position={[0, 0, 0.07]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.012, 0.012, 0.1, 8]} />{body}</mesh></group>;
+    case "water_heater":
+      return <group><mesh castShadow><cylinderGeometry args={[0.1, 0.1, 0.3, 16]} />{body}</mesh><mesh position={[0, -0.17, 0]}><boxGeometry args={[0.06, 0.04, 0.04]} />{body}</mesh></group>;
     case "valve":
       return <group><mesh rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[0.03, 0.03, 0.16, 12]} />{body}</mesh><mesh position={[0, 0.06, 0]}><cylinderGeometry args={[0.012, 0.012, 0.08, 8]} />{body}</mesh><mesh position={[0, 0.11, 0]}><boxGeometry args={[0.08, 0.016, 0.016]} /><meshStandardMaterial color={device.state.open === true ? "#34d399" : "#ff4d5e"} /></mesh></group>;
     default: return <mesh castShadow><boxGeometry args={[0.06, 0.06, 0.03]} />{body}</mesh>;

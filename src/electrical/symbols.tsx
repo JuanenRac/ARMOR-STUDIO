@@ -38,6 +38,9 @@ function glyph(kind: string, colour: string): ReactNode {
     case "node": return <g {...s}><rect x="8" y="10" width="24" height="20" rx="3" /><path d="M13 10 V5 M20 10 V5 M27 10 V5 M13 30 V35 M20 30 V35 M27 30 V35" /><circle cx="20" cy="20" r="3" fill={colour} /></g>;
     case "load": return <g {...s}><path d="M3 20 H9 L12 11 L18 29 L24 11 L30 29 L33 20 H37" /></g>;
     case "water-heater": return <g {...s}><rect x="10" y="4" width="20" height="32" rx="6" /><path d="M14 18 q3 -3 6 0 t6 0 M14 25 q3 -3 6 0 t6 0" /></g>;
+    case "motor": return <g {...s}><circle cx="20" cy="19" r="12" />{label(colour, "M", 20, 24, 14)}<path d="M20 31 V36 M14 36 H26" /></g>;
+    case "pump": return <g {...s}><circle cx="20" cy="19" r="12" /><path d="M13 19 H27 M22 14 L27 19 L22 24" /></g>;
+    case "solar-heater": return <g {...s}><path d="M5 30 L15 12 H35 L25 30 Z" /><path d="M10 21 H30 M15 12 L10 21" /><circle cx="32" cy="7" r="3" /></g>;
     case "socket": return <g {...s}><circle cx="20" cy="20" r="14" /><path d="M14 16 V22 M26 16 V22 M20 28 V24" /></g>;
     case "lighting": return <g {...s}><circle cx="20" cy="17" r="9" /><path d="M16 28 H24 M17 32 H23 M20 4 V2 M6 17 H3 M37 17 H34 M10 7 L8 5 M30 7 L32 5" /></g>;
     case "ev-charger": return <g {...s}><rect x="10" y="4" width="18" height="30" rx="3" />{label(colour, "EV", 19, 23, 12)}<path d="M28 14 H34 V26 q0 5 -5 5" /></g>;

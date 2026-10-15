@@ -19,6 +19,8 @@ import {
   setBinding, setProp, setState, updateFrame, updateWire, type ConnectError,
 } from "./electrical/ops";
 import { emptyDesign, housePreset } from "./electrical/presets";
+import { addSiteLoads, siteLoads } from "./electrical/siteBridge";
+import type { Opening, RoofItem, SiteFeature } from "./domain";
 import { buildElectricalDoc, parseElectricalDoc } from "./electrical/sync";
 import { ElementBody, KindSwatch } from "./electrical/symbols";
 import type { SyncStatus } from "./electrical/useElectricalSync";
@@ -31,6 +33,8 @@ type Props = {
   nodeIds: string[]; solarDevices: SolarDeviceView[]; solarWaiting: SolarRegistration[];
   /** What the ARMOR-ELECTRICAL nodes report: an element tied to a node and a channel shows its figures. */
   electricalNodes?: ElectricalNodeReading[];
+  /** The site design, to draw its motors and water equipment as loads. */
+  site?: { openings: readonly Opening[]; features: readonly SiteFeature[]; roofItems: readonly RoofItem[] };
 };
 type Selection = { kind: "element" | "wire" | "frame"; id: string } | null;
 type Tool = "select" | "wire";
@@ -41,7 +45,7 @@ const HISTORY_LIMIT = 100, COALESCE_MS = 800, MIN_ZOOM = 0.15, MAX_ZOOM = 3;
 const CAN_OPEN = new Set(["mcb", "mcb-dc", "rcd", "fuse-dc", "isolator", "contactor", "e-breaker", "e-breaker-dc", "transfer", "dc-dc", "meter-ac", "meter-dc", "relay", "diverter"]);
 const format = (template: string, args: ReadonlyArray<string | number>): string => template.replace(/\{(\d+)\}/g, (_match, index: string) => String(args[Number(index)] ?? ""));
 
-export function ElectricalDesigner({ t, design, setDesign, status, nodeIds, solarDevices, solarWaiting, electricalNodes = [] }: Props) {
+export function ElectricalDesigner({ t, design, setDesign, status, nodeIds, solarDevices, solarWaiting, electricalNodes = [], site }: Props) {
   const [tool, setTool] = useState<Tool>("select");
   const [place, setPlace] = useState<string | null>(null);
   const [selection, setSelection] = useState<Selection>(null);
@@ -291,6 +295,13 @@ export function ElectricalDesigner({ t, design, setDesign, status, nodeIds, sola
     } catch { say(t("elImportBad")); }
     if (fileInput.current) fileInput.current.value = "";
   };
+  const drawFromSite = () => {
+    if (!site) return;
+    const words = { gate: t("elSiteGate"), garage: t("elSiteGarage"), shutter: t("elSiteShutter"), waterHeater: t("el_water-heater"), solarPump: t("el_pump"), solarHeater: t("el_solar-heater") };
+    const found = addSiteLoads(designRef.current, siteLoads(site, words));
+    if (!found.added) { say(t("elSiteNothing")); return; }
+    commit(found.design); window.setTimeout(fit, 0); say(format(t("elSiteAdded"), [found.added]));
+  };
   const startNew = async (example: boolean) => {
     if (designRef.current.elements.length && !(await askConfirm(t("elClearConfirm"), t))) return;
     commit(example ? housePreset(t) : emptyDesign()); setSelection(null); setWireFrom(null);
@@ -501,6 +512,7 @@ export function ElectricalDesigner({ t, design, setDesign, status, nodeIds, sola
           <div className="ed-group" role="group" aria-label={t("nd_group_design")}>
             <button onClick={() => startNew(false)} title={t("elNew")} aria-label={t("elNew")}>▢</button>
             <button onClick={() => startNew(true)} title={t("elPresetHouse")} aria-label={t("elPresetHouse")}>⌂</button>
+            {site && <button onClick={drawFromSite} title={t("elSiteAdd")} aria-label={t("elSiteAdd")}>⛶</button>}
           </div>
           <div className="ed-group" role="group" aria-label={t("nd_group_files")}>
             <button onClick={exportJson} title={t("elExportJson")} aria-label={t("elExportJson")}>{"{ }"}</button>

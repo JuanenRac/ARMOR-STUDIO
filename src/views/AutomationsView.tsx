@@ -6,7 +6,7 @@
 import { askConfirm } from "../askConfirm";
 import { useState, type FormEvent } from "react";
 import { ApiError, createAutomation, deleteAutomation, runAutomation, updateAutomation, type Automation, type AutomationAction, type AlarmSourceType, type AutomationInput, type StudioDevice, type Trigger } from "../api";
-import { ACTUATOR_KINDS, MAIN_FIELD } from "../deviceKinds";
+import { ACTUATOR_KINDS, MAIN_FIELD, OPENING_KINDS, isOpeningKind } from "../deviceKinds";
 import type { Translate } from "../components/camera";
 import "./alarms.css";
 import { MenuTitle } from "../menuLogos";
@@ -17,7 +17,7 @@ const SOURCE_LABEL: Record<AlarmSourceType, string> = { node: "sourceNode", came
 const stateWord = (field: string, value: boolean | number, t: Translate): string =>
   field === "open" ? t(value ? "state_open" : "state_closed") : field === "locked" ? t(value ? "state_locked" : "state_unlocked") : field === "triggered" ? t(value ? "problem_triggered" : "state_clear") : t(value ? "state_on" : "state_off");
 const commandWord = (kind: StudioDevice["kind"] | undefined, command: string, t: Translate): string =>
-  command === "toggle" ? t("cmdToggle") : kind === "lock" ? t(command === "on" ? "cmdLock" : "cmdUnlock") : kind === "valve" ? t(command === "on" ? "cmdOpen" : "cmdClose") : t(command === "on" ? "cmdOn" : "cmdOff");
+  command === "toggle" ? t("cmdToggle") : kind === "lock" ? t(command === "on" ? "cmdLock" : "cmdUnlock") : isOpeningKind(kind) ? t(command === "on" ? "cmdOpen" : "cmdClose") : t(command === "on" ? "cmdOn" : "cmdOff");
 
 const blank = (): AutomationInput & { id?: string } => ({ name: "", enabled: true, trigger: { type: "device", device_id: "", field: "triggered", equals: true }, when_mode: "any", actions: [{ type: "device", device_id: "", command: "on" }] });
 
@@ -110,7 +110,7 @@ export function AutomationsView({ t, origin, automations, reload, devices, now }
         {action.type === "device" && <>
           <label>{t("devices")}<select value={action.device_id} onChange={event => setAction(index, { ...action, device_id: event.target.value })}><option value="">{t("chooseDevice")}</option>{actuators.map(device => <option key={device.id} value={device.id}>{device.name}</option>)}</select></label>
           <label>{t("cmdToggle")}<select value={action.command} onChange={event => setAction(index, { ...action, command: event.target.value as "on" | "off" | "toggle", ...(event.target.value === "toggle" ? { for_s: undefined } : {}) })}>
-            {(["on", "off", "toggle"] as const).filter(item => item !== "toggle" || !["siren", "lock", "valve"].includes(byId(action.device_id)?.kind ?? "")).map(item => <option key={item} value={item}>{commandWord(byId(action.device_id)?.kind, item, t)}</option>)}</select></label>
+            {(["on", "off", "toggle"] as const).filter(item => item !== "toggle" || !["siren", "lock", ...OPENING_KINDS].includes(byId(action.device_id)?.kind ?? "")).map(item => <option key={item} value={item}>{commandWord(byId(action.device_id)?.kind, item, t)}</option>)}</select></label>
           {action.command !== "toggle" && <label>{t("forSeconds")}<input type="number" min={0} max={3600} value={action.for_s ?? 0} onChange={event => setAction(index, { ...action, for_s: Math.max(0, Number(event.target.value) || 0) || undefined })} /></label>}
         </>}
         {(form.actions ?? []).length > 1 && <button type="button" className="danger-button" onClick={() => setForm({ ...form, actions: (form.actions ?? []).filter((_, i) => i !== index) })} title={t("removeAction")}>−</button>}

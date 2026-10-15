@@ -200,3 +200,8 @@
 .p-side-handle { fill: #060d13; stroke: #ffb020; stroke-width: 2; vector-effect: non-scaling-stroke; cursor: move; } .p-side-handle:hover { fill: #ffb020; }
 .p-wall-handle { stroke: #ffb020; stroke-width: 6; stroke-linecap: round; vector-effect: non-scaling-stroke; cursor: move; opacity: .85; } .p-wall-handle:hover { stroke: #ffd27a; opacity: 1; }
 .wall-mover { display: grid; gap: .3rem; margin: .4rem 0; } .wall-mover-row { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; font-size: .8rem; } .wall-mover-row > span { flex: 1 1 8rem; color: #cfe6ec; }
+
+/* gates that slide, motors of doors and shutters, and the solar water heater of a roof */
+.p-gate-track { stroke: #8d979a; stroke-width: 1.5; fill: none; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+.p-motor { fill: #f59e0b; stroke: #7c4a03; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.p-solar-heater { fill: #12294d; stroke: #c8d9e8; stroke-width: 1.2; } .p-solar-heater-tank { fill: #e8eef0; stroke: #8d9aa1; stroke-width: 1; }

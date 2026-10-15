@@ -25,7 +25,7 @@ const DC_BREAKERS = new Set(["mcb-dc", "fuse-dc", "e-breaker-dc"]);
 const OVERCURRENT = new Set(["mcb", "e-breaker"]);
 const BUSES = new Set(["busbar-ac", "busbar-dc", "junction-ac", "junction-dc"]);
 const CAN_OPEN = new Set([...SERIES, "transfer"]);
-const AC_LOADS = new Set(["load", "water-heater", "socket", "lighting", "ev-charger", "hvac"]);
+const AC_LOADS = new Set(["load", "water-heater", "motor", "pump", "solar-heater", "socket", "lighting", "ev-charger", "hvac"]);
 
 const isOpen = (element: Element): boolean => element.state === "open" && CAN_OPEN.has(element.kind);
 

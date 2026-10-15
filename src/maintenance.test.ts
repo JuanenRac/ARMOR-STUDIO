@@ -33,7 +33,8 @@ describe("the updates and the console", () => {
   it("writes a step as the program and what is being done to it", () => {
     expect(stepLabel(translate("en"), "server.download")).toBe("Server: download");
     expect(stepLabel(translate("es"), "studio.verify")).toBe("Studio (esta consola): comprobar el hash");
-    expect(stepLabel(translate("de"), "refresh")).toBe("refresh");
+    expect(stepLabel(translate("de"), "refresh")).toBe("nach Updates suchen");
+    expect(stepLabel(translate("de"), "nothing_like_this")).toBe("nothing_like_this");
   });
 
   it("tells how long the machine has been on in the words of a person", () => {

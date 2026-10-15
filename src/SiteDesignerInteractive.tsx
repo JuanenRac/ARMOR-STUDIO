@@ -43,9 +43,9 @@ type Props = {
 
 type Snapshot = { model: SiteModel; dimensions: Dimensions };
 const GRID_M = 0.25, HISTORY_LIMIT = 100, COALESCE_MS = 900;
-const FEATURE_TOOLS: ReadonlySet<Tool> = new Set(["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "floor", "mirror", "lift", "stair-light", "radiator", "washer", "fridge", "desk", "plant", "rug", "intercom", "intercom-monitor", "alarm-panel", "alarm-keypad"]);
-const ROOF_ITEM_OF: Partial<Record<Tool, RoofItemKind>> = { chimney: "chimney", "roof-solar": "solar", antenna: "antenna", gutter: "gutter", downpipe: "downpipe" };
-const REPEATING: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp", "chimney", "roof-solar", "antenna", "gutter", "downpipe", "pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road"]);
+const FEATURE_TOOLS: ReadonlySet<Tool> = new Set(["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "floor", "mirror", "lift", "stair-light", "radiator", "washer", "fridge", "desk", "plant", "rug", "water-heater", "hot-tank", "solar-tank", "intercom", "intercom-monitor", "alarm-panel", "alarm-keypad"]);
+const ROOF_ITEM_OF: Partial<Record<Tool, RoofItemKind>> = { chimney: "chimney", "roof-solar": "solar", "roof-heater": "solar-heater", antenna: "antenna", gutter: "gutter", downpipe: "downpipe" };
+const REPEATING: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp", "chimney", "roof-solar", "roof-heater", "antenna", "gutter", "downpipe", "pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road"]);
 const NUDGE = 0.25;
 
 export function SiteDesignerInteractive(props: Props) {

@@ -2,6 +2,29 @@
 
 All notable changes to this project are documented here.
 
+## [0.7.4] - Motorised gates, garage doors and shutters, water heaters and tanks, and a bridge to the Electrical Designer
+
+- **Gates:** new looks for a gate - farm or field gate, sliding gate and cantilever gate - drawn in the plan (swing arc or sliding track) and in 3D, and a motorised gate shows its motor box and can be tied to a gate motor of the Devices menu.
+- **Garage doors:** four new kinds besides sectional, roller and swing - up-and-over, sliding, bi-fold and side sectional - each with its own look in 3D.
+- **Motors:** a garage door and a window roller shutter can have a motor (drawn in the plan and in 3D, with the roller-shutter box and its slats) and each is tied to its device.
+- **Roller shutters on windows** are now drawn: the box above the window, the slats let down and the motor at the end of the axle.
+- **Water:** electric water heaters, hot water tanks and solar circuit tanks in the Interior panel, with their 2D symbols, 3D bodies, icons and names in seven languages.
+- **Roofs:** a solar water heater (collector and horizontal tank) that follows the slope of the roof and can be tilted.
+- **Devices:** four new kinds - motorised roller shutter, gate motor, garage door motor and water heater - with open and close commands, icons, colours, 3D bodies and the Zigbee2MQTT field maps.
+- **Electrical Designer:** new elements - motor, circulation pump and roof solar water heater - and a button that draws the motors and water equipment of the site as loads, once, remembering the object each came from, with tests.
+- **Configuration > Updates and Console:** the window of an update keeps running and comes back with its steps and log when you go to another menu; the console keeps its commands, folder and history too.
+- The list of the last operations can be emptied and scrolls inside its own box when it is long.
+- Every log window has a small copy icon (the updates log, the console, the firmware log and the node messages) that flashes when it has copied.
+- **Configuration > Updates > operating system:** a "Full upgrade" button (apt full-upgrade: what a plain update keeps back, a new kernel for one) and a "Repair packages" button (dpkg --configure -a and apt-get -f install); the card names the packages kept back and, in red, the ones left half-installed, so they are repaired before the machine is restarted.
+- The steps of the system jobs are named in the interface language.
+- **Guided tours:** a window that dims the page, lights up the part it explains with a pulsing outline, opens the menu by itself and shows a card with an animated picture, the words, the progress and the buttons; keyboard (arrows, Enter, Esc), phone layout, and six tours - welcome, security, designers, energy, house and administration - with 29 steps in the seven languages.
+- **Rich hover hints:** pausing the pointer on any control (or reaching it with the keyboard) shows a card next to it with the explanation and, in the rich mode, a small animated drawing of its menu; the browser's own tip is taken off meanwhile and put back after.
+- **Configuration > Preferences (new tab):** guided tours on or off, a welcome tour on the first visit, every tour to start or replay and to mark as not seen, hover hints off, text or with picture and the time they wait.
+- **Preferences of the look:** animations (all, fewer, none), density (comfortable or compact), size of the text (85 to 130 %) and the menu Studio opens at (or the last one used), all applied at once and kept in this browser.
+- **Preferences of the alarms:** the sound and the notification of the browser for a new critical alarm can each be switched off; every preference can be restored to its default.
+- The Help has a button that starts the welcome tour, and the Help of Configuration describes the Preferences.
+- The Help of the Site Designer lists the new gates, garage doors, motors and water equipment, and how they reach the Electrical Designer, in the seven languages.
+
 ## [0.7.3] - Updates from GitHub, operating system updates and a maintenance console
 
 - **Configuration > Updates:** the programs of the machine (server, Studio, network watcher, observation service, voice gateway and helper scripts) with the version installed, the newest release on GitHub and a state for each: up to date, update available, not installed, newer than GitHub or unknown (and why).

@@ -1,0 +1,99 @@
+/* The guided tours, the pictures that move and the rich hover hints. Every colour comes from the theme; every movement stops when the preferences say "none". */
+
+/* ---- the pictures ---- */
+.tour-art { display: block; overflow: visible; }
+.tour-art .art-frame, .tour-art .art-draw, .tour-art .art-grid, .tour-art .art-link, .tour-art .art-gear, .tour-art .art-gear-teeth, .tour-art .art-ring, .tour-art .art-look, .tour-art .art-bell, .tour-art .art-spin,
+.tour-art .art-cursor { fill: none; stroke: var(--accent, #3bd9ee); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tour-art .art-grid { stroke-opacity: .25; stroke-width: 1; }
+.tour-art .art-frame { stroke-opacity: .85; }
+.tour-art .art-draw { stroke: var(--accent-2, #ffb020); stroke-dasharray: 160; stroke-dashoffset: 160; animation: art-draw 2.4s ease-in-out infinite; }
+.tour-art .art-trace { stroke-dasharray: 220; stroke-dashoffset: 220; animation-name: art-trace; }
+.tour-art .art-pulse, .tour-art .art-blip, .tour-art .art-rec, .tour-art .art-node, .tour-art .art-knob, .tour-art .art-sun { fill: var(--accent-2, #ffb020); }
+.tour-art .art-pulse { animation: art-pulse 1.6s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+.tour-art .art-ring { stroke-opacity: .6; animation: art-ring 2.6s ease-out infinite; transform-origin: center; transform-box: fill-box; }
+.tour-art .art-ring-2 { animation-delay: 1.1s; }
+.tour-art .art-sweep { fill: var(--accent, #3bd9ee); fill-opacity: .3; transform-origin: 60px 42px; animation: art-spin 3.2s linear infinite; }
+.tour-art .art-blip { animation: art-blip 3.2s ease-in-out infinite; }
+.tour-art .art-blip-2 { animation-delay: 1.6s; }
+.tour-art .art-rec { fill: #ff4d5e; animation: art-blink 1.2s steps(2) infinite; }
+.tour-art .art-look { stroke: var(--accent-2, #ffb020); animation: art-look 3s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+.tour-art .art-item { fill: var(--accent, #3bd9ee); fill-opacity: .25; animation: art-item 2s ease-in-out infinite; }
+.tour-art .art-ray { stroke: var(--accent-2, #ffb020); stroke-width: 2; fill: none; stroke-linecap: round; animation: art-blink 1.8s ease-in-out infinite; }
+.tour-art .art-spark { stroke: var(--accent-2, #ffb020); animation: art-pulse 1.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+.tour-art .art-charge { fill: var(--accent, #3bd9ee); fill-opacity: .45; transform-origin: left center; transform-box: fill-box; animation: art-charge 2.6s ease-in-out infinite; }
+.tour-art .art-light { fill: var(--accent-2, #ffb020); fill-opacity: .55; animation: art-blink 2.4s ease-in-out infinite; }
+.tour-art .art-light-2 { animation-delay: 1.2s; }
+.tour-art .art-gear { animation: art-spin 8s linear infinite; transform-origin: center; transform-box: fill-box; }
+.tour-art .art-gear-teeth { stroke-width: 3; animation: art-spin 8s linear infinite; transform-origin: 60px 40px; }
+.tour-art .art-spin { animation: art-spin 3s linear infinite; transform-origin: 60px 40px; }
+.tour-art .art-bell { transform-origin: 60px 14px; animation: art-ring-bell 1.6s ease-in-out infinite; }
+.tour-art .art-knob { animation: art-knob 2.4s ease-in-out infinite; }
+.tour-art .art-link { stroke-dasharray: 4 5; animation: art-flow 1.2s linear infinite; }
+.tour-art .art-node { animation: art-pulse 2.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+.tour-art .art-node-small { fill-opacity: .7; animation: none; }
+.tour-art .art-cursor { stroke: var(--accent-2, #ffb020); animation: art-blink 1s steps(2) infinite; }
+@keyframes art-draw { 0% { stroke-dashoffset: 160; } 55%, 85% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -160; } }
+@keyframes art-trace { 0% { stroke-dashoffset: 220; } 60%, 85% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -220; } }
+@keyframes art-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: .55; } }
+@keyframes art-ring { 0% { transform: scale(.6); opacity: .8; } 100% { transform: scale(1.25); opacity: 0; } }
+@keyframes art-spin { to { transform: rotate(360deg); } }
+@keyframes art-blip { 0%, 100% { opacity: .1; } 20% { opacity: 1; } 60% { opacity: .1; } }
+@keyframes art-blink { 0%, 100% { opacity: 1; } 50% { opacity: .2; } }
+@keyframes art-look { 0%, 100% { transform: translateX(-3px); } 50% { transform: translateX(3px); } }
+@keyframes art-item { 0%, 100% { fill-opacity: .2; } 50% { fill-opacity: .9; } }
+@keyframes art-charge { 0% { transform: scaleX(.15); } 70%, 100% { transform: scaleX(1); } }
+@keyframes art-ring-bell { 0%, 60%, 100% { transform: rotate(0); } 10% { transform: rotate(14deg); } 20% { transform: rotate(-12deg); } 30% { transform: rotate(9deg); } 40% { transform: rotate(-6deg); } 50% { transform: rotate(3deg); } }
+@keyframes art-knob { 0%, 100% { transform: translateX(-14px); } 50% { transform: translateX(14px); } }
+@keyframes art-flow { to { stroke-dashoffset: -18; } }
+
+/* ---- the window of the tour ---- */
+.tour-layer { position: fixed; inset: 0; z-index: 1000; }
+.tour-shield { position: absolute; inset: 0; }
+.tour-dim { position: absolute; inset: 0; background: rgba(2, 8, 14, .66); animation: tour-fade .25s ease both; }
+.tour-spot { position: absolute; border-radius: 10px; box-shadow: 0 0 0 9999px rgba(2, 8, 14, .66); outline: 2px solid var(--accent, #3bd9ee); animation: tour-spot 1.8s ease-in-out infinite; transition: left .3s ease, top .3s ease, width .3s ease, height .3s ease; pointer-events: none; }
+@keyframes tour-spot { 0%, 100% { outline-color: var(--accent, #3bd9ee); outline-offset: 2px; } 50% { outline-color: var(--accent-2, #ffb020); outline-offset: 6px; } }
+@keyframes tour-fade { from { opacity: 0; } }
+@keyframes tour-in { from { opacity: 0; transform: translateY(8px) scale(.97); } }
+.tour-card { position: absolute; width: min(380px, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow: auto; box-sizing: border-box; padding: 1rem 1.15rem 1rem; border-radius: 14px;
+  background: var(--panel, #0f1c26); color: var(--text, #e6f1f6); border: 1px solid var(--accent, #3bd9ee); box-shadow: 0 18px 50px rgba(0, 0, 0, .55), 0 0 0 1px rgba(59, 217, 238, .15); animation: tour-in .28s ease both; outline: none; }
+.tour-card.centred { left: 50%; top: 50%; translate: -50% -50%; width: min(440px, calc(100vw - 24px)); }
+.tour-card h3 { margin: .1rem 0 .4rem; font-size: 1.15rem; }
+.tour-card p { margin: .3rem 0; line-height: 1.5; }
+.tour-card .eyebrow { margin: 0; }
+.tour-art-box { display: flex; justify-content: center; margin: -.2rem 0 .3rem; padding: .35rem; border-radius: 10px; background: rgba(59, 217, 238, .07); }
+.tour-close { position: absolute; top: .45rem; right: .55rem; border: 0; background: none; color: inherit; font-size: 1.4rem; line-height: 1; cursor: pointer; opacity: .75; }
+.tour-close:hover { opacity: 1; }
+.tour-missing { font-size: .85rem; }
+.tour-dots { display: flex; gap: .3rem; justify-content: center; margin: .7rem 0 .5rem; }
+.tour-dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .2); transition: all .25s ease; }
+.tour-dots i.past { background: var(--accent, #3bd9ee); opacity: .55; }
+.tour-dots i.now { width: 20px; border-radius: 5px; background: var(--accent-2, #ffb020); }
+.tour-buttons { display: flex; justify-content: space-between; gap: .6rem; }
+.tour-buttons button { flex: 1; }
+.tour-foot { display: flex; justify-content: space-between; align-items: center; gap: .6rem; margin-top: .55rem; flex-wrap: wrap; font-size: .85rem; }
+.tour-foot .link { border: 0; background: none; color: var(--accent, #3bd9ee); cursor: pointer; padding: 0; text-decoration: underline; }
+.tour-never { display: flex; gap: .35rem; align-items: center; opacity: .8; }
+.tour-card small { display: block; margin-top: .4rem; text-align: center; opacity: .6; }
+@media (max-width: 640px) { .tour-card { left: 12px !important; right: 12px; top: auto !important; bottom: 12px; width: auto; translate: none; } .tour-card.centred { left: 12px !important; top: auto !important; translate: none; } }
+
+/* ---- the rich hover hints ---- */
+.rich-tip { position: fixed; z-index: 1100; max-width: min(320px, calc(100vw - 24px)); box-sizing: border-box; padding: .6rem .8rem; border-radius: 10px; pointer-events: none; font-size: .9rem; line-height: 1.45;
+  background: var(--panel, #0f1c26); color: var(--text, #e6f1f6); border: 1px solid var(--accent, #3bd9ee); box-shadow: 0 10px 32px rgba(0, 0, 0, .5); animation: tip-in .16s ease both; }
+.rich-tip.hidden { visibility: hidden; animation: none; }
+.rich-tip .tip-art { display: flex; justify-content: center; margin: -.1rem 0 .35rem; padding: .25rem; border-radius: 8px; background: rgba(59, 217, 238, .08); }
+.rich-tip .tip-title { display: block; margin-bottom: .15rem; color: var(--accent-2, #ffb020); font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; }
+.rich-tip strong { display: block; font-size: .98rem; margin-bottom: .1rem; }
+.rich-tip.text { padding: .4rem .6rem; font-size: .85rem; }
+@keyframes tip-in { from { opacity: 0; transform: translateY(4px) scale(.97); } }
+
+/* ---- what the preferences change on the whole page ---- */
+html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .08s !important; }
+html[data-motion="reduced"] .tour-art *, html[data-motion="off"] .tour-art * { animation: none !important; }
+html[data-motion="off"] .tour-art .art-draw, html[data-motion="reduced"] .tour-art .art-draw { stroke-dashoffset: 0 !important; }
+html[data-motion="off"] .tour-art .art-charge, html[data-motion="reduced"] .tour-art .art-charge { transform: none !important; }
+@media (prefers-reduced-motion: reduce) { .tour-art *, .tour-spot, .tour-card, .rich-tip { animation: none !important; } .tour-art .art-draw { stroke-dashoffset: 0; } }
+html[data-density="compact"] .stack-card { padding: .65rem .8rem; }
+html[data-density="compact"] .config-grid { gap: .6rem; }
+html[data-density="compact"] .sidebar nav .nav-items button { padding-block: .22rem; }
+html[data-density="compact"] .panel-heading { margin-bottom: .5rem; }

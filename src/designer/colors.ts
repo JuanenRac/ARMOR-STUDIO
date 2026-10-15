@@ -23,14 +23,14 @@ export const DEFAULT_TERRAIN_COLOUR = "#17414d";
 export const DEFAULT_WALL_COLOUR = "#d9e3e6", DEFAULT_ROOF_COLOUR = "#9a4d3f";
 export const DEFAULT_DOOR_COLOUR = "#6f8f9a", DEFAULT_WINDOW_FRAME_COLOUR = "#eef6f8";
 export const DEFAULT_LIGHT_COLOUR = "#ffe9a8";
-export const DEFAULT_ROOF_ITEM_COLOUR = { chimney: "#8a5a4a", solar: "#173f7a", antenna: "#c3d0d4", vent: "#7d8b93", gutter: "#8d9aa1", downpipe: "#8d9aa1" } as const;
+export const DEFAULT_ROOF_ITEM_COLOUR = { chimney: "#8a5a4a", solar: "#173f7a", antenna: "#c3d0d4", vent: "#7d8b93", gutter: "#8d9aa1", downpipe: "#8d9aa1", "solar-heater": "#12294d" } as const;
 /** The colour a kind of ground object shows by default (its main body). */
 export const DEFAULT_FEATURE_COLOUR: Record<SiteFeatureKind, string> = {
   pillar: "#a8b4b8", lamp: "#59666d", mast: "#c3d0d4", solar: "#173f7a", canopy: "#4b6f7a", entrance: "#9fb1b7", path: "#6f8b93", road: "#1c252b",
   tree: "#2f7d45", kennel: "#a6763f", fence: "#8a9296", fountain: "#b3b8b3", coop: "#c9583b", gate: "#20272b", sidewalk: "#b8bcbd",
   pool: "#3fa7d6", planter: "#8a5a3c", terrace: "#a49a8c",
   bench: "#9a6b3d", table: "#a2784a", barbecue: "#8a5a4a", pergola: "#9a7448", shed: "#8a6a4a", hedge: "#2f6b3a", mailbox: "#b8392f", bins: "#2f6b4a", tank: "#cfd8dc", "ac-unit": "#e7ecee", "electrical-box": "#9aa6ab", car: "#b5332e", floor: "#b08a5a",
-  wall: "#cdd6d8", fireplace: "#8a6a5a", stairs: "#b09a7c", kitchen: "#d8d2c4", bathroom: "#e6eef0", bed: "#8a8fb5", wardrobe: "#9a7a58", sofa: "#6b7f95", armchair: "#7a6a8f", dining: "#a2784a", tv: "#1b2226", mirror: "#b9d6e0", lift: "#9aa4ab", "stair-light": "#ffe9a8", radiator: "#e8e4dc", washer: "#e9edef", fridge: "#dfe5e8", desk: "#a98456", plant: "#4f8f4a", rug: "#9b6a63", intercom: "#3b4a54", "intercom-monitor": "#2f3b44", "alarm-panel": "#a78bfa", "alarm-keypad": "#8b7bd8",
+  wall: "#cdd6d8", fireplace: "#8a6a5a", stairs: "#b09a7c", kitchen: "#d8d2c4", bathroom: "#e6eef0", bed: "#8a8fb5", wardrobe: "#9a7a58", sofa: "#6b7f95", armchair: "#7a6a8f", dining: "#a2784a", tv: "#1b2226", mirror: "#b9d6e0", lift: "#9aa4ab", "stair-light": "#ffe9a8", radiator: "#e8e4dc", washer: "#e9edef", fridge: "#dfe5e8", desk: "#a98456", plant: "#4f8f4a", rug: "#9b6a63", intercom: "#3b4a54", "intercom-monitor": "#2f3b44", "alarm-panel": "#a78bfa", "alarm-keypad": "#8b7bd8", "water-heater": "#eef1f2", "hot-tank": "#c9d3d8", "solar-tank": "#e6b34a",
 };
 export const featureColourOf = (kind: SiteFeatureKind, style: string | undefined): string =>
   kind === "gate" ? (style === "wood" ? "#8a6234" : style === "modern" ? "#2d3438" : style === "stone" ? "#9a8f82" : "#20272b")

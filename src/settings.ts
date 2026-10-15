@@ -71,8 +71,8 @@ function readSensor(raw: unknown): Sensor | null {
 
 const COORDINATE_LIMIT = 5000;
 const ROOF_STYLES: readonly RoofStyle[] = ["flat", "shed", "gable", "hip", "pyramid"];
-const FEATURE_KINDS = ["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "floor", "mirror", "lift", "stair-light", "radiator", "washer", "fridge", "desk", "plant", "rug", "intercom", "intercom-monitor", "alarm-panel", "alarm-keypad"] as const;
-const ROOF_ITEM_KINDS = ["chimney", "solar", "antenna", "vent", "gutter", "downpipe"] as const;
+const FEATURE_KINDS = ["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "floor", "mirror", "lift", "stair-light", "radiator", "washer", "fridge", "desk", "plant", "rug", "intercom", "intercom-monitor", "alarm-panel", "alarm-keypad", "water-heater", "hot-tank", "solar-tank"] as const;
+const ROOF_ITEM_KINDS = ["chimney", "solar", "antenna", "vent", "gutter", "downpipe", "solar-heater"] as const;
 const num = (raw: Record<string, unknown>, key: string, fallback: number, low: number, high: number) => finite(raw[key]) ? clamp(raw[key] as number, low, high) : fallback;
 const integer = (raw: Record<string, unknown>, key: string, high: number): number | null => finite(raw[key]) && Number.isInteger(raw[key]) && (raw[key] as number) >= 0 && (raw[key] as number) <= high ? (raw[key] as number) : null;
 
@@ -133,6 +133,7 @@ function readOpening(raw: unknown): Opening | null {
     ...(typeof raw.style === "string" && OPENING_STYLES[raw.kind]?.includes(raw.style) ? { style: raw.style } : {}),
     ...(raw.swing === "out" && (raw.kind === "door" || raw.kind === "garage") ? { swing: "out" as const } : {}), ...(raw.hinge === "right" && raw.kind === "door" ? { hinge: "right" as const } : {}),
     ...(raw.shutter === true ? { shutter: true } : {}), ...(raw.contact === true ? { contact: true } : {}),
+    ...(raw.motor === true && raw.kind !== "opening" ? { motor: true } : {}), ...(raw.kind !== "opening" && readFeatureLink(raw.link) ? { link: readFeatureLink(raw.link) } : {}),
   };
 }
 

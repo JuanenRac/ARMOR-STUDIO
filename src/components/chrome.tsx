@@ -5,6 +5,8 @@
 import { useState } from "react";
 import type { ServerInfo } from "../api";
 import { NAV_GROUPS, type View } from "../domain";
+import { getPrefs as getPrefsForHelp } from "../prefs";
+import { startTour } from "../tour/tourStore";
 import { useClock } from "../hooks";
 import { formatUptime } from "../history";
 import type { Translate } from "./camera";
@@ -26,7 +28,7 @@ export function Sidebar({ view, setView, sidebarOpen, toggle, connection, alarmB
     return next;
   });
   return <aside className="sidebar">
-    <div className="brand">
+    <div className="brand" data-tour="brand">
       <span className="brand-mark armor-mark"><ArmorMark /></span>
       <div className="brand-copy"><strong>A.R.M.O.R.</strong><small>STUDIO CONSOLE</small></div>
       <button className="sidebar-toggle" title={sidebarOpen ? t("collapse") : t("expand")} aria-label={sidebarOpen ? t("collapse") : t("expand")} onClick={toggle}>{sidebarOpen ? "‹" : "›"}</button>
@@ -38,7 +40,7 @@ export function Sidebar({ view, setView, sidebarOpen, toggle, connection, alarmB
         <button type="button" className="nav-group-title" aria-expanded={!folded} title={folded ? t("navGroupUnfold") : t("navGroupFold")} onClick={() => flip(group.title)}>
           <i aria-hidden="true">{folded ? "▸" : "▾"}</i><strong className="nav-group-name">{t(group.title)}</strong>{folded && waiting > 0 && <b className="nav-badge">{waiting}</b>}
         </button>
-        <div className="nav-items">{group.items.map(([key, icon]) => <button key={key} className={view === key ? "active" : ""} onClick={() => setView(key)} title={t(key)}><span className="nav-icon">{icon}</span><em>{t(key)}</em>{key === "alarms" && alarmBadge > 0 && <b className="nav-badge">{alarmBadge}</b>}</button>)}</div>
+        <div className="nav-items">{group.items.map(([key, icon]) => <button key={key} data-tour={`nav-${key}`} className={view === key ? "active" : ""} onClick={() => setView(key)} title={t(key)}><span className="nav-icon">{icon}</span><em>{t(key)}</em>{key === "alarms" && alarmBadge > 0 && <b className="nav-badge">{alarmBadge}</b>}</button>)}</div>
       </div>;
     })}</nav>
     <div className="sidebar-foot"><span className="state-dot normal" /> <span>{connection}</span></div>
@@ -53,11 +55,11 @@ export function TopBar({ view, revision, mode, demo, siteStatus, fullScreen, isF
     <div className="top-status">
       {demo && <span className="demo-badge" title={t("offlineDemo")}>{t("offlineDemo")}</span>}
       <button className={`icon-button ${isFullScreen ? "active" : ""}`} title={isFullScreen ? t("exitFullscreen") : t("fullscreen")} aria-label={isFullScreen ? t("exitFullscreen") : t("fullscreen")} aria-pressed={isFullScreen} onClick={fullScreen}>{isFullScreen ? "🗗" : "⛶"}</button>
-      <button className="icon-button help-button" title={t("helpButton")} aria-label={t("helpButton")} onClick={openHelp}>?</button>
+      <button className="icon-button help-button" data-tour="help" title={t("helpButton")} aria-label={t("helpButton")} onClick={openHelp}>?</button>
       <button className="icon-button about-button" title={t("about")} onClick={openAbout}>i</button>
       {siteStatus !== "idle" && <span className={`site-sync ${siteStatus}`} title={t(`siteSync_${siteStatus}`)}>{siteStatus === "saved" ? "☁✓" : siteStatus === "saving" ? "☁…" : "☁!"}</span>}
       <span>REV {revision}</span>
-      <button className={`mode-button ${mode}`} onClick={toggleMode} disabled={demo} title={mode === "armed" ? t("disarmSystem") : t("armSystem")} aria-label={mode === "armed" ? t("disarmSystem") : t("armSystem")}>{mode === "armed" ? t("armed") : t("disarmed")}</button>
+      <button data-tour="arm" className={`mode-button ${mode}`} onClick={toggleMode} disabled={demo} title={mode === "armed" ? t("disarmSystem") : t("armSystem")} aria-label={mode === "armed" ? t("disarmSystem") : t("armSystem")}>{mode === "armed" ? t("armed") : t("disarmed")}</button>
     </div>
   </header>;
 }
@@ -94,7 +96,10 @@ export function HelpDialog({ close, initial, t }: { close: () => void; initial?:
         <nav className="help-nav" aria-label={t("helpSections")}>{HELP_SECTIONS.map(section => <button key={section.id} className={current === section.id ? "active" : ""} onClick={() => setCurrent(section.id)}>{t(`help_s_${section.id}`)}</button>)}</nav>
         <article className="help-text" tabIndex={0}><h3>{t(`help_s_${current}`)}</h3>{t(`help_b_${current}`).split("\n\n").map((paragraph, index) => <p key={index}>{paragraph}</p>)}</article>
       </div>
-      <button className="primary" onClick={close}>{t("returnConsole")}</button>
+      <div className="help-actions">
+        {getPrefsForHelp().tutorial && <button onClick={() => { close(); startTour("welcome"); }}>{t("tourHelpButton")}</button>}
+        <button className="primary" onClick={close}>{t("returnConsole")}</button>
+      </div>
     </section>
   </div>;
 }
@@ -144,7 +149,7 @@ export function StatusBar(props: StatusBarProps) {
   const item = (label: string, value: string, tone = "") => <span className={`sb-item ${tone}`}><em>{label}</em><b>{value}</b></span>;
   const nodesTone = nodesTotal > 0 && nodesOnline < nodesTotal ? "warn" : "";
   const camerasTone = camerasTotal > 0 && camerasReachable < camerasTotal ? "warn" : "";
-  return <footer className="status-bar" role="contentinfo">
+  return <footer className="status-bar" role="contentinfo" data-tour="statusbar">
     <div className="sb-left">
       <span className="sb-chip" title={serverName}>{serverName}</span>
       <i className="sb-sep" />

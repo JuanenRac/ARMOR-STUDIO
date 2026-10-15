@@ -233,6 +233,27 @@ function StairLight({ feature, glow }: Props) {
   </group>;
 }
 
+/** A tank standing on the floor (a hot-water accumulator, the tank of a solar circuit): a body with an insulating jacket, pipes on top and, for the solar one, a coil and its pump. */
+function Tank({ feature, glow, solar }: Props & { solar: boolean }) {
+  const r = Math.min(feature.width, feature.depth) / 2, h = feature.height, jacket = feature.color ?? (solar ? "#e6b34a" : "#c9d3d8");
+  return <group>
+    <Cylinder radius={r} height={h} at={[0, h / 2, 0]} color={jacket} glow={glow} rough={0.35} metal={0.2} />
+    <Cylinder radius={r * 0.98} height={0.04} at={[0, h + 0.02, 0]} color="#5c6a70" />
+    {[-0.3, 0.3].map(x => <Cylinder key={x} radius={0.025} height={0.25} at={[x * r, h + 0.15, 0]} color="#b87333" metal={0.7} rough={0.35} segments={10} />)}
+    {solar && <><Box size={[0.16, 0.2, 0.14]} at={[r + 0.09, h * 0.25, 0]} color="#2f3b44" glow={glow} /><Cylinder radius={0.02} height={r + 0.1} at={[r * 0.5, h * 0.25, 0]} color="#b87333" metal={0.7} rough={0.35} segments={10} /></>}
+  </group>;
+}
+
+/** A wall-hung electric water heater: an upright oval drum with its pipes underneath and a pilot light. */
+function WaterHeater({ feature, glow }: Props) {
+  const w = feature.width, d = feature.depth, h = feature.height, white = feature.color ?? "#eef1f2";
+  return <group>
+    <Cylinder radius={Math.min(w, d) / 2} height={h} at={[0, h / 2 + 0.06, 0]} color={white} glow={glow} rough={0.3} />
+    <Box size={[0.06, 0.06, 0.02]} at={[0, h * 0.7, Math.min(w, d) / 2 + 0.005]} color="#3bd97a" glow={{ emissive: "#3bd97a", emissiveIntensity: 1.2 }} cast={false} />
+    {[-0.08, 0.08].map(x => <Cylinder key={x} radius={0.015} height={0.1} at={[x, 0.01, 0]} color="#b87333" metal={0.7} rough={0.35} segments={8} />)}
+  </group>;
+}
+
 function Radiator({ feature, glow }: Props) {
   const w = feature.width, h = feature.height, d = feature.depth, white = feature.color ?? "#e8e4dc", fins = Math.max(4, Math.round(w / 0.09));
   return <group>
@@ -345,6 +366,9 @@ export function InteriorBody(props: Props) {
     case "lift": return <Lift {...props} />;
     case "stair-light": return <StairLight {...props} />;
     case "radiator": return <Radiator {...props} />;
+    case "water-heater": return <WaterHeater {...props} />;
+    case "hot-tank": return <Tank {...props} solar={false} />;
+    case "solar-tank": return <Tank {...props} solar />;
     case "washer": return <Washer {...props} />;
     case "fridge": return <Fridge {...props} />;
     case "desk": return <Desk {...props} />;

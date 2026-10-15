@@ -81,7 +81,25 @@ function Fence({ feature, glow }: Props) {
   </group>;
 }
 
+/** The gate of a farm or an estate: one wide leaf of tubes between two posts that swings (farm), slides sideways on a track (slide) or hangs from its own counterweighted frame without touching the ground (cantilever). */
+function RailGate({ feature, glow }: Props) {
+  const w = feature.width, h = feature.height, style = feature.style ?? "farm", post = 0.3, gap = Math.max(1, w - 2 * post), px = w / 2 - post / 2;
+  const tube = feature.color ?? (style === "farm" ? "#9aa4a8" : "#3a4348"), leafH = h * 0.8, rails = 5, shift = style === "farm" ? 0 : gap * 0.5;
+  const leafLength = style === "cantilever" ? gap * 1.5 : gap;
+  return <group>
+    {[-px, px].map(x => <Box key={x} size={[post, h, post]} at={[x, h / 2, 0]} color="#8d979a" glow={glow} rough={0.9} metal={0.3} />)}
+    <group position={[shift * (style === "farm" ? 0 : 1) - (style === "cantilever" ? gap * 0.25 : 0), 0, style === "farm" ? 0 : post * 0.7]}>
+      {Array.from({ length: rails }, (_, index) => <Box key={index} size={[leafLength, 0.05, 0.05]} at={[0, 0.25 + index * (leafH - 0.3) / (rails - 1), 0]} color={tube} metal={0.6} rough={0.45} glow={glow} />)}
+      {[-1, 1].map(side => <Box key={side} size={[0.05, leafH - 0.2, 0.05]} at={[side * leafLength / 2, 0.15 + (leafH - 0.2) / 2, 0]} color={tube} metal={0.6} rough={0.45} />)}
+      <Box size={[leafLength, 0.04, 0.04]} at={[0, leafH / 2, 0]} color={tube} metal={0.6} rough={0.45} rotation={[0, 0, Math.atan2(leafH - 0.3, leafLength) * 0.35]} />
+    </group>
+    {style !== "farm" && <Box size={[w + gap * 0.6, 0.05, 0.08]} at={[gap * 0.15, 0.03, post * 0.7]} color="#5c6a70" metal={0.5} rough={0.5} cast={false} />}
+    {feature.automatic && <Box size={[0.22, 0.3, 0.18]} at={[-px, 0.55, post * 0.6]} color="#f59e0b" metal={0.3} rough={0.45} />}
+  </group>;
+}
+
 function Gate({ feature, glow }: Props) {
+  if (feature.style === "farm" || feature.style === "slide" || feature.style === "cantilever") return <RailGate feature={feature} glow={glow} />;
   const w = feature.width, h = feature.height, style = feature.style ?? "iron";
   const pillar = style === "stone" ? 0.7 : 0.55, gap = Math.max(1, w - 2 * pillar), leaf = gap / 2 - 0.03, px = w / 2 - pillar / 2;
   const stone = style === "stone" || style === "wood" ? "#9a8f82" : "#8d979a", leafColour = feature.color ?? (style === "wood" ? "#8a6234" : style === "modern" ? "#2d3438" : "#20272b");

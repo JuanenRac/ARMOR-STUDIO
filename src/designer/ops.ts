@@ -189,7 +189,7 @@ export function addWallLamp(model: SiteModel, buildingId: string, edge: number, 
 
 const ROOF_ITEM_DEFAULTS: Record<RoofItemKind, { width: number; depth: number; height: number }> = {
   chimney: { width: 0.6, depth: 0.6, height: 1.2 }, solar: { width: 1.7, depth: 1, height: 0.06 }, antenna: { width: 0.1, depth: 0.1, height: 3 }, vent: { width: 0.4, depth: 0.4, height: 0.4 },
-  gutter: { width: 4, depth: 0.14, height: 0.1 }, downpipe: { width: 0.09, depth: 0.09, height: 3 },
+  gutter: { width: 4, depth: 0.14, height: 0.1 }, downpipe: { width: 0.09, depth: 0.09, height: 3 }, "solar-heater": { width: 2, depth: 1.4, height: 0.5 },
 };
 
 /** The height above the ground of the roof surface at a point of a building. */
@@ -281,10 +281,13 @@ export const FEATURE_DEFAULTS: Record<SiteFeatureKind, Omit<SiteFeature, "id" | 
   "intercom-monitor": { width: 0.2, depth: 0.05, height: 0.26, rotation: 0, slope: 0 },
   "alarm-panel": { width: 0.3, depth: 0.08, height: 0.4, rotation: 0, slope: 0 },
   "alarm-keypad": { width: 0.14, depth: 0.04, height: 0.2, rotation: 0, slope: 0 },
+  "water-heater": { width: 0.45, depth: 0.45, height: 0.9, rotation: 0, slope: 0 },
+  "hot-tank": { width: 0.6, depth: 0.6, height: 1.6, rotation: 0, slope: 0 },
+  "solar-tank": { width: 0.8, depth: 0.8, height: 1.8, rotation: 0, slope: 0 },
 };
 
 /** How high above the floor a thing that hangs on a wall is put when it is placed (a mirror, the panel of an intercom, an alarm keypad); the rest stand on the floor. */
-export const MOUNT_HEIGHT: Partial<Record<SiteFeatureKind, number>> = { mirror: 0.3, intercom: 1.3, "intercom-monitor": 1.4, "alarm-panel": 1.4, "alarm-keypad": 1.3 };
+export const MOUNT_HEIGHT: Partial<Record<SiteFeatureKind, number>> = { mirror: 0.3, intercom: 1.3, "intercom-monitor": 1.4, "alarm-panel": 1.4, "alarm-keypad": 1.3, "water-heater": 1.3 };
 
 export function addFeature(model: SiteModel, kind: SiteFeatureKind, x: number, y: number, z = 0): { model: SiteModel; id: string } {
   const id = nextId(kind, model.features.map(item => item.id));
@@ -352,7 +355,7 @@ export function canTurnAbout(selection: Selection, axis: "yaw" | "pitch" | "roll
 /** How high, in metres, each kind of device is usually fixed: a smoke detector on the ceiling, a plug near the floor, a door contact on the frame. */
 export const DEVICE_HEIGHT: Record<string, number> = {
   smoke: 2.6, co: 1.6, gas: 0.3, water_leak: 0.05, panic_button: 1.2, door: 1.0, window: 1.3, motion: 2.2, glass_break: 2.0, vibration: 1.0, climate: 1.4, temperature: 1.4, humidity: 1.4, light_level: 2.0,
-  smart_plug: 0.35, smart_light: 2.4, smart_switch: 1.2, siren: 2.5, lock: 1.05, valve: 0.6,
+  smart_plug: 0.35, smart_light: 2.4, smart_switch: 1.2, siren: 2.5, lock: 1.05, valve: 0.6, shutter: 2.0, gate_motor: 1.0, garage_motor: 2.3, water_heater: 1.6,
 };
 
 /** Put a device (or move it) in the design. */

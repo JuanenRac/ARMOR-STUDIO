@@ -82,6 +82,30 @@ describe("browser-local settings", () => {
     expect(back.features).toEqual(good.features);
     expect(back.placements).toEqual(good.placements);
   });
+  it("keeps the motors, the devices they are tied to and the new gates, garage doors and water equipment", () => {
+    const site: StudioSettings = {
+      ...good,
+      openings: [
+        { id: "g1", buildingId: "b1", edge: 0, floor: 0, kind: "garage", offset: 1, width: 3, height: 2.2, sill: 0, style: "slide", motor: true, link: { kind: "device", id: "garage-door" } },
+        { id: "w1", buildingId: "b1", edge: 1, floor: 0, kind: "window", offset: 1, width: 1.2, height: 1.2, sill: 0.9, shutter: true, motor: true, link: { kind: "device", id: "shutter-1" } },
+      ],
+      roofItems: [{ id: "h1", buildingId: "b1", kind: "solar-heater", x: 4, y: 3, width: 2, depth: 1.4, height: 0.5, rotation: 0, tilt: 30 }],
+      features: [
+        { id: "gate-1", kind: "gate", x: 1, y: 1, z: 0, width: 4.2, depth: 0.6, height: 2.4, rotation: 0, slope: 0, style: "cantilever", automatic: true, link: { kind: "device", id: "gate-motor" } },
+        { id: "wh-1", kind: "water-heater", x: 3, y: 3, z: 0, width: 0.45, depth: 0.45, height: 0.9, rotation: 0, slope: 0 },
+        { id: "ht-1", kind: "hot-tank", x: 3.5, y: 3, z: 0, width: 0.6, depth: 0.6, height: 1.6, rotation: 0, slope: 0 },
+        { id: "st-1", kind: "solar-tank", x: 4, y: 3, z: 0, width: 0.8, depth: 0.8, height: 1.8, rotation: 0, slope: 0 },
+      ],
+    };
+    const back = parseStudioSettings(serializeStudioSettings(site));
+    expect(back.openings).toEqual(site.openings);
+    expect(back.roofItems).toEqual(site.roofItems);
+    expect(back.features).toEqual(site.features);
+    // a door has no motor, and a made-up opening style or a motor on a plain opening is not trusted
+    const odd = parseStudioSettings(JSON.stringify({ ...site, openings: [{ ...site.openings[0], style: "teleport" }, { id: "a1", buildingId: "b1", edge: 0, floor: 0, kind: "opening", offset: 0, width: 1, height: 2, sill: 0, motor: true }] }));
+    expect(odd.openings?.[0].style).toBeUndefined();
+    expect(odd.openings?.[1].motor).toBeUndefined();
+  });
   it("survives missing, damaged and wrongly shaped storage", () => {
     expect(parseStudioSettings(null)).toEqual({});
     expect(parseStudioSettings("{not json")).toEqual({});

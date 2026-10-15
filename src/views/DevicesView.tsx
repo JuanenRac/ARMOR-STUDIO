@@ -7,7 +7,7 @@ import { askConfirm } from "../askConfirm";
 import { useMemo, useState, type FormEvent } from "react";
 import { ApiError, commandDevice, createDevice, deleteDevice, setDeviceState, updateDevice, type DeviceKind, type DeviceProtocol, type DeviceRisk, type StudioDevice } from "../api";
 import {
-  ACTUATOR_KINDS, ago, ALARM_KIND, applyPreset, describeState, deviceProblem, KIND_COLOUR, KindIcon, MAIN_FIELD, mapToText, PRESETS, PROTOCOLS, slug, textToMap, SENSOR_KINDS, type PresetId, type PresetResult,
+  ACTUATOR_KINDS, isOpeningKind, ago, ALARM_KIND, applyPreset, describeState, deviceProblem, KIND_COLOUR, KindIcon, MAIN_FIELD, mapToText, PRESETS, PROTOCOLS, slug, textToMap, SENSOR_KINDS, type PresetId, type PresetResult,
 } from "../deviceKinds";
 import type { Translate } from "../components/camera";
 import "./devices.css";
@@ -86,7 +86,7 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
 
   const conn = form ? currentConnection(form) : null;
   const mqttConn = conn?.source.type === "mqtt" ? conn.source : undefined;
-  const commandLabels = (kind: DeviceKind) => kind === "lock" ? ["cmdLock", "cmdUnlock"] : kind === "valve" ? ["cmdOpen", "cmdClose"] : ["cmdOn", "cmdOff"];
+  const commandLabels = (kind: DeviceKind) => kind === "lock" ? ["cmdLock", "cmdUnlock"] : isOpeningKind(kind) ? ["cmdOpen", "cmdClose"] : ["cmdOn", "cmdOff"];
 
   return <section className="devices-view">
     <header className="devices-head">
@@ -163,7 +163,7 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
           {device.category === "actuator" && device.can_command && <div className="device-commands">
             <button onClick={() => void act(() => switchDevice(device, "on"))}>{t(onLabel)}</button>
             <button onClick={() => void act(() => switchDevice(device, "off"))}>{t(offLabel)}</button>
-            {device.kind !== "siren" && device.kind !== "lock" && device.kind !== "valve" && <button onClick={() => void act(() => switchDevice(device, "toggle"))}>{t("cmdToggle")}</button>}
+            {device.kind !== "siren" && device.kind !== "lock" && !isOpeningKind(device.kind) && <button onClick={() => void act(() => switchDevice(device, "toggle"))}>{t("cmdToggle")}</button>}
           </div>}
           <div className="device-actions">
             {ALARM_KIND[device.kind] && main && <button title={t("testHelp")} onClick={() => void act(() => setDeviceState(origin, device.id, { [main]: !isOn }))}>{isOn ? t("testClear") : t("testTrigger")}</button>}

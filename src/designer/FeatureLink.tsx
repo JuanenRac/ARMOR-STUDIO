@@ -8,10 +8,17 @@ import type { AlarmNodeView, StudioDevice } from "../api";
 import type { FeatureLink, FeatureLinkKind, SiteFeature, SiteFeatureKind } from "../domain";
 
 /** What each kind of object can be tied to. */
-export const LINK_OF_KIND: Partial<Record<SiteFeatureKind, FeatureLinkKind>> = {
+export const LINK_OF_KIND: Partial<Record<string, FeatureLinkKind>> = {
+  gate: "device", "water-heater": "device", "solar-tank": "device", "opening:garage": "device", "opening:window": "device", "opening:door": "device",
   intercom: "camera", "intercom-monitor": "feature", "alarm-panel": "alarm", "alarm-keypad": "alarm", "stair-light": "device", lamp: "device",
 };
 
+/** The kinds of device each object can be tied to; the rest take the lights, switches and plugs. A tank of a solar circuit is tied to the plug or switch of its pump. */
+const SWITCHES = ["smart_plug", "smart_switch", "smart_breaker"] as const;
+export const DEVICE_KINDS_OF: Partial<Record<string, readonly string[]>> = {
+  gate: ["gate_motor", ...SWITCHES], "water-heater": ["water_heater", ...SWITCHES], "solar-tank": [...SWITCHES, "water_heater"],
+  "opening:garage": ["garage_motor", ...SWITCHES], "opening:window": ["shutter", ...SWITCHES], "opening:door": ["lock", ...SWITCHES],
+};
 export type LinkSources = {
   cameras: ReadonlyArray<{ id: string; name: string }>;
   alarmNodes: readonly AlarmNodeView[];
@@ -44,12 +51,12 @@ const LIVE_KEY: Record<NonNullable<ReturnType<typeof liveOfLink>>, string> = {
   alarm: "site_linkLiveAlarm", armed: "site_linkLiveArmed", disarmed: "site_linkLiveDisarmed", offline: "site_linkLiveOffline", on: "site_linkLiveOn", off: "site_linkLiveOff", missing: "site_linkMissing",
 };
 
-export function FeatureLinkField({ t, feature, sources, onChange }: { t: (key: string) => string; feature: SiteFeature; sources: LinkSources; onChange: (link: FeatureLink | undefined) => void }) {
+export function FeatureLinkField({ t, feature, sources, onChange }: { t: (key: string) => string; feature: { kind: string; link?: FeatureLink }; sources: LinkSources; onChange: (link: FeatureLink | undefined) => void }) {
   const kind = LINK_OF_KIND[feature.kind];
   if (!kind) return null;
   const options: Array<{ id: string; label: string }> = kind === "camera" ? sources.cameras.map(item => ({ id: item.id, label: item.name || item.id }))
     : kind === "alarm" ? sources.alarmNodes.map(item => ({ id: item.node_id, label: item.node_id }))
-    : kind === "device" ? sources.devices.filter(item => item.kind === "smart_light" || item.kind === "smart_switch" || item.kind === "smart_plug").map(item => ({ id: item.id, label: item.name || item.id }))
+    : kind === "device" ? sources.devices.filter(item => (DEVICE_KINDS_OF[feature.kind] ?? ["smart_light", "smart_switch", "smart_plug"]).includes(item.kind)).map(item => ({ id: item.id, label: item.name || item.id }))
     : sources.features.filter(item => item.kind === "intercom").map(item => ({ id: item.id, label: item.label || item.id }));
   const current = feature.link?.kind === kind ? feature.link.id : "";
   const known = options.some(option => option.id === current);

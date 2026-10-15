@@ -24,7 +24,8 @@
 .mt-steps li { display: grid; grid-template-columns: minmax(10rem, 16rem) 1fr; gap: .8rem; align-items: center; font-size: .84rem; }
 .mt-steps li.waiting { opacity: .55; } .mt-steps li.skipped { opacity: .7; } .mt-steps li.failed span { color: #ff8e99; }
 .mt-log { max-height: 20rem; overflow: auto; margin: .4rem 0 0; padding: .7rem; background: #050b11; border: 1px solid #12303b; border-radius: 8px; font: .76rem/1.45 "DM Mono", ui-monospace, Consolas, monospace; white-space: pre-wrap; word-break: break-word; color: #b9e6ee; }
-.mt-history { list-style: none; padding: 0; margin: 0; display: grid; gap: .3rem; font-size: .82rem; }
+.mt-dismiss { margin-left: .5rem; border: 0; background: none; color: #9fd8e3; font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 0 .3rem; }
+.mt-history { list-style: none; padding: 0 .4rem 0 0; margin: 0; display: grid; gap: .3rem; font-size: .82rem; max-height: 18rem; overflow-y: auto; scrollbar-width: thin; }
 .mt-history li { display: grid; grid-template-columns: 12rem 8rem 1fr auto; gap: .6rem; align-items: center; padding: .25rem 0; border-bottom: 1px solid #12303b; }
 .mc-lock form { display: grid; gap: .6rem; max-width: 26rem; }
 .mc-console { display: grid; gap: .6rem; }
@@ -38,3 +39,10 @@
 .mc-input input { flex: 1 1 18rem; min-width: 12rem; font-family: "DM Mono", ui-monospace, Consolas, monospace; }
 .mc-limit { display: flex; align-items: center; gap: .35rem; font-size: .75rem; color: #6f98a3; }
 @media (max-width: 800px) { .mt-steps li { grid-template-columns: 1fr; } .mt-history li { grid-template-columns: 1fr 1fr; } }
+/* The small copy button of every log window. */
+.copy-button { display: inline-flex; align-items: center; gap: .35rem; padding: .25rem .45rem; border: 1px solid #285a66; border-radius: 8px; background: #0b202a; color: #9fd8e3; cursor: pointer; line-height: 1; }
+.copy-button:hover { background: #12303b; color: #e9ffff; }
+.copy-button.ok { color: #5df0c4; border-color: #1f7a62; } .copy-button.bad { color: #ff8e99; border-color: #974b55; }
+.copy-note { font-size: .72rem; }
+.log-box { position: relative; } .log-box > .copy-button { position: absolute; top: .4rem; right: .4rem; z-index: 2; }
+.log-head { display: flex; justify-content: space-between; align-items: center; gap: .6rem; }

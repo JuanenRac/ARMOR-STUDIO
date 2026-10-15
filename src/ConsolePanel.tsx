@@ -6,6 +6,7 @@
  */
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { ApiError, cancelConsoleJob, lockConsole, readConsole, readConsoleJob, runConsole, unlockConsole, type ConsoleJob, type ConsoleState } from "./api";
+import { CopyButton } from "./components/CopyButton";
 import "./maintenance.css";
 
 type Translate = (key: string) => string;
@@ -23,23 +24,28 @@ export const QUICK: ReadonlyArray<{ key: string; command: string }> = [
   { key: "mc_q_restart", command: "systemctl restart armor-server && systemctl is-active armor-server" },
 ];
 
+/** What is on the screen of the console is kept while the person is in another menu, and comes back: the commands, their output (a command that was still running goes on being followed), the folder and the history. */
+const memory: { origin: string; entries: Entry[]; cwd: string; history: string[]; offsets: Record<string, number> } = { origin: "", entries: [], cwd: "/root", history: [], offsets: {} };
+
 const timeText = (seconds: number) => (seconds >= 3600 ? "1 h" : seconds >= 60 ? `${seconds / 60} min` : `${seconds} s`);
 
 export function ConsolePanel({ t, origin, isAdmin }: Props) {
   const [state, setState] = useState<ConsoleState | null>(null);
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [entries, setEntries] = useState<Entry[]>([]);
+  const [entries, setEntries] = useState<Entry[]>(() => (memory.origin === origin ? memory.entries : []));
   const [line, setLine] = useState("");
-  const [cwd, setCwd] = useState("/root");
+  const [cwd, setCwd] = useState(() => (memory.origin === origin ? memory.cwd : "/root"));
   const [limit, setLimit] = useState<number>(120);
-  const history = useRef<string[]>([]);
+  const history = useRef<string[]>(memory.origin === origin ? memory.history : []);
   const cursor = useRef(-1);
   const screen = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
-  const offsets = useRef<Record<string, number>>({});
+  const offsets = useRef<Record<string, number>>(memory.origin === origin ? memory.offsets : {});
   const running = entries.some(entry => entry.state === "running");
   const unlocked = Boolean(state && state.unlocked_until > Date.now());
+
+  useEffect(() => { memory.origin = origin; memory.entries = entries; memory.cwd = cwd; memory.history = history.current; memory.offsets = offsets.current; });
 
   const refresh = async () => { try { setState(await readConsole(origin)); } catch { setState({ available: false, enabled: false, unlocked_until: 0 }); } };
   useEffect(() => { if (isAdmin) void refresh(); }, [origin, isAdmin]);   // eslint-disable-line react-hooks/exhaustive-deps
@@ -118,6 +124,7 @@ export function ConsolePanel({ t, origin, isAdmin }: Props) {
       <span className="muted">{t("mc_quick")}:</span>
       {QUICK.map(item => <button key={item.key} disabled={running} onClick={() => { setLine(item.command); input.current?.focus(); }} title={item.command}>{t(item.key)}</button>)}
     </div>
+    <div className="log-box"><CopyButton t={t} text={() => entries.map(entry => `${entry.cwd}# ${entry.command}\n${entry.output}${entry.state === "timeout" ? `\n[${t("mc_timeout")}]` : entry.code !== null && entry.code !== 0 ? `\n[${t("mc_exit")} ${entry.code}]` : ""}`).join("\n\n")} />
     <div className="mc-screen" ref={screen} onClick={() => input.current?.focus()}>
       {entries.map(entry => <div key={entry.id} className="mc-entry">
         <div className="mc-prompt"><span className="mc-cwd">root@armor:{entry.cwd}</span># {entry.command}</div>
@@ -126,7 +133,7 @@ export function ConsolePanel({ t, origin, isAdmin }: Props) {
         {entry.state === "timeout" && <div className="mc-state bad">{t("mc_timeout")}</div>}
         {entry.state === "done" && entry.code !== null && entry.code !== 0 && <div className="mc-state bad">{t("mc_exit")} {entry.code}</div>}
       </div>)}
-    </div>
+    </div></div>
     <form className="mc-input" onSubmit={event => { event.preventDefault(); void run(line); }}>
       <span className="mc-cwd">{cwd}#</span>
       <input ref={input} value={line} onChange={event => setLine(event.target.value)} onKeyDown={keys} placeholder={t("mc_placeholder")} disabled={running} spellCheck={false} autoComplete="off" aria-label={t("mc_placeholder")} />

@@ -7,11 +7,12 @@ import { NotificationsPanel } from "./NotificationsPanel";
 import { InstallationPanel } from "./InstallationPanel";
 import { UpdatesPanel } from "./UpdatesPanel";
 import { ConsolePanel } from "./ConsolePanel";
+import { PreferencesPanel } from "./PreferencesPanel";
 import type { NetworkOverview } from "./networkModel";
 import "./configuration.css";
 import { MenuTitle } from "./menuLogos";
 
-type Tab = "general" | "users" | "server" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications";
+type Tab = "general" | "users" | "server" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications" | "preferences";
 type Props = {
   t: (key: string) => string;
   origin: string; setOrigin: (value: string) => void;
@@ -23,7 +24,7 @@ type Props = {
   network?: NetworkOverview | null;
 };
 
-const tabs: Tab[] = ["general", "users", "server", "services", "broker", "files", "installation", "firmware", "updates", "console", "notifications"];
+const tabs: Tab[] = ["general", "users", "server", "services", "broker", "files", "installation", "firmware", "updates", "console", "notifications", "preferences"];
 
 /** Can the browser reach something at this address at all? (no-cors: only a network failure rejects, which is what a wrong scheme or port gives.) */
 async function reachable(url: string): Promise<boolean> {
@@ -84,8 +85,8 @@ export function ConfigurationPanel(props: Props) {
 
   return <section className="configuration">
     <div className="panel-heading"><MenuTitle kind="configuration"><p className="eyebrow">{t("systemConfiguration")}</p><h2>{t("configuration")}</h2><p className="muted">{t("configurationHelp")}</p></MenuTitle></div>
-    <div className="config-tabs" role="tablist" aria-label={t("configuration")}>
-      {tabs.map(item => <button key={item} className={tab === item ? "active" : ""} role="tab" aria-selected={tab === item} onClick={() => setTab(item)}>{tabLabel(item)}</button>)}
+    <div className="config-tabs" role="tablist" aria-label={t("configuration")} data-tour="config-tabs">
+      {tabs.map(item => <button key={item} data-tour={`tab-${item}`} className={tab === item ? "active" : ""} role="tab" aria-selected={tab === item} onClick={() => setTab(item)}>{tabLabel(item)}</button>)}
     </div>
     {tab === "general" && <div className="config-grid">
       <article className="stack-card"><h3>{t("serverOrigin")}</h3><label>{t("serverOrigin")}<input value={props.origin} onChange={event => props.setOrigin(event.target.value)} inputMode="url" /></label><OriginCheck t={t} origin={props.origin} setOrigin={props.setOrigin} /><small>{props.connection}</small><p className={`operator-session ${props.operatorUnlocked ? "ready" : ""}`}>{props.operatorUnlocked ? t("studioAccessActive") : t("studioAccessWaiting")}</p><small>{t("studioAccessNotice")}</small><button onClick={props.savePreferences}>{t("savePreferences")}</button><button onClick={props.exportSite}>{t("exportSite")}</button></article>
@@ -98,6 +99,7 @@ export function ConfigurationPanel(props: Props) {
     {tab === "files" && <FilesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "installation" && <InstallationPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "notifications" && <NotificationsPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
+    {tab === "preferences" && <PreferencesPanel t={t} />}
     {tab === "updates" && <UpdatesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "console" && <ConsolePanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "firmware" && <FirmwarePanel t={t} origin={props.origin} isAdmin={props.isAdmin} network={props.network ?? null} />}

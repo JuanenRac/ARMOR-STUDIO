@@ -1,0 +1,40 @@
+/* Configuration > Preferences */
+.pf-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; margin-bottom: .6rem; }
+.pf-head h3 { margin: 0 0 .2rem; }
+.pf-saved { color: var(--accent-2, #34d399); font-size: .85rem; white-space: nowrap; }
+.pf-card { display: flex; flex-direction: column; gap: .7rem; }
+.pf-card h3 { margin: 0; }
+.pf-sub { margin-top: .6rem !important; }
+.pf-toggle { display: flex; gap: .6rem; align-items: flex-start; cursor: pointer; }
+.pf-toggle input { margin-top: .25rem; }
+.pf-toggle span { display: flex; flex-direction: column; gap: .15rem; }
+.pf-toggle small { opacity: .7; }
+.pf-choice { border: 1px solid rgba(255, 255, 255, .12); border-radius: 10px; padding: .45rem .6rem .6rem; display: flex; flex-wrap: wrap; gap: .45rem; margin: 0; }
+.pf-choice legend { padding: 0 .35rem; font-size: .85rem; opacity: .8; }
+.pf-choice label { display: inline-flex; gap: .35rem; align-items: center; padding: .3rem .65rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .15); cursor: pointer; transition: background .15s ease, border-color .15s ease; }
+.pf-choice label.on { background: rgba(59, 217, 238, .18); border-color: var(--accent, #3bd9ee); }
+.pf-choice input { accent-color: var(--accent, #3bd9ee); }
+.pf-hint { margin: 0; font-size: .85rem; }
+.pf-range { display: flex; flex-direction: column; gap: .3rem; }
+.pf-range input[type=range] { width: 100%; accent-color: var(--accent, #3bd9ee); }
+.pf-preview { padding: .6rem .7rem; border: 1px dashed rgba(255, 255, 255, .2); border-radius: 10px; }
+.pf-preview p { margin: .2rem 0 .5rem; font-size: .85rem; }
+.pf-actions { display: flex; gap: .6rem; margin-top: .4rem; flex-wrap: wrap; }
+.pf-tours { margin-top: 1rem; }
+.pf-tour-list { list-style: none; margin: .6rem 0; padding: 0; display: grid; gap: .6rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); }
+.pf-tour-list li { display: flex; gap: .8rem; align-items: center; padding: .6rem .7rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, .12); background: rgba(255, 255, 255, .03); transition: border-color .2s ease, transform .2s ease; }
+.pf-tour-list li:hover { border-color: var(--accent, #3bd9ee); transform: translateY(-1px); }
+.pf-tour-list li.seen { opacity: .85; }
+.pf-tour-art { flex: none; padding: .2rem; border-radius: 8px; background: rgba(59, 217, 238, .07); }
+.pf-tour-text { flex: 1; display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
+.pf-badge { font-style: normal; font-size: .75rem; margin-left: .3rem; color: var(--accent-2, #34d399); }
+@media (max-width: 640px) { .pf-tour-list li { flex-wrap: wrap; } .pf-tour-art { display: none; } }
+
+/* the global rules of "label" stack a label's parts: here the box sits beside its words */
+.pf .pf-toggle { display: flex; flex-direction: row; align-items: flex-start; gap: .65rem; font-size: 1rem; }
+.pf .pf-toggle strong { font-size: .98rem; font-weight: 600; }
+.pf .pf-toggle small { font-size: .82rem; line-height: 1.35; }
+.pf .pf-toggle input, .pf .pf-choice input { width: auto; flex: none; margin: .2rem 0 0; }
+.pf .pf-choice label { display: inline-flex; flex-direction: row; align-items: center; gap: .4rem; font-size: .95rem; }
+.pf .pf-choice input { margin: 0; }
+.pf .pf-range { font-size: .95rem; }

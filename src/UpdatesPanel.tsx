@@ -7,15 +7,20 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { askConfirm } from "./askConfirm";
 import {
-  ApiError, maintenanceStatus, readMaintJob, readUpdates, rollbackUpdate, startUpdates, systemAction,
+  ApiError, clearUpdateHistory, type UpgradeMode, maintenanceStatus, readMaintJob, readUpdates, rollbackUpdate, startUpdates, systemAction,
   type MaintComponent, type MaintJob, type MaintOverview,
 } from "./api";
+import { CopyButton } from "./components/CopyButton";
 import "./maintenance.css";
 
 type Translate = (key: string) => string;
 type Props = { t: Translate; origin: string; isAdmin: boolean };
 
 const POLL_MS = 700;
+const JOB_KEY = "armor-studio-update-job";
+/** The job the person was following: kept so that going to another menu and coming back finds the same steps and the same log (the work itself runs in the maintenance helper). */
+const storedJob = (): string => { try { return window.localStorage.getItem(JOB_KEY) ?? ""; } catch { return ""; } };
+const keepJob = (id: string): void => { try { if (id) window.localStorage.setItem(JOB_KEY, id); else window.localStorage.removeItem(JOB_KEY); } catch { /* storage may be blocked */ } };
 
 export const explainMaintenance = (t: Translate, error: unknown): string => {
   const code = error instanceof ApiError ? error.code : typeof error === "string" ? error : "generic";
@@ -34,6 +39,7 @@ export function uptimeText(seconds: number): string {
 /** The label of a step of a job, in the console's words: "server.download" is "Server: download". */
 export function stepLabel(t: Translate, id: string): string {
   const [component, step] = id.split(".");
+  if (step === undefined) { const own = t(`mt_step_${id}`); return own === `mt_step_${id}` ? id : own; }   // the steps of the system jobs have no program in front
   const stepText = t(`mt_step_${step ?? ""}`);
   const named = component && t(`mt_c_${component}`) !== `mt_c_${component}` ? t(`mt_c_${component}`) : component;
   return step ? `${named}: ${stepText === `mt_step_${step}` ? step : stepText}` : id;
@@ -53,6 +59,7 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
   const [message, setMessage] = useState("");
   const [waiting, setWaiting] = useState(false);
   const logEnd = useRef<HTMLDivElement>(null);
+  const restored = useRef(false);
   const logLines = useRef<string[]>([]);
   const running = job !== null && job.state === "running";
 
@@ -91,12 +98,22 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
     return () => { cancelled = true; window.clearInterval(timer); };
   }, [job?.id, job?.state, origin, load]);   // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Back in this menu: the job that is running (or the last one the person was following) comes back with its steps and its whole log.
+  useEffect(() => {
+    if (!overview || restored.current || job !== null) return;
+    restored.current = true;
+    const id = overview.running[0] ?? storedJob();
+    if (!id) return;
+    readMaintJob(origin, id, 0).then(found => { logLines.current = found.log; setJob({ ...found, log: logLines.current }); }).catch(() => keepJob(""));
+  }, [overview, job, origin]);
+
   useEffect(() => { logEnd.current?.scrollIntoView?.({ block: "nearest" }); }, [job?.log.length]);
 
   if (!isAdmin) return <article className="stack-card"><h3>{t("mt_title")}</h3><p className="muted">{t("cs_admin_only")}</p></article>;
   if (available === false) return <article className="stack-card"><h3>{t("mt_title")}</h3><p className="notice">{t("mt_unavailable")}</p><p className="muted">{hint || t("mt_hint")}</p></article>;
 
-  const begin = (next: MaintJob) => { logLines.current = next.log ?? []; setJob({ ...next, log: logLines.current }); setWaiting(false); };
+  const begin = (next: MaintJob) => { logLines.current = next.log ?? []; setJob({ ...next, log: logLines.current }); setWaiting(false); keepJob(next.id); };
+  const dismiss = () => { keepJob(""); logLines.current = []; setJob(null); };
   const label = (id: string) => (t(`mt_c_${id}`) === `mt_c_${id}` ? id : t(`mt_c_${id}`));
   const updatable = (overview?.components ?? []).filter(item => item.status === "update_available" && item.installable);
 
@@ -111,15 +128,20 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
     try { begin(await rollbackUpdate(origin, item.id)); setMessage(""); }
     catch (error) { setMessage(explainMaintenance(t, error)); }
   };
-  const system = async (action: "check" | "upgrade" | "reboot") => {
+  const system = async (action: "check" | "upgrade" | "reboot", mode: UpgradeMode = "upgrade") => {
     if (running) return;
-    if (action === "upgrade" && !(await askConfirm(t("mt_confirm_system"), t))) return;
+    if (action === "upgrade" && !(await askConfirm(t(mode === "full" ? "mt_confirm_full" : mode === "repair" ? "mt_confirm_repair" : "mt_confirm_system"), t))) return;
     if (action === "reboot" && !(await askConfirm(t("mt_confirm_reboot"), t))) return;
     try {
-      const next = await systemAction(origin, action);
+      const next = await systemAction(origin, action, mode);
       if (action === "reboot") { setMessage(t("mt_rebooting")); return; }
       begin(next); setMessage("");
     } catch (error) { setMessage(explainMaintenance(t, error)); }
+  };
+  const emptyHistory = async () => {
+    if (!(await askConfirm(t("mt_confirm_clear_history"), t))) return;
+    try { await clearUpdateHistory(origin); await load(false); }
+    catch (error) { setMessage(explainMaintenance(t, error)); }
   };
   const toggle = (id: string) => setPicked(current => { const next = new Set(current); if (next.has(id)) next.delete(id); else next.add(id); return next; });
   const studioUpdated = Boolean(job && job.state === "done" && job.label.split(", ").includes("studio"));
@@ -161,17 +183,21 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
         <dl className="mt-facts"><dt>{t("mt_os_kernel")}</dt><dd>{os.kernel || "—"}</dd><dt>{t("mt_os_uptime")}</dt><dd>{uptimeText(os.uptime_s)}</dd></dl>
         <p>{os.packages.length > 0 ? <><strong>{os.packages.length}</strong> {t("mt_os_packages")}</> : t("mt_os_none")}</p>
         {os.packages.length > 0 && <details className="mt-packages"><summary>{t("mt_os_packages")}</summary><ul>{os.packages.map(item => <li key={item.name}><code>{item.name}</code> {item.from} → {item.to}</li>)}</ul></details>}
+        {(os.broken?.length ?? 0) > 0 && <p className="notice danger" role="alert">{t("mt_os_broken")} <code>{os.broken!.join(", ")}</code></p>}
+        {(os.kept_back?.length ?? 0) > 0 && <p className="notice">{t("mt_os_kept_back")} <code>{os.kept_back!.join(", ")}</code></p>}
         {os.reboot_required && <p className="notice">{t("mt_os_reboot_needed")}</p>}
       </>}
       <div className="mt-buttons">
         <button onClick={() => void system("check")} disabled={running}>{t("mt_os_check")}</button>
-        <button className="primary" onClick={() => void system("upgrade")} disabled={running || (os?.packages.length ?? 0) === 0}>{t("mt_os_upgrade")}</button>
+        <button className="primary" onClick={() => void system("upgrade")} disabled={running || ((os?.packages.length ?? 0) === 0 && (os?.kept_back?.length ?? 0) === 0)}>{t("mt_os_upgrade")}</button>
+        <button onClick={() => void system("upgrade", "full")} disabled={running} title={t("mt_os_full_hint")}>{t("mt_os_full")}</button>
+        <button className={(os?.broken?.length ?? 0) > 0 ? "primary" : ""} onClick={() => void system("upgrade", "repair")} disabled={running} title={t("mt_os_repair_hint")}>{t("mt_os_repair")}</button>
         <button className={os?.reboot_required ? "danger" : ""} onClick={() => void system("reboot")} disabled={running}>{t("mt_os_reboot")}</button>
       </div>
     </article>
 
     {job && <article className="stack-card mt-job">
-      <div className="mt-head"><h3>{t("mt_job_title")}</h3><span className={`mt-badge job-${job.state}`}>{t(`mt_job_${job.state}`)}</span></div>
+      <div className="mt-head"><h3>{t("mt_job_title")}</h3><span><span className={`mt-badge job-${job.state}`}>{t(`mt_job_${job.state}`)}</span>{job.state !== "running" && <button className="mt-dismiss" onClick={dismiss} aria-label={t("close")} title={t("close")}>×</button>}</span></div>
       <Bar percent={job.percent} state={job.state} />
       <ul className="mt-steps">{job.steps.map(step => <li key={step.id} className={step.state}>
         <span>{stepLabel(t, step.id)}</span><Bar percent={step.state === "done" || step.state === "skipped" ? 100 : step.percent} state={step.state} />
@@ -179,12 +205,13 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
       {waiting && <p className="muted">{t("mt_job_running")}</p>}
       {job.state === "failed" && <p className="notice" role="alert">{explainMaintenance(t, job.error.split(": ").pop() ?? "generic")}</p>}
       {studioUpdated && <button className="primary" onClick={() => window.location.reload()}>{t("mt_reload")}</button>}
-      <h4>{t("mt_log")}</h4>
+      <div className="log-head"><h4>{t("mt_log")}</h4><CopyButton t={t} text={() => job.log.join("\n")} /></div>
       <pre className="mt-log" aria-live="polite">{job.log.join("\n")}<div ref={logEnd} /></pre>
     </article>}
 
     {overview && overview.history.length > 0 && <article className="stack-card">
-      <h3>{t("mt_history")}</h3>
+      <div className="log-head"><h3>{t("mt_history")} <small className="muted">({overview.history.length})</small></h3>
+        <button className="danger" onClick={() => void emptyHistory()} disabled={running}>{t("mt_history_clear")}</button></div>
       <ul className="mt-history">{overview.history.map(entry => <li key={entry.id} className={entry.state}>
         <span>{new Date(entry.started * 1000).toLocaleString()}</span><strong>{entry.kind}</strong><span>{entry.label}</span><span className={`mt-badge job-${entry.state}`}>{t(`mt_job_${entry.state}`)}</span>
       </li>)}</ul>

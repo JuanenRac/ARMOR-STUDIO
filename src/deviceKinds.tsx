@@ -8,14 +8,17 @@ import type { ReactNode } from "react";
 import type { DeviceCommandsInput, DeviceKind, DeviceProtocol, DeviceSource, DeviceState, StudioDevice } from "./api";
 
 export const SENSOR_KINDS: readonly DeviceKind[] = ["smoke", "co", "gas", "water_leak", "panic_button", "door", "window", "motion", "glass_break", "vibration", "climate", "temperature", "humidity", "light_level", "energy_meter"];
-export const ACTUATOR_KINDS: readonly DeviceKind[] = ["smart_plug", "smart_light", "smart_switch", "smart_breaker", "siren", "lock", "valve"];
+export const ACTUATOR_KINDS: readonly DeviceKind[] = ["smart_plug", "smart_light", "smart_switch", "smart_breaker", "siren", "lock", "valve", "shutter", "gate_motor", "garage_motor", "water_heater"];
+/** The actuators whose state is "open": their commands read open and close (a valve, a roller shutter, the motor of a gate or of a garage door). */
+export const OPENING_KINDS: readonly DeviceKind[] = ["valve", "shutter", "gate_motor", "garage_motor"];
+export const isOpeningKind = (kind: string | undefined): boolean => OPENING_KINDS.includes(kind as DeviceKind);
 export const ALL_KINDS: readonly DeviceKind[] = [...SENSOR_KINDS, ...ACTUATOR_KINDS];
 export const PROTOCOLS: readonly DeviceProtocol[] = ["wifi", "zigbee", "bluetooth", "zwave", "thread", "lora", "rf433", "wired", "other"];
 
 /** The main state field of a kind: what the card shows and what an automation waits for. */
 export const MAIN_FIELD: Record<DeviceKind, string | null> = {
   smoke: "triggered", co: "triggered", gas: "triggered", water_leak: "triggered", panic_button: "triggered", door: "open", window: "open", motion: "triggered", glass_break: "triggered", vibration: "triggered",
-  climate: null, temperature: null, humidity: null, light_level: null, smart_plug: "on", smart_light: "on", smart_switch: "on", smart_breaker: "on", energy_meter: null, siren: "on", lock: "locked", valve: "open",
+  climate: null, temperature: null, humidity: null, light_level: null, smart_plug: "on", smart_light: "on", smart_switch: "on", smart_breaker: "on", energy_meter: null, siren: "on", lock: "locked", valve: "open", shutter: "open", gate_motor: "open", garage_motor: "open", water_heater: "on",
 };
 /** The kinds that raise an alarm, and when: at any time (fire, gas, flood, panic) or while armed (intrusion). */
 export const ALARM_KIND: Partial<Record<DeviceKind, "always" | "armed">> = { smoke: "always", co: "always", gas: "always", water_leak: "always", panic_button: "always", door: "armed", window: "armed", motion: "armed", glass_break: "armed", vibration: "armed" };
@@ -23,7 +26,7 @@ export const ALARM_KIND: Partial<Record<DeviceKind, "always" | "armed">> = { smo
 /** The colour a kind wears (the same in the list, the plan and the overview). */
 export const KIND_COLOUR: Record<DeviceKind, string> = {
   smoke: "#ff7a45", co: "#ff9b45", gas: "#ffb020", water_leak: "#38bdf8", panic_button: "#ff4d5e", door: "#f5c04a", window: "#7dd3fc", motion: "#a78bfa", glass_break: "#f472b6", vibration: "#c4b5fd",
-  climate: "#2dd4bf", temperature: "#fb923c", humidity: "#22d3ee", light_level: "#fde047", smart_plug: "#34d399", smart_light: "#facc15", smart_switch: "#4ade80", smart_breaker: "#22d3ee", energy_meter: "#a3e635", siren: "#fb7185", lock: "#60a5fa", valve: "#5eead4",
+  climate: "#2dd4bf", temperature: "#fb923c", humidity: "#22d3ee", light_level: "#fde047", smart_plug: "#34d399", smart_light: "#facc15", smart_switch: "#4ade80", smart_breaker: "#22d3ee", energy_meter: "#a3e635", siren: "#fb7185", lock: "#60a5fa", valve: "#5eead4", shutter: "#93c5fd", gate_motor: "#fdba74", garage_motor: "#fcd34d", water_heater: "#f87171",
 };
 
 const svg = (children: ReactNode, size: number) => <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">{children}</svg>;
@@ -50,6 +53,10 @@ const GLYPHS: Record<DeviceKind, ReactNode> = {
   siren: <><path d="M7 20v-6a5 5 0 0 1 10 0v6" /><path d="M5 20h14" /><path d="M12 4V2M4.500 7L3 5.500M19.500 7L21 5.500" strokeWidth="1.3" /></>,
   lock: <><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /><circle cx="12" cy="16" r="1.200" fill="currentColor" /></>,
   valve: <><path d="M3 12h5M16 12h5" /><path d="M8 8l8 8V8l-8 8z" /><path d="M12 8V4M9 4h6" /></>,
+  shutter: <><rect x="4" y="3" width="16" height="4" rx="1" /><path d="M5 7v13M19 7v13M7 10h10M7 13h10M7 16h10" strokeWidth="1.3" /></>,
+  gate_motor: <><path d="M3 20V6M21 20V6" /><path d="M6 9h12M6 14h12M9 9v5M12 9v5M15 9v5" strokeWidth="1.3" /><path d="M3 20h18" /></>,
+  garage_motor: <><path d="M3 21V9l9-6 9 6v12" /><path d="M7 21v-8h10v8M7 15.500h10M7 18h10" strokeWidth="1.3" /></>,
+  water_heater: <><rect x="6" y="3" width="12" height="18" rx="4" /><path d="M9 11q1.500-1.500 3 0t3 0M9 15q1.500-1.500 3 0t3 0" strokeWidth="1.300" /></>,
 };
 /** The bare drawing of a kind (24 x 24), to place inside another SVG. */
 export const kindGlyph = (kind: DeviceKind): ReactNode => GLYPHS[kind];
@@ -107,7 +114,8 @@ const Z2M_FIELDS: Partial<Record<DeviceKind, Array<{ field: string; path: string
   light_level: [{ field: "lux", path: "illuminance_lux" }], smart_plug: [{ field: "on", path: "state" }, { field: "power_w", path: "power" }, { field: "voltage_v", path: "voltage" }, { field: "current_a", path: "current" }, { field: "energy_kwh", path: "energy" }],
   smart_breaker: [{ field: "on", path: "state" }, { field: "power_w", path: "power" }, { field: "voltage_v", path: "voltage" }, { field: "current_a", path: "current" }, { field: "energy_kwh", path: "energy" }],
   energy_meter: [{ field: "power_w", path: "power" }, { field: "voltage_v", path: "voltage" }, { field: "current_a", path: "current" }, { field: "energy_kwh", path: "energy" }], smart_light: [{ field: "on", path: "state" }], smart_switch: [{ field: "on", path: "state" }],
-  lock: [{ field: "locked", path: "state" }],
+  lock: [{ field: "locked", path: "state" }], water_heater: [{ field: "on", path: "state" }, { field: "power_w", path: "power" }, { field: "temperature", path: "temperature" }],
+  shutter: [{ field: "open", path: "state" }], gate_motor: [{ field: "open", path: "state" }], garage_motor: [{ field: "open", path: "state" }],
 };
 
 export type PresetResult = { source: DeviceSource; commands: DeviceCommandsInput; protocol?: DeviceProtocol };

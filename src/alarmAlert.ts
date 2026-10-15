@@ -29,22 +29,23 @@ function beep(): void {
   } catch { /* the browser did not allow a sound before the first click: the notification and the badge still tell */ }
 }
 
-export function useCriticalAlarmAlert(alarms: { active: readonly Alarm[] } | null | undefined, title: string, enabled = true): void {
+export function useCriticalAlarmAlert(alarms: { active: readonly Alarm[] } | null | undefined, title: string, enabled = true, how: { sound?: boolean; notification?: boolean } = {}): void {
+  const sound = how.sound !== false, notification = how.notification !== false;
   const known = useRef<Set<string> | null>(null);
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || !notification) return;
     const ask = () => { try { if (typeof Notification !== "undefined" && Notification.permission === "default") void Notification.requestPermission(); } catch { /* not available */ } };
     window.addEventListener("pointerdown", ask, { once: true });
     return () => window.removeEventListener("pointerdown", ask);
-  }, [enabled]);
+  }, [enabled, notification]);
   useEffect(() => {
     if (!alarms) return;
     const { fresh, known: next } = newCriticalAlarms(known.current, alarms.active);
     known.current = next;
     if (!enabled || fresh.length === 0) return;
-    beep();
+    if (sound) beep();
     try {
-      if (typeof Notification !== "undefined" && Notification.permission === "granted") new Notification(title, { body: fresh.map(alarm => alarm.code).join(", "), tag: "armor-critical", requireInteraction: true });
+      if (notification && typeof Notification !== "undefined" && Notification.permission === "granted") new Notification(title, { body: fresh.map(alarm => alarm.code).join(", "), tag: "armor-critical", requireInteraction: true });
     } catch { /* a notification that cannot be shown is not worth an error */ }
-  }, [alarms, title, enabled]);
+  }, [alarms, title, enabled, sound, notification]);
 }

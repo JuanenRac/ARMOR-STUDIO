@@ -3,6 +3,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useMemo, useState } from "react";
+import { CopyButton } from "../components/CopyButton";
 import { readAudit, readSystem } from "../api";
 import { usePolled } from "../hooks";
 import type { Translate } from "../components/camera";
@@ -54,7 +55,7 @@ export function SystemView({ t, origin, isAdmin }: { t: Translate; origin: strin
     </>}
     <NodeMessages t={t} origin={origin} />
     <article className="stack-card audit-card">
-      <h3>{t("auditTitle")}</h3>
+      <div className="log-head"><h3>{t("auditTitle")}</h3>{isAdmin && <CopyButton t={t} text={() => entries.map(entry => [entry.at, entry.outcome, entry.action, entry.actor ?? "", entry.target ?? "", entry.detail ?? ""].join(" | ")).join("\n")} />}</div>
       {!isAdmin ? <p className="muted">{t("auditOnlyAdmin")}</p> : <>
         <p className="muted">{t("auditHelp")}</p>
         <div className="devices-filters"><input type="search" value={filter} placeholder={t("auditFilter")} onChange={event => setFilter(event.target.value)} /><button className={problems ? "on" : ""} onClick={() => setProblems(value => !value)}>{t("auditOnlyProblems")}</button></div>

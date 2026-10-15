@@ -11,12 +11,12 @@ export type Tool =
   | "select" | "move" | "elevate"
   | "terrain-rect" | "terrain-poly" | "building-rect" | "building-poly"
   | "door" | "window" | "garage" | "arch" | "wall-lamp"
-  | "chimney" | "roof-solar" | "antenna" | "gutter" | "downpipe"
+  | "chimney" | "roof-solar" | "roof-heater" | "antenna" | "gutter" | "downpipe"
   | "pillar" | "lamp" | "mast" | "solar" | "canopy" | "entrance" | "path" | "road"
   | "tree" | "kennel" | "fence" | "fountain" | "coop" | "gate" | "sidewalk" | "pool" | "planter" | "terrace"
   | "bench" | "table" | "barbecue" | "pergola" | "shed" | "hedge" | "mailbox" | "bins" | "tank" | "ac-unit" | "electrical-box" | "car"
   | "floor" | "wall" | "fireplace" | "stairs" | "kitchen" | "bathroom" | "bed" | "wardrobe" | "sofa" | "armchair" | "dining" | "tv"
-  | "mirror" | "lift" | "stair-light" | "radiator" | "washer" | "fridge" | "desk" | "plant" | "rug" | "intercom" | "intercom-monitor" | "alarm-panel" | "alarm-keypad"
+  | "mirror" | "lift" | "stair-light" | "radiator" | "washer" | "fridge" | "desk" | "plant" | "rug" | "intercom" | "intercom-monitor" | "alarm-panel" | "alarm-keypad" | "water-heater" | "hot-tank" | "solar-tank"
   | "camera" | "sensor" | "device";
 
 export const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
@@ -70,7 +70,7 @@ export const TOOL_GROUPS: ReadonlyArray<readonly ToolSpec[]> = [
   [{ tool: "select", key: "V", labelKey: "toolSelect", views: BOTH }, { tool: "move", key: "X", labelKey: "toolMove", views: BOTH }, { tool: "elevate", key: "Z", labelKey: "toolElevate", views: ONLY_3D }],
   [{ tool: "terrain-rect", key: "T", labelKey: "toolTerrainRect", views: ONLY_2D }, { tool: "terrain-poly", key: "Y", labelKey: "toolTerrainPoly", views: ONLY_2D }, { tool: "path", key: "H", labelKey: "toolPath", views: BOTH }, { tool: "road", key: "O", labelKey: "toolRoad", views: BOTH }, { tool: "sidewalk", key: "4", labelKey: "toolSidewalk", views: BOTH }],
   [{ tool: "building-rect", key: "B", labelKey: "toolBuildingRect", views: ONLY_2D }, { tool: "building-poly", key: "G", labelKey: "toolBuildingPoly", views: ONLY_2D }, { tool: "door", key: "D", labelKey: "toolDoor", views: BOTH }, { tool: "window", key: "N", labelKey: "toolWindow", views: BOTH }, { tool: "garage", key: "5", labelKey: "toolGarage", views: BOTH }, { tool: "arch", key: "6", labelKey: "toolArch", views: BOTH }, { tool: "chimney", key: "C", labelKey: "toolChimney", views: BOTH }],
-  [{ tool: "roof-solar", key: "R", labelKey: "toolRoofSolar", views: BOTH }, { tool: "antenna", key: "A", labelKey: "toolAntenna", views: BOTH }, { tool: "gutter", key: "-", labelKey: "toolGutter", views: BOTH }, { tool: "downpipe", key: "=", labelKey: "toolDownpipe", views: BOTH }, { tool: "mast", key: "M", labelKey: "toolMast", views: BOTH }],
+  [{ tool: "roof-solar", key: "R", labelKey: "toolRoofSolar", views: BOTH }, { tool: "roof-heater", key: "", labelKey: "toolRoofHeater", views: BOTH }, { tool: "antenna", key: "A", labelKey: "toolAntenna", views: BOTH }, { tool: "gutter", key: "-", labelKey: "toolGutter", views: BOTH }, { tool: "downpipe", key: "=", labelKey: "toolDownpipe", views: BOTH }, { tool: "mast", key: "M", labelKey: "toolMast", views: BOTH }],
   [{ tool: "lamp", key: "F", labelKey: "toolLamp", views: BOTH }, { tool: "wall-lamp", key: "W", labelKey: "toolWallLamp", views: BOTH }, { tool: "solar", key: "S", labelKey: "toolSolar", views: BOTH }],
   [{ tool: "fence", key: "J", labelKey: "toolFence", views: BOTH }, { tool: "gate", key: "3", labelKey: "toolGate", views: BOTH }, { tool: "entrance", key: "E", labelKey: "toolEntrance", views: BOTH }, { tool: "pillar", key: "P", labelKey: "toolPillar", views: BOTH }],
   [{ tool: "tree", key: "I", labelKey: "toolTree", views: BOTH }, { tool: "planter", key: "0", labelKey: "toolPlanter", views: BOTH }, { tool: "fountain", key: "1", labelKey: "toolFountain", views: BOTH }, { tool: "pool", key: "7", labelKey: "toolPool", views: BOTH }, { tool: "terrace", key: "8", labelKey: "toolTerrace", views: BOTH }, { tool: "canopy", key: "Q", labelKey: "toolCanopy", views: BOTH }, { tool: "kennel", key: "U", labelKey: "toolKennel", views: BOTH }, { tool: "coop", key: "2", labelKey: "toolCoop", views: BOTH }],
@@ -83,6 +83,7 @@ export const TOOL_GROUPS: ReadonlyArray<readonly ToolSpec[]> = [
   [{ tool: "lift", key: "", labelKey: "toolI_lift", views: BOTH }, { tool: "stair-light", key: "", labelKey: "toolI_stair-light", views: BOTH }, { tool: "radiator", key: "", labelKey: "toolI_radiator", views: BOTH }],
   [{ tool: "mirror", key: "", labelKey: "toolI_mirror", views: BOTH }, { tool: "desk", key: "", labelKey: "toolI_desk", views: BOTH }, { tool: "plant", key: "", labelKey: "toolI_plant", views: BOTH }, { tool: "rug", key: "", labelKey: "toolI_rug", views: BOTH }],
   [{ tool: "washer", key: "", labelKey: "toolI_washer", views: BOTH }, { tool: "fridge", key: "", labelKey: "toolI_fridge", views: BOTH }],
+  [{ tool: "water-heater", key: "", labelKey: "toolI_water-heater", views: BOTH }, { tool: "hot-tank", key: "", labelKey: "toolI_hot-tank", views: BOTH }, { tool: "solar-tank", key: "", labelKey: "toolI_solar-tank", views: BOTH }],
   [{ tool: "intercom", key: "", labelKey: "toolI_intercom", views: BOTH }, { tool: "intercom-monitor", key: "", labelKey: "toolI_intercom-monitor", views: BOTH }, { tool: "alarm-panel", key: "", labelKey: "toolI_alarm-panel", views: BOTH }, { tool: "alarm-keypad", key: "", labelKey: "toolI_alarm-keypad", views: BOTH }],
   [{ tool: "camera", key: "K", labelKey: "toolCamera", views: BOTH }, { tool: "sensor", key: "L", labelKey: "toolSensor", views: BOTH }, { tool: "device", key: "9", labelKey: "toolDevice", views: BOTH }],
 ];
@@ -91,7 +92,7 @@ export const TOOL_GROUPS: ReadonlyArray<readonly ToolSpec[]> = [
  * the things of one system of ARMOR that are placed in the house; its tools are still part of TOOL_GROUPS (keys, 2D and 3D work, texts), only the panel they are shown in changes.
  */
 export const BRANCHES: ReadonlyArray<{ id: string; titleKey: string; tools: readonly Tool[] }> = [
-  { id: "interior", titleKey: "toolboxTitleInterior", tools: ["floor", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "lift", "stair-light", "radiator", "mirror", "desk", "plant", "rug", "washer", "fridge"] },
+  { id: "interior", titleKey: "toolboxTitleInterior", tools: ["floor", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "lift", "stair-light", "radiator", "water-heater", "hot-tank", "solar-tank", "mirror", "desk", "plant", "rug", "washer", "fridge"] },
   { id: "armor", titleKey: "toolboxTitleArmor", tools: ["intercom", "intercom-monitor", "alarm-panel", "alarm-keypad", "camera", "sensor", "device"] },
 ];
 const inView = (mode: ToolMode) => TOOL_GROUPS.map(group => group.filter(spec => spec.views.includes(mode))).filter(group => group.length > 0);

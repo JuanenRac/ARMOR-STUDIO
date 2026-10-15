@@ -6,11 +6,12 @@
 import { readIngest } from "../api";
 import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
+import { CopyButton } from "../components/CopyButton";
 
 export function NodeMessages({ t, origin }: { t: Translate; origin: string }) {
   const topics = usePolled(() => readIngest(origin), 5000, origin).data?.topics ?? null;
   return <article className="stack-card ingest-card">
-    <h3>{t("ing_title")}</h3>
+    <div className="log-head"><h3>{t("ing_title")}</h3>{topics && topics.length > 0 && <CopyButton t={t} text={() => topics.map(item => `${item.topic} ok=${item.accepted} refused=${item.rejected}${item.ignored_fields.length ? " ignored=" + item.ignored_fields.join(",") : ""}${item.last_error ? " last=" + item.last_error : ""}`).join("\n")} />}</div>
     <p className="muted">{t("ing_help")}</p>
     {topics === null ? null : topics.length === 0 ? <p className="muted">{t("ing_empty")}</p> : <div className="ingest-table" role="table">
       <div className="ingest-row head" role="row"><span>{t("ing_topic")}</span><span>{t("ing_ok")}</span><span>{t("ing_bad")}</span><span>{t("ing_last")}</span></div>

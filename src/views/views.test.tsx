@@ -160,7 +160,7 @@ describe("the menus render with data in every language", () => {
 });
 
 describe("families of phrases chosen at run time are complete", () => {
-  const ALL_KINDS = ["smoke", "co", "gas", "water_leak", "panic_button", "door", "window", "motion", "glass_break", "vibration", "climate", "temperature", "humidity", "light_level", "smart_plug", "smart_light", "smart_switch", "siren", "lock", "valve"];
+  const ALL_KINDS = ["smoke", "co", "gas", "water_leak", "panic_button", "door", "window", "motion", "glass_break", "vibration", "climate", "temperature", "humidity", "light_level", "smart_plug", "smart_light", "smart_switch", "siren", "lock", "valve", "shutter", "gate_motor", "garage_motor", "water_heater"];
   const families: Record<string, string[]> = {
     kind: ALL_KINDS, protocol: ["wifi", "bluetooth", "zigbee", "zwave", "thread", "lora", "rf433", "wired", "other"], problem: ["triggered", "tamper", "battery", "offline"],
     severity: ["critical", "high", "warning"], alarmState: ["active", "going", "ended"], event: ["alarm", "alert", "device", "node", "camera", "mode"],
