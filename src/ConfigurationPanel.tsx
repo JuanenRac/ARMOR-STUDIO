@@ -5,11 +5,13 @@ import { BrokerPanel, FilesPanel, ServicesPanel } from "./AdminPanel";
 import { FirmwarePanel } from "./FirmwarePanel";
 import { NotificationsPanel } from "./NotificationsPanel";
 import { InstallationPanel } from "./InstallationPanel";
+import { UpdatesPanel } from "./UpdatesPanel";
+import { ConsolePanel } from "./ConsolePanel";
 import type { NetworkOverview } from "./networkModel";
 import "./configuration.css";
 import { MenuTitle } from "./menuLogos";
 
-type Tab = "general" | "users" | "server" | "services" | "broker" | "files" | "installation" | "firmware" | "notifications";
+type Tab = "general" | "users" | "server" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications";
 type Props = {
   t: (key: string) => string;
   origin: string; setOrigin: (value: string) => void;
@@ -21,7 +23,7 @@ type Props = {
   network?: NetworkOverview | null;
 };
 
-const tabs: Tab[] = ["general", "users", "server", "services", "broker", "files", "installation", "firmware", "notifications"];
+const tabs: Tab[] = ["general", "users", "server", "services", "broker", "files", "installation", "firmware", "updates", "console", "notifications"];
 
 /** Can the browser reach something at this address at all? (no-cors: only a network failure rejects, which is what a wrong scheme or port gives.) */
 async function reachable(url: string): Promise<boolean> {
@@ -96,6 +98,8 @@ export function ConfigurationPanel(props: Props) {
     {tab === "files" && <FilesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "installation" && <InstallationPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "notifications" && <NotificationsPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
+    {tab === "updates" && <UpdatesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
+    {tab === "console" && <ConsolePanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "firmware" && <FirmwarePanel t={t} origin={props.origin} isAdmin={props.isAdmin} network={props.network ?? null} />}
   </section>;
 }

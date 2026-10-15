@@ -27,6 +27,7 @@ const rows: Record<string, Row> = {
   in_part_cameras: ["Cameras (without passwords)", "Cámaras (sin contraseñas)", "Kameras (ohne Passwörter)", "Caméras (sans mots de passe)", "Telecamere (senza password)", "カメラ（パスワードなし）", "摄像头（不含密码）"],
   in_part_site: ["Site design", "Diseño del sitio", "Geländeentwurf", "Plan du site", "Progetto del sito", "敷地の設計", "场地设计"],
   in_part_electrical: ["Electrical design", "Diseño eléctrico", "Elektrik-Entwurf", "Plan électrique", "Progetto elettrico", "電気設計", "电气设计"],
+  in_part_alarm_design: ["Alarm design", "Diseño de alarma", "Alarm-Entwurf", "Plan de l'alarme", "Progetto di allarme", "警報設計", "报警设计"],
   in_part_network: ["Network design", "Diseño de red", "Netzwerk-Entwurf", "Plan du réseau", "Progetto di rete", "ネットワーク設計", "网络设计"],
   in_part_rules: ["Rules", "Reglas", "Regeln", "Règles", "Regole", "ルール", "规则"],
   in_part_automations: ["Automations", "Automatizaciones", "Automatisierungen", "Automatisations", "Automazioni", "オートメーション", "自动化"],

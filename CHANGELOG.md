@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented here.
 
+## [0.7.3] - Updates from GitHub, operating system updates and a maintenance console
+
+- **Configuration > Updates:** the programs of the machine (server, Studio, network watcher, observation service, voice gateway and helper scripts) with the version installed, the newest release on GitHub and a state for each: up to date, update available, not installed, newer than GitHub or unknown (and why).
+- Each program can be updated by itself, several can be picked, or everything that has an update can be updated at once; a program can also be reinstalled, and every one can go back to its previous version.
+- Every update shows what it is doing: a bar for each step (download, check the hash, install, restart, check it works), a total bar and the log line by line, while the server or Studio themselves restart in the middle of it.
+- The updates are checked against the hash the release publishes, keep a copy of what they replace and put it back by themselves if the program does not work afterwards; Studio asks before it starts and offers to reload itself when it was updated.
+- **The operating system:** its version, kernel and time on, the packages that can be upgraded (with the version each goes to), a button to look for updates, another to update the system with the progress apt reports, a note when a reboot is needed and a button to reboot the machine.
+- The last operations are kept and listed with their result, so after a failure it is clear what ran and what happened.
+- **Configuration > Console:** commands as root on the machine for the day nothing else works, one at a time, with a time limit of 30 seconds to an hour, the folder remembered from one command to the next, the output printed as it comes and a button to stop a running command.
+- The console is shut twice: the maintenance helper keeps it off unless it was turned on on purpose, and Studio asks the administrator for the password again before the first command and after ten minutes without use; five wrong passwords close the door for five minutes.
+- The console has the history of commands (arrow keys), quick buttons for the usual tasks (state of the services, the server's log, disk, memory, network addresses, restart the server) and says so clearly when it is off or the helper is not installed.
+- Every command typed in the console, who typed it and how it ended are written in the audit trail.
+- The side menu is 50 points wider and shows every name whole (it had been cut short); on a short screen its list scrolls by itself while the brand and the connection state stay in view.
+- The installation file now carries the alarm design as one of its parts, with its name in the seven languages, and the list of parts to import shows it.
+- All the new texts are in the seven languages, with tests that no sentence is left bare.
+
 ## [0.7.2] - Alarm designer, a menu in groups and a complete help
 
 - **Alarm Designer:** a new menu in Design, like the electrical and network designers, for the house's alarm: panels, expanders, communicator, door and window contacts, motion, dual-technology, outdoor beam, glass-break, vibration, smoke, heat, carbon monoxide, gas and flood detectors, panic buttons, tamper switches, sirens, strobes, relay outputs, keypads, card readers, key fobs, touch panels, power supplies and batteries, joined by wired loops, radio links, the siren output, the data bus and the supply.

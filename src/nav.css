@@ -11,11 +11,12 @@ nav button { position: relative; } .nav-badge { margin-left: auto; min-width: 20
 @media (max-width: 800px) { .sidebar nav { display: flex; overflow-x: auto; gap: .6rem; } .nav-group { display: flex; gap: .3rem; align-items: center; } .nav-group-title { display: none; } .nav-group.folded .nav-items { display: grid; } .nav-items { display: flex; gap: .3rem; } }
 .site-sync { padding: .35rem .5rem; border-radius: 8px; border: 1px solid #285a66; color: #7ee7ff; } .site-sync.saving { color: #ffcf7d; border-color: #7a5a1c; } .site-sync.offline { color: #ff8e99; border-color: #974b55; }
 
-/* The side menu is a little wider, a name stays on one line (the whole name is in the tooltip), and when the screen is short the list of screens scrolls on its own while the brand and the connection state stay in view. */
+/* The side menu is 50 points wider than before (see compact.css) and every name is shown whole, on as many lines as it needs; when the screen is short the list of screens scrolls on its own
+   while the brand and the connection state stay in view. */
 .studio-frame .sidebar { min-height: 0; overflow: hidden; }
 .studio-frame .sidebar nav { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; padding-right: .15rem; }
-.studio-frame .sidebar nav button em { min-width: 0; flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-style: normal; }
 .studio-frame .sidebar nav button { min-width: 0; }
+.studio-frame .sidebar nav button em { min-width: 0; flex: 1 1 auto; font-style: normal; white-space: normal; overflow-wrap: anywhere; }
 .studio-frame .sidebar .sidebar-foot { flex: 0 0 auto; }
-.studio-frame .nav-group-title span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-@media (max-width: 800px) { .studio-frame .sidebar nav { overflow-y: visible; overflow-x: auto; } .studio-frame .sidebar nav button em { overflow: visible; } }
+.studio-frame .nav-group-title span { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 800px) { .studio-frame .sidebar nav { overflow-y: visible; overflow-x: auto; } }

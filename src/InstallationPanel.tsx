@@ -9,7 +9,7 @@ import { ApiError, installationExport, installationImport, type InstallationRepo
 type Translate = (key: string, ...args: Array<string | number>) => string;
 type Props = { t: Translate; origin: string; isAdmin: boolean };
 
-export const INSTALLATION_PARTS = ["cameras", "site", "electrical", "network", "rules", "automations", "devices", "solar_devices", "energy_alarms", "users"] as const;
+export const INSTALLATION_PARTS = ["cameras", "site", "electrical", "network", "alarm_design", "rules", "automations", "devices", "solar_devices", "energy_alarms", "users"] as const;
 export type InstallationPart = (typeof INSTALLATION_PARTS)[number];
 
 /** What a file holds, by part: how many items a list has, or 1 for a document. Parts it does not hold are not listed. */
