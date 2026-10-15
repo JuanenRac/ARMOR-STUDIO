@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
-import { AboutDialog, ConfirmDialog, HelpDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
+import { AboutDialog, ConfirmDialog, HelpDialog, PinDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
 import { DesignVersionsDialog } from "./DesignVersionsDialog";
 import { SessionUserContext } from "./sessionContext";
 import { KnownNodesContext } from "./knownNodes";
@@ -223,12 +223,13 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   };
   // The question is asked in the page (ConfirmDialog), not with the browser's confirm(): a browser can switch that one off, and then the button did nothing at all.
   const toggleMode = () => setPendingMode(state.mode === "armed" ? "disarmed" : "armed");
-  const changeMode = async (next: "armed" | "disarmed") => {
+  const changeMode = async (next: "armed" | "disarmed", pin?: string) => {
     setPendingMode(null);
-    try { applyState(await setSystemMode(origin, next)); setNotice(t(next === "armed" ? "modeArmedNotice" : "modeDisarmedNotice")); }
+    try { applyState(await setSystemMode(origin, next, pin)); setNotice(t(next === "armed" ? "modeArmedNotice" : "modeDisarmedNotice")); }
     catch (error) {
       // Say why: a ended session, a refusal, an error of the server or no answer at all are different things to do something about.
       if (error instanceof ApiError && error.status === 401) { setNotice(t("modeSessionEnded")); sessionUser.refresh(); }
+      else if (error instanceof ApiError && (error.code === "wrong_pin" || error.code === "pin_locked" || error.code === "pin_not_set")) setNotice(t(`mode_${error.code}`));
       else if (error instanceof ApiError && error.status === 403) setNotice(t("modeForbidden"));
       else if (error instanceof ApiError) setNotice(t("modeServerError").replace("{status}", String(error.status)));
       else setNotice(t("modeNoAnswer"));
@@ -319,7 +320,8 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     {versionsOf && <DesignVersionsDialog kind={versionsOf} origin={origin} t={t} close={() => setVersionsOf(null)}
       draft={versionsOf === "site" ? siteSync.draft : null} restoreDraft={siteSync.restoreDraft}
       restore={design => { if (versionsOf === "site") siteSync.restoreDocument(design); else if (versionsOf === "electrical") setElectrical(current => applyElectricalDoc(design, current)); else setNetworkDesign(current => applyNetworkDoc(design, current)); }} />}
-    {pendingMode && <ConfirmDialog title={t(pendingMode === "armed" ? "armSystem" : "disarmSystem")} text={t(pendingMode === "armed" ? "confirmArm" : "confirmDisarm")} confirmLabel={t(pendingMode === "armed" ? "armSystem" : "disarmSystem")} danger={pendingMode === "disarmed"} confirm={() => void changeMode(pendingMode)} cancel={() => setPendingMode(null)} t={t} />}
+    {pendingMode === "disarmed" && <PinDialog title={t("disarmSystem")} text={t("confirmDisarm")} confirmLabel={t("disarmSystem")} confirm={pin => void changeMode("disarmed", pin)} cancel={() => setPendingMode(null)} t={t} />}
+    {pendingMode === "armed" && <ConfirmDialog title={t("armSystem")} text={t("confirmArm")} confirmLabel={t("armSystem")} confirm={() => void changeMode("armed")} cancel={() => setPendingMode(null)} t={t} />}
   </main>
   <StatusBar serverName={serverName} synced={connectionState === "synced"} mode={state.mode}
     nodesOnline={nodes.filter(node => node.online && !node.stale).length} nodesTotal={nodes.length}

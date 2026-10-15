@@ -76,7 +76,7 @@ export async function listConfiguredCameras(origin: string): Promise<PublicCamer
   return Array.isArray(body.cameras) ? body.cameras : [];
 }
 export async function listCameraViews(origin: string): Promise<CameraView[]> {
-  const response = await timedFetch(origin.replace(/\/$/, "") + "/api/v1/camera-views", { headers: { Accept: "application/json" } });
+  const response = await timedFetch(origin.replace(/\/$/, "") + "/api/v1/camera-views", { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error("Camera view list returned " + response.status);
   const body = await response.json() as { cameras?: CameraView[] };
   return Array.isArray(body.cameras) ? body.cameras : [];
@@ -171,7 +171,7 @@ export type ArmorEvent = { id: number; at: string } & (
   | { type: "camera"; camera_id: string; from: Reachability; to: Reachability }
   | { type: "mode"; mode: "armed" | "disarmed" }
   | { type: "device"; device_id: string; kind: string; field: string; from: boolean | number | null; to: boolean | number }
-  | { type: "alarm"; alarm_id: string; state: "raised" | "acknowledged" | "cleared"; severity: "critical" | "high" | "warning"; source: string; source_type: "node" | "camera" | "device"; code: string });
+  | { type: "alarm"; alarm_id: string; state: "raised" | "acknowledged" | "cleared"; severity: "critical" | "high" | "warning"; source: string; source_type: AlarmSourceType; code: string });
 export type Zone = {
   id: string; name: string; action: "ignore"; node_id?: string; sensor_id?: number;
   x_min_mm: number; x_max_mm: number; y_min_mm: number; y_max_mm: number;
@@ -249,7 +249,7 @@ export async function closeStudioSession(origin: string): Promise<void> {
 
 export type Role = "admin" | "operator" | "panel";
 export type StudioUser = { id: string; username: string; role: Role };
-export type ListedUser = StudioUser & { createdAt: string; updatedAt: string; current: boolean };
+export type ListedUser = StudioUser & { createdAt: string; updatedAt: string; current: boolean; hasPin: boolean; hasDuress: boolean };
 /** An answer the server refused, with the stable `code` that says why. */
 export class ApiError extends Error {
   constructor(readonly status: number, readonly code: string) { super(`${status} ${code}`); }
@@ -304,10 +304,10 @@ export const adminSaveFile = (origin: string, id: string, change: { content: str
 export const adminAccounts = (origin: string) => userCall<{ accounts: BrokerAccount[]; installed?: boolean }>(origin, "GET", "/api/v1/admin/mqtt/accounts");
 export const adminAddAccount = (origin: string, role: string, name: string) => userCall<{ ok: boolean; user: string; password: string }>(origin, "POST", "/api/v1/admin/mqtt/accounts", { role, name });
 export const adminRemoveAccount = (origin: string, user: string) => userCall<{ ok: boolean }>(origin, "DELETE", `/api/v1/admin/mqtt/accounts/${encodeURIComponent(user)}`);
-export const adminProvisionNode = (origin: string, request: { node_id: string; address: string; broker_host: string; broker_port?: number; panel_user?: string; panel_password?: string }) => userCall<ProvisionResult>(origin, "POST", "/api/v1/admin/nodes/provision", request);
+export const adminProvisionNode = (origin: string, request: { node_id: string; address: string; kind?: "radar" | "solar" | "electrical" | "network" | "alarm"; broker_host: string; broker_port?: number; panel_user?: string; panel_password?: string }) => userCall<ProvisionResult>(origin, "POST", "/api/v1/admin/nodes/provision", request);
 // ---- Firmware of the field nodes (the server updates them, one at a time, with the login of their own panel) --------------------------------------------
 
-export type FirmwareKind = "radar" | "solar" | "electrical" | "hmi";
+export type FirmwareKind = "radar" | "solar" | "electrical" | "hmi" | "alarm";
 export type FirmwareTargetState = "waiting" | "checking" | "signing_in" | "uploading" | "restarting" | "done" | "failed";
 export type FirmwareTarget = { address: string; node_id?: string; state: FirmwareTargetState; version_before?: string; version_after?: string; error?: string; progress?: number; sent?: number; total?: number; waited_s?: number };
 export type FirmwareJob = { id: string; kind: FirmwareKind; source: "github" | "upload"; state: "preparing" | "running" | "done" | "failed"; version?: string; bytes?: number; sha256?: string; error?: string; targets: FirmwareTarget[] };
@@ -337,10 +337,15 @@ export const notificationsStatus = (origin: string) => userCall<NotificationsSta
 export const notificationsTest = (origin: string, channel?: string) => userCall<{ results: NotificationTestResult[] }>(origin, "POST", "/api/v1/admin/notifications/test", channel ? { channel } : {});
 export const changeAccount = (origin: string, change: { currentPassword: string; username?: string; newPassword?: string }) => userCall<StudioUser>(origin, "PATCH", "/api/v1/account", change);
 
-/** Arm or disarm the system (an operator, from Studio). Answers with the new state of the perimeter. */
-export async function setSystemMode(origin: string, mode: "armed" | "disarmed"): Promise<SystemState> {
-  const response = await timedFetch(endpoint(origin, "/api/v1/mode"), { method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ mode }) });
-  if (!response.ok) throw new ApiError(response.status, response.status === 401 ? "session_ended" : response.status === 403 ? "forbidden" : "generic");
+/** Arm or disarm the system (an operator, from Studio). Disarming carries the PIN of the signed-in user when there is one to type. Answers with the new state of the perimeter. */
+export async function setSystemMode(origin: string, mode: "armed" | "disarmed", pin?: string): Promise<SystemState> {
+  const response = await timedFetch(endpoint(origin, "/api/v1/mode"), { method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify(mode === "disarmed" && pin ? { mode, pin } : { mode }) });
+  if (!response.ok) {
+    const parsed = await response.json().catch(() => ({})) as { code?: string };
+    // The PIN refusals have a code of their own (wrong_pin, pin_locked, pin_not_set); the rest keep the short names of before.
+    const code = parsed.code && /^pin_|^wrong_pin$/.test(parsed.code) ? parsed.code : response.status === 401 ? "session_ended" : response.status === 403 ? "forbidden" : "generic";
+    throw new ApiError(response.status, code);
+  }
   return response.json() as Promise<SystemState>;
 }
 
@@ -369,7 +374,9 @@ export type Alarm = {
   /** The facts the server attached (which device, which port, what the numbers were). */
   detail?: Record<string, string | number | boolean>;
 };
-export type Trigger = { type: "device"; device_id: string; field: string; equals: boolean | number } | { type: "alarm"; severity?: Severity; source_type?: "node" | "camera" | "device"; source_id?: string } | { type: "mode"; mode: "armed" | "disarmed" };
+/** Where an alarm can come from: the same closed list as the server and the contract. */
+export type AlarmSourceType = "node" | "camera" | "device" | "solar" | "electrical" | "network" | "alarm";
+export type Trigger = { type: "device"; device_id: string; field: string; equals: boolean | number } | { type: "alarm"; severity?: Severity; source_type?: AlarmSourceType; source_id?: string } | { type: "mode"; mode: "armed" | "disarmed" };
 export type AutomationAction = { type: "device"; device_id: string; command: "on" | "off" | "toggle"; for_s?: number } | { type: "notify" };
 export type Automation = { id: string; name: string; enabled: boolean; trigger: Trigger; when_mode: "any" | "armed" | "disarmed"; actions: AutomationAction[]; created_at: string; last_run: string | null; runs: number };
 export type AutomationInput = { name?: string; enabled?: boolean; trigger?: Trigger; when_mode?: "any" | "armed" | "disarmed"; actions?: AutomationAction[] };
@@ -478,8 +485,13 @@ export const listAlarmNodes = (origin: string) => userCall<AlarmNodes>(origin, "
 export type AlarmCommandRecord = { command_id: string; node_id: string; action: "arm" | "disarm"; mode?: "away" | "stay"; accepted: boolean; refusal: string; phase?: AlarmPhase; actor: string; at: string };
 export const alarmCommandsStatus = (origin: string) => userCall<{ enabled: boolean; pending: unknown[]; recent: AlarmCommandRecord[] }>(origin, "GET", "/api/v1/alarm/commands");
 /** Arm (away or stay, optionally leaving out the zones that are open) or disarm a panel. There is no PIN in it: the server, the node and the broker must all have allowed it. */
-export const sendAlarmCommand = (origin: string, node: string, action: "arm" | "disarm", mode?: "away" | "stay", force = false) =>
-  userCall<{ accepted: boolean; command_id: string }>(origin, "POST", "/api/v1/alarm/command", action === "arm" ? { node, action, mode, ...(force ? { force: true } : {}) } : { node, action });
+export const sendAlarmCommand = (origin: string, node: string, action: "arm" | "disarm", mode?: "away" | "stay", force = false, pin?: string) =>
+  userCall<{ accepted: boolean; command_id: string }>(origin, "POST", "/api/v1/alarm/command", action === "arm" ? { node, action, mode, ...(force ? { force: true } : {}) } : { node, action, ...(pin ? { pin } : {}) });
+
+/** The PIN that disarms the system: yours (after confirming the password), or anybody's for an administrator. The duress PIN disarms as well, and warns in silence. */
+export const setMyPin = (origin: string, change: { currentPassword: string; pin?: string; duress_pin?: string; clear?: boolean }) => userCall<StudioUser>(origin, "PUT", "/api/v1/account/pin", change);
+export const setUserPin = (origin: string, id: string, pin: string, duress_pin?: string) => userCall<ListedUser>(origin, "PUT", `/api/v1/users/${encodeURIComponent(id)}/pin`, { pin, ...(duress_pin ? { duress_pin } : {}) });
+export const clearUserPin = (origin: string, id: string) => userCall<ListedUser>(origin, "DELETE", `/api/v1/users/${encodeURIComponent(id)}/pin`);
 
 // ---- the local network, as the ARMOR-NETWORK nodes see it -------------------------------------------------------------------------------
 export type NetworkDocument = { revision: number; updated_at: string | null; updated_by: string | null; network: Record<string, unknown> | null };

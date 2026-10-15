@@ -78,7 +78,7 @@ function AdoptForm({ t, origin, candidate, close }: { t: Translate; origin: stri
     event.preventDefault();
     setBusy(true); setError("");
     try {
-      setResult(await adminProvisionNode(origin, { node_id: form.node_id.trim(), address: candidate.ip, broker_host: form.broker_host.trim(), ...(form.password ? { panel_user: form.user.trim(), panel_password: form.password } : {}) }));
+      setResult(await adminProvisionNode(origin, { node_id: form.node_id.trim(), address: candidate.ip, ...(candidate.kind ? { kind: candidate.kind } : {}), broker_host: form.broker_host.trim(), ...(form.password ? { panel_user: form.user.trim(), panel_password: form.password } : {}) }));
       setForm(current => ({ ...current, password: "" }));
     } catch (failure) {
       const code = failure instanceof ApiError ? failure.code : "generic";

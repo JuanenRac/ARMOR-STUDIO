@@ -28,6 +28,7 @@ const ROWS: Record<string, Row> = {
   source_device: ["Devices", "Dispositivos", "Geräte", "Appareils", "Dispositivi", "デバイス", "设备"],
   source_solar: ["Solar", "Solar", "Solar", "Solaire", "Solare", "ソーラー", "太阳能"],
   source_electrical: ["Electrical", "Eléctrico", "Elektrik", "Électrique", "Elettrico", "電気", "电气"],
+  source_alarm: ["Alarm panels", "Centrales de alarma", "Alarmzentralen", "Centrales d'alarme", "Centrali d'allarme", "警報盤", "报警主机"],
   source_network: ["Network", "Red", "Netzwerk", "Réseau", "Rete", "ネットワーク", "网络"],
   fact_node: ["Monitor node", "Nodo que vigila", "Überwachender Knoten", "Nœud qui surveille", "Nodo che monitora", "監視ノード", "监控节点"],
   fact_interface: ["Interface", "Interfaz", "Schnittstelle", "Interface", "Interfaccia", "インターフェース", "接口"],

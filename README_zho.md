@@ -21,13 +21,13 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-7-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-319%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-352%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
 
 ---
 
-**诚实性检查 - 今天真正能运行的部分:** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，并有 319 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、每个菜单在七种语言下的渲染、静态主机）。**尚未证实的：** 每种真实摄像头的实时视频和 PTZ、太阳能菜单与真实逆变器或电池的配合，以及正式的无障碍或可用性评审。当服务器无法访问时，Studio 显示演示数据，并在顶部栏中说明。
+**诚实性检查 - 今天真正能运行的部分:** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，并有 352 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、每个菜单在七种语言下的渲染、静态主机）。**尚未证实的：** 每种真实摄像头的实时视频和 PTZ、太阳能菜单与真实逆变器或电池的配合，以及正式的无障碍或可用性评审。当服务器无法访问时，Studio 显示演示数据，并在顶部栏中说明。
 
 ---
 
@@ -48,8 +48,9 @@
 * **七种语言**（英语、西班牙语、德语、法语、意大利语、日语、中文）和十六种主题，默认主题名为 *Armor*。
 * **登记你的设备：** 在“逆变器”和“电池”菜单中，为每台逆变器或电池组添加名称、型号（Voltronic、MPP Solar、Pylontech US2000 / US3000 / US5000、ANT-BMS）、连接方式（RS232、RS485、USB、CAN、Wi-Fi）和网关节点；它会等待第一次真实读数，期间可用“显示示例读数”试用菜单。
 * **电气设计器：** 绘制住宅的电气图（电网、电表、保护装置、转换开关、配电、光伏、逆变器、电池和负载，交流与直流），用端口和导线连接，按配电箱分组，把逆变器和电池与服务器读取的光伏设备关联以查看实时数值，并让检查功能审阅（一条线路上有两个电源、断路器和导线与电流的匹配、缺失的保护、直流电压）。图纸保存在服务器上；这只是一张图：目前不会控制或测量任何设备。
-* **报警主机：** “报警主机”菜单显示每个 ARMOR-ALARM 节点的情况：是否在守护（离家或在家）、防区和最近事件，并在“报警”菜单中提示正在响起的警报（严重）或被拆的防区（高级）。只有服务器（`ARMOR_ALARM_COMMANDS=1`）、节点和代理都允许时，管理员才能在那里布防和撤防；从控制台撤防不带 PIN，所以会先询问。不是经过认证的报警系统。
+* **报警主机：** “报警主机”菜单显示每个 ARMOR-ALARM 节点的情况：是否在守护（离家或在家）、防区和最近事件，并在“报警”菜单中提示正在响起的警报（严重）或被拆的防区（高级）。只有服务器（`ARMOR_ALARM_COMMANDS=1`）、节点和代理都允许时，管理员才能在那里布防和撤防；从控制台撤防会要求输入当前登录用户的 PIN，由服务器校验。不是经过认证的报警系统。
 * **场地设计器中的墙体与合并建筑：** 建筑或地块的一面墙可以向内或向外推（所选形状每条边上有一个手柄，或使用“移动墙体”按钮），相邻的墙会跟随，因此长方形保持直角、对面的墙不动；墙体相接的两栋建筑可以**合并**：共用的墙只建一次，开在其上的门或窗（无论属于哪栋建筑）两面都起作用，小型建筑的地面也会以自己的颜色显示。
+* **撤防 PIN 与任意来源的报警：** 撤防（系统，或从卡片上撤防某台报警主机）会在对话框中要求输入 PIN，“配置 > 用户”可设置 PIN 和胁迫 PIN；自动化可由任何报警来源触发（包括正在鸣响的报警主机）；固件界面和节点接入也支持报警主机。
 
 ## 🔄 架构
 
@@ -91,7 +92,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 319 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
+npm test            # 352 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```
@@ -113,6 +114,7 @@ $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # 
 * **ARMOR-STUDIO** (本仓库) - 网页控制台：摄像头、雷达、报警、太阳能和 2D/3D 场地设计器
 * **[ARMOR-ANDROID-CONTROL](https://github.com/JuanenRac/ARMOR-ANDROID-CONTROL)** - 带实时 2D/3D 雷达的 Android 操作员客户端
 * **[ARMOR-SERVER-AI](https://github.com/JuanenRac/ARMOR-SERVER-AI)** - 会解释决策且从不执行动作的视觉推理策略
+* **[ARMOR-VISION](https://github.com/JuanenRac/ARMOR-VISION)** - Jetson Orin NX 上的摄像头区域、遮罩与检测规则
 * **[ARMOR-VOICE-AI](https://github.com/JuanenRac/ARMOR-VOICE-AI)** - 带无法伪造确认的离线语音意图
 * **[ARMOR-HARDWARE](https://github.com/JuanenRac/ARMOR-HARDWARE)** - 外壳、电子器件和台架验收矩阵
 * **[ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS)** - 部署、CM5 测试台、备份与 TLS

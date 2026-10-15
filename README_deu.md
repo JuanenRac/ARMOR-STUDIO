@@ -21,13 +21,13 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-7-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-319%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-352%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
 
 ---
 
-**Ehrlichkeitsprüfung - was heute läuft:** Studio spricht mit [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) und ist durch 319 Unit-Tests abgedeckt (Einstellungen lesen, Kameras zusammenführen, die Arithmetik der Solar-Diagramme, jedes Menü in den sieben Sprachen dargestellt, der statische Host). **Nicht belegt** sind Live-Video und PTZ mit jeder echten Kamera, die Solarmenüs mit einem echten Wechselrichter oder einer echten Batterie und eine formale Barrierefreiheits- oder Usability-Prüfung. Solange der Server nicht erreichbar ist, zeigt Studio Demodaten und sagt das in der oberen Leiste.
+**Ehrlichkeitsprüfung - was heute läuft:** Studio spricht mit [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) und ist durch 352 Unit-Tests abgedeckt (Einstellungen lesen, Kameras zusammenführen, die Arithmetik der Solar-Diagramme, jedes Menü in den sieben Sprachen dargestellt, der statische Host). **Nicht belegt** sind Live-Video und PTZ mit jeder echten Kamera, die Solarmenüs mit einem echten Wechselrichter oder einer echten Batterie und eine formale Barrierefreiheits- oder Usability-Prüfung. Solange der Server nicht erreichbar ist, zeigt Studio Demodaten und sagt das in der oberen Leiste.
 
 ---
 
@@ -48,8 +48,9 @@
 * **Sieben Sprachen** (Englisch, Spanisch, Deutsch, Französisch, Italienisch, Japanisch, Chinesisch) und sechzehn Themen, das Standardthema heißt *Armor*.
 * **Deklariere dein Gerät:** in den Menüs Wechselrichter und Batterien fügst du jeden Wechselrichter oder Batteriestapel mit Name, Modell (Voltronic, MPP Solar, Pylontech US2000 / US3000 / US5000, ANT-BMS), Anschluss (RS232, RS485, USB, CAN, WLAN) und Gateway-Knoten hinzu; es wartet auf seinen ersten echten Messwert, und mit *Beispielwerte zeigen* lässt sich das Menü inzwischen ausprobieren.
 * **Elektroplaner:** zeichnen Sie den Stromlaufplan des Hauses (Netz, Zähler, Schutzorgane, Umschalter, Verteilung, PV, Wechselrichter, Batterien und Verbraucher, AC und DC) mit Anschlüssen und Leitungen, gruppieren Sie ihn in Tafeln, verbinden Sie Wechselrichter und Batterien mit den vom Server gelesenen Solargeräten, um ihre Live-Werte zu sehen, und lassen Sie die Prüfungen ihn durchsehen (zwei Quellen an einer Leitung, Schutzschalter und Kabel gegen den Strom, fehlende Schutzorgane, DC-Spannungen). Die Zeichnung liegt auf dem Server; es ist eine Zeichnung: noch schaltet oder misst nichts.
-* **Alarmzentralen:** Das Menü *Alarmzentralen* zeigt, was jeder ARMOR-ALARM-Knoten meldet: ob er überwacht (abwesend oder anwesend), seine Zonen und letzten Ereignisse, und meldet im Menü Alarme einen ertönenden Alarm (kritisch) oder eine Zone mit Sabotage (hoch). Ein Administrator kann dort eine Zentrale nur scharf- und unscharf schalten, wenn der Server (`ARMOR_ALARM_COMMANDS=1`), der Knoten und der Broker es erlauben; Unscharfschalten von der Konsole trägt keine PIN, daher wird zuerst gefragt. Keine zertifizierte Alarmanlage.
+* **Alarmzentralen:** Das Menü *Alarmzentralen* zeigt, was jeder ARMOR-ALARM-Knoten meldet: ob er überwacht (abwesend oder anwesend), seine Zonen und letzten Ereignisse, und meldet im Menü Alarme einen ertönenden Alarm (kritisch) oder eine Zone mit Sabotage (hoch). Ein Administrator kann dort eine Zentrale nur scharf- und unscharf schalten, wenn der Server (`ARMOR_ALARM_COMMANDS=1`), der Knoten und der Broker es erlauben; das Unscharfschalten von der Konsole verlangt die PIN des angemeldeten Benutzers, die der Server prüft. Keine zertifizierte Alarmanlage.
 * **Wände und verbundene Gebäude im Standortplaner:** Eine Wand eines Gebäudes oder des Grundstücks lässt sich nach innen oder außen schieben (ein Griff an jeder Seite der gewählten Form oder die Schaltflächen *Eine Wand verschieben*), die Nachbarwände folgen, sodass ein Rechteck seine rechten Winkel behält und die gegenüberliegende Wand stehen bleibt; und zwei Gebäude, deren Wände sich berühren, lassen sich **verbinden**: die gemeinsame Wand wird einmal gebaut, eine Tür oder ein Fenster darin - von beiden Gebäuden - wirkt von beiden Seiten, und der Boden eines kleinen Gebäudes ist in seiner eigenen Farbe zu sehen.
+* **PIN zum Entschärfen und Alarme aus jeder Quelle:** Das Entschärfen (des Systems oder einer Alarmzentrale von ihrer Karte aus) fragt die PIN in einem Dialog ab, Konfiguration > Benutzer legt die PIN und die Zwangs-PIN fest, eine Automatisierung kann von jeder Alarmquelle ausgehen (auch von einer schlagenden Alarmzentrale), und die Firmware-Ansicht und die Aufnahme von Knoten kennen die Alarmzentralen.
 
 ## 🔄 Architektur
 
@@ -91,7 +92,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 319 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
+npm test            # 352 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```
@@ -113,6 +114,7 @@ $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # 
 * **ARMOR-STUDIO** (dieses Repository) - Web-Konsole: Kameras, Radar, Alarme, Solarenergie und 2D/3D-Standortdesigner
 * **[ARMOR-ANDROID-CONTROL](https://github.com/JuanenRac/ARMOR-ANDROID-CONTROL)** - Android-Bedienclient mit Live-Radar in 2D/3D
 * **[ARMOR-SERVER-AI](https://github.com/JuanenRac/ARMOR-SERVER-AI)** - Visuelle Inferenzrichtlinie, die ihre Entscheidungen erklärt und nie handelt
+* **[ARMOR-VISION](https://github.com/JuanenRac/ARMOR-VISION)** - Kamerazonen, Masken und Erkennungsregeln für den Jetson Orin NX
 * **[ARMOR-VOICE-AI](https://github.com/JuanenRac/ARMOR-VOICE-AI)** - Offline-Sprachabsichten mit einer nicht fälschbaren Bestätigung
 * **[ARMOR-HARDWARE](https://github.com/JuanenRac/ARMOR-HARDWARE)** - Gehäuse, Elektronik und die Abnahmematrix am Prüfstand
 * **[ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS)** - Bereitstellung, CM5-Prüfstand, Backup und TLS

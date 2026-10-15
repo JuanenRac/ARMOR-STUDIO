@@ -4,7 +4,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useCallback, useContext, useEffect, useState, type FormEvent } from "react";
-import { ApiError, changeAccount, createUser, deleteUser, listUsers, updateUser, type ListedUser, type Role } from "./api";
+import { ApiError, changeAccount, clearUserPin, createUser, deleteUser, listUsers, setMyPin, setUserPin, updateUser, type ListedUser, type Role } from "./api";
 import { SessionUserContext } from "./sessionContext";
 
 type Props = { t: (key: string) => string; origin: string };
@@ -49,6 +49,19 @@ export function UsersPanel({ t, origin }: Props) {
     } catch (error) { explain(error); }
   };
 
+  // ---- my PIN ----
+  const [mine, setMine] = useState({ pin: "", duress: "" });
+  const digits = (value: string) => value.replace(/[^0-9]/g, "");
+  const saveMyPin = async (clear = false) => {
+    try {
+      await setMyPin(origin, clear ? { currentPassword: account.current, clear: true } : { currentPassword: account.current, pin: mine.pin, ...(mine.duress ? { duress_pin: mine.duress } : {}) });
+      setMine({ pin: "", duress: "" });
+      setAccount(current => ({ ...current, current: "" }));
+      say(t(clear ? "pinCleared" : "pinSaved"));
+      await reload();
+    } catch (error) { explain(error); }
+  };
+
   // ---- administration ----
   const [fresh, setFresh] = useState<{ username: string; password: string; role: Role }>({ username: "", password: "", role: "operator" });
   const add = async (event: FormEvent) => {
@@ -56,15 +69,18 @@ export function UsersPanel({ t, origin }: Props) {
     try { await createUser(origin, { ...fresh, username: fresh.username.trim() }); setFresh({ username: "", password: "", role: "operator" }); say(t("userCreated")); await reload(); }
     catch (error) { explain(error); }
   };
-  const [draft, setDraft] = useState<{ username: string; password: string; role: Role }>({ username: "", password: "", role: "operator" });
-  const startEdit = (user: ListedUser) => { setEditing(user.id); setDraft({ username: user.username, password: "", role: user.role }); };
+  const [draft, setDraft] = useState<{ username: string; password: string; role: Role; pin: string; duress: string }>({ username: "", password: "", role: "operator", pin: "", duress: "" });
+  const startEdit = (user: ListedUser) => { setEditing(user.id); setDraft({ username: user.username, password: "", role: user.role, pin: "", duress: "" }); };
   const saveEdit = async (user: ListedUser) => {
     const change: { username?: string; password?: string; role?: Role } = {};
     if (draft.username.trim() !== user.username) change.username = draft.username.trim();
     if (draft.password) change.password = draft.password;
     if (draft.role !== user.role) change.role = draft.role;
-    if (!Object.keys(change).length) { setEditing(""); return; }
-    try { await updateUser(origin, user.id, change); setEditing(""); say(t("userUpdated")); await reload(); }
+    if (!Object.keys(change).length && !draft.pin) { setEditing(""); return; }
+    try {
+      if (Object.keys(change).length) await updateUser(origin, user.id, change);
+      if (draft.pin) await setUserPin(origin, user.id, draft.pin, draft.duress || undefined);
+      setEditing(""); say(t("userUpdated")); await reload(); }
     catch (error) { explain(error); }
   };
   const remove = async (user: ListedUser) => {
@@ -86,6 +102,13 @@ export function UsersPanel({ t, origin }: Props) {
         <label>{t("confirmPassword")}<input type="password" autoComplete="new-password" value={account.repeat} onChange={event => setAccount({ ...account, repeat: event.target.value })} /></label>
         <div className="users-actions"><button className="primary" type="submit" disabled={!me || !account.current}>{t("saveAccount")}</button></div>
       </form>
+      <h4>{t("pinTitle")}</h4>
+      <p className="muted small">{t("pinHelp")} {t("currentPassword")}</p>
+      <div className="users-form">
+        <label>{t("pinValue")}<input type="password" inputMode="numeric" autoComplete="off" maxLength={10} value={mine.pin} onChange={event => setMine({ ...mine, pin: digits(event.target.value) })} /></label>
+        <label>{t("duressValue")}<input type="password" inputMode="numeric" autoComplete="off" maxLength={10} value={mine.duress} onChange={event => setMine({ ...mine, duress: digits(event.target.value) })} /></label>
+        <div className="users-actions"><button className="primary" disabled={!me || !account.current || mine.pin.length < 4} onClick={() => void saveMyPin()}>{t("pinSave")}</button><button disabled={!me || !account.current} onClick={() => void saveMyPin(true)}>{t("pinClear")}</button></div>
+      </div>
     </article>
 
     {!session?.known && !me
@@ -103,12 +126,14 @@ export function UsersPanel({ t, origin }: Props) {
                       <label>{t("userName")}<input value={draft.username} maxLength={40} onChange={event => setDraft({ ...draft, username: event.target.value })} /></label>
                       <label>{t("newPassword")}<input type="password" autoComplete="new-password" placeholder={t("keepPassword")} value={draft.password} onChange={event => setDraft({ ...draft, password: event.target.value })} /></label>
                       <label>{t("role")}<select value={draft.role} onChange={event => setDraft({ ...draft, role: event.target.value as Role })}>{ROLES.map(role => <option key={role} value={role}>{roleName(role)}</option>)}</select></label>
+                      <label>{t("pinValue")}<input type="password" inputMode="numeric" autoComplete="off" maxLength={10} placeholder={user.hasPin ? t("keepPassword") : ""} value={draft.pin} onChange={event => setDraft({ ...draft, pin: digits(event.target.value) })} /></label>
+                      <label>{t("duressValue")}<input type="password" inputMode="numeric" autoComplete="off" maxLength={10} value={draft.duress} onChange={event => setDraft({ ...draft, duress: digits(event.target.value) })} /></label>
                       <div className="users-actions"><button className="primary" onClick={() => void saveEdit(user)}>{t("saveUser")}</button><button onClick={() => setEditing("")}>{t("cancel")}</button></div>
                     </div>
                   : <>
-                      <div className="user-main"><strong>{user.username}</strong>{user.current && <small className="user-chip">{t("youLabel")}</small>}<span className={`role-badge ${user.role}`}>{roleName(user.role)}</span></div>
+                      <div className="user-main"><strong>{user.username}</strong>{user.current && <small className="user-chip">{t("youLabel")}</small>}<span className={`role-badge ${user.role}`}>{roleName(user.role)}</span><small className="user-chip">{user.hasPin ? t("userHasPin") : t("userNoPin")}</small></div>
                       <small className="muted">{t("createdOn")} {day(user.createdAt)}</small>
-                      <div className="users-actions"><button onClick={() => startEdit(user)}>{t("editUser")}</button><button className="danger-button" disabled={user.current} onClick={() => void remove(user)}>{t("deleteUser")}</button></div>
+                      <div className="users-actions"><button onClick={() => startEdit(user)}>{t("editUser")}</button>{user.hasPin && <button onClick={() => void clearUserPin(origin, user.id).then(() => { say(t("pinCleared")); return reload(); }).catch(explain)}>{t("pinClear")}</button>}<button className="danger-button" disabled={user.current} onClick={() => void remove(user)}>{t("deleteUser")}</button></div>
                     </>}
               </li>)}
             </ul>

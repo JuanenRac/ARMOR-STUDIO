@@ -21,13 +21,13 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-7-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-319%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-352%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
 
 ---
 
-**Comprobación de honestidad - qué funciona hoy:** Studio habla con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) y está cubierto por 319 pruebas unitarias (lectura de ajustes, fusión de cámaras, la aritmética de las gráficas solares, cada menú dibujado en los siete idiomas, el servidor estático). **No** está probado el vídeo en vivo y el PTZ con cada cámara real, los menús solares con un inversor o batería reales ni una revisión formal de accesibilidad o usabilidad. Mientras no se alcanza el servidor, Studio muestra datos de demostración y lo dice en la barra superior.
+**Comprobación de honestidad - qué funciona hoy:** Studio habla con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) y está cubierto por 352 pruebas unitarias (lectura de ajustes, fusión de cámaras, la aritmética de las gráficas solares, cada menú dibujado en los siete idiomas, el servidor estático). **No** está probado el vídeo en vivo y el PTZ con cada cámara real, los menús solares con un inversor o batería reales ni una revisión formal de accesibilidad o usabilidad. Mientras no se alcanza el servidor, Studio muestra datos de demostración y lo dice en la barra superior.
 
 ---
 
@@ -48,8 +48,9 @@
 * **Siete idiomas** (inglés, español, alemán, francés, italiano, japonés y chino) y dieciséis temas, el predeterminado llamado *Armor*.
 * **Declara tu equipo:** en los menús Inversores y Baterías añades cada inversor o pila de baterías con su nombre, modelo (Voltronic, MPP Solar, Pylontech US2000 / US3000 / US5000, ANT-BMS), conexión (RS232, RS485, USB, CAN, Wi-Fi) y nodo pasarela; espera su primera lectura real y *Ver lecturas de ejemplo* te deja probar el menú mientras tanto.
 * **Diseñador eléctrico:** dibuja el esquema eléctrico de la casa (red, contador, protecciones, conmutadores, distribución, FV, inversores, baterías y cargas, en AC y DC) con puertos y cables, agrúpalo en cuadros, une inversores y baterías con los dispositivos solares que lee el servidor para ver sus valores en directo, y deja que las comprobaciones lo revisen (dos fuentes en una línea, magnetotérmicos y cables frente a la corriente, protecciones que faltan, tensiones DC). El dibujo se guarda en el servidor; es un dibujo: de momento nada maniobra ni mide.
-* **Centrales de alarma:** el menú *Centrales de alarma* muestra lo que dice cada nodo ARMOR-ALARM: si vigila (fuera o en casa), sus zonas y sus últimos eventos, y avisa en el menú Alarmas de una alarma sonando (crítica) o de una zona en sabotaje (alta). Un administrador puede armar y desarmar una central desde allí solo si el servidor (`ARMOR_ALARM_COMMANDS=1`), el nodo y el broker lo permiten; desarmar desde la consola no lleva PIN, así que pregunta antes. No es un sistema de alarma certificado.
+* **Centrales de alarma:** el menú *Centrales de alarma* muestra lo que dice cada nodo ARMOR-ALARM: si vigila (fuera o en casa), sus zonas y sus últimos eventos, y avisa en el menú Alarmas de una alarma sonando (crítica) o de una zona en sabotaje (alta). Un administrador puede armar y desarmar una central desde allí solo si el servidor (`ARMOR_ALARM_COMMANDS=1`), el nodo y el broker lo permiten; desarmar desde la consola pide el PIN del usuario que ha entrado, que comprueba el servidor. No es un sistema de alarma certificado.
 * **Paredes y edificios fusionados en el diseñador del emplazamiento:** una pared de un edificio o del terreno se puede empujar hacia dentro o hacia fuera (un tirador en cada lado de la forma seleccionada, o los botones *Mover una pared*) y las paredes contiguas la siguen, de modo que un rectángulo conserva sus ángulos rectos y la pared opuesta no se mueve; y dos edificios cuyas paredes se tocan se pueden **fusionar**: la pared común se construye una vez, una puerta o ventana abierta en ella - de cualquiera de los dos - funciona por los dos lados, y el suelo de un edificio pequeño se ve con su propio color.
+* **PIN para desarmar y alarmas de cualquier origen:** desarmar (el sistema, o una central desde su tarjeta) pide el PIN en un cuadro, Configuración > Usuarios pone el PIN y el PIN de coacción, una automatización puede arrancar con cualquier origen de alarma (también una central sonando), y la pantalla de firmware y la adopción de nodos conocen las centrales de alarma.
 
 ## 🔄 Arquitectura
 
@@ -91,7 +92,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 319 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
+npm test            # 352 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```
@@ -113,6 +114,7 @@ $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # 
 * **ARMOR-STUDIO** (este repositorio) - Consola web: cámaras, radar, alarmas, energía solar y el diseñador de sitio 2D/3D
 * **[ARMOR-ANDROID-CONTROL](https://github.com/JuanenRac/ARMOR-ANDROID-CONTROL)** - Cliente Android del operador con radar 2D/3D en vivo
 * **[ARMOR-SERVER-AI](https://github.com/JuanenRac/ARMOR-SERVER-AI)** - Política de inferencia visual que explica sus decisiones y nunca actúa
+* **[ARMOR-VISION](https://github.com/JuanenRac/ARMOR-VISION)** - Zonas de cámara, máscaras y reglas de detección para la Jetson Orin NX
 * **[ARMOR-VOICE-AI](https://github.com/JuanenRac/ARMOR-VOICE-AI)** - Intenciones de voz sin conexión con una confirmación imposible de falsificar
 * **[ARMOR-HARDWARE](https://github.com/JuanenRac/ARMOR-HARDWARE)** - Cajas, electrónica y la matriz de aceptación en banco
 * **[ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS)** - Despliegue, el banco de pruebas de la CM5, copias de seguridad y TLS

@@ -16,7 +16,7 @@ import type { NetworkOverview } from "./networkModel";
 type Translate = (key: string) => string;
 type Props = { t: Translate; origin: string; isAdmin: boolean; network: NetworkOverview | null };
 
-export const FIRMWARE_KINDS: readonly FirmwareKind[] = ["radar", "solar", "electrical", "hmi"];
+export const FIRMWARE_KINDS: readonly FirmwareKind[] = ["radar", "solar", "electrical", "alarm", "hmi"];
 export type FoundNode = { ip: string; nodeId?: string; hostname?: string; online: boolean; kind?: FirmwareKind };
 
 const HOST_PREFIX = "armor-";

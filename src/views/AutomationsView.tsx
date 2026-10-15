@@ -4,7 +4,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useState, type FormEvent } from "react";
-import { ApiError, createAutomation, deleteAutomation, runAutomation, updateAutomation, type Automation, type AutomationAction, type AutomationInput, type StudioDevice, type Trigger } from "../api";
+import { ApiError, createAutomation, deleteAutomation, runAutomation, updateAutomation, type Automation, type AutomationAction, type AlarmSourceType, type AutomationInput, type StudioDevice, type Trigger } from "../api";
 import { ACTUATOR_KINDS, MAIN_FIELD } from "../deviceKinds";
 import type { Translate } from "../components/camera";
 import "./alarms.css";
@@ -12,6 +12,7 @@ import { MenuTitle } from "../menuLogos";
 
 type Props = { t: Translate; origin: string; automations: Automation[]; reload: () => void; devices: StudioDevice[]; now: number };
 
+const SOURCE_LABEL: Record<AlarmSourceType, string> = { node: "sourceNode", camera: "sourceCamera", device: "sourceDevice", solar: "sourceSolar", electrical: "sourceElectrical", network: "sourceNetwork", alarm: "sourceAlarm" };
 const stateWord = (field: string, value: boolean | number, t: Translate): string =>
   field === "open" ? t(value ? "state_open" : "state_closed") : field === "locked" ? t(value ? "state_locked" : "state_unlocked") : field === "triggered" ? t(value ? "problem_triggered" : "state_clear") : t(value ? "state_on" : "state_off");
 const commandWord = (kind: StudioDevice["kind"] | undefined, command: string, t: Translate): string =>
@@ -33,7 +34,7 @@ export function AutomationsView({ t, origin, automations, reload, devices, now }
     if (trigger.type === "mode") return t(trigger.mode === "armed" ? "modeArmedNotice" : "modeDisarmedNotice");
     const parts = [t("trigger_alarm")];
     if (trigger.severity) parts.push(t(`severity_${trigger.severity}`));
-    if (trigger.source_type) parts.push(t(trigger.source_type === "node" ? "sourceNode" : trigger.source_type === "camera" ? "sourceCamera" : "sourceDevice"));
+    if (trigger.source_type) parts.push(t(SOURCE_LABEL[trigger.source_type]));
     if (trigger.source_id) parts.push(byId(trigger.source_id)?.name ?? trigger.source_id);
     return parts.join(" · ");
   };
@@ -94,7 +95,7 @@ export function AutomationsView({ t, origin, automations, reload, devices, now }
         </>}
         {trigger?.type === "alarm" && <>
           <label>{t("anySeverity")}<select value={trigger.severity ?? ""} onChange={event => setTrigger({ ...trigger, severity: (event.target.value || undefined) as Trigger extends { severity?: infer S } ? S : never })}><option value="">{t("anySeverity")}</option>{(["critical", "high", "warning"] as const).map(item => <option key={item} value={item}>{t(`severity_${item}`)}</option>)}</select></label>
-          <label>{t("anySource")}<select value={trigger.source_type ?? ""} onChange={event => setTrigger({ ...trigger, source_type: (event.target.value || undefined) as "node" | "camera" | "device" | undefined })}><option value="">{t("anySource")}</option><option value="node">{t("sourceNode")}</option><option value="camera">{t("sourceCamera")}</option><option value="device">{t("sourceDevice")}</option></select></label>
+          <label>{t("anySource")}<select value={trigger.source_type ?? ""} onChange={event => setTrigger({ ...trigger, source_type: (event.target.value || undefined) as AlarmSourceType | undefined })}><option value="">{t("anySource")}</option>{(Object.keys(SOURCE_LABEL) as AlarmSourceType[]).map(item => <option key={item} value={item}>{t(SOURCE_LABEL[item])}</option>)}</select></label>
         </>}
         {trigger?.type === "mode" && <label>{t("trigger_mode")}<select value={trigger.mode} onChange={event => setTrigger({ type: "mode", mode: event.target.value as "armed" | "disarmed" })}><option value="armed">{t("modeArmedNotice")}</option><option value="disarmed">{t("modeDisarmedNotice")}</option></select></label>}
       </div>

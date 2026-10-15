@@ -94,6 +94,24 @@ export function ConfirmDialog({ title, text, confirmLabel, danger, confirm, canc
   </div>;
 }
 
+/** Disarming asks for the PIN: the field is there for everybody, and the server only insists for a user who has one (or when the installation requires it). */
+export function PinDialog({ title, text, confirmLabel, confirm, cancel, t }: { title: string; text: string; confirmLabel: string; confirm: (pin: string) => void; cancel: () => void; t: Translate }) {
+  const [pin, setPin] = useState("");
+  return <div className="modal-backdrop" role="presentation" onMouseDown={cancel} onKeyDown={event => { if (event.key === "Escape") cancel(); }}>
+    <form className="about-dialog confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="pin-title" aria-describedby="pin-text" onMouseDown={event => event.stopPropagation()}
+      onSubmit={event => { event.preventDefault(); confirm(pin); }}>
+      <h2 id="pin-title">{title}</h2>
+      <p id="pin-text">{text}</p>
+      <label className="pin-field">{t("pinLabel")}<input type="password" inputMode="numeric" autoComplete="one-time-code" maxLength={10} value={pin} autoFocus
+        placeholder={t("pinPlaceholder")} onChange={event => setPin(event.target.value.replace(/[^0-9]/g, ""))} /></label>
+      <div className="confirm-actions">
+        <button type="button" onClick={cancel}>{t("cancelAction")}</button>
+        <button type="submit" className="danger">{confirmLabel}</button>
+      </div>
+    </form>
+  </div>;
+}
+
 export type StatusBarProps = {
   serverName: string; synced: boolean; mode: "armed" | "disarmed";
   nodesOnline: number; nodesTotal: number; camerasReachable: number; camerasTotal: number; highAlerts: number;

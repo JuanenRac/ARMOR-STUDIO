@@ -136,7 +136,7 @@ export function FilesPanel({ t, origin, isAdmin }: Props) {
 
 // ---- the broker --------------------------------------------------------------------------------------------------------------------------------
 
-const ROLES = ["node", "solar-node", "electrical-node", "network-node", "consumer", "device", "bridge"] as const;
+const ROLES = ["node", "solar-node", "electrical-node", "network-node", "alarm-node", "consumer", "device", "bridge"] as const;
 
 export function BrokerPanel({ t, origin, isAdmin }: Props) {
   const gate = useAgent(origin, isAdmin);

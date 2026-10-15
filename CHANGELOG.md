@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.9] - Automations from any alarm source, and the PIN to disarm
+
+- The trigger "when an alarm..." offers every origin the server knows (radar node, camera, device, solar equipment, electrical node, the network and an alarm panel), so "when the central sounds, switch on the lights" can be made. The alarm type of the events is the closed list of the contract.
+- **Disarming asks for the PIN** (the system, and an alarm panel from its card) in a dialog of the page, with the refusals told in the seven languages (wrong PIN, locked, none set). **Configuration > Users** sets, changes and removes the PIN and the duress PIN: yours after confirming your password, anybody's for an administrator; the list says who has one. The alarm of a disarm under duress and the origin "alarm panels" have their words.
+- The firmware screen updates alarm panels too, adopting a node gives it the account of its kind, and the broker accounts can be of an alarm panel.
+
 ## [0.6.8] - In progress
 
 - **The installation as one file:** *Configuration > Installation* downloads the whole installation (never a password, token or key) and imports a file, with the parts to import ticked and a report of what was applied, what was left alone and what did not check out (and which cameras need their user name and password typed in), in the seven languages; the users' page offers the new `panel` role for a wall panel's own account.

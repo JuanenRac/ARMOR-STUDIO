@@ -21,13 +21,13 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-7-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-319%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-352%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
 
 ---
 
-**正直さのチェック - 今日動いているもの:** Studio は [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) と通信し、319 件の単体テスト（設定の読み取り、カメラの統合、太陽光グラフの計算、7 言語すべてでの各メニューの描画、静的ホスト）で網羅されています。**実証されていないもの：** すべての実カメラでのライブ映像と PTZ、実際のインバーターやバッテリーでの太陽光メニュー、そして正式なアクセシビリティやユーザビリティの評価。サーバーに接続できない間、Studio はデモデータを表示し、上部バーでそう伝えます。
+**正直さのチェック - 今日動いているもの:** Studio は [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) と通信し、352 件の単体テスト（設定の読み取り、カメラの統合、太陽光グラフの計算、7 言語すべてでの各メニューの描画、静的ホスト）で網羅されています。**実証されていないもの：** すべての実カメラでのライブ映像と PTZ、実際のインバーターやバッテリーでの太陽光メニュー、そして正式なアクセシビリティやユーザビリティの評価。サーバーに接続できない間、Studio はデモデータを表示し、上部バーでそう伝えます。
 
 ---
 
@@ -48,8 +48,9 @@
 * **7 言語**（英語、スペイン語、ドイツ語、フランス語、イタリア語、日本語、中国語）と 16 のテーマ。既定のテーマの名前は *Armor* です。
 * **機器を登録：** 「インバーター」と「バッテリー」メニューで、各インバーターやバッテリースタックを名前、モデル（Voltronic、MPP Solar、Pylontech US2000 / US3000 / US5000、ANT-BMS）、接続（RS232、RS485、USB、CAN、Wi-Fi）、ゲートウェイノードとともに追加します。最初の実測値を待つ間は「サンプルの測定値を表示」でメニューを試せます。
 * **電気設計：** 住宅の電気回路図（系統、電力量計、保護機器、切替スイッチ、配電、太陽光、インバーター、蓄電池、負荷。AC と DC）をポートと電線で描き、盤ごとにまとめ、インバーターや蓄電池をサーバーが読むソーラー機器に結びつけてリアルタイム値を表示し、チェック機能に見直させます（1 本の線に 2 つの電源、電流に対するブレーカーとケーブル、不足する保護、DC 電圧）。図面はサーバーに保存されます。これは図面です。今のところ何も開閉も計測もしません。
-* **警報盤：** 「警報盤」メニューは各 ARMOR-ALARM ノードの状態（警戒中か〔外出／在宅〕、区域、直近のイベント）を表示し、鳴っている警報（重大）や改ざんされた区域（高）を「警報」メニューに知らせます。管理者がそこから警戒セット・解除できるのは、サーバー（`ARMOR_ALARM_COMMANDS=1`）、ノード、ブローカーがすべて許可した場合だけです。コンソールからの解除には PIN が付かないため、先に確認します。認証された警報システムではありません。
+* **警報盤：** 「警報盤」メニューは各 ARMOR-ALARM ノードの状態（警戒中か〔外出／在宅〕、区域、直近のイベント）を表示し、鳴っている警報（重大）や改ざんされた区域（高）を「警報」メニューに知らせます。管理者がそこから警戒セット・解除できるのは、サーバー（`ARMOR_ALARM_COMMANDS=1`）、ノード、ブローカーがすべて許可した場合だけです。コンソールからの解除にはログイン中のユーザーの PIN を求め、サーバーが確認します。認証された警報システムではありません。
 * **サイト設計の壁と建物の結合：** 建物や土地の壁を内側・外側へ押せます（選択した形の各辺のハンドル、または「壁を動かす」ボタン）。隣の壁がついてくるので、長方形は直角を保ち、反対側の壁は動きません。壁が接する 2 つの建物は**結合**でき、共有の壁は 1 回だけ作られ、そこに開けたドアや窓（どちらの建物のものでも）は両面から機能し、小さな建物の床も選んだ色で表示されます。
+* **解除用 PIN とあらゆる発生元の警報：** 解除（システム、またはカードからの警報盤）はダイアログで PIN を求め、「設定 > ユーザー」で PIN と脅迫用 PIN を設定します。自動化は鳴っている警報盤を含むあらゆる警報の発生元から始められ、ファームウェア画面とノードの登録は警報盤に対応します。
 
 ## 🔄 アーキテクチャ
 
@@ -91,7 +92,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 319 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
+npm test            # 352 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```
@@ -113,6 +114,7 @@ $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # 
 * **ARMOR-STUDIO** (このリポジトリ) - Web コンソール：カメラ、レーダー、アラーム、太陽光発電、2D/3D サイト設計
 * **[ARMOR-ANDROID-CONTROL](https://github.com/JuanenRac/ARMOR-ANDROID-CONTROL)** - リアルタイム 2D/3D レーダー付きの Android オペレータークライアント
 * **[ARMOR-SERVER-AI](https://github.com/JuanenRac/ARMOR-SERVER-AI)** - 判断を説明し、決して動作しない視覚推論ポリシー
+* **[ARMOR-VISION](https://github.com/JuanenRac/ARMOR-VISION)** - Jetson Orin NX 向けのカメラのゾーン、マスク、検知ルール
 * **[ARMOR-VOICE-AI](https://github.com/JuanenRac/ARMOR-VOICE-AI)** - 偽造できない確認を備えたオフライン音声インテント
 * **[ARMOR-HARDWARE](https://github.com/JuanenRac/ARMOR-HARDWARE)** - 筐体、電子部品、ベンチ受け入れマトリクス
 * **[ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS)** - デプロイ、CM5 テストベンチ、バックアップ、TLS

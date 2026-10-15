@@ -21,13 +21,13 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-7-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-319%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-352%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
 </p>
 
 ---
 
-**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 319 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, every menu rendered in the seven languages, the static host). What has **not** been proven is live video and PTZ against every real camera, the solar menus with a real inverter or battery, and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
+**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 352 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, every menu rendered in the seven languages, the static host). What has **not** been proven is live video and PTZ against every real camera, the solar menus with a real inverter or battery, and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
 
 ---
 
@@ -48,8 +48,9 @@
 * **Seven languages** (English, Spanish, German, French, Italian, Japanese, Chinese) and sixteen themes, the default one called *Armor*.
 * **Declare your equipment:** in the Inverters and Batteries menus you add each inverter or battery stack with its name, model (Voltronic, MPP Solar, Pylontech US2000 / US3000 / US5000, ANT-BMS), connection (RS232, RS485, USB, CAN, Wi-Fi) and gateway node; it waits for its first real reading, and *Show example readings* lets you try the menu meanwhile.
 * **Electrical Designer:** draw the house's electrical diagram (grid, meter, protections, transfer switches, distribution, PV, inverters, batteries and loads, AC and DC) with ports and wires, group it in panels, tie inverters and batteries to the solar devices the server reads to see their live values, and let the checks review it (two sources on one line, breakers and cables against the current, missing protections, DC voltages). The drawing is kept on the server; it is a drawing: nothing switches or measures anything yet.
-* **Alarm panels:** the *Alarm panels* menu shows what each ARMOR-ALARM node says: whether it is guarding (away or at home), its zones and its last events, and it tells a sounding alarm (critical) or a zone in tamper (high) in the Alarms menu. An administrator can arm and disarm a panel from there only when the server (`ARMOR_ALARM_COMMANDS=1`), the node and the broker all allow it; a disarm from the console carries no PIN, so it asks first. Not a certified alarm system.
+* **Alarm panels:** the *Alarm panels* menu shows what each ARMOR-ALARM node says: whether it is guarding (away or at home), its zones and its last events, and it tells a sounding alarm (critical) or a zone in tamper (high) in the Alarms menu. An administrator can arm and disarm a panel from there only when the server (`ARMOR_ALARM_COMMANDS=1`), the node and the broker all allow it; a disarm from the console asks for the PIN of the signed-in user, which the server checks. Not a certified alarm system.
 * **Walls and merged buildings in the site designer:** a wall of a building or of the terrain can be pushed in or out (a handle on each side of the selected shape, or the *Move a wall* buttons) and the walls beside it follow, so a rectangle keeps its right angles and the opposite wall stays; and two buildings whose walls touch can be **merged**: the shared wall is built once, a door or window cut into it - on either building - works from both sides, and the floor finish of a small building shows in its own colour.
+* **PIN to disarm and alarms from any source:** disarming (the system, or an alarm panel from its card) asks for the PIN in a dialog, Configuration > Users sets the PIN and the duress PIN, an automation can start from any alarm source (a sounding alarm panel included), and the firmware screen and the adoption of nodes know the alarm panels.
 
 ## 🔄 Architecture
 
@@ -91,7 +92,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 319 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
+npm test            # 352 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```
@@ -113,6 +114,7 @@ $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # 
 * **ARMOR-STUDIO** (this repository) - Web console: cameras, radar, alarms, solar energy and the 2D/3D site designer
 * **[ARMOR-ANDROID-CONTROL](https://github.com/JuanenRac/ARMOR-ANDROID-CONTROL)** - Android operator client with a live 2D/3D radar
 * **[ARMOR-SERVER-AI](https://github.com/JuanenRac/ARMOR-SERVER-AI)** - Visual inference policy that explains its decisions and never actuates
+* **[ARMOR-VISION](https://github.com/JuanenRac/ARMOR-VISION)** - Camera zones, masks and detection rules for the Jetson Orin NX
 * **[ARMOR-VOICE-AI](https://github.com/JuanenRac/ARMOR-VOICE-AI)** - Offline voice intents with a confirmation that cannot be forged
 * **[ARMOR-HARDWARE](https://github.com/JuanenRac/ARMOR-HARDWARE)** - Enclosures, electronics and the bench acceptance matrix
 * **[ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS)** - Deployment, the CM5 test bench, backup and TLS

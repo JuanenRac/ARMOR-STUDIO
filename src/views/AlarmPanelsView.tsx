@@ -1,12 +1,13 @@
 /**
  * The Alarm panels menu: what the ARMOR-ALARM nodes say about the house's alarm, live. The totals (panels, guarding, sounding), one card per node with its phase and mode,
  * its zones and its last events, and - for an administrator, only when the server, the node and the broker all allow it - the buttons that arm and disarm it.
- * A disarm from here carries no PIN, so it asks first; an accepted command is not an armed alarm, and the card shows what the node says next.
+ * A disarm from here asks for the PIN of the signed-in user (the server checks it; the node never sees it); an accepted command is not an armed alarm, and the card shows what the node says next.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useState } from "react";
 import { alarmCommandsStatus, sendAlarmCommand, ApiError, type AlarmNodeView, type AlarmNodes } from "../api";
 import { MenuLogo } from "../menuLogos";
+import { PinDialog } from "../components/chrome";
 import { usePolled } from "../hooks";
 import type { Translate } from "../components/camera";
 import { NodeFinder } from "../NodeFinder";
@@ -58,10 +59,11 @@ function PanelCard({ t, origin, node, now, canCommand, recent, reload }: { t: Tr
   const sounding = state.phase === "alarm";
   const guarding = state.phase === "armed" || state.phase === "exit_delay" || state.phase === "entry_delay";
   const allowed = canCommand && !node.stale && state.commands_enabled;
-  const send = async (action: "arm" | "disarm", mode?: "away" | "stay") => {
-    if (action === "disarm" && !window.confirm(fill(t("apConfirmDisarm"), node.node_id))) return;
+  const [askingPin, setAskingPin] = useState(false);
+  const send = async (action: "arm" | "disarm", mode?: "away" | "stay", pin?: string) => {
+    setAskingPin(false);
     setBusy(true); setMessage(null);
-    try { await sendAlarmCommand(origin, node.node_id, action, mode, force); setMessage({ text: t("apSent"), bad: false }); reload(); }
+    try { await sendAlarmCommand(origin, node.node_id, action, mode, force, pin); setMessage({ text: t("apSent"), bad: false }); reload(); }
     catch (error) {
       const code = error instanceof ApiError ? error.code : "other";
       setMessage({ text: t(`apErr_${code}`) !== `apErr_${code}` ? t(`apErr_${code}`) : t("apErr_other"), bad: true });
@@ -101,7 +103,8 @@ function PanelCard({ t, origin, node, now, canCommand, recent, reload }: { t: Tr
     {canCommand && <div className="ap-actions">
       <button type="button" disabled={busy || !allowed || state.phase !== "disarmed"} onClick={() => void send("arm", "away")}>{t("apArmAway")}</button>
       <button type="button" disabled={busy || !allowed || state.phase !== "disarmed"} onClick={() => void send("arm", "stay")}>{t("apArmStay")}</button>
-      <button type="button" className="danger" disabled={busy || !allowed || state.phase === "disarmed"} onClick={() => void send("disarm")}>{t("apDisarm")}</button>
+      <button type="button" className="danger" disabled={busy || !allowed || state.phase === "disarmed"} onClick={() => setAskingPin(true)}>{t("apDisarm")}</button>
+      {askingPin && <PinDialog title={t("apDisarm")} text={fill(t("apConfirmDisarm"), node.node_id)} confirmLabel={t("apDisarm")} confirm={pin => void send("disarm", undefined, pin)} cancel={() => setAskingPin(false)} t={t} />}
       {openZones.length > 0 && state.phase === "disarmed" && <label className="ap-force"><input type="checkbox" checked={force} onChange={event => setForce(event.target.checked)} /> {t("apForce")}</label>}
     </div>}
     {message && <p className={`solar-notice ${message.bad ? "bad" : ""}`} role={message.bad ? "alert" : "status"}>{message.text}</p>}

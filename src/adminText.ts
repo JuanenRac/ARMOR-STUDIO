@@ -70,6 +70,7 @@ const rows: Record<string, Row> = {
   adm_role_node: ["Radar node", "Nodo radar", "Radarknoten", "Nœud radar", "Nodo radar", "レーダーノード", "雷达节点"],
   "adm_role_solar-node": ["Solar node", "Nodo solar", "Solarknoten", "Nœud solaire", "Nodo solare", "太陽光ノード", "光伏节点"],
   "adm_role_electrical-node": ["Electrical node", "Nodo eléctrico", "Elektroknoten", "Nœud électrique", "Nodo elettrico", "電気ノード", "电气节点"],
+  "adm_role_alarm-node": ["Alarm panel node", "Nodo central de alarma", "Alarmzentrale", "Nœud centrale d'alarme", "Nodo centrale d'allarme", "警報盤ノード", "报警主机节点"],
   "adm_role_network-node": ["Network node", "Nodo de red", "Netzknoten", "Nœud réseau", "Nodo di rete", "ネットワークノード", "网络节点"],
   adm_role_consumer: ["Alarm consumer (siren, light...)", "Consumidor de alarmas (sirena, luz...)", "Alarm-Verbraucher (Sirene, Licht ...)", "Consommateur d'alarmes (sirène, lumière...)", "Consumatore di allarmi (sirena, luce...)", "アラームの受信側（サイレン、照明など）", "报警消费者（警笛、灯等）"],
   adm_role_device: ["One device (plug, sensor)", "Un dispositivo (enchufe, sensor)", "Ein Gerät (Steckdose, Sensor)", "Un appareil (prise, capteur)", "Un dispositivo (presa, sensore)", "1 台の機器（プラグ、センサー）", "单个设备（插座、传感器）"],
