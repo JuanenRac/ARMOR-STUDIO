@@ -11,12 +11,16 @@ nav button { position: relative; } .nav-badge { margin-left: auto; min-width: 20
 @media (max-width: 800px) { .sidebar nav { display: flex; overflow-x: auto; gap: .6rem; } .nav-group { display: flex; gap: .3rem; align-items: center; } .nav-group-title { display: none; } .nav-group.folded .nav-items { display: grid; } .nav-items { display: flex; gap: .3rem; } }
 .site-sync { padding: .35rem .5rem; border-radius: 8px; border: 1px solid #285a66; color: #7ee7ff; } .site-sync.saving { color: #ffcf7d; border-color: #7a5a1c; } .site-sync.offline { color: #ff8e99; border-color: #974b55; }
 
-/* The side menu is 50 points wider than before (see compact.css) and every name is shown whole, on as many lines as it needs; when the screen is short the list of screens scrolls on its own
-   while the brand and the connection state stay in view. */
+/* The side menu is 50 points wider than before (see compact.css) and every name is shown whole, on as many lines as it needs (words are never cut); when the screen is short the list of
+   screens scrolls on its own while the brand and the connection state stay in view. */
 .studio-frame .sidebar { min-height: 0; overflow: hidden; }
-.studio-frame .sidebar nav { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; padding-right: .15rem; }
-.studio-frame .sidebar nav button { min-width: 0; }
-.studio-frame .sidebar nav button em { min-width: 0; flex: 1 1 auto; font-style: normal; white-space: normal; overflow-wrap: anywhere; }
+.studio-frame .sidebar nav { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; padding: .5rem .15rem 0 0; }
+.studio-frame .sidebar nav button { align-items: center; }
+.studio-frame .sidebar nav button em { flex: 1 1 auto; font-style: normal; white-space: normal; overflow-wrap: normal; word-break: normal; hyphens: manual; text-align: left; line-height: 1.2; }
 .studio-frame .sidebar .sidebar-foot { flex: 0 0 auto; }
-.studio-frame .nav-group-title span { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
-@media (max-width: 800px) { .studio-frame .sidebar nav { overflow-y: visible; overflow-x: auto; } }
+.nav-group-title .nav-group-name { flex: 1 1 auto; width: auto; display: block; font-weight: 700; white-space: normal; overflow-wrap: normal; word-break: normal; text-align: left; }
+.nav-group-title { width: 100%; justify-content: flex-start; border-radius: 6px; }
+@media (max-width: 800px) { .studio-frame .sidebar nav { overflow-y: visible; overflow-x: auto; } .studio-frame .sidebar nav button em { white-space: nowrap; } }
+
+.studio-frame .nav-group-title { font-size: .64rem; letter-spacing: .16em; padding: .2rem .55rem .15rem; }
+.studio-frame .nav-group-title i { font-size: .8rem; width: 1rem; }

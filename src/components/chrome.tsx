@@ -36,7 +36,7 @@ export function Sidebar({ view, setView, sidebarOpen, toggle, connection, alarmB
       const waiting = group.items.some(([key]) => key === "alarms") ? alarmBadge : 0;
       return <div key={group.title} className={`nav-group ${folded ? "folded" : ""}`}>
         <button type="button" className="nav-group-title" aria-expanded={!folded} title={folded ? t("navGroupUnfold") : t("navGroupFold")} onClick={() => flip(group.title)}>
-          <i aria-hidden="true">{folded ? "▸" : "▾"}</i><span>{t(group.title)}</span>{folded && waiting > 0 && <b className="nav-badge">{waiting}</b>}
+          <i aria-hidden="true">{folded ? "▸" : "▾"}</i><strong className="nav-group-name">{t(group.title)}</strong>{folded && waiting > 0 && <b className="nav-badge">{waiting}</b>}
         </button>
         <div className="nav-items">{group.items.map(([key, icon]) => <button key={key} className={view === key ? "active" : ""} onClick={() => setView(key)} title={t(key)}><span className="nav-icon">{icon}</span><em>{t(key)}</em>{key === "alarms" && alarmBadge > 0 && <b className="nav-badge">{alarmBadge}</b>}</button>)}</div>
       </div>;
