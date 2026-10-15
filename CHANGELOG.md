@@ -416,8 +416,6 @@ All notable changes to this project are documented here.
 
 - Verified build completed; release version advanced from `0.1.2` to `0.1.3`.
 
-## Unreleased
-
 - Added the initial Studio login screen backed by ARMOR-SERVER's dedicated
   HttpOnly Studio session; that session now also authorises privileged camera
   actions without exposing or requesting the server operator token.
@@ -432,7 +430,6 @@ All notable changes to this project are documented here.
   optional live MJPEG relay status without storing passwords in the browser.
 - Retains credentials in the active browser session and restores public camera
   parameters from the local server after reload; added real RTSP path discovery.
-
 
 ## [0.1.2]
 
