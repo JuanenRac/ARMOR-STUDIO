@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here.
 
+## [0.7.0] - Audit round two: texts of the new service descriptions
+
+- The descriptions of the services of the server in the five languages cover the new ones.
+
 ## [0.6.9] - Automations from any alarm source, and the PIN to disarm
 
 - The trigger "when an alarm..." offers every origin the server knows (radar node, camera, device, solar equipment, electrical node, the network and an alarm panel), so "when the central sounds, switch on the lights" can be made. The alarm type of the events is the closed list of the contract.
