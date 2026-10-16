@@ -11,7 +11,7 @@ import "./alerts.css";
 
 const ICON: Record<string, string> = { critical: "⚠", high: "▲", warning: "●" };
 
-export function AlarmPopups({ popups, open, dismiss, dismissAll, t }: { popups: readonly Popup[]; open: (popup: Popup) => void; dismiss: (id: string) => void; dismissAll: () => void; t: (key: string) => string }) {
+export function AlarmPopups({ popups, open, dismiss, dismissAll, acknowledge, t }: { popups: readonly Popup[]; open: (popup: Popup) => void; dismiss: (id: string) => void; dismissAll: () => void; /** Mark the alarm as seen without leaving the page. */ acknowledge?: (id: string) => void; t: (key: string) => string }) {
   const settings = useAlerts();
   if (popups.length === 0) return null;
   return <div className={`alarm-popups ${settings.popups.blink ? "blink" : ""}`} role="region" aria-label={t("popupRegion")} aria-live="assertive">
@@ -23,6 +23,7 @@ export function AlarmPopups({ popups, open, dismiss, dismissAll, t }: { popups: 
         <small>{alarmSentence(popup.alarm, t, { type: false, severity: true, source: true })}</small>
         <em>{new Date(popup.alarm.raised_at).toLocaleTimeString()} · {t("popupGo")} ›</em>
       </button>
+      {acknowledge && <button type="button" className="alarm-popup-ack" onClick={() => { stopSound(); acknowledge(popup.id); dismiss(popup.id); }}>{t("acknowledge")}</button>}
       <button type="button" className="alarm-popup-close" onClick={() => { stopSound(); dismiss(popup.id); }} aria-label={t("close")} title={t("close")}>×</button>
     </article>)}
   </div>;

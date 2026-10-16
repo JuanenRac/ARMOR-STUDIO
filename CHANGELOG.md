@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented here.
 
+## [0.7.6] - A check before arming, a viewer role, ntfy, proof of custody, daily energy and a Help that knows all of it
+
+- **Before arming:** the arm button asks the server first and lists what would leave the perimeter blind or noisy - a radar node that does not answer, a silent panel, an open zone, a camera that is down, an open door or window, alarms nobody has seen - and offers "Arm anyway" when something blocks.
+- **Check without arming:** a tick button in the top bar shows the same check on demand.
+- **Viewer role:** Configuration > Users can create viewers, each role has a line saying what it may do, a viewer cannot arm (the button is off), and only the tabs that do not change the installation are offered.
+- **ntfy:** the Notifications tab lists the ntfy push channel, tests it and explains how to set it up and how an unacknowledged critical alarm is told again as unattended.
+- **Proof of custody:** the Record library downloads a file signed by the server with the digest of an evidence file and every audit line about it.
+- **Energy per day:** the Electrical menu shows the last week of each channel's energy, with the day a meter wrapped or restarted marked.
+- **Acknowledge from the pop-up:** an alarm pop-up has its own Acknowledge button next to the jump to the right menu.
+- **Help, tours and assistant:** the alarms, record, electrical, automations and configuration sections explain the new features in every language, and since the menu tours and the assistant read the Help they say the same.
+- **Hover hints:** the check button, the proof button and the threshold value explain themselves.
+- The Help no longer says there are five extra tours or that the connection state is at the foot of the menu.
+- All the new texts exist in Portuguese as well as the other seven languages.
+
 ## [0.7.5] - Alarm sounds, voice and pop-ups, a Help book with four levels, a tour for every menu and an assistant
 
 - **Alarm sounds:** Configuration > Preferences chooses a sound for each severity and, if wanted, another for each kind of source, with a play button on every row; eight sounds are made by Studio itself.

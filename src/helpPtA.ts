@@ -29,7 +29,9 @@ Um novo alarme crítico faz soar três apitos e, se permitir notificações no n
 
 Reconhecer marca um alarme como visto; Reconhecer todos marca todos os que estão à espera. Um alarme reconhecido sai da lista e fica guardado no Registo abaixo, a sua causa tenha terminado ou não; a história completa fica no Histórico. Se a sua causa continua, a mesma condição reportada de novo não o traz de volta: só volta depois de a causa terminar e acontecer de novo.
 
-Detalhes mostra os factos de um alarme (dispositivo, endereço, MAC, porta, números). A cruz apaga um alarme. «Marcar o dispositivo como conhecido» diz ao A.R.M.O.R. que um dispositivo novo é bem-vindo. Os filtros reduzem a lista por gravidade e origem, e a caixa de pesquisa procura qualquer texto. O botão grande arma ou desarma o sistema; desarmar pede o seu PIN.`],
+Detalhes mostra os factos de um alarme (dispositivo, endereço, MAC, porta, números). A cruz apaga um alarme. «Marcar o dispositivo como conhecido» diz ao A.R.M.O.R. que um dispositivo novo é bem-vindo. Os filtros reduzem a lista por gravidade e origem, e a caixa de pesquisa procura qualquer texto. O botão grande arma ou desarma o sistema; desarmar pede o seu PIN.
+
+Antes de armar: o botão pergunta primeiro ao servidor e mostra o que deixaria o perímetro cego ou ruidoso - um nó de radar que não responde, uma central de alarme muda, uma zona aberta, uma câmara em baixo, uma porta ou janela aberta e alarmes que ninguém viu. Se algo bloqueia, o botão diz «Armar mesmo assim»; nada se arma até confirmar. O botão com visto na barra superior mostra a mesma verificação sem armar. Um alarme novo aparece também como janela que nunca bloqueia a página, com botão Reconhecer e salto para o menu certo; os sons, a voz e as janelas escolhem-se em Configuração > Preferências. Uma conta com função de observador só olha e não pode armar.`],
   alarmPanels: ["Centrais de alarme", `Os nós de alarme (ARMOR-ALARM): cada um lê as suas zonas com fio e escuta os seus sensores Zigbee, gere a central (armar, atrasos, a sirene, o PIN) e diz ao servidor o que vê.
 
 Cada cartão mostra se o nó está em vigilância, o seu modo (ausente ou em casa), as suas zonas e o que aconteceu por último. Um alarme a soar dispara um alarme crítico no menu Alarmes, e uma zona em violação um alto. «Procurar nós» encontra centrais na rede local que ainda não estão no sistema.
@@ -53,7 +55,9 @@ O mapa desenha-se a partir do desenho do seu local: terreno, edifícios, câmara
 
 Apaga os itens selecionados com «Apagar selecionados», ou limpa em massa: tudo do tipo escolhido, ou só o que for mais antigo que um número de dias. Apagar é permanente e o Studio pergunta primeiro. O ecrã Câmaras mostra que câmaras estão a gravar, e continua a sabê-lo depois de recarregar a página.
 
-As fotografias e gravações fazem-se a partir do ecrã Câmaras (Fotografia e o botão vermelho de gravar).`],
+As fotografias e gravações fazem-se a partir do ecrã Câmaras (Fotografia e o botão vermelho de gravar).
+
+Prova de custódia: o botão «Prova de custódia» descarrega um ficheiro assinado pelo servidor com o tamanho, o SHA-256 da prova tal como está agora, quando foi feita e cada linha da auditoria sobre ela (quem a protegeu, quem pediu a sua impressão digital). Entregue-o junto com o ficheiro: o servidor pode dizer se o documento é autêntico e se o ficheiro ainda tem a mesma impressão digital.`],
   history: ["Histórico", `Tudo o que aconteceu, do mais recente para o mais antigo: cada mudança de nível de alerta de um nó, nós e câmaras a ficar ligados ou desligados, mudanças do modo de segurança, alarmes disparados, reconhecidos e terminados, e eventos de dispositivos e da rede. É o sítio para ver toda a história, também dos alarmes que já reconheceu.
 
 O resumo de cima conta os eventos guardados, os das últimas 24 horas, os alertas ALTOS e os incidentes de nós. Os filtros escolhem o tipo de evento, o nível de alerta e um período (de / até); a caixa de pesquisa procura qualquer texto. «Carregar eventos mais antigos» pede mais ao servidor. «Em direto» atualiza a cada cinco segundos e pode pausar-se. «Limpar histórico» apaga os eventos guardados mas não os alarmes.`],
@@ -71,5 +75,7 @@ Uma bateria abaixo de 20 % de carga dispara um aviso que termina quando volta a 
 
 Se desenhou a instalação no Desenhador elétrico e associou os seus elementos a nós, o esquema aqui mostra os valores em direto sobre ele. Sem desenho, vê os nós e os seus canais em lista. Quando ainda nenhum nó elétrico reportou, o ecrã diz-lhe o que fazer: ligue um nesta rede e procure-o no localizador de nós.
 
-Os alarmes desta área são avisos que terminam sozinhos: um contador que dispara o seu próprio alarme, uma tensão da rede fora de gama (cerca de 230 V, de 195 a 253) e a perda da entrada da rede; uma avaria retida de um contactor é ALTA.`],
+Os alarmes desta área são avisos que terminam sozinhos: um contador que dispara o seu próprio alarme, uma tensão da rede fora de gama (cerca de 230 V, de 195 a 253) e a perda da entrada da rede; uma avaria retida de um contactor é ALTA.
+
+Energia por dia: um cartão soma, para a última semana, o que o contador de cada canal contou. Soma só a diferença entre leituras, por isso um contador que dá a volta aos 9 999,99 kWh ou recomeça do zero após um corte não gera um dia negativo nem volta a contar todo o seu total; o dia em que acontece fica assinalado.`],
 };

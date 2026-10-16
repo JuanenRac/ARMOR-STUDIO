@@ -9,7 +9,7 @@ import { ApiError, notificationsStatus, notificationsTest, type NotificationsSta
 type Translate = (key: string) => string;
 type Props = { t: Translate; origin: string; isAdmin: boolean };
 
-const PLACES = ["webhook", "mqtt", "telegram", "homeassistant"] as const;
+const PLACES = ["webhook", "mqtt", "telegram", "ntfy", "homeassistant"] as const;
 
 const explain = (t: Translate, error: unknown): string => {
   const code = error instanceof ApiError ? error.code : "generic";
@@ -65,6 +65,8 @@ export function NotificationsPanel({ t, origin, isAdmin }: Props) {
           <p className="muted small">{t("nt_file")}</p>
           <h4 className="fw-flow-title">Telegram</h4>
           <p className="small">{t("nt_telegram_steps")}</p>
+          <h4 className="fw-flow-title">ntfy</h4>
+          <p className="small">{t("nt_ntfy_steps")}</p>
           <h4 className="fw-flow-title">Home Assistant</h4>
           <p className="small">{t("nt_ha_steps")}</p>
         </article>

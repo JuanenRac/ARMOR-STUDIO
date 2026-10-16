@@ -1,0 +1,5 @@
+.preflight-dialog { width: min(520px, 100%); }
+.pre-list { list-style: none; margin: .6rem 0; padding: 0; display: grid; gap: .35rem; max-height: 50vh; overflow-y: auto; }
+.pre-list li { display: grid; grid-template-columns: auto 1fr; gap: .5rem; padding: .4rem .6rem; border: 1px solid #285a66; border-radius: 8px; background: rgba(8, 24, 32, .6); font-size: .85rem; }
+.pre-list li.block { border-color: #974b55; background: rgba(60, 14, 20, .5); }
+.pre-ok { color: #5df0c4; font-weight: 600; }

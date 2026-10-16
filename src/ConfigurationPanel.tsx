@@ -19,11 +19,12 @@ type Props = {
   theme: string; themes: readonly string[]; setTheme: (value: string) => void;
   language: string; languages: readonly { code: string; name: string }[]; setLanguage: (value: string) => void;
   connection: string; savePreferences: () => void; exportSite: () => void;
-  operatorUnlocked: boolean; isAdmin: boolean;
+  operatorUnlocked: boolean; isAdmin: boolean; /** A viewer only looks: the tabs that change the installation are not offered. */ isViewer?: boolean;
   /** What the network node has found: the nodes to update are picked from it. */
   network?: NetworkOverview | null;
 };
 
+const VIEWER_TABS: readonly string[] = ["general", "users", "preferences"];
 const tabs: Tab[] = ["general", "users", "server", "services", "broker", "files", "installation", "firmware", "updates", "console", "notifications", "preferences"];
 
 /** Can the browser reach something at this address at all? (no-cors: only a network failure rejects, which is what a wrong scheme or port gives.) */
@@ -86,7 +87,7 @@ export function ConfigurationPanel(props: Props) {
   return <section className="configuration">
     <div className="panel-heading"><MenuTitle kind="configuration"><p className="eyebrow">{t("systemConfiguration")}</p><h2>{t("configuration")}</h2><p className="muted">{t("configurationHelp")}</p></MenuTitle></div>
     <div className="config-tabs" role="tablist" aria-label={t("configuration")} data-tour="config-tabs">
-      {tabs.map(item => <button key={item} data-tour={`tab-${item}`} className={tab === item ? "active" : ""} role="tab" aria-selected={tab === item} onClick={() => setTab(item)}>{tabLabel(item)}</button>)}
+      {tabs.filter(item => !props.isViewer || VIEWER_TABS.includes(item)).map(item => <button key={item} data-tour={`tab-${item}`} className={tab === item ? "active" : ""} role="tab" aria-selected={tab === item} onClick={() => setTab(item)}>{tabLabel(item)}</button>)}
     </div>
     {tab === "general" && <div className="config-grid">
       <article className="stack-card"><h3>{t("serverOrigin")}</h3><label>{t("serverOrigin")}<input value={props.origin} onChange={event => props.setOrigin(event.target.value)} inputMode="url" /></label><OriginCheck t={t} origin={props.origin} setOrigin={props.setOrigin} /><small>{props.connection}</small><p className={`operator-session ${props.operatorUnlocked ? "ready" : ""}`}>{props.operatorUnlocked ? t("studioAccessActive") : t("studioAccessWaiting")}</p><small>{t("studioAccessNotice")}</small><button onClick={props.savePreferences}>{t("savePreferences")}</button><button onClick={props.exportSite}>{t("exportSite")}</button></article>

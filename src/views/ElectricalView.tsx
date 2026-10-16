@@ -6,7 +6,7 @@
  */
 import { askConfirm } from "../askConfirm";
 import { useMemo, useState } from "react";
-import { commandDevice, electricalElements, electricalHistory, type ElectricalElement } from "../api";
+import { listElectricalEnergy, commandDevice, electricalElements, electricalHistory, type ElectricalElement } from "../api";
 import { KindIcon } from "../deviceKinds";
 import { MenuLogo } from "../menuLogos";
 import { DesignerLink } from "../components/DesignerLink";
@@ -36,6 +36,23 @@ export function drawnNodeIds(design: Design): Set<string> {
   return ids;
 }
 
+/** The energy of every channel for the last week, day by day, as the server adds it up from the meters' counters (a counter that wraps or is reset is taken into account). */
+function ElectricalEnergyCard({ t, origin }: { t: Props["t"]; origin: string }) {
+  const energy = usePolled(() => listElectricalEnergy(origin, 7), 60_000, origin).data;
+  const rows = (energy?.channels ?? []).filter(item => item.days.some(day => day.kwh > 0));
+  if (rows.length === 0) return null;
+  const days = [...new Set(rows.flatMap(item => item.days.map(day => day.day)))].sort().slice(-7);
+  return <article className="solar-card el-energy">
+    <div className="solar-card-head"><h3>{t("elEnergyTitle")}</h3></div>
+    <p className="muted">{t("elEnergyHelp")}</p>
+    <div className="el-energy-table" role="table">
+      <div className="el-energy-row head" role="row"><span>{t("elLiveChannel")}</span>{days.map(day => <span key={day}>{day.slice(5)}</span>)}</div>
+      {rows.map(item => <div className="el-energy-row" role="row" key={`${item.node}/${item.channel}`}><span><b>{item.channel}</b> <small>{item.node}</small></span>
+        {days.map(day => { const found = item.days.find(entry => entry.day === day); return <span key={day} title={found?.resets ? t("elEnergyReset") : undefined}>{found ? `${found.kwh.toFixed(2)}${found.resets ? " ↺" : ""}` : "–"}</span>; })}</div>)}
+    </div>
+  </article>;
+}
+
 export function ElectricalView({ openDevices, t, origin, readings, unreachable, design, openDesigner, network = null, now }: Props) {
   const nodes = readings?.nodes ?? [];
   const drawn = useMemo(() => drawnNodeIds(design), [design]);
@@ -53,6 +70,7 @@ export function ElectricalView({ openDevices, t, origin, readings, unreachable, 
     </header>
     {unreachable && <p className="solar-notice bad">{t("elLiveUnreachable")}</p>}
     <DesignerLink title={t("elLiveRole")} text={t("elLiveRoleText")} button={t("elLiveOpenDesigner")} open={openDesigner} />
+    <ElectricalEnergyCard t={t} origin={origin} />
     <ElectricalDevices t={t} origin={origin} openDevices={openDevices} now={now} />
     <NodeFinder t={t} origin={origin} network={network} wantKind="electrical" knownIds={nodes.map(node => node.node_id)} />
     {nodes.length === 0 ? <div className="solar-empty"><MenuLogo kind="electrical" size={92} /><h3>{t("elLiveNone")}</h3><p>{t("elLiveNoneHelp")}</p></div>

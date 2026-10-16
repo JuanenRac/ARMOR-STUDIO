@@ -7,13 +7,14 @@ import { ConfirmHost } from "./askConfirm";
 import { useAlarmAnnouncer } from "./alerts/useAlarmAnnouncer";
 import { AlarmPopups } from "./alerts/AlarmPopups";
 import { Assistant } from "./assistant/Assistant";
+import { PreflightDialog } from "./preflight/PreflightDialog";
 import type { RouteContext } from "./alerts/route";
 import { getPrefs, openingView, setPrefs, usePrefs } from "./prefs";
 import { TourHost } from "./tour/TourHost";
 import { RichTooltips } from "./tour/RichTooltips";
 import { shouldAutoStart, startTour } from "./tour/tourStore";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
+import { acknowledgeAlarm, listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
 import { AboutDialog, ConfirmDialog, HelpDialog, PinDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
 import { DesignVersionsDialog } from "./DesignVersionsDialog";
@@ -108,6 +109,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const sessionUser = useSessionUser(origin);
   const isAdmin = sessionUser.user?.role === "admin";
   const [pendingMode, setPendingMode] = useState<"armed" | "disarmed" | null>(null);
+  const [checkOpen, setCheckOpen] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const [restored, setRestored] = useState(false);
   const savedLayout = useMemo(() => loadLayout(), []);
@@ -338,7 +340,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
       setTheme={value => { setTheme(value as Theme); savePreferences(origin, { theme: value }).catch(() => { /* kept locally at least */ }); }} language={language} languages={LANGUAGES}
       setLanguage={value => { setLanguage(value as LanguageCode); savePreferences(origin, { language: value }).catch(() => { /* kept locally at least */ }); }} isAdmin={isAdmin}
       connection={connection} network={networkPoll.data ?? null}
-      savePreferences={saveSettings} exportSite={exportSettings} operatorUnlocked={operatorUnlocked}
+      savePreferences={saveSettings} exportSite={exportSettings} operatorUnlocked={operatorUnlocked} isViewer={sessionUser.user?.role === "viewer"}
     />,
   };
 
@@ -346,7 +348,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   return <SessionUserContext.Provider value={sessionUser}><KnownNodesContext.Provider value={knownNodes}><StreamRenewContext.Provider value={renewStream}><div className="studio-frame"><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
     <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} alarmBadge={alarmsPending} t={t} />
     <section className="main-stage" data-tour="stage">
-      <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} t={t} />
+      <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={sessionUser.user?.role === "viewer"} checkPerimeter={() => setCheckOpen(true)} t={t} />
       {panels[view]}
     </section>
     {expandedCamera && <CameraFullscreen camera={expandedCamera} cameras={cameras} origin={origin} recording={recordingCameraIds.includes(expandedCamera.id)} t={t} close={() => setExpandedCameraId("")} fullScreen={fullScreen} step={stepExpanded} snapshot={() => void saveSnapshot(expandedCamera)} toggleRecording={() => void toggleRecording(expandedCamera)} invokePtz={command => commandPtz(expandedCamera, command)} />}
@@ -354,13 +356,14 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     <RichTooltips t={t} />
     {helpOpen && <HelpDialog initial={view} close={() => setHelpOpen(false)} t={t} />}
     <Assistant view={view} t={t} openHelp={() => setHelpOpen(true)} />
-    <AlarmPopups popups={announcer.popups} open={announcer.open} dismiss={announcer.dismiss} dismissAll={announcer.dismissAll} t={t} />
+    <AlarmPopups popups={announcer.popups} open={announcer.open} dismiss={announcer.dismiss} dismissAll={announcer.dismissAll} acknowledge={sessionUser.user?.role === "viewer" ? undefined : id => { void acknowledgeAlarm(origin, id).then(alarmPoll.reload, () => undefined); }} t={t} />
     {aboutOpen && <AboutDialog version={studioVersion} revision={state.revision} close={() => setAboutOpen(false)} t={t} />}
     {versionsOf && <DesignVersionsDialog kind={versionsOf} origin={origin} t={t} close={() => setVersionsOf(null)}
       draft={versionsOf === "site" ? siteSync.draft : null} restoreDraft={siteSync.restoreDraft}
       restore={design => { if (versionsOf === "site") siteSync.restoreDocument(design); else if (versionsOf === "electrical") setElectrical(current => applyElectricalDoc(design, current)); else if (versionsOf === "alarm") setAlarmDesign(current => applyAlarmDoc(design, current)); else setNetworkDesign(current => applyNetworkDoc(design, current)); }} />}
     {pendingMode === "disarmed" && <PinDialog title={t("disarmSystem")} text={t("confirmDisarm")} confirmLabel={t("disarmSystem")} confirm={pin => void changeMode("disarmed", pin)} cancel={() => setPendingMode(null)} t={t} />}
-    {pendingMode === "armed" && <ConfirmDialog title={t("armSystem")} text={t("confirmArm")} confirmLabel={t("armSystem")} confirm={() => void changeMode("armed")} cancel={() => setPendingMode(null)} t={t} />}
+    {checkOpen && <PreflightDialog origin={origin} names={{ cameras, devices }} infoOnly confirm={() => undefined} cancel={() => setCheckOpen(false)} t={t} />}
+    {pendingMode === "armed" && <PreflightDialog origin={origin} names={{ cameras, devices }} confirm={() => void changeMode("armed")} cancel={() => setPendingMode(null)} t={t} />}
   </main>
   <StatusBar serverName={serverName} synced={connectionState === "synced"} mode={state.mode}
     nodesOnline={nodes.filter(node => node.online && !node.stale).length} nodesTotal={nodes.length}

@@ -149,6 +149,13 @@ export async function setMediaProtected(origin: string, item: MediaItem, protect
   const response = await timedFetch(endpoint(origin, `/api/v1/media/${encodeURIComponent(item.cameraId)}/${kind}/${encodeURIComponent(item.file)}/protected`), { method: "PUT", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ protected: protect }) });
   if (!response.ok) throw new Error("Media protection returned " + response.status);
 }
+/** The signed proof of custody of one piece of evidence (its digest now and the audit lines about it), as the text of a JSON file to hand over with it. */
+export async function readMediaProof(origin: string, item: MediaItem): Promise<string> {
+  const kind = item.kind === "snapshot" ? "snapshots" : "recordings";
+  const response = await timedFetch(endpoint(origin, `/api/v1/media/${encodeURIComponent(item.cameraId)}/${kind}/${encodeURIComponent(item.file)}/proof`), { headers: { Accept: "application/json" }, credentials: "include" });
+  if (!response.ok) throw new Error("Media proof returned " + response.status);
+  return JSON.stringify(await response.json(), null, 2);
+}
 export async function deleteAllMedia(origin: string, kind: "snapshot" | "recording" | "all"): Promise<number> {
   const response = await timedFetch(endpoint(origin, "/api/v1/media"), { method: "DELETE", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ kind }) });
   if (!response.ok) throw new Error("Media delete returned " + response.status);
@@ -253,7 +260,7 @@ export async function closeStudioSession(origin: string): Promise<void> {
 
 // ---- Studio users -------------------------------------------------------------------------------------------------------------
 
-export type Role = "admin" | "operator" | "panel";
+export type Role = "admin" | "operator" | "panel" | "viewer";
 export type StudioUser = { id: string; username: string; role: Role };
 export type ListedUser = StudioUser & { createdAt: string; updatedAt: string; current: boolean; hasPin: boolean; hasDuress: boolean };
 /** An answer the server refused, with the stable `code` that says why. */
@@ -362,7 +369,7 @@ export async function firmwareUpload(origin: string, file: File): Promise<Firmwa
 
 // ---- Where the alarms are sent ----------------------------------------------------------------------------------------------------------------------
 
-export type NotificationsStatus = { webhook: boolean; mqtt: boolean; telegram: boolean; homeassistant: boolean; language: string };
+export type NotificationsStatus = { webhook: boolean; mqtt: boolean; telegram: boolean; ntfy: boolean; homeassistant: boolean; language: string };
 export type NotificationTestResult = { channel: string; ok: boolean; detail: string };
 export const notificationsStatus = (origin: string) => userCall<NotificationsStatus>(origin, "GET", "/api/v1/admin/notifications");
 export const notificationsTest = (origin: string, channel?: string) => userCall<{ results: NotificationTestResult[] }>(origin, "POST", "/api/v1/admin/notifications/test", channel ? { channel } : {});
@@ -407,6 +414,13 @@ export type Alarm = {
 };
 /** Where an alarm can come from: the same closed list as the server and the contract. */
 export type AlarmSourceType = "node" | "camera" | "device" | "solar" | "electrical" | "network" | "alarm";
+export type PreflightIssue = { kind: "node" | "panel" | "zone" | "camera" | "device" | "alarm"; level: "block" | "warn"; code: "node_offline" | "panel_silent" | "zone_open" | "camera_down" | "opening_open" | "device_offline" | "alarm_unseen"; id: string; detail?: string };
+export type Preflight = { ready: boolean; checked_at: string; blocking: number; warnings: number; issues: PreflightIssue[] };
+export async function readPreflight(origin: string): Promise<Preflight> {
+  const response = await fetch(`${origin}/api/v1/preflight`, { credentials: "include" });
+  if (!response.ok) throw new Error(`preflight ${response.status}`);
+  return response.json() as Promise<Preflight>;
+}
 export type Trigger = { type: "device"; device_id: string; field: string; equals: boolean | number; /** For a number: wait for it to go above (gt) or below (lt) `equals`; absent or eq waits for the value. */ op?: "eq" | "gt" | "lt" } | { type: "alarm"; severity?: Severity; source_type?: AlarmSourceType; source_id?: string } | { type: "mode"; mode: "armed" | "disarmed" };
 export type AutomationAction = { type: "device"; device_id: string; command: "on" | "off" | "toggle"; for_s?: number } | { type: "notify" };
 export type Automation = { id: string; name: string; enabled: boolean; trigger: Trigger; when_mode: "any" | "armed" | "disarmed"; actions: AutomationAction[]; created_at: string; last_run: string | null; runs: number };
@@ -500,6 +514,14 @@ export async function listElectricalReadings(origin: string): Promise<Electrical
   const response = await timedFetch(endpoint(origin, "/api/v1/electrical/readings"), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`Electrical readings returned ${response.status}`);
   return response.json() as Promise<ElectricalReadings>;
+}
+
+export type ElectricalEnergyDay = { day: string; kwh: number; resets: number };
+export type ElectricalEnergy = { channels: Array<{ node: string; channel: string; days: ElectricalEnergyDay[] }> };
+export async function listElectricalEnergy(origin: string, days = 7): Promise<ElectricalEnergy> {
+  const response = await timedFetch(endpoint(origin, `/api/v1/electrical/energy?days=${days}`), { headers: { Accept: "application/json" }, ...localSession });
+  if (!response.ok) throw new Error(`Electrical energy returned ${response.status}`);
+  return response.json() as Promise<ElectricalEnergy>;
 }
 
 // ---- the alarm nodes (ARMOR-ALARM) -------------------------------------------------------------------------------------------------------

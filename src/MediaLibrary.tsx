@@ -4,7 +4,7 @@
  */
 import { askConfirm } from "./askConfirm";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { deleteAllMedia, deleteMedia, listMedia, mediaUrl, setMediaProtected, type MediaItem } from "./api";
+import { deleteAllMedia, deleteMedia, listMedia, mediaUrl, setMediaProtected, readMediaProof, type MediaItem } from "./api";
 import { MenuTitle } from "./menuLogos";
 
 type Filter = "all" | "snapshot" | "recording";
@@ -38,6 +38,17 @@ export function MediaLibrary({ origin, cameras, t }: { origin: string; cameras: 
     if (!selected) return;
     try { await setMediaProtected(origin, selected, !selected.protected); await refresh(); } catch { setMessage(t("mediaFailed")); }
   };
+  const downloadProof = async () => {
+    if (!selected) return;
+    try {
+      const text = await readMediaProof(origin, selected);
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+      link.download = `${selected.file}.proof.json`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    } catch { setMessage(t("mediaFailed")); }
+  };
   const removeSelected = async () => {
     if (!selected || !(await askConfirm(t("confirmDeleteMedia"), t))) return;
     try { await deleteMedia(origin, selected); setMessage(t("mediaDeleted")); await refresh(); }
@@ -64,7 +75,7 @@ export function MediaLibrary({ origin, cameras, t }: { origin: string; cameras: 
         </button>)}
       </aside>
       <article className="media-preview">
-        {selected ? <><div className="preview-stage">{selected.kind === "snapshot" ? <img src={mediaUrl(origin, selected)} alt={`${t("snapshot")}: ${cameraName(selected.cameraId)}`} /> : <video key={selected.id} src={mediaUrl(origin, selected)} controls preload="metadata" />}</div><footer className="preview-footer"><div><span className={`media-kind ${selected.kind}`}>{selected.kind === "snapshot" ? "PHOTO" : "VIDEO"}</span><h3>{cameraName(selected.cameraId)}</h3><p>{t("createdAt")}: {new Date(selected.createdAt).toLocaleString()} · {t("fileSize")}: {size(selected.bytes)}</p></div><button onClick={() => void toggleProtection()} title={t("mediaProtectedNote")}>{selected.protected ? t("mediaUnprotect") : t("mediaProtect")}</button><button className="danger-button" onClick={() => void removeSelected()}>{t("deleteMedia")}</button></footer></> : <div className="media-empty preview-empty"><span>◉</span><p>{t("selectMedia")}</p></div>}
+        {selected ? <><div className="preview-stage">{selected.kind === "snapshot" ? <img src={mediaUrl(origin, selected)} alt={`${t("snapshot")}: ${cameraName(selected.cameraId)}`} /> : <video key={selected.id} src={mediaUrl(origin, selected)} controls preload="metadata" />}</div><footer className="preview-footer"><div><span className={`media-kind ${selected.kind}`}>{selected.kind === "snapshot" ? "PHOTO" : "VIDEO"}</span><h3>{cameraName(selected.cameraId)}</h3><p>{t("createdAt")}: {new Date(selected.createdAt).toLocaleString()} · {t("fileSize")}: {size(selected.bytes)}</p></div><button onClick={() => void toggleProtection()} title={t("mediaProtectedNote")}>{selected.protected ? t("mediaUnprotect") : t("mediaProtect")}</button><button onClick={() => void downloadProof()} title={t("mediaProofNote")}>{t("mediaProof")}</button><button className="danger-button" onClick={() => void removeSelected()}>{t("deleteMedia")}</button></footer></> : <div className="media-empty preview-empty"><span>◉</span><p>{t("selectMedia")}</p></div>}
       </article>
     </div>
   </section>;

@@ -19,3 +19,8 @@
 .el-device-values { display: flex; flex-wrap: wrap; gap: .3rem .8rem; font-variant-numeric: tabular-nums; font-size: .82rem; }
 .el-device-actions { display: flex; gap: .4rem; }
 @media (max-width: 760px) { .el-device { grid-template-columns: auto minmax(0, 1fr); } .el-device-values, .el-device-actions { grid-column: 1 / -1; } }
+
+.el-energy-table { display: grid; gap: .2rem; overflow-x: auto; }
+.el-energy-row { display: grid; grid-template-columns: minmax(8rem, 1.4fr) repeat(7, minmax(3.4rem, 1fr)); gap: .4rem; font-size: .78rem; padding: .2rem .3rem; border-bottom: 1px solid rgba(40, 90, 102, .4); }
+.el-energy-row.head { color: var(--t-muted, #8eb1bb); font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; }
+.el-energy-row span:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }

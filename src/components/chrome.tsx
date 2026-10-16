@@ -48,19 +48,20 @@ export function Sidebar({ view, setView, sidebarOpen, toggle, alarmBadge, t }: {
   </aside>;
 }
 
-export function TopBar({ view, revision, mode, demo, siteStatus, fullScreen, isFullScreen, openAbout, openHelp, toggleMode, t }: {
-  view: View; revision: number; mode: "armed" | "disarmed"; demo: boolean; /** Whether the design is kept on the server. */ siteStatus: "idle" | "saved" | "saving" | "offline"; fullScreen: () => void; /** True while the page is fullscreen: the same button then leaves it. */ isFullScreen: boolean; openAbout: () => void; openHelp: () => void; /** Arm when disarmed, disarm when armed (after asking). */ toggleMode: () => void; t: Translate;
+export function TopBar({ view, revision, mode, demo, siteStatus, fullScreen, isFullScreen, openAbout, openHelp, toggleMode, readOnly = false, checkPerimeter, t }: {
+  view: View; revision: number; mode: "armed" | "disarmed"; demo: boolean; /** Whether the design is kept on the server. */ siteStatus: "idle" | "saved" | "saving" | "offline"; fullScreen: () => void; /** True while the page is fullscreen: the same button then leaves it. */ isFullScreen: boolean; openAbout: () => void; openHelp: () => void; /** Arm when disarmed, disarm when armed (after asking). */ toggleMode: () => void; /** A viewer only looks: the arm button is off. */ readOnly?: boolean; /** Look at what would stop the perimeter from being ready, without arming. */ checkPerimeter?: () => void; t: Translate;
 }) {
   return <header className="topbar">
     <div className="top-left"><span className="top-art" aria-hidden="true"><TourArt art={ART_OF_VIEW[view] ?? "menu"} size={64} /></span><div><p className="eyebrow">AUTONOMOUS RADAR &amp; MULTIMODAL OBSERVATION RANGE</p><h1>{t(view)}</h1></div></div>
     <div className="top-status">
       {demo && <span className="demo-badge" title={t("offlineDemo")}>{t("offlineDemo")}</span>}
       <button className={`icon-button ${isFullScreen ? "active" : ""}`} title={isFullScreen ? t("exitFullscreen") : t("fullscreen")} aria-label={isFullScreen ? t("exitFullscreen") : t("fullscreen")} aria-pressed={isFullScreen} onClick={fullScreen}>{isFullScreen ? "🗗" : "⛶"}</button>
+      {checkPerimeter && <button className="icon-button" title={t("pre_check")} aria-label={t("pre_check")} onClick={checkPerimeter}>✔</button>}
       <button className="icon-button help-button" data-tour="help" title={t("helpButton")} aria-label={t("helpButton")} onClick={openHelp}>?</button>
       <button className="icon-button about-button" title={t("about")} onClick={openAbout}>i</button>
       {siteStatus !== "idle" && <span className={`site-sync ${siteStatus}`} title={t(`siteSync_${siteStatus}`)}>{siteStatus === "saved" ? "☁✓" : siteStatus === "saving" ? "☁…" : "☁!"}</span>}
       <span>REV {revision}</span>
-      <button data-tour="arm" className={`mode-button ${mode}`} onClick={toggleMode} disabled={demo} title={mode === "armed" ? t("disarmSystem") : t("armSystem")} aria-label={mode === "armed" ? t("disarmSystem") : t("armSystem")}>{mode === "armed" ? t("armed") : t("disarmed")}</button>
+      <button data-tour="arm" className={`mode-button ${mode}`} onClick={toggleMode} disabled={demo || readOnly} title={mode === "armed" ? t("disarmSystem") : t("armSystem")} aria-label={mode === "armed" ? t("disarmSystem") : t("armSystem")}>{mode === "armed" ? t("armed") : t("disarmed")}</button>
     </div>
   </header>;
 }

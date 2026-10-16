@@ -334,5 +334,8 @@ export const hintsPt: Record<string, string> = {
  "adm_adopt_go": "Cria a conta e, com o início de sessão do painel do nó, escreve as definições do broker no nó e reinicia-o.",
  "adm_adopt_user": "O utilizador administrador do painel web do próprio nó. Usa-se uma vez e nunca se guarda.",
  "adm_adopt_password": "A palavra-passe do painel web do próprio nó. Usa-se uma vez e nunca se guarda; deixe vazio para escrever você a conta no nó.",
- "adm_adopt_broker": "O endereço que o nó usará para chegar ao broker: tem de ser alcançável a partir do nó, por isso use o endereço da máquina na rede."
+ "adm_adopt_broker": "O endereço que o nó usará para chegar ao broker: tem de ser alcançável a partir do nó, por isso use o endereço da máquina na rede.",
+ "pre_check": "Mostra o que impediria o perímetro de estar pronto (nós, centrais, zonas, câmaras, portas e janelas, alarmes por ver) sem armar nada.",
+ "mediaProof": "Descarrega um ficheiro assinado pelo servidor com a impressão digital desta prova e cada linha de auditoria sobre ela, para entregar com ela.",
+ "th_value": "O valor que a leitura deve ultrapassar ou ficar abaixo para a regra começar."
 };

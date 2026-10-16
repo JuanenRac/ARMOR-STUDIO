@@ -9,7 +9,7 @@ import { ApiError, changeAccount, clearUserPin, createUser, deleteUser, listUser
 import { SessionUserContext } from "./sessionContext";
 
 type Props = { t: (key: string) => string; origin: string };
-const ROLES: readonly Role[] = ["admin", "operator", "panel"];
+const ROLES: readonly Role[] = ["admin", "operator", "viewer", "panel"];
 
 export function UsersPanel({ t, origin }: Props) {
   // Who is signed in comes from the one answer Studio keeps up to date (it asks again by itself), never from a question of this panel's own.
@@ -88,7 +88,7 @@ export function UsersPanel({ t, origin }: Props) {
     if (!(await askConfirm(`${t("confirmDeleteUser")}\n\n${user.username}`, t))) return;
     try { await deleteUser(origin, user.id); say(t("userDeleted")); await reload(); } catch (error) { explain(error); }
   };
-  const roleName = (role: Role) => t(role === "admin" ? "roleAdmin" : role === "panel" ? "rolePanel" : "roleOperator");
+  const roleName = (role: Role) => t(role === "admin" ? "roleAdmin" : role === "panel" ? "rolePanel" : role === "viewer" ? "roleViewer" : "roleOperator");
   const day = (iso: string) => { const date = new Date(iso); return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString(); };
   const rule = `${t("passwordMinimum")} ${minimum} ${t("charactersWord")}.`;
 
@@ -127,6 +127,7 @@ export function UsersPanel({ t, origin }: Props) {
                       <label>{t("userName")}<input value={draft.username} maxLength={40} onChange={event => setDraft({ ...draft, username: event.target.value })} /></label>
                       <label>{t("newPassword")}<input type="password" autoComplete="new-password" placeholder={t("keepPassword")} value={draft.password} onChange={event => setDraft({ ...draft, password: event.target.value })} /></label>
                       <label>{t("role")}<select value={draft.role} onChange={event => setDraft({ ...draft, role: event.target.value as Role })}>{ROLES.map(role => <option key={role} value={role}>{roleName(role)}</option>)}</select></label>
+                      <p className="muted small">{t(`roleHelp_${draft.role}`)}</p>
                       <label>{t("pinValue")}<input type="password" inputMode="numeric" autoComplete="off" maxLength={10} placeholder={user.hasPin ? t("keepPassword") : ""} value={draft.pin} onChange={event => setDraft({ ...draft, pin: digits(event.target.value) })} /></label>
                       <label>{t("duressValue")}<input type="password" inputMode="numeric" autoComplete="off" maxLength={10} value={draft.duress} onChange={event => setDraft({ ...draft, duress: digits(event.target.value) })} /></label>
                       <div className="users-actions"><button className="primary" onClick={() => void saveEdit(user)}>{t("saveUser")}</button><button onClick={() => setEditing("")}>{t("cancel")}</button></div>
