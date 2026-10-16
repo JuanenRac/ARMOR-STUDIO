@@ -92,7 +92,7 @@ const readHelpLevel = (): HelpLevel => { try { const value = window.localStorage
 const pageOf = (id: string): ArtId => (id === "start" ? "welcome" : id === "tips" ? "tips" : ART_OF_VIEW[id as View] ?? "menu");
 
 /** The Help window, laid out like a book: the menus as chapters on the left, a picture and the text of the chosen one on the right at the level of detail the person picks (simple, medium, advanced or technical), and arrows to turn the page. It is wide and short so that it fits a 1080-pixel screen. */
-export function HelpDialog({ close, initial, t }: { close: () => void; initial?: string; t: Translate }) {
+export function HelpDialog({ close, initial, t, language }: { close: () => void; initial?: string; t: Translate; language?: string }) {
   const start = initial ? HELP_SECTIONS.findIndex(section => section.id === initial) : 0;
   const [index, setIndex] = useState(start >= 0 ? start : 0);
   const [level, setLevel] = useState<HelpLevel>(readHelpLevel);
@@ -118,6 +118,7 @@ export function HelpDialog({ close, initial, t }: { close: () => void; initial?:
         <article className={`help-page turn-${turn}`} key={section.id} tabIndex={0}>
           <div className="help-art"><TourArt art={pageOf(section.id)} size={150} /><small>{t(`hb_${level}_h`)}</small></div>
           <div className="help-text"><h3>{t(`help_s_${section.id}`)}</h3>
+            {language && <img className="help-shot" key={`${language}/${section.id}`} src={`./help/${language}/${section.id}.jpg`} alt={t(`help_s_${section.id}`)} loading="lazy" onError={event => { event.currentTarget.style.display = "none"; }} />}
             {shown.map((paragraph, number) => <p key={number} className={number === 0 ? "lead" : ""}>{paragraph}</p>)}
             {level !== "technical" && level !== "advanced" && paragraphs.length > shown.length && <p className="muted help-more">{t("hb_more")}</p>}
             {level === "technical" && tech && tech.routes.length > 0 && <div className="help-tech"><strong>{t("hb_tech_title")}</strong>
