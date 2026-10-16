@@ -1,11 +1,15 @@
-.assistant, .assistant-call { position: fixed; z-index: 700; display: flex; align-items: flex-start; gap: .5rem; transition: left .6s cubic-bezier(.3, .9, .3, 1), top .6s cubic-bezier(.3, .9, .3, 1); pointer-events: none; }
+.assistant, .assistant-call { position: fixed; z-index: 700; display: block; transition: left .6s cubic-bezier(.3, .9, .3, 1), top .6s cubic-bezier(.3, .9, .3, 1); pointer-events: none; }
 .assistant > *, .assistant-call { pointer-events: auto; }
-.assistant.corner, .assistant-call.corner { left: auto; right: 18px; top: auto; bottom: 52px; flex-direction: row-reverse; }
 .assistant-call { padding: 0; border: 0; background: none; cursor: pointer; opacity: .85; } .assistant-call:hover { opacity: 1; }
-.assistant-mascot { padding: 0; border: 0; background: none; cursor: pointer; animation: mascot-float 3.2s ease-in-out infinite; filter: drop-shadow(0 0 12px rgba(0, 229, 255, .45)); }
-.assistant-bubble { position: relative; width: min(340px, 70vw); padding: .7rem .85rem; border: 1px solid #2f8ea0; border-radius: 14px; background: linear-gradient(155deg, rgba(14, 44, 56, .97), rgba(7, 22, 30, .97)); box-shadow: 0 10px 30px rgba(0, 0, 0, .5); animation: bubble-in .3s ease both; }
-.assistant-bubble::before { content: ""; position: absolute; left: -7px; top: 22px; width: 12px; height: 12px; transform: rotate(45deg); background: #0f2f3b; border-left: 1px solid #2f8ea0; border-bottom: 1px solid #2f8ea0; }
-.assistant.corner .assistant-bubble::before { left: auto; right: -7px; transform: rotate(225deg); }
+.assistant-mascot { display: block; width: 100%; height: 100%; padding: 0; user-select: none; -webkit-user-drag: none; border: 0; background: none; cursor: pointer; animation: mascot-float 3.2s ease-in-out infinite; filter: drop-shadow(0 0 12px rgba(0, 229, 255, .45)); }
+.assistant-bubble { position: absolute; width: min(340px, 70vw); padding: .7rem .85rem; border: 1px solid #2f8ea0; border-radius: 14px; background: linear-gradient(155deg, rgba(14, 44, 56, .97), rgba(7, 22, 30, .97)); box-shadow: 0 10px 30px rgba(0, 0, 0, .5); animation: bubble-in .3s ease both; }
+.assistant-bubble::before { content: ""; position: absolute; width: 12px; height: 12px; transform: rotate(45deg); background: #0f2f3b; }
+/* the tip of the bubble points at the mascot from the side it opened on (--arrow: where along that edge); on a diagonal the bubble touches the mascot's corner and has no tip */
+.assistant-bubble.side-right::before { left: -7px; top: var(--arrow, 22px); border-left: 1px solid #2f8ea0; border-bottom: 1px solid #2f8ea0; }
+.assistant-bubble.side-left::before { right: -7px; top: var(--arrow, 22px); border-top: 1px solid #2f8ea0; border-right: 1px solid #2f8ea0; }
+.assistant-bubble.side-below::before { top: -7px; left: var(--arrow, 22px); border-top: 1px solid #2f8ea0; border-left: 1px solid #2f8ea0; }
+.assistant-bubble.side-above::before { bottom: -7px; left: var(--arrow, 22px); border-bottom: 1px solid #2f8ea0; border-right: 1px solid #2f8ea0; }
+.assistant-bubble.side-below-right::before, .assistant-bubble.side-below-left::before, .assistant-bubble.side-above-right::before, .assistant-bubble.side-above-left::before { display: none; }
 .assistant-bubble strong { display: block; margin-bottom: .25rem; font-size: .9rem; color: #e9ffff; }
 .assistant-bubble p { margin: 0 0 .6rem; font-size: .8rem; line-height: 1.5; color: #c3dde3; max-height: 9.5rem; overflow-y: auto; }
 .assistant-actions { display: flex; flex-wrap: wrap; gap: .35rem; } .assistant-actions button { padding: .28rem .6rem; font-size: .72rem; }
@@ -18,12 +22,11 @@
 @keyframes mascot-blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
 @keyframes mascot-talk { to { transform: scaleY(1.8); } }
 @keyframes mascot-pulse { 50% { opacity: .35; } }
-@keyframes bubble-in { from { opacity: 0; transform: translateX(-10px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes bubble-in { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
 html[data-motion="off"] .assistant *, html[data-motion="off"] .assistant-call *, html[data-motion="reduced"] .assistant *, html[data-motion="reduced"] .assistant-call * { animation: none !important; }
 html[data-motion="off"] .assistant, html[data-motion="reduced"] .assistant { transition: none; }
-@media (max-width: 800px) { .assistant:not(.corner) { left: 8px !important; top: auto !important; bottom: 50px; } }
 
-.assistant-bubble { max-height: min(80vh, 560px); overflow-y: auto; }
+.assistant-bubble { max-height: min(calc(100vh - 60px), 560px); overflow-y: auto; }
 .assistant-asked { display: block; margin-bottom: .3rem; color: #7fb4c0; font-style: italic; }
 .assistant-chips { display: flex; flex-wrap: wrap; gap: .3rem; margin: 0 0 .5rem; align-items: center; }
 .assistant-chips small { flex-basis: 100%; color: #7fb4c0; }
@@ -33,9 +36,7 @@ html[data-motion="off"] .assistant, html[data-motion="reduced"] .assistant { tra
 .assistant-ask button { padding: .3rem .7rem; font-size: .75rem; }
 
 /* put where the person wants it: no flying, the bubble opens to the side that has room */
-.assistant.free, .assistant-call.free { right: auto; bottom: auto; flex-direction: row; }
-.assistant.free.flip, .assistant-call.free.flip { flex-direction: row-reverse; }
-.assistant.flip:not(.corner) .assistant-bubble::before { left: auto; right: -7px; transform: rotate(225deg); }
+.assistant.free, .assistant-call.free { transition: none; }
 .assistant.dragging { transition: none; }
 .assistant.dragging .assistant-mascot { cursor: grabbing; animation: none; }
 .assistant:not(.pinned) .assistant-mascot { cursor: grab; touch-action: none; }

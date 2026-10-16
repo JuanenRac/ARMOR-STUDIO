@@ -11,6 +11,7 @@ import { HELP_SECTIONS } from "../helpText";
 import { setPrefs, usePrefs } from "../prefs";
 import { startTour, useActiveTour } from "../tour/tourStore";
 import { menuTourId } from "../tour/menuTours";
+import { placeBubble, type Side } from "./placement";
 import { answer as answerQuestion, suggestions, type Answer } from "./engine";
 import type { Topic } from "./knowledge";
 import "./assistant.css";
@@ -43,6 +44,9 @@ export function Assistant({ view, t, language, go, openHelp }: { view: View; t: 
   const [live, setLive] = useState<{ left: number; top: number } | null>(null);   // while it is being dragged
   const drag = useRef<{ x: number; y: number; left: number; top: number; moved: boolean } | null>(null);
   const dragged = useRef(false);
+  const bubbleRef = useRef<HTMLDivElement>(null);
+  const [bubbleAt, setBubbleAt] = useState<{ side: Side; dx: number; dy: number; arrow: number } | null>(null);
+  const [, setViewportTick] = useState(0);   // the window changed size: the bubble is placed again
   const hidden = away.has(view);
   const free = prefs.assistantX !== null && prefs.assistantY !== null;
 
@@ -63,7 +67,10 @@ export function Assistant({ view, t, language, go, openHelp }: { view: View; t: 
     return () => { window.removeEventListener("resize", place); window.clearTimeout(timer); };
   }, [view, free, prefs.assistantPinned]);
 
+  useEffect(() => { const again = () => setViewportTick(value => value + 1); window.addEventListener("resize", again); return () => window.removeEventListener("resize", again); }, []);
+
   const scale = SCALE[prefs.assistantSize];
+  const mascotWidth = Math.round(56 * scale), mascotHeight = Math.round(63 * scale);
   const maxLeft = () => Math.max(0, window.innerWidth - Math.round(70 * scale));
   const maxTop = () => Math.max(0, window.innerHeight - Math.round(90 * scale));
   const place = (left: number, top: number) => { setPrefs({ assistantX: clamp(left, 0, maxLeft()) / window.innerWidth, assistantY: clamp(top, 0, maxTop()) / window.innerHeight }); };
@@ -77,7 +84,7 @@ export function Assistant({ view, t, language, go, openHelp }: { view: View; t: 
     const d = drag.current;
     if (!d) return;
     const dx = event.clientX - d.x, dy = event.clientY - d.y;
-    if (!d.moved && Math.hypot(dx, dy) < 5) return;
+    if (!d.moved && Math.hypot(dx, dy) < 3) return;
     d.moved = true;
     setLive({ left: clamp(d.left + dx, 0, maxLeft()), top: clamp(d.top + dy, 0, maxTop()) });
   };
@@ -97,16 +104,35 @@ export function Assistant({ view, t, language, go, openHelp }: { view: View; t: 
     place(box.left + step[0]!, box.top + step[1]!);
   };
 
+  const kept = free ? { left: clamp(prefs.assistantX! * window.innerWidth, 0, maxLeft()), top: clamp(prefs.assistantY! * window.innerHeight, 0, maxTop()) } : null;
+  const corner = { left: Math.max(0, window.innerWidth - 18 - mascotWidth), top: Math.max(0, window.innerHeight - 52 - mascotHeight) };   // where it rests when it has no menu to fly to
+  const where = live ?? kept ?? spot ?? corner;
+
+  // the bubble opens where it fits: right, left, below, above or on a diagonal of the mascot, never outside the window (it is measured, then placed)
+  useLayoutEffect(() => {
+    const bubble = bubbleRef.current;
+    if (!open || !bubble) { setBubbleAt(null); return; }
+    const measure = () => {
+      const size = { width: bubble.offsetWidth, height: bubble.offsetHeight };
+      const mascot = { left: where.left, top: where.top, width: mascotWidth, height: mascotHeight };
+      const placed = placeBubble(mascot, size, { width: window.innerWidth, height: window.innerHeight });
+      const along = placed.side === "above" || placed.side === "below" ? mascotWidth / 2 - placed.dx : mascotHeight / 2 - placed.dy;   // the tip of the bubble points at the middle of the mascot
+      const length = placed.side === "above" || placed.side === "below" ? size.width : size.height;
+      setBubbleAt(current => current && current.side === placed.side && current.dx === placed.dx && current.dy === placed.dy ? current : { ...placed, arrow: clamp(along - 6, 12, Math.max(12, length - 24)) });
+    };
+    measure();
+    const watcher = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    watcher?.observe(bubble);
+    return () => watcher?.disconnect();
+  });
+
   if (!prefs.assistant || tour) return null;
   const section = HELP_SECTIONS.find(item => item.id === view);
   const paragraphs = section ? t(`help_b_${view}`).split("\n\n").filter(item => item.trim()) : [];
   const text = paragraphs.length > 0 ? paragraphs[tip % paragraphs.length] : t("asst_hello");
   const short = text.length > 330 ? `${text.slice(0, 327)}…` : text;
-  const kept = free ? { left: clamp(prefs.assistantX! * window.innerWidth, 0, maxLeft()), top: clamp(prefs.assistantY! * window.innerHeight, 0, maxTop()) } : null;
-  const where = live ?? kept ?? spot;
-  const style = where ? { left: where.left, top: where.top } : undefined;
-  const flip = where ? where.left > window.innerWidth * 0.55 : false;   // on the right half the bubble opens to the left of the mascot
-  const classes = `${where ? "" : "corner"} ${free || live ? "free" : ""} ${live ? "dragging" : ""} ${flip ? "flip" : ""} ${prefs.assistantPinned ? "pinned" : ""}`;
+  const style = { left: where.left, top: where.top, width: mascotWidth, height: mascotHeight };
+  const classes = `${free || live ? "free" : ""} ${live ? "dragging" : ""} ${prefs.assistantPinned ? "pinned" : ""}`;
   const ask = (text: string) => {
     const asked = text.trim();
     if (!asked) return;
@@ -127,7 +153,7 @@ export function Assistant({ view, t, language, go, openHelp }: { view: View; t: 
     <button type="button" className="assistant-mascot" onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag} onKeyDown={arrow}
       onClick={() => { if (dragged.current) { dragged.current = false; return; } setOpen(value => !value); }}
       title={prefs.assistantPinned ? (open ? t("asst_quiet") : t("asst_call")) : `${open ? t("asst_quiet") : t("asst_call")} · ${t("asst_drag_hint")}`} aria-expanded={open}><Mascot talking={open} scale={scale} /></button>
-    {open && <div className="assistant-bubble" role="status">
+    {open && <div ref={bubbleRef} className={`assistant-bubble side-${bubbleAt?.side ?? "right"}`} role="status" style={bubbleAt ? { left: bubbleAt.dx, top: bubbleAt.dy, "--arrow": `${bubbleAt.arrow}px` } as React.CSSProperties : { visibility: "hidden" }}>
       {reply ? <>
         <small className="assistant-asked">{t("asst_you")}: {reply.asked}</small>
         {reply.answer.kind === "topic" && <strong>{t(`help_s_${reply.answer.topic.view}`) !== `help_s_${reply.answer.topic.view}` ? t(`help_s_${reply.answer.topic.view}`) : t("asst_name")}</strong>}
