@@ -9,3 +9,6 @@
 .sm-device.battery .sm-device-badge, .sm-device.offline .sm-device-badge { stroke: #ffb020; }
 .sm-target { stroke: #060d13; stroke-width: 1.5; fill: #00e5ff; } .sm-target.review { fill: #ffb020; } .sm-target.high { fill: #ff4d5e; } .sm-target.ignored { fill: #8b9ba1; } .sm-target-halo { fill: rgba(255, 255, 255, .07); animation: sm-pulse 1.6s ease-out infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes sm-pulse { 0% { transform: scale(.6); opacity: .9; } 100% { transform: scale(1.6); opacity: 0; } } @media (prefers-reduced-motion: reduce) { .sm-device-halo, .sm-target-halo { animation: none !important; } }
+
+.sm-alarm-ring { fill: none; stroke: #ff4d5e; stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: sm-pulse 1.2s ease-out infinite; } .sm-alarm-dot { fill: #ff4d5e; stroke: #060d13; stroke-width: 1.5; }
+.sm-alarm.high .sm-alarm-ring, .sm-alarm.high .sm-alarm-dot { stroke: #ff9f43; fill-opacity: 1; } .sm-alarm.high .sm-alarm-dot { fill: #ff9f43; } .sm-alarm.warning .sm-alarm-ring { stroke: #f6d04d; } .sm-alarm.warning .sm-alarm-dot { fill: #f6d04d; }

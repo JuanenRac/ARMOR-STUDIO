@@ -15,7 +15,9 @@ Deixar o ponteiro sobre qualquer botão, campo ou entrada do menu mostra uma bre
 
 «Precisa de atenção» lista as coisas que pedem alguém: alarmes por ver e nós com problemas; cada um abre o seu ecrã. «Atividade recente» são os últimos eventos, do mais recente para o mais antigo. As «Ações rápidas» saltam para as câmaras, o desenhador do local ou o formulário para adicionar um dispositivo.
 
-O pequeno mapa em direto mostra o local com os alvos dos radares à medida que se movem. Se o servidor não puder ser alcançado, o ecrã di-lo e mostra dados de demonstração, claramente assinalados como tal.`],
+O pequeno mapa em direto mostra o local com os alvos dos radares à medida que se movem. Se o servidor não puder ser alcançado, o ecrã di-lo e mostra dados de demonstração, claramente assinalados como tal.
+
+Alarmes no mapa: um alarme que ninguém reconheceu pulsa no mapa em direto onde está desenhada a sua câmara, o seu dispositivo ou o seu radar (vermelho se crítico, laranja se alto, amarelo para um aviso), para ver onde está sem abrir a lista.`],
   weather: ["Meteorologia", `A previsão do seu local: agora, as próximas 48 horas e os próximos dias, com avisos da previsão e a qualidade do ar.
 
 Da primeira vez, ativa a meteorologia e escolhe o local: procure uma localidade, ou escreva você mesmo a latitude e a longitude. O local fica guardado neste servidor. «Mudar de local» escolhe outro; «Desativar e esquecer o local» remove-o.

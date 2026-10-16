@@ -72,7 +72,7 @@ export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras
     <div className="ov-main">
       <article className="ov-card ov-map">
         <header><h3>{t("liveMap")}</h3><button className="link-button" onClick={() => setView("siteDesigner")}>{t("qaDesigner")} ▸</button></header>
-        <SiteMap model={model} dimensions={dimensions} devices={devices} nodes={nodes} onDevice={onDevice} empty={t("liveMapEmpty")} />
+        <SiteMap model={model} dimensions={dimensions} devices={devices} nodes={nodes} alarms={alarms?.active ?? []} onDevice={onDevice} empty={t("liveMapEmpty")} />
       </article>
       <div className="ov-side">
         <article className="ov-card">

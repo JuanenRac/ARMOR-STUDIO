@@ -4,7 +4,8 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { StudioDevice } from "../api";
+import type { Alarm, StudioDevice } from "../api";
+import { alarmPlaces } from "./alarmPlaces";
 import { deviceProblem, KIND_COLOUR, kindGlyph } from "../deviceKinds";
 import { bounds, offsetPolygon } from "../designer/geometry";
 import { fitTransform, headingOf, radarView, sectorPoints, toMetres, type Point } from "../designer/model";
@@ -14,9 +15,9 @@ import type { Dimensions } from "../domain";
 import type { NodeState } from "../types";
 import "./site-map.css";
 
-type Props = { model: SiteModel; dimensions: Dimensions; devices: StudioDevice[]; nodes: NodeState[]; onDevice?: (id: string) => void; empty: string };
+type Props = { model: SiteModel; dimensions: Dimensions; devices: StudioDevice[]; nodes: NodeState[]; /** Alarms waiting for a person: each one that can be placed pulses where it is. */ alarms?: readonly Alarm[]; onDevice?: (id: string) => void; empty: string };
 
-export function SiteMap({ model, dimensions, devices, nodes, onDevice, empty }: Props) {
+export function SiteMap({ model, dimensions, devices, nodes, alarms = [], onDevice, empty }: Props) {
   const box = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 640, height: 360 });
   useEffect(() => {
@@ -41,6 +42,7 @@ export function SiteMap({ model, dimensions, devices, nodes, onDevice, empty }: 
     const cos = Math.cos(rotation * Math.PI / 180), sin = Math.sin(rotation * Math.PI / 180);
     return [[-w / 2, -d / 2], [w / 2, -d / 2], [w / 2, d / 2], [-w / 2, d / 2]].map(([dx, dy]) => ({ x: x + dx * cos - dy * sin, y: y + dx * sin + dy * cos }));
   };
+  const marked = useMemo(() => alarmPlaces(alarms, model, dimensions), [alarms, model, dimensions]);
   const hasDesign = model.terrain.points.length > 2 || model.buildings.length > 0;
 
   return <div ref={box} className="site-map">
@@ -63,6 +65,7 @@ export function SiteMap({ model, dimensions, devices, nodes, onDevice, empty }: 
           <title>{device.name}</title>
         </g>;
       })}
+      {marked.map(place => { const c = S(place.point); return <g key={place.id} className={`sm-alarm ${place.severity}`}><circle cx={c.x} cy={c.y} r="20" className="sm-alarm-ring" /><circle cx={c.x} cy={c.y} r="6" className="sm-alarm-dot" /><title>{place.code}</title></g>; })}
       {placed.map(target => { const c = S(target.point); return <g key={target.key}><circle cx={c.x} cy={c.y} r="14" className="sm-target-halo" /><circle cx={c.x} cy={c.y} r="5" className={`sm-target ${target.counted ? target.alert : "ignored"}`} /></g>; })}
     </svg>
   </div>;
