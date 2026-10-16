@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { describeStep, fill, FirmwarePanel, firmwareNodes } from "./FirmwarePanel";
+import { describeStep, fill, FirmwarePanel, firmwareMemory, firmwareNodes } from "./FirmwarePanel";
 import { locales, requiredUiKeys, text } from "./i18n";
 import type { NetworkOverview } from "./networkModel";
 
@@ -35,6 +35,23 @@ describe("the node firmware screen", () => {
     expect(html).toContain("192.168.0.50");
     expect(html).not.toContain("pantalla");
     expect(html).toMatch(new RegExp(`<button class="primary" type="submit" disabled="">${text("en", "fw_start")}</button>`));
+  });
+
+  it("shows again what it was doing when it is opened again (an alarm may take the person to another menu in the middle of an update)", () => {
+    const render = () => renderToStaticMarkup(createElement(FirmwarePanel, { t: key => text("en", key), origin: "http://kept", isAdmin: true, network: found }));
+    render();   // the panel meets its server: what was kept for another one is forgotten
+    firmwareMemory.set("job", { id: "j1", kind: "radar", source: "github", state: "running", version: "0.6.6", targets: [] });
+    firmwareMemory.set("picked", new Set(["192.168.0.235"]));
+    firmwareMemory.set("user", "installer");
+    firmwareMemory.set("jobId", "j1");
+    const html = render();
+    expect(html).toContain(text("en", "fw_job_running"));
+    expect(html).toContain("0.6.6");
+    expect(html).toContain('value="installer"');
+    expect(html).not.toMatch(/type="password" value="[^"]/);   // the password is never kept
+    // another server: nothing of this one is shown
+    const other = renderToStaticMarkup(createElement(FirmwarePanel, { t: key => text("en", key), origin: "http://other", isAdmin: true, network: found }));
+    expect(other).not.toContain(text("en", "fw_job_running"));
   });
 
   it("is for administrators only", () => {

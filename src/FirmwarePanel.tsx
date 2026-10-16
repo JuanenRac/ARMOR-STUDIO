@@ -73,28 +73,47 @@ function Bar({ percent, state }: { percent: number; state?: "done" | "failed" | 
   return <div className={`fw-bar ${state ?? "working"}`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={value}><i style={{ width: `${value}%` }} /></div>;
 }
 
+/**
+ * What the panel was doing, kept outside the component: an alarm can take the person to another menu in the middle of an update and the panel is then closed, but the job goes on in the
+ * server. Coming back, the panel shows the same nodes, the same choices and the same bars, and goes on asking how the job stands. The password is never kept (it is only for the update).
+ */
+const KEPT = new Map<string, unknown>();
+/** For the tests: what the panel remembers. */
+export const firmwareMemory = KEPT;
+let keptOrigin = "";
+function useKept<T>(key: string, initial: T): [T, (value: T | ((current: T) => T)) => void] {
+  const [value, setValue] = useState<T>(() => (KEPT.has(key) ? KEPT.get(key) as T : initial));
+  const set = (next: T | ((current: T) => T)) => setValue(current => { const resolved = typeof next === "function" ? (next as (current: T) => T)(current) : next; KEPT.set(key, resolved); return resolved; });
+  return [value, set];
+}
+
 export function FirmwarePanel({ t, origin, isAdmin, network }: Props) {
-  const [kind, setKind] = useState<FirmwareKind>("radar");
-  const [picked, setPicked] = useState<ReadonlySet<string>>(new Set());
-  const [probes, setProbes] = useState<Record<string, FirmwareProbe>>({});
-  const [login, setLogin] = useState({ user: "admin", password: "" });
-  const [source, setSource] = useState<"github" | "file">("github");
-  const [file, setFile] = useState<File | null>(null);
-  const [release, setRelease] = useState<FirmwareRelease | null>(null);
+  if (keptOrigin !== origin) { KEPT.clear(); keptOrigin = origin; }   // another server: nothing of the other one is shown
+  const [kind, setKind] = useKept<FirmwareKind>("kind", "radar");
+  const [picked, setPicked] = useKept<ReadonlySet<string>>("picked", new Set());
+  const [probes, setProbes] = useKept<Record<string, FirmwareProbe>>("probes", {});
+  const [user, setUser] = useKept("user", "admin");
+  const [password, setPassword] = useState("");
+  const login = { user, password };
+  const setLogin = (next: { user: string; password: string }) => { setUser(next.user); setPassword(next.password); };
+  const [source, setSource] = useKept<"github" | "file">("source", "github");
+  const [file, setFile] = useKept<File | null>("file", null);
+  const [release, setRelease] = useKept<FirmwareRelease | null>("release", null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState<"" | "probe" | "release" | "file">("");
   const [confirming, setConfirming] = useState(false);
-  const [job, setJob] = useState<FirmwareJob | null>(null);
-  const jobId = useRef("");
+  const [job, setJob] = useKept<FirmwareJob | null>("job", null);
+  const jobId = useRef(String(KEPT.get("jobId") ?? ""));
 
-  const [manualIps, setManualIps] = useState<string[]>([]);
+  const [manualIps, setManualIps] = useKept<string[]>("manualIps", []);
   const [typedIp, setTypedIp] = useState("");
   // The network node only sees what is on its own network: a node can also be added by its address.
   const found = useMemo(() => [...firmwareNodes(network), ...manualIps.filter(ip => !firmwareNodes(network).some(node => node.ip === ip)).map(ip => ({ ip, online: true } as FoundNode))], [network, manualIps]);
   const candidates = useMemo(() => found.filter(node => !node.kind || node.kind === kind), [found, kind]);
   const running = job !== null && (job.state === "preparing" || job.state === "running");
 
-  useEffect(() => { setPicked(new Set()); setRelease(null); setMessage(""); }, [kind]);
+  const lastKind = useRef(kind);
+  useEffect(() => { if (lastKind.current === kind) return; lastKind.current = kind; setPicked(new Set()); setRelease(null); setMessage(""); }, [kind]);   // the first run is the panel opening again: what was picked stays
 
   // While a job runs, ask the server how it stands, twice a second.
   useEffect(() => {
@@ -125,7 +144,7 @@ export function FirmwarePanel({ t, origin, isAdmin, network }: Props) {
       if (source === "file" && file) { setBusy("file"); upload = await firmwareUpload(origin, file); }
       const targets = candidates.filter(node => picked.has(node.ip)).map(node => ({ address: node.ip, ...(node.nodeId ? { node_id: node.nodeId } : {}) }));
       const started = await firmwareStart(origin, { kind, source: source === "file" ? "upload" : "github", ...(upload ? { upload_id: upload.id } : {}), targets, panel_user: login.user.trim(), panel_password: login.password });
-      jobId.current = started.id;
+      jobId.current = started.id; KEPT.set("jobId", started.id);
       setJob(await firmwareJob(origin, started.id));
     } catch (error) { setMessage(explain(t, error)); } finally { setBusy(""); }
   };
