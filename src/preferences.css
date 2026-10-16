@@ -42,3 +42,12 @@
 .cap-number { display: grid; gap: 4px; margin: .5rem 0; }
 .cap-number input { max-width: 9rem; }
 .cap-recent { margin: 0; padding-left: 1.1rem; display: grid; gap: .3rem; }
+
+.iz-card { margin-top: 1rem; }
+.iz-picture { position: relative; width: min(100%, 640px); aspect-ratio: 16 / 9; background: #06141b; border: 1px solid #2f8ea0; border-radius: 8px; overflow: hidden; touch-action: none; user-select: none; }
+.iz-picture.drawable { cursor: crosshair; }
+.iz-picture img, .iz-blank { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+.iz-zone { position: absolute; border: 2px solid #ff6f79; background: rgba(255, 111, 121, .28); box-sizing: border-box; pointer-events: none; }
+.iz-zone.draft { border-style: dashed; background: rgba(255, 111, 121, .15); }
+.iz-list { margin: .5rem 0; padding-left: 1.1rem; display: grid; gap: .3rem; }
+.iz-list button { margin-left: .5rem; }

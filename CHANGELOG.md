@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here.
 
+## [0.7.9] - Zones of the picture to ignore
+
+- **Zones to ignore:** Configuration > Cameras shows, under the settings of a saved camera, its live picture with the zones that the observation service ignores drawn over it.
+- Dragging on the picture draws a new zone (a rectangle, in whichever direction you drag), and a click or a thin sliver is not a zone.
+- Each zone is listed with its place and size in per cent and can be removed on its own, or all of them at once, before saving.
+- At most sixteen zones per camera, and the server's answer to a wrong zone is told instead of being lost.
+- Everybody who may look sees the zones; only an administrator draws, removes and saves them.
+- What is ignored is only the movement detection: the live video, the photos and the recordings stay whole, as the text says.
+- A tree that waves, a road or a screen no longer raise alarms once its part of the picture is a zone.
+- **Help, tours and assistant:** the cameras section explains the zones in every language, and the assistant answers "a tree keeps setting off the alarm, how do I ignore that part of the picture" in each of them.
+- All the new texts exist in the eight languages.
+- Tests check how a zone is drawn from two corners (any direction, kept inside the picture, nothing for a click) and that every question of the dictionary still finds its task.
+
 ## [0.7.8] - Automatic capture, a movable assistant and the public connection in Network
 
 - **Automatic capture:** a new tab in Configuration sets what the server takes by itself when a camera sees something while the perimeter is armed.

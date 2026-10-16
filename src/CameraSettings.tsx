@@ -3,6 +3,7 @@
  * and the removal of one.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { IgnoreZonesEditor } from "./IgnoreZonesEditor";
 import { askConfirm } from "./askConfirm";
 import { useEffect, useState } from "react";
 import { configureCamera, deleteCamera, discoverCameraStreams, type CameraConnection, type DiscoveredCamera } from "./api";
@@ -17,6 +18,8 @@ type Props = {
   cameras: StudioCamera[]; onCameraSaved: (camera: StudioCamera) => void; onCameraDeleted: (id: string) => void;
   selectedCameraId: string; onCameraSelected: (id: string) => void;
   discovered: DiscoveredCamera[]; discover: () => void;
+  /** An administrator sets the zones to ignore; anybody else only sees them. */
+  isAdmin?: boolean;
 };
 
 const emptyConnection = (): CameraConnection => ({ id: "", name: "", host: "", snapshotUrl: "", rtspPath: "", previewPath: "", username: "", password: "", onvifPort: 80, rtspPort: 554 });
@@ -92,5 +95,6 @@ export function CameraSettings(props: Props) {
       <div className="camera-field camera-field-wide"><label><span>{t("snapshotUrl")}</span><input placeholder="http://camera/snapshot.jpg" value={form.snapshotUrl} onChange={event => update("snapshotUrl", event.target.value)} /></label></div>
       <div className="camera-form-actions"><button className="primary" onClick={() => void saveCamera()}>{t("saveCamera")}</button><button disabled={!form.id || !(selected?.hasCredentials || (form.username && form.password))} onClick={() => void discoverRtsp()}>{t("discoverRtsp")}</button>{form.id && <button className="danger-button" onClick={() => void removeCamera()}>{t("deleteCamera")}</button>}</div><p className="notice">{message}</p>
     </article>
+    {form.id && <IgnoreZonesEditor t={t} origin={props.origin} cameraId={form.id} isAdmin={Boolean(props.isAdmin)} />}
   </div>;
 }

@@ -323,7 +323,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     services: <ServicesView t={t} origin={origin} />,
     weather: <WeatherView t={t} locale={language} origin={origin} />,
     cameras: <CameraMonitorView openDesigner={() => setView("siteDesigner")} cameras={cameras} selected={selected} selectedId={selectedCamera} gridSize={gridSize} setGridSize={setGridSize} recordingIds={recordingCameraIds} streamUrls={streamUrls} reachability={reachability} notice={notice} t={t} select={setSelectedCamera} toggle={camera => updateCamera(camera.id, { enabled: !camera.enabled })} snapshot={camera => void saveSnapshot(camera)} record={camera => void toggleRecording(camera)} expand={expand} ptz={commandPtz} slots={slots} setSlot={(index, id) => setSlots(current => { const next = [...current]; while (next.length <= index) next.push(""); next[index] = id; return next; })}
-      settings={<CameraSettings t={t} origin={origin} cameras={cameras} selectedCameraId={selectedCamera} onCameraSelected={setSelectedCamera}
+      settings={<CameraSettings t={t} origin={origin} isAdmin={isAdmin} cameras={cameras} selectedCameraId={selectedCamera} onCameraSelected={setSelectedCamera}
         onCameraSaved={camera => setCameras(current => { const next = upsertCamera(current, camera); persist(next); return next; })}
         onCameraDeleted={id => setCameras(current => { const next = current.filter(camera => camera.id !== id); persist(next); setSelectedCamera(selectionAfterRemoval(next, selectedCamera, id)); return next; })}
         discovered={discovered} discover={() => void discoverLocalCameras()} />} />,

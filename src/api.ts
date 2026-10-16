@@ -374,6 +374,10 @@ export type NotificationTestResult = { channel: string; ok: boolean; detail: str
 /** What the server takes by itself when a camera sees something while the perimeter is armed. */
 export type CaptureSettings = { enabled: boolean; photo: boolean; photo_count: number; photo_interval_s: number; video: boolean; video_seconds: number; cooldown_s: number };
 export type CaptureRecord = { camera_id: string; at: string; photos: number; video: boolean };
+/** A part of a camera's picture that the observation service does not look at: a rectangle in fractions of the picture, from the top left. */
+export type IgnoreZone = { x: number; y: number; w: number; h: number };
+export const readIgnoreZones = (origin: string, id: string) => userCall<{ camera_id: string; zones: IgnoreZone[] }>(origin, "GET", `/api/v1/cameras/${encodeURIComponent(id)}/ignore-zones`);
+export const saveIgnoreZones = (origin: string, id: string, zones: IgnoreZone[]) => userCall<{ camera_id: string; zones: IgnoreZone[] }>(origin, "PUT", `/api/v1/cameras/${encodeURIComponent(id)}/ignore-zones`, { zones });
 export const readCaptureSettings = (origin: string) => userCall<{ settings: CaptureSettings; recent: CaptureRecord[] }>(origin, "GET", "/api/v1/capture-settings");
 export const saveCaptureSettings = (origin: string, settings: CaptureSettings) => userCall<{ settings: CaptureSettings }>(origin, "PUT", "/api/v1/capture-settings", settings);
 export const notificationsStatus = (origin: string) => userCall<NotificationsStatus>(origin, "GET", "/api/v1/admin/notifications");
