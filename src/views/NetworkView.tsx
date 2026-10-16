@@ -17,6 +17,7 @@ import {
   kindOf, lastOf, linePath, type NetworkDevice, type NetworkNode, type NetworkOverview, type NetworkSample,
 } from "../networkModel";
 import { servicesOf, useNetworkOrders, type OrderState } from "../networkOrders";
+import { publicFacts } from "../networkPublic";
 import "./network.css";
 
 type Tab = "devices" | "services" | "internet" | "traffic" | "events";
@@ -141,7 +142,29 @@ function DeviceDetail({ t, origin, node, device, isAdmin, reload, now, close, st
   </aside>;
 }
 
-export function NetworkView({ openDesigner, t, origin, isAdmin, overview, reload, now }: { openDesigner?: () => void; t: Translate; origin: string; isAdmin: boolean; overview: NetworkOverview | null; reload: () => void; now: number }) {
+function PublicCard({ t, info, language, now }: { t: Translate; info: NonNullable<NetworkNode["public"]>; language: string; now: number }) {
+  const facts = publicFacts(info, language, now);
+  const [copied, setCopied] = useState(false);
+  return <section className="net-public stack-card" aria-label={t("no_public_title")}>
+    <div className="net-public-main">
+      <small>{t("no_public_ip")}</small>
+      <strong className="mono">{info.ip}</strong>
+      <button type="button" onClick={() => void copyText(info.ip).then(ok => { setCopied(ok); window.setTimeout(() => setCopied(false), 1500); })}>{copied ? t("no_copied") : t("no_copy")}</button>
+    </div>
+    <dl className="net-facts">
+      {facts.isp && <div><dt>{t("no_public_provider")}</dt><dd>{facts.isp}</dd></div>}
+      {facts.asn && <div><dt>{t("pub_asn")}</dt><dd className="mono">{facts.asn}</dd></div>}
+      <div><dt>{t("pub_version")}</dt><dd>IPv{facts.version}</dd></div>
+      {(info.city || info.region || facts.country) && <div><dt>{t("no_public_place")}</dt><dd>{facts.flag ? `${facts.flag} ` : ""}{[info.city, info.region, facts.country].filter(Boolean).join(", ")}</dd></div>}
+      {info.timezone && <div><dt>{t("no_public_timezone")}</dt><dd>{info.timezone}{facts.localTime ? ` · ${t("pub_localtime")} ${facts.localTime}` : ""}</dd></div>}
+      {info.hostname && <div><dt>{t("no_public_host")}</dt><dd className="mono">{info.hostname}</dd></div>}
+      {info.changed_ms !== undefined && <div><dt>{t("pub_same_since")}</dt><dd>{formatDateTime(info.changed_ms)} ({formatAgo(info.changed_ms, now)})</dd></div>}
+      <div><dt>{t("no_public_checked")}</dt><dd>{formatDateTime(info.checked_ms)} ({formatAgo(info.checked_ms, now)})</dd></div>
+    </dl>
+  </section>;
+}
+
+export function NetworkView({ openDesigner, t, origin, isAdmin, overview, reload, now, language = "en" }: { openDesigner?: () => void; language?: string; t: Translate; origin: string; isAdmin: boolean; overview: NetworkOverview | null; reload: () => void; now: number }) {
   const [tab, setTab] = useState<Tab>("devices");
   const [showOutages, setShowOutages] = useState(false);
   const [query, setQuery] = useState(""), [kind, setKind] = useState(""), [onlyUnknown, setOnlyUnknown] = useState(false), [onlyOffline, setOnlyOffline] = useState(false);
@@ -182,6 +205,7 @@ export function NetworkView({ openDesigner, t, origin, isAdmin, overview, reload
         <div><small>{t("net_downtime24")}</small><strong>{formatDuration(internet.downtime_24h_s ?? 0)}</strong></div>
         <div><small>{t("net_devices")}</small><strong>{data!.totals.online}/{data!.totals.devices}</strong><em>{data!.totals.unknown} {t("net_not_known")}</em></div>
       </div>
+      {node.public && <PublicCard t={t} info={node.public} language={language} now={now} />}
       {showOutages && <section className="net-outage-day" aria-label={t("net_outages_last24")}>
         <h3>{t("net_outages_last24")}</h3>
         {lastDay.length === 0 ? <p className="muted">{t("net_no_outages")}</p> : <ul>{lastDay.map(outage => <li key={`${outage.started_ms}${outage.kind}`}><b>{formatDateTimeSeconds(outage.started_ms)}</b> → <b>{formatDateTimeSeconds(outage.ended_ms)}</b><span>{formatDuration(outage.duration_s)}</span><em>{t(`net_outage_${outage.kind}`)}</em></li>)}</ul>}
