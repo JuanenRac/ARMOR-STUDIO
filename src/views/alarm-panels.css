@@ -14,3 +14,10 @@
 .ap-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
 .ap-force { display: inline-flex; align-items: center; gap: .4rem; font-size: .8rem; color: #a9d0d6; }
 @media (max-width: 760px) { .ap-zone-list { grid-template-columns: 1fr; } }
+
+.zl-card { display: grid; gap: 8px; }
+.zl-card h4 { margin: 0; }
+.zl-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; gap: 8px; align-items: end; }
+.zl-row label { display: grid; gap: 2px; font-size: 12px; }
+.zl-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 720px) { .zl-row { grid-template-columns: 1fr; } }

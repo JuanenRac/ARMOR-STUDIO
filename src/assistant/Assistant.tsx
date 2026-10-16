@@ -6,10 +6,13 @@
  */
 import { useEffect, useLayoutEffect, useState } from "react";
 import type { View } from "../domain";
+import type { Locale } from "../i18n";
 import { HELP_SECTIONS } from "../helpText";
 import { usePrefs } from "../prefs";
 import { startTour, useActiveTour } from "../tour/tourStore";
 import { menuTourId } from "../tour/menuTours";
+import { answer as answerQuestion, suggestions, type Answer } from "./engine";
+import type { Topic } from "./knowledge";
 import "./assistant.css";
 
 export function Mascot({ talking }: { talking: boolean }) {
@@ -24,16 +27,19 @@ export function Mascot({ talking }: { talking: boolean }) {
   </svg>;
 }
 
-export function Assistant({ view, t, openHelp }: { view: View; t: (key: string) => string; openHelp: (view: string) => void }) {
+export function Assistant({ view, t, language, go, openHelp }: { view: View; t: (key: string) => string; language: Locale; go: (view: View) => void; openHelp: (view: string) => void }) {
   const prefs = usePrefs();
   const tour = useActiveTour();
   const [away, setAway] = useState<ReadonlySet<string>>(new Set());   // the menus where the person put the mascot away
   const [open, setOpen] = useState(true);
   const [tip, setTip] = useState(0);
   const [spot, setSpot] = useState<{ left: number; top: number } | null>(null);
+  const [question, setQuestion] = useState("");
+  const [reply, setReply] = useState<{ asked: string; answer: Answer } | null>(null);
+  const [seed, setSeed] = useState(0);
   const hidden = away.has(view);
 
-  useEffect(() => { setOpen(true); setTip(0); }, [view]);
+  useEffect(() => { setOpen(true); setTip(0); setReply(null); }, [view]);
 
   // fly to the menu the person is in: next to its entry in the list, or in the corner when the list is folded or out of sight
   useLayoutEffect(() => {
@@ -55,20 +61,53 @@ export function Assistant({ view, t, openHelp }: { view: View; t: (key: string) 
   const text = paragraphs.length > 0 ? paragraphs[tip % paragraphs.length] : t("asst_hello");
   const short = text.length > 330 ? `${text.slice(0, 327)}…` : text;
   const style = spot ? { left: spot.left, top: spot.top } : undefined;
+  const ask = (text: string) => {
+    const asked = text.trim();
+    if (!asked) return;
+    setQuestion("");
+    setSeed(value => value + 1);
+    setReply({ asked, answer: answerQuestion(asked, language, HELP_SECTIONS.map(item => item.id), t) });
+  };
+  const showTopic = (topic: Topic) => setReply({ asked: topic.q[Math.max(0, ["en", "es", "de", "fr", "it", "ja", "zh", "pt"].indexOf(language))] ?? topic.q[0], answer: { kind: "topic", topic, text: topic.a[Math.max(0, ["en", "es", "de", "fr", "it", "ja", "zh", "pt"].indexOf(language))] ?? topic.a[0], others: [] } });
+  const goTo = (target: View, tour = false) => { go(target); if (tour) window.setTimeout(() => startTour(menuTourId(target)), 400); };
+  const targetView = reply && (reply.answer.kind === "topic" ? reply.answer.topic.view : reply.answer.kind === "help" ? reply.answer.view as View : null);
+  const helpView = reply?.answer.kind === "help" ? reply.answer.view : null;
+  const targetTour = reply?.answer.kind === "topic" ? Boolean(reply.answer.topic.tour) : helpView !== null && HELP_SECTIONS.some(item => item.id === helpView);
+  const examples = suggestions(language, 3, seed);
 
   if (hidden) return <button type="button" className={`assistant-call ${spot ? "" : "corner"}`} style={style} onClick={() => setAway(current => { const next = new Set(current); next.delete(view); return next; })} title={t("asst_call")} aria-label={t("asst_call")}><Mascot talking={false} /></button>;
 
   return <div className={`assistant ${spot ? "" : "corner"}`} style={style} role="complementary" aria-label={t("asst_name")}>
     <button type="button" className="assistant-mascot" onClick={() => setOpen(value => !value)} title={open ? t("asst_quiet") : t("asst_call")} aria-expanded={open}><Mascot talking={open} /></button>
     {open && <div className="assistant-bubble" role="status">
-      <strong>{section ? t(`help_s_${view}`) : t("asst_name")}</strong>
-      <p>{short}</p>
-      <div className="assistant-actions">
-        {section && <button type="button" className="primary" onClick={() => startTour(menuTourId(view))}>{t("asst_show")}</button>}
-        {paragraphs.length > 1 && <button type="button" onClick={() => setTip(value => value + 1)}>{t("asst_more")} ({(tip % paragraphs.length) + 1}/{paragraphs.length})</button>}
-        <button type="button" onClick={() => openHelp(view)}>{t("asst_help")}</button>
-        <button type="button" onClick={() => setAway(current => new Set(current).add(view))}>{t("asst_hide")}</button>
-      </div>
+      {reply ? <>
+        <small className="assistant-asked">{t("asst_you")}: {reply.asked}</small>
+        {reply.answer.kind === "topic" && <strong>{t(`help_s_${reply.answer.topic.view}`) !== `help_s_${reply.answer.topic.view}` ? t(`help_s_${reply.answer.topic.view}`) : t("asst_name")}</strong>}
+        {reply.answer.kind === "help" && <strong>{t(`help_s_${reply.answer.view}`)}</strong>}
+        <p>{reply.answer.kind === "topic" || reply.answer.kind === "help" ? reply.answer.text : reply.answer.kind === "hello" ? t("asst_hi") : reply.answer.kind === "thanks" ? t("asst_thanks") : t("asst_none")}</p>
+        {(reply.answer.kind === "none" || reply.answer.kind === "hello" || reply.answer.kind === "thanks") && <div className="assistant-chips">{examples.map(example => <button key={example} type="button" onClick={() => ask(example)}>{example}</button>)}</div>}
+        {reply.answer.kind === "topic" && reply.answer.others.length > 0 && <div className="assistant-chips"><small>{t("asst_see_also")}</small>{reply.answer.others.map(other => <button key={other.id} type="button" onClick={() => showTopic(other)}>{other.q[Math.max(0, ["en", "es", "de", "fr", "it", "ja", "zh", "pt"].indexOf(language))]}</button>)}</div>}
+        <div className="assistant-actions">
+          {targetView && targetView !== view && <button type="button" className="primary" onClick={() => goTo(targetView)}>{t("asst_goto")}</button>}
+          {targetView && targetTour && <button type="button" className={targetView === view ? "primary" : ""} onClick={() => goTo(targetView, true)}>{t("asst_show")}</button>}
+          {targetView && <button type="button" onClick={() => openHelp(targetView)}>{t("asst_help")}</button>}
+          <button type="button" onClick={() => setReply(null)}>{t("asst_back")}</button>
+        </div>
+      </> : <>
+        <strong>{section ? t(`help_s_${view}`) : t("asst_name")}</strong>
+        <p>{short}</p>
+        <div className="assistant-actions">
+          {section && <button type="button" className="primary" onClick={() => startTour(menuTourId(view))}>{t("asst_show")}</button>}
+          {paragraphs.length > 1 && <button type="button" onClick={() => setTip(value => value + 1)}>{t("asst_more")} ({(tip % paragraphs.length) + 1}/{paragraphs.length})</button>}
+          <button type="button" onClick={() => openHelp(view)}>{t("asst_help")}</button>
+          <button type="button" onClick={() => setAway(current => new Set(current).add(view))}>{t("asst_hide")}</button>
+        </div>
+        <div className="assistant-chips"><small>{t("asst_try")}</small>{examples.map(example => <button key={example} type="button" onClick={() => ask(example)}>{example}</button>)}</div>
+      </>}
+      <form className="assistant-ask" onSubmit={event => { event.preventDefault(); ask(question); }}>
+        <input value={question} onChange={event => setQuestion(event.target.value)} placeholder={t("asst_ask_ph")} aria-label={t("asst_ask_ph")} maxLength={200} />
+        <button type="submit" className="primary" disabled={!question.trim()}>{t("asst_ask_send")}</button>
+      </form>
     </div>}
   </div>;
 }

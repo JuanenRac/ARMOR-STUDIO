@@ -536,6 +536,10 @@ export type AlarmNodeView = { node_id: string; state: AlarmState; received_at: s
 export type AlarmNodes = { nodes: AlarmNodeView[]; totals: { nodes: number; stale: number; armed: number; sounding: number } };
 export const listAlarmNodes = (origin: string) => userCall<AlarmNodes>(origin, "GET", "/api/v1/alarm/nodes");
 export type AlarmCommandRecord = { command_id: string; node_id: string; action: "arm" | "disarm"; mode?: "away" | "stay"; accepted: boolean; refusal: string; phase?: AlarmPhase; actor: string; at: string };
+/** A Zigbee device of the registry tied to a zone of an alarm panel: the server tells the panel how that zone is while it holds the radio. */
+export type ZoneLink = { device_id: string; node_id: string; zone_id: string };
+export const listZoneLinks = (origin: string) => userCall<{ links: ZoneLink[] }>(origin, "GET", "/api/v1/alarm/zone-links");
+export const saveZoneLinks = (origin: string, links: ZoneLink[]) => userCall<{ links: ZoneLink[] }>(origin, "PUT", "/api/v1/alarm/zone-links", { links });
 export const alarmCommandsStatus = (origin: string) => userCall<{ enabled: boolean; pending: unknown[]; recent: AlarmCommandRecord[] }>(origin, "GET", "/api/v1/alarm/commands");
 /** Arm (away or stay, optionally leaving out the zones that are open) or disarm a panel. There is no PIN in it: the server, the node and the broker must all have allowed it. */
 export const sendAlarmCommand = (origin: string, node: string, action: "arm" | "disarm", mode?: "away" | "stay", force = false, pin?: string) =>

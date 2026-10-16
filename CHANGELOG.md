@@ -2,6 +2,27 @@
 
 All notable changes to this project are documented here.
 
+## [0.7.7] - Alarms on the live map and Zigbee sensors for the zones of the alarm panels
+
+- **Ask the assistant in words:** the mascot has a text box; write what you want to do ("how do I arm the alarm", "a node does not answer") and it answers with the steps.
+- Each answer comes with buttons: take me to the right menu, show it step by step (the menu's tour starts by itself) or open the Help.
+- A dictionary of thirty tasks in the eight languages (arming and disarming, alarms, cameras, recordings, devices, automations, users, notifications, updates, nodes, Bluetooth PIN, Zigbee zones, solar, electricity, network, drawings, language, lost password and more); a question in one language is answered in the language of the interface.
+- When no task fits, it searches the Help text of every menu in your language and answers with the best paragraph, and when it finds nothing it says so and suggests questions instead of guessing.
+- It ignores accents, capitals and punctuation, understands other forms of a word (arm, armo, armar) and works with Japanese and Chinese, which have no spaces between words.
+- Suggested questions change each time, and the chips ask them with one click.
+- It works in the browser with no server, no model and no outside service: nothing you type leaves your screen.
+- Tests check that every task has its keywords, sample question and answer in the eight languages, that each sample question finds its task, and that questions phrased in other words still do.
+- **Alarms on the map:** an alarm nobody has acknowledged pulses on the live site map where its camera, its device or its radar is drawn, so you see where it is without opening the list.
+- The marker is red for a critical alarm, orange for a high one and yellow for a warning, and it disappears when the alarm is acknowledged or cleared.
+- An alarm whose source is not drawn (a network, a solar or an alarm-panel alarm, a device that was never placed) stays in the list only, instead of being drawn in a wrong place.
+- **Zigbee sensors for the zones:** Alarm panels has a new card where an administrator ties each Zigbee sensor of the device registry to a zone of a panel.
+- With those links the server tells the panel how each zone is while it holds the Zigbee radio, so arming a panel really guards its Zigbee doors, windows and motion sensors.
+- The card offers the sensors, the panels and the zones of the chosen panel in lists, refuses a zone chosen twice and shows what it could not save.
+- Anybody who may look sees the links read-only; only an administrator edits them, and at most 64 links are kept.
+- **Help, tours and assistant:** the overview and the alarm panels sections explain the alarms on the map and the Zigbee links in every language, and the menu tours and the assistant say it too because they read the same text.
+- All the new texts exist in the eight languages, with a test that no phrase of the card is missing in any of them.
+- The card follows the narrow layout: on a phone its three lists stack in one column.
+
 ## [0.7.6] - A check before arming, a viewer role, ntfy, proof of custody, daily energy and a Help that knows all of it
 
 - **Before arming:** the arm button asks the server first and lists what would leave the perimeter blind or noisy - a radar node that does not answer, a silent panel, an open zone, a camera that is down, an open door or window, alarms nobody has seen - and offers "Arm anyway" when something blocks.

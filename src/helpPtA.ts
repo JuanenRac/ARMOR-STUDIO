@@ -10,7 +10,9 @@ O menu da esquerda tem os ecrãs em grupos: Monitorização (o resumo, a meteoro
 
 O botão grande do canto superior direito arma ou desarma todo o sistema. Desarmar pede o seu PIN (Configuração > Utilizadores); um PIN de coação também desarma, mas dispara em silêncio um alarme crítico. Com o sistema armado, uma intrusão, uma porta aberta ou uma câmara que deixa de responder dispara um alarme; desarmar fecha os que dependem do modo.
 
-Deixar o ponteiro sobre qualquer botão, campo ou entrada do menu mostra uma breve explicação do que faz. O idioma e o aspeto da consola estão em Configuração.`],
+Deixar o ponteiro sobre qualquer botão, campo ou entrada do menu mostra uma breve explicação do que faz. O idioma e o aspeto da consola estão em Configuração.
+
+Pergunte ao assistente: a mascote tem uma caixa de texto. Escreva o que quer fazer por palavras suas ("como armo o alarme", "um nó não responde", "atualizar o servidor") e responde com os passos, pode levá-lo ao menu certo, mostrá-lo passo a passo ou abrir a Ajuda. Entende os oito idiomas, os acentos e as maiúsculas não importam, e quando não sabe diz e oferece exemplos. Funciona no seu próprio ecrã, sem servidor nem serviço externo.`],
   overview: ["Resumo", `O primeiro ecrã. Reúne, em cartões, o que merece um olhar: o estado do perímetro (armado ou desarmado), os nós de campo que estão ligados, os rastos ativos que os radares veem, as câmaras que estão ativadas e os alarmes à espera de uma pessoa.
 
 «Precisa de atenção» lista as coisas que pedem alguém: alarmes por ver e nós com problemas; cada um abre o seu ecrã. «Atividade recente» são os últimos eventos, do mais recente para o mais antigo. As «Ações rápidas» saltam para as câmaras, o desenhador do local ou o formulário para adicionar um dispositivo.
@@ -40,7 +42,9 @@ Cada cartão mostra se o nó está em vigilância, o seu modo (ausente ou em cas
 
 Um administrador pode armar e desarmar uma central daqui, mas só quando três coisas o permitem: o servidor (ARMOR_ALARM_COMMANDS=1), o nó (a sua definição para os comandos do servidor) e o broker (a sua lista de acessos). Um desarme a partir daqui pede o PIN do utilizador com sessão iniciada: o servidor verifica-o e o nó nunca o vê. Um comando aceite não é um alarme armado: o cartão mostra o que o nó diz a seguir. Isto não é um sistema de alarme certificado.
 
-«Abrir o Desenhador de alarme» leva-o ao desenho do alarme da casa: as centrais mostradas aqui aparecem lá com as suas zonas como sensores, associadas às reais, e a partir de uma central associada no desenho volta a este menu.`],
+«Abrir o Desenhador de alarme» leva-o ao desenho do alarme da casa: as centrais mostradas aqui aparecem lá com as suas zonas como sensores, associadas às reais, e a partir de uma central associada no desenho volta a este menu.
+
+Sensores Zigbee das zonas: enquanto o servidor tem o rádio Zigbee, uma central não ouve sozinha os sensores. Em cima, um administrador liga cada sensor Zigbee a uma zona de uma central; o servidor diz então à central como está essa zona sempre que muda (e a cada meio minuto), assim armar a central vigia de verdade essas portas, janelas e detetores de movimento. Quando a própria central tem o rádio, ouve-os diretamente e ignora o que o servidor diz.`],
   cameras: ["Câmaras", `A vista em direto das câmaras IP do local. Escolha uma disposição (uma câmara, uma grelha, uma parede) e cada lugar mostra uma câmara; um lugar com lista pendente deixa escolher qual. Um clique numa câmara amplia-a; as setas vão para a seguinte ou a anterior.
 
 Numa câmara: Fotografia guarda uma foto nas Gravações, o botão vermelho grava e para, e os controlos PTZ movem uma câmara motorizada (rotação, inclinação, zoom) quando o suporta. A parede em ecrã inteiro mostra as câmaras da vista em todo o ecrã, sem espaços.

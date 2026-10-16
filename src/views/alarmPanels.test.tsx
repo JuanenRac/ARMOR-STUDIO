@@ -32,6 +32,13 @@ describe("the Alarm panels menu", () => {
     expect(html).toContain("No alarm node has reported yet");
     expect(html).toContain("does not answer the alarm panels");
   });
+  it("has every phrase of the Zigbee links card in the eight languages", () => {
+    const keys = ["zlTitle", "zlHelp", "zlDevice", "zlNode", "zlZone", "zlPick", "zlAdd", "zlRemove", "zlSave", "zlSaved", "zlError", "zlNone"];
+    for (const language of ["en", "es", "de", "fr", "it", "ja", "zh", "pt"] as const) {
+      for (const key of keys) expect(text(language, key), `${language}: ${key}`).not.toBe(key);
+      if (language !== "en") expect(text(language, "zlTitle"), language).not.toBe(text("en", "zlTitle"));
+    }
+  });
   it("offers no button to arm or disarm until the server says it may", () => {
     const html = renderToStaticMarkup(createElement(AlarmPanelsView, { t: (key: string) => text("en", key), origin: "http://x", nodes, unreachable: false, isAdmin: true, now: Date.now() }));
     expect(html).not.toContain("Arm: away");

@@ -4,8 +4,8 @@
  * A disarm from here asks for the PIN of the signed-in user (the server checks it; the node never sees it); an accepted command is not an armed alarm, and the card shows what the node says next.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import { useState } from "react";
-import { alarmCommandsStatus, sendAlarmCommand, ApiError, type AlarmNodeView, type AlarmNodes } from "../api";
+import { useEffect, useState } from "react";
+import { alarmCommandsStatus, listDevices, listZoneLinks, saveZoneLinks, sendAlarmCommand, ApiError, type AlarmNodeView, type AlarmNodes, type StudioDevice, type ZoneLink } from "../api";
 import { MenuLogo } from "../menuLogos";
 import { PinDialog } from "../components/chrome";
 import { usePolled } from "../hooks";
@@ -40,10 +40,59 @@ export function AlarmPanelsView({ t, origin, nodes, unreachable, network = null,
     {unreachable && <p className="solar-notice bad">{t("apUnreachable")}</p>}
     {openDesigner && <p className="solar-notice ap-designer"><span>{t("apDesignerHelp")}</span> <button onClick={openDesigner}>{t("apOpenDesigner")}</button></p>}
     {isAdmin && status.data && !enabled && <p className="solar-notice">{t("apCommandsOff")}</p>}
+    {list.length > 0 && <ZoneLinks t={t} origin={origin} nodes={list} isAdmin={isAdmin} />}
     <NodeFinder t={t} origin={origin} network={network} wantKind="alarm" knownIds={list.map(node => node.node_id)} />
     {list.length === 0 ? <div className="solar-empty"><MenuLogo kind="alarmPanels" size={92} /><h3>{t("apNone")}</h3><p>{t("apNoneHelp")}</p></div>
       : list.map(node => <PanelCard key={node.node_id} t={t} origin={origin} node={node} now={now} canCommand={isAdmin && enabled} recent={(status.data?.recent ?? []).filter(item => item.node_id === node.node_id).slice(0, 3)} reload={status.reload} />)}
   </div>;
+}
+
+/** Which Zigbee sensor is which zone of which panel: the server tells the panel the state of those zones while it holds the radio. Everybody who may look sees them; an administrator edits. */
+function ZoneLinks({ t, origin, nodes, isAdmin }: { t: Translate; origin: string; nodes: AlarmNodeView[]; isAdmin: boolean }) {
+  const [links, setLinks] = useState<ZoneLink[] | null>(null);
+  const [sensors, setSensors] = useState<StudioDevice[]>([]);
+  const [message, setMessage] = useState<{ text: string; bad: boolean } | null>(null);
+  useEffect(() => {
+    let live = true;
+    listZoneLinks(origin).then(answer => { if (live) setLinks(answer.links); }).catch(() => { if (live) setLinks([]); });
+    listDevices(origin).then(answer => { if (live) setSensors(answer.devices.filter(device => device.category === "sensor")); }).catch(() => undefined);
+    return () => { live = false; };
+  }, [origin]);
+  if (links === null || (!isAdmin && links.length === 0)) return null;
+  const zonesOf = (nodeId: string) => nodes.find(node => node.node_id === nodeId)?.state.zones ?? [];
+  const change = (index: number, patch: Partial<ZoneLink>) => { setMessage(null); setLinks(links.map((link, at) => at === index ? { ...link, ...patch } : link)); };
+  const complete = links.every(link => link.device_id && link.node_id && link.zone_id);
+  const save = async () => {
+    try { setLinks((await saveZoneLinks(origin, links)).links); setMessage({ text: t("zlSaved"), bad: false }); }
+    catch { setMessage({ text: t("zlError"), bad: true }); }
+  };
+  return <section className="solar-notice zl-card" aria-label={t("zlTitle")}>
+    <h4>{t("zlTitle")}</h4>
+    <p className="muted small">{t("zlHelp")}</p>
+    {links.length === 0 && <p className="muted">{t("zlNone")}</p>}
+    {links.map((link, index) => <div key={index} className="zl-row">
+      <label>{t("zlDevice")}<select disabled={!isAdmin} value={link.device_id} onChange={event => change(index, { device_id: event.target.value })}>
+        <option value="">{t("zlPick")}</option>
+        {sensors.map(device => <option key={device.id} value={device.id}>{device.name}</option>)}
+        {link.device_id && !sensors.some(device => device.id === link.device_id) && <option value={link.device_id}>{link.device_id}</option>}
+      </select></label>
+      <label>{t("zlNode")}<select disabled={!isAdmin} value={link.node_id} onChange={event => change(index, { node_id: event.target.value, zone_id: "" })}>
+        <option value="">{t("zlPick")}</option>
+        {nodes.map(node => <option key={node.node_id} value={node.node_id}>{node.node_id}</option>)}
+      </select></label>
+      <label>{t("zlZone")}<select disabled={!isAdmin} value={link.zone_id} onChange={event => change(index, { zone_id: event.target.value })}>
+        <option value="">{t("zlPick")}</option>
+        {zonesOf(link.node_id).map(zone => <option key={zone.id} value={zone.id}>{zone.name ?? zone.id}</option>)}
+        {link.zone_id && !zonesOf(link.node_id).some(zone => zone.id === link.zone_id) && <option value={link.zone_id}>{link.zone_id}</option>}
+      </select></label>
+      {isAdmin && <button type="button" onClick={() => { setMessage(null); setLinks(links.filter((_, at) => at !== index)); }}>{t("zlRemove")}</button>}
+    </div>)}
+    {isAdmin && <div className="zl-actions">
+      <button type="button" disabled={links.length >= 64} onClick={() => setLinks([...links, { device_id: "", node_id: nodes[0]?.node_id ?? "", zone_id: "" }])}>{t("zlAdd")}</button>
+      <button type="button" disabled={!complete} onClick={() => void save()}>{t("zlSave")}</button>
+    </div>}
+    {message && <p className={`solar-notice ${message.bad ? "bad" : ""}`} role={message.bad ? "alert" : "status"}>{message.text}</p>}
+  </section>;
 }
 
 function Tile({ label, value, bad = false }: { label: string; value: string; bad?: boolean }) {

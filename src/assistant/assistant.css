@@ -22,3 +22,12 @@
 html[data-motion="off"] .assistant *, html[data-motion="off"] .assistant-call *, html[data-motion="reduced"] .assistant *, html[data-motion="reduced"] .assistant-call * { animation: none !important; }
 html[data-motion="off"] .assistant, html[data-motion="reduced"] .assistant { transition: none; }
 @media (max-width: 800px) { .assistant:not(.corner) { left: 8px !important; top: auto !important; bottom: 50px; } }
+
+.assistant-bubble { max-height: min(80vh, 560px); overflow-y: auto; }
+.assistant-asked { display: block; margin-bottom: .3rem; color: #7fb4c0; font-style: italic; }
+.assistant-chips { display: flex; flex-wrap: wrap; gap: .3rem; margin: 0 0 .5rem; align-items: center; }
+.assistant-chips small { flex-basis: 100%; color: #7fb4c0; }
+.assistant-chips button { padding: .22rem .55rem; font-size: .7rem; text-align: left; border-radius: 999px; }
+.assistant-ask { display: flex; gap: .35rem; margin-top: .55rem; }
+.assistant-ask input { flex: 1; min-width: 0; padding: .3rem .55rem; font-size: .78rem; border-radius: 8px; }
+.assistant-ask button { padding: .3rem .7rem; font-size: .75rem; }

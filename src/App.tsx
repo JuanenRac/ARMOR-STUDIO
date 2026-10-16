@@ -355,7 +355,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     <TourHost t={t} view={view} setView={setView} />
     <RichTooltips t={t} />
     {helpOpen && <HelpDialog initial={view} close={() => setHelpOpen(false)} t={t} />}
-    <Assistant view={view} t={t} openHelp={() => setHelpOpen(true)} />
+    <Assistant view={view} t={t} language={language} go={setView} openHelp={() => setHelpOpen(true)} />
     <AlarmPopups popups={announcer.popups} open={announcer.open} dismiss={announcer.dismiss} dismissAll={announcer.dismissAll} acknowledge={sessionUser.user?.role === "viewer" ? undefined : id => { void acknowledgeAlarm(origin, id).then(alarmPoll.reload, () => undefined); }} t={t} />
     {aboutOpen && <AboutDialog version={studioVersion} revision={state.revision} close={() => setAboutOpen(false)} t={t} />}
     {versionsOf && <DesignVersionsDialog kind={versionsOf} origin={origin} t={t} close={() => setVersionsOf(null)}
