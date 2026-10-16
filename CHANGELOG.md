@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased] - Next version
+
+- **Connection announcements:** the alarm voice now says aloud when a node, a device or a camera connects, as it already did when one was lost.
+- A node that comes back is no longer called silent right after it reconnects: the server counts its silence from its return (server fix, shipped with this version).
+- **Mute button:** one button beside Help silences the alarm sounds and the voice, and shows which state it is in.
+- **Menus keep their state:** a form half filled, a tab or a firmware update in progress is still there when the person comes back, also when an alarm takes them to another menu.
+- **Overview redesign:** tiles for alarm panels, energy and network, and a layout that fits from 1093 px up to full HD without a vertical scrollbar.
+- **Release notes in Updates:** the changes of a program's new version are shown before installing it.
+- **Configuration in groups:** the tabs are ordered from the person's own settings to the system's, with a separator between groups.
+- **Voice styles:** the alarm voice can speak in original personalities (action hero, dark lord, theatrical), in the eight languages; none imitates a real person.
+- **A mascot that speaks:** the assistant reads its answers aloud, with a mouth that moves, a switch in Preferences and an icon in its bubble.
+- Pin, return to its place and voice are small icon buttons in a corner of the bubble.
+- The bubble opens on the side that has room and the mascot is easier to drag.
+- **Hints everywhere:** pointing at any control says what it is and what it does, in the eight languages; controls with no hint of their own get one from their kind and name (designer tools, tabs, filters, fields and tiles).
+- **Help pictures:** every main menu has a picture with example data in the Help, in the eight languages.
+- The assistant knows about signed firmware, network Zigbee and the voice styles, and answers questions about them.
+- The README is rewritten in the eight languages with screenshots taken at 1920x1080.
+
 ## [0.7.9] - Zones of the picture to ignore
 
 - **Zones to ignore:** Configuration > Cameras shows, under the settings of a saved camera, its live picture with the zones that the observation service ignores drawn over it.
