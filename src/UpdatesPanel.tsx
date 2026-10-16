@@ -4,6 +4,7 @@
  * (look for its updates, update it, reboot). Whatever is running shows its steps with a bar each, a total bar and the log line by line, as the maintenance helper does it.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { parseReleaseNotes } from "./releaseNotes";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { askConfirm } from "./askConfirm";
 import {
@@ -58,6 +59,7 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
   const [job, setJob] = useState<MaintJob | null>(null);
   const [message, setMessage] = useState("");
   const [waiting, setWaiting] = useState(false);
+  const [notesOpen, setNotesOpen] = useState<ReadonlySet<string>>(new Set());   // the programs whose release notes are shown
   const logEnd = useRef<HTMLDivElement>(null);
   const restored = useRef(false);
   const logLines = useRef<string[]>([]);
@@ -157,7 +159,7 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
       {message && <p className="notice" role="alert">{message}</p>}
       <table className="mt-table">
         <thead><tr><th /><th>{t("mt_col_program")}</th><th>{t("mt_col_installed")}</th><th>{t("mt_col_latest")}</th><th>{t("mt_col_state")}</th><th /></tr></thead>
-        <tbody>{(overview?.components ?? []).map(item => <tr key={item.id} className={item.status}>
+        <tbody>{(overview?.components ?? []).flatMap(item => [<tr key={item.id} className={item.status}>
           <td><input type="checkbox" aria-label={label(item.id)} checked={picked.has(item.id)} disabled={running || !(item.installable && item.status !== "unknown")} onChange={() => toggle(item.id)} /></td>
           <td><strong>{label(item.id)}</strong><small>{item.repo} · {item.service}</small></td>
           <td className="mt-version">{item.installed || "—"}</td>
@@ -166,8 +168,13 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
           <td className="mt-actions">
             <button disabled={running || !item.installable || item.status === "unknown"} onClick={() => void update([item.id], item.status !== "update_available")}>{item.status === "update_available" || item.status === "not_installed" ? t("mt_update") : t("mt_reinstall")}</button>
             <button disabled={running || !item.installed} onClick={() => void rollback(item)}>{t("mt_rollback")}</button>
+            {item.latest && <button className={notesOpen.has(item.id) ? "active" : ""} aria-expanded={notesOpen.has(item.id)} onClick={() => setNotesOpen(current => { const next = new Set(current); if (next.has(item.id)) next.delete(item.id); else next.add(item.id); return next; })}>{notesOpen.has(item.id) ? t("mt_changes_hide") : t("mt_changes")}</button>}
           </td>
-        </tr>)}</tbody>
+        </tr>, ...(notesOpen.has(item.id) && item.latest ? [<tr key={`${item.id}-notes`} className="mt-notes-row"><td /><td colSpan={5}>
+          <div className="mt-notes" role="region" aria-label={`${t("mt_changes_in")} ${item.latest}`}>
+            <strong>{t("mt_changes_in")} {item.latest}</strong>
+            {parseReleaseNotes(item.notes).length === 0 ? <p className="muted">{t("mt_changes_none")}</p> : <ul>{parseReleaseNotes(item.notes).map((line, position) => line.kind === "item" ? <li key={position}>{line.text}</li> : <li key={position} className="mt-notes-text">{line.text}</li>)}</ul>}
+          </div></td></tr>] : [])])}</tbody>
       </table>
       <div className="mt-buttons">
         <button onClick={() => setPicked(new Set(updatable.map(item => item.id)))} disabled={running || updatable.length === 0}>{t("mt_select_updatable")}</button>

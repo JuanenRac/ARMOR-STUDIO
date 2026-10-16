@@ -16,6 +16,7 @@ import { shouldAutoStart, startTour } from "./tour/tourStore";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { acknowledgeAlarm, listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
+import { useConnectionAnnouncer } from "./alerts/useConnectionAnnouncer";
 import { ViewSlot, viewsToDraw } from "./viewSlots";
 import { AboutDialog, ConfirmDialog, HelpDialog, PinDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
 import { DesignVersionsDialog } from "./DesignVersionsDialog";
@@ -157,6 +158,16 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     electricalNodes: new Set((electricalPoll.data?.nodes ?? []).map(item => item.node_id)),
     cameras: new Set(cameras.map(camera => camera.id)),
   }), [alarmNodesPoll.data, solarPoll.data, electricalPoll.data, cameras]);
+  // says aloud what connects: the sources are what the server last said about each kind (an unread source says nothing)
+  const connectionSources = useMemo(() => ({
+    node: nodes.map(node => ({ id: node.node_id, name: node.node_id, online: node.online && !node.stale })),
+    device: devicePoll.data ? devicePoll.data.devices.map(device => ({ id: device.id, name: device.name, online: device.online })) : null,
+    camera: cameras.length > 0 && Object.keys(reachability).length > 0 ? cameras.map(camera => ({ id: camera.id, name: camera.name, online: reachability[camera.id] === "online" })) : null,
+    alarm: alarmNodesPoll.data ? alarmNodesPoll.data.nodes.map(node => ({ id: node.node_id, name: node.node_id, online: !node.stale })) : null,
+    solar: solarPoll.data ? [...new Set(solarPoll.data.devices.map(device => device.node_id))].map(id => ({ id, name: id, online: solarPoll.data!.devices.some(device => device.node_id === id && !device.stale) })) : null,
+    electrical: electricalPoll.data ? electricalPoll.data.nodes.map(node => ({ id: node.node_id, name: node.node_id, online: !node.stale })) : null,
+  }), [nodes, devicePoll.data, cameras, reachability, alarmNodesPoll.data, solarPoll.data, electricalPoll.data]);
+  useConnectionAnnouncer({ sources: connectionSources, t, language, enabled: connectionState === "synced" });
   const announcer = useAlarmAnnouncer({ alarms: alarmPoll.data, t, language, armed: state.mode === "armed", enabled: true, sound: prefs.alertSound, notification: prefs.alertNotifications, context: alertContext,
     go: target => { if (target.camera) setSelectedCamera(target.camera); setView(target.view); } });
   // the menu the person is in is remembered for "open where I was"; the first visit starts the welcome tour
