@@ -5,6 +5,7 @@
  */
 import type { View } from "../domain";
 import type { ArtId } from "./TourArt";
+import { MENU_TOURS } from "./menuTours";
 
 export type TourStep = {
   /** The menu to be in for this step; the tour opens it by itself. */
@@ -18,7 +19,7 @@ export type Tour = { id: string; /** The minutes it takes, about. */ minutes: nu
 
 const nav = (view: View): string => `nav-${view}`;
 
-export const TOURS: readonly Tour[] = [
+const BASE_TOURS: readonly Tour[] = [
   { id: "welcome", minutes: 2, art: "welcome", steps: [
     { art: "welcome" },
     { target: "brand", art: "menu", placement: "right" },
@@ -62,6 +63,8 @@ export const TOURS: readonly Tour[] = [
     { view: "configuration", target: "tab-preferences", art: "tips", placement: "bottom" },
   ] },
 ];
+
+export const TOURS: readonly Tour[] = [...BASE_TOURS, ...MENU_TOURS];
 
 export const tourById = (id: string): Tour | undefined => TOURS.find(tour => tour.id === id);
 

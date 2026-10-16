@@ -12,12 +12,14 @@ import { formatUptime } from "../history";
 import type { Translate } from "./camera";
 import { ArmorMark } from "../menuLogos";
 import { HELP_SECTIONS } from "../helpText";
+import { HELP_TECH } from "../helpTech";
+import { TourArt, ART_OF_VIEW, type ArtId } from "../tour/TourArt";
 import "../help.css";
 
 const NAV_CLOSED_KEY = "armor-studio-nav-closed";
 
-export function Sidebar({ view, setView, sidebarOpen, toggle, connection, alarmBadge, t }: {
-  view: View; setView: (view: View) => void; sidebarOpen: boolean; toggle: () => void; connection: string; /** Alarms waiting for a person. */ alarmBadge: number; t: Translate;
+export function Sidebar({ view, setView, sidebarOpen, toggle, alarmBadge, t }: {
+  view: View; setView: (view: View) => void; sidebarOpen: boolean; toggle: () => void; /** Alarms waiting for a person. */ alarmBadge: number; t: Translate;
 }) {
   // The groups can be folded; which ones are folded is remembered in this browser. The group of the screen you are on never hides it.
   const [closed, setClosed] = useState<ReadonlySet<string>>(() => { try { return new Set<string>(JSON.parse(window.localStorage.getItem(NAV_CLOSED_KEY) ?? "[]") as string[]); } catch { return new Set<string>(); } });
@@ -43,7 +45,6 @@ export function Sidebar({ view, setView, sidebarOpen, toggle, connection, alarmB
         <div className="nav-items">{group.items.map(([key, icon]) => <button key={key} data-tour={`nav-${key}`} className={view === key ? "active" : ""} onClick={() => setView(key)} title={t(key)}><span className="nav-icon">{icon}</span><em>{t(key)}</em>{key === "alarms" && alarmBadge > 0 && <b className="nav-badge">{alarmBadge}</b>}</button>)}</div>
       </div>;
     })}</nav>
-    <div className="sidebar-foot"><span className="state-dot normal" /> <span>{connection}</span></div>
   </aside>;
 }
 
@@ -51,7 +52,7 @@ export function TopBar({ view, revision, mode, demo, siteStatus, fullScreen, isF
   view: View; revision: number; mode: "armed" | "disarmed"; demo: boolean; /** Whether the design is kept on the server. */ siteStatus: "idle" | "saved" | "saving" | "offline"; fullScreen: () => void; /** True while the page is fullscreen: the same button then leaves it. */ isFullScreen: boolean; openAbout: () => void; openHelp: () => void; /** Arm when disarmed, disarm when armed (after asking). */ toggleMode: () => void; t: Translate;
 }) {
   return <header className="topbar">
-    <div className="top-left"><div><p className="eyebrow">AUTONOMOUS RADAR &amp; MULTIMODAL OBSERVATION RANGE</p><h1>{t(view)}</h1></div></div>
+    <div className="top-left"><span className="top-art" aria-hidden="true"><TourArt art={ART_OF_VIEW[view] ?? "menu"} size={64} /></span><div><p className="eyebrow">AUTONOMOUS RADAR &amp; MULTIMODAL OBSERVATION RANGE</p><h1>{t(view)}</h1></div></div>
     <div className="top-status">
       {demo && <span className="demo-badge" title={t("offlineDemo")}>{t("offlineDemo")}</span>}
       <button className={`icon-button ${isFullScreen ? "active" : ""}`} title={isFullScreen ? t("exitFullscreen") : t("fullscreen")} aria-label={isFullScreen ? t("exitFullscreen") : t("fullscreen")} aria-pressed={isFullScreen} onClick={fullScreen}>{isFullScreen ? "🗗" : "⛶"}</button>
@@ -83,23 +84,54 @@ export function AboutDialog({ version, revision, close, t }: { version: string; 
   </div>;
 }
 
-/** The Help window: every menu explained, a list of sections on the left and the chosen one on the right. */
+const HELP_LEVELS = ["simple", "medium", "advanced", "technical"] as const;
+type HelpLevel = (typeof HELP_LEVELS)[number];
+const HELP_LEVEL_KEY = "armor-studio-help-level";
+const readHelpLevel = (): HelpLevel => { try { const value = window.localStorage.getItem(HELP_LEVEL_KEY); return (HELP_LEVELS as readonly string[]).includes(value ?? "") ? (value as HelpLevel) : "medium"; } catch { return "medium"; } };
+const pageOf = (id: string): ArtId => (id === "start" ? "welcome" : id === "tips" ? "tips" : ART_OF_VIEW[id as View] ?? "menu");
+
+/** The Help window, laid out like a book: the menus as chapters on the left, a picture and the text of the chosen one on the right at the level of detail the person picks (simple, medium, advanced or technical), and arrows to turn the page. It is wide and short so that it fits a 1080-pixel screen. */
 export function HelpDialog({ close, initial, t }: { close: () => void; initial?: string; t: Translate }) {
-  const [current, setCurrent] = useState(initial && HELP_SECTIONS.some(section => section.id === initial) ? initial : HELP_SECTIONS[0].id);
-  return <div className="modal-backdrop" role="presentation" onMouseDown={close} onKeyDown={event => { if (event.key === "Escape") close(); }}>
+  const start = initial ? HELP_SECTIONS.findIndex(section => section.id === initial) : 0;
+  const [index, setIndex] = useState(start >= 0 ? start : 0);
+  const [level, setLevel] = useState<HelpLevel>(readHelpLevel);
+  const [turn, setTurn] = useState<"next" | "prev">("next");
+  const section = HELP_SECTIONS[index];
+  const go = (next: number) => { if (next < 0 || next >= HELP_SECTIONS.length) return; setTurn(next > index ? "next" : "prev"); setIndex(next); };
+  const choose = (next: HelpLevel) => { setLevel(next); try { window.localStorage.setItem(HELP_LEVEL_KEY, next); } catch { /* storage may be blocked */ } };
+  const paragraphs = t(`help_b_${section.id}`).split("\n\n");
+  const shown = level === "simple" ? paragraphs.slice(0, 1) : level === "medium" ? paragraphs.slice(0, 2) : paragraphs;
+  const tech = HELP_TECH[section.id];
+  return <div className="modal-backdrop" role="presentation" onMouseDown={close} onKeyDown={event => { if (event.key === "Escape") close(); else if (event.key === "ArrowRight" && !(event.target instanceof HTMLSelectElement)) go(index + 1); else if (event.key === "ArrowLeft" && !(event.target instanceof HTMLSelectElement)) go(index - 1); }}>
     <section className="about-dialog help-dialog" role="dialog" aria-modal="true" aria-labelledby="help-title" onMouseDown={event => event.stopPropagation()}>
       <button className="modal-close" onClick={close} aria-label={t("close")}>×</button>
-      <p className="eyebrow">A.R.M.O.R. STUDIO</p>
-      <h2 id="help-title">{t("helpTitle")}</h2>
-      <p className="muted">{t("helpIntro")}</p>
+      <header className="help-head">
+        <div><p className="eyebrow">A.R.M.O.R. STUDIO</p><h2 id="help-title">{t("helpTitle")}</h2></div>
+        <div className="help-levels" role="radiogroup" aria-label={t("hb_level")}>
+          <span>{t("hb_level")}</span>
+          {HELP_LEVELS.map(item => <button key={item} type="button" role="radio" aria-checked={level === item} className={level === item ? "active" : ""} title={t(`hb_${item}_h`)} onClick={() => choose(item)}>{t(`hb_${item}`)}</button>)}
+        </div>
+      </header>
       <div className="help-body">
-        <nav className="help-nav" aria-label={t("helpSections")}>{HELP_SECTIONS.map(section => <button key={section.id} className={current === section.id ? "active" : ""} onClick={() => setCurrent(section.id)}>{t(`help_s_${section.id}`)}</button>)}</nav>
-        <article className="help-text" tabIndex={0}><h3>{t(`help_s_${current}`)}</h3>{t(`help_b_${current}`).split("\n\n").map((paragraph, index) => <p key={index}>{paragraph}</p>)}</article>
+        <nav className="help-nav" aria-label={t("helpSections")}>{HELP_SECTIONS.map((item, position) => <button key={item.id} className={index === position ? "active" : ""} onClick={() => go(position)}>{t(`help_s_${item.id}`)}</button>)}</nav>
+        <article className={`help-page turn-${turn}`} key={section.id} tabIndex={0}>
+          <div className="help-art"><TourArt art={pageOf(section.id)} size={150} /><small>{t(`hb_${level}_h`)}</small></div>
+          <div className="help-text"><h3>{t(`help_s_${section.id}`)}</h3>
+            {shown.map((paragraph, number) => <p key={number} className={number === 0 ? "lead" : ""}>{paragraph}</p>)}
+            {level !== "technical" && level !== "advanced" && paragraphs.length > shown.length && <p className="muted help-more">{t("hb_more")}</p>}
+            {level === "technical" && tech && tech.routes.length > 0 && <div className="help-tech"><strong>{t("hb_tech_title")}</strong>
+              <ul>{tech.routes.map(route => <li key={route}><code>{route}</code></li>)}</ul>
+              <small>{tech.every ? `${t("hb_tech_every")}: ${tech.every}` : ""}{tech.role === "admin" ? ` · ${t("hb_tech_admin")}` : ""}</small></div>}
+          </div>
+        </article>
       </div>
-      <div className="help-actions">
-        {getPrefsForHelp().tutorial && <button onClick={() => { close(); startTour("welcome"); }}>{t("tourHelpButton")}</button>}
-        <button className="primary" onClick={close}>{t("returnConsole")}</button>
-      </div>
+      <footer className="help-actions">
+        <div className="help-pager"><button type="button" onClick={() => go(index - 1)} disabled={index === 0} aria-label={t("hb_prev")} title={t("hb_prev")}>‹</button>
+          <span>{t("hb_page").replace("{0}", String(index + 1)).replace("{1}", String(HELP_SECTIONS.length))}</span>
+          <button type="button" onClick={() => go(index + 1)} disabled={index === HELP_SECTIONS.length - 1} aria-label={t("hb_next")} title={t("hb_next")}>›</button></div>
+        <div>{getPrefsForHelp().tutorial && <button onClick={() => { close(); startTour("welcome"); }}>{t("tourHelpButton")}</button>}
+          <button className="primary" onClick={close}>{t("returnConsole")}</button></div>
+      </footer>
     </section>
   </div>;
 }
@@ -154,7 +186,7 @@ export function StatusBar(props: StatusBarProps) {
       <span className="sb-chip" title={serverName}>{serverName}</span>
       <i className="sb-sep" />
       <span className={`sb-dot ${synced ? "ok" : "down"}`} aria-hidden="true" />
-      <span className="sb-title">{synced ? t("perimeterControl") : t("serverOffline")}</span>
+      <span className="sb-title">{synced ? t("serverSynchronized") : t("serverOffline")}</span>
       {item(t("sbNodes"), `${nodesOnline}/${nodesTotal}`, nodesTone)}
       {item(t("sbCameras"), `${camerasReachable}/${camerasTotal}`, camerasTone)}
       <span className={`sb-mode ${mode}`}>{mode === "armed" ? t("armed") : t("disarmed")}</span>

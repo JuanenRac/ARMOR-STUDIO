@@ -31,16 +31,21 @@ export function useServerStatus(origin: string): { state: SystemState; connectio
   const [connection, setConnection] = useState<Connection>("demo");
   const [latencyMs, setLatencyMs] = useState<number | null>(null);
   useEffect(() => {
-    let cancelled = false, failures = 0;
+    let cancelled = false, failures = 0, busy = false;
     // One answer that is late or lost is not a lost server (a browser shares a few connections between the camera pictures and these calls): the console says it is offline after three in a row.
     const refresh = async () => {
+      if (busy || document.hidden) return;   // a slow server is not asked again while it has not answered, and a tab nobody is looking at does not ask at all
+      busy = true;
       const started = performance.now();
       try { const next = await readStatus(origin); failures = 0; if (!cancelled) { setState(next); setConnection("synced"); setLatencyMs(Math.round(performance.now() - started)); } }
       catch { failures += 1; if (!cancelled && failures >= 3) { setConnection("demo"); setLatencyMs(null); } }
+      finally { busy = false; }
     };
     void refresh();
     const timer = window.setInterval(() => void refresh(), 3000);
-    return () => { cancelled = true; window.clearInterval(timer); };
+    const back = () => { if (!document.hidden) void refresh(); };   // the tab is shown again: bring it up to date at once
+    document.addEventListener("visibilitychange", back);
+    return () => { cancelled = true; window.clearInterval(timer); document.removeEventListener("visibilitychange", back); };
   }, [origin]);
   return { state, connection, latencyMs, apply: setState };
 }

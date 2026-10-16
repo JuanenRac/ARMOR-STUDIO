@@ -36,6 +36,8 @@ export type Prefs = {
   startView: StartView;
   /** The menu the person was in last, kept for `startView: "last"`. */
   lastView: View;
+  /** The mascot that guides from menu to menu. */
+  assistant: boolean;
   /** A new critical alarm is heard. */
   alertSound: boolean;
   /** A new critical alarm is shown as a notification of the browser. */
@@ -44,7 +46,7 @@ export type Prefs = {
 
 export const DEFAULT_PREFS: Prefs = {
   tutorial: true, tourAutoStart: true, toursDone: [], tooltips: "rich", tooltipDelay: 450, motion: "full", density: "comfortable", textScale: 100,
-  startView: "overview", lastView: "overview", alertSound: true, alertNotifications: true,
+  startView: "overview", lastView: "overview", assistant: true, alertSound: true, alertNotifications: true,
 };
 
 export const LIMITS = { tooltipDelay: [150, 1500], textScale: [85, 130], tours: 40 } as const;
@@ -64,7 +66,7 @@ export function parsePrefs(raw: string | null): Prefs {
     tutorial: bool("tutorial", DEFAULT_PREFS.tutorial), tourAutoStart: bool("tourAutoStart", DEFAULT_PREFS.tourAutoStart), toursDone: done,
     tooltips: oneOf(TOOLTIP_MODES, source.tooltips, DEFAULT_PREFS.tooltips), tooltipDelay: number("tooltipDelay", DEFAULT_PREFS.tooltipDelay, LIMITS.tooltipDelay),
     motion: oneOf(MOTION_MODES, source.motion, DEFAULT_PREFS.motion), density: oneOf(DENSITIES, source.density, DEFAULT_PREFS.density), textScale: number("textScale", DEFAULT_PREFS.textScale, LIMITS.textScale),
-    startView: start, lastView: oneOf(VIEWS, source.lastView, DEFAULT_PREFS.lastView), alertSound: bool("alertSound", DEFAULT_PREFS.alertSound), alertNotifications: bool("alertNotifications", DEFAULT_PREFS.alertNotifications),
+    startView: start, lastView: oneOf(VIEWS, source.lastView, DEFAULT_PREFS.lastView), assistant: bool("assistant", DEFAULT_PREFS.assistant), alertSound: bool("alertSound", DEFAULT_PREFS.alertSound), alertNotifications: bool("alertNotifications", DEFAULT_PREFS.alertNotifications),
   };
 }
 

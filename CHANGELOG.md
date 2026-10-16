@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented here.
 
+## [0.7.5] - Alarm sounds, voice and pop-ups, a Help book with four levels, a tour for every menu and an assistant
+
+- **Alarm sounds:** Configuration > Preferences chooses a sound for each severity and, if wanted, another for each kind of source, with a play button on every row; eight sounds are made by Studio itself.
+- **Your own sounds:** audio files (up to 1.5 MB) can be uploaded from the browser, kept in the browser's own storage, played, assigned to a severity or a source and removed.
+- **Spoken alarms:** the browser's voice can say the severity, the kind of alarm and where it comes from, with a language, a female or male voice, an age (child, adult, elderly) and a speed, and a button to test it.
+- **Muting:** everything can be muted at once, and each severity and each kind of source can be muted on its own; the volume is a slider.
+- **Pop-ups:** a new alarm shows an animated card in a corner that never blocks the page, closes with a click or by itself after the chosen seconds, pulses when critical and can be limited to the time the system is armed.
+- **Smart jump:** an alarm can take you to where it is handled - an intruder seen by a camera opens that camera, one seen by a radar opens the camera that covers it, a panel alarm opens the panels, a solar or electrical fault its own menu - or only when a click asks for it.
+- **Blinking tab:** the title of the browser tab blinks with the number of alarms that wait for a person.
+- **Help book:** the Help is wider and shorter so it fits a 1080-pixel screen, has an animated picture for every menu, arrows (and the arrow keys) to turn the page, and four levels of detail - simple, medium, advanced and technical - the last one listing what each menu reads from the server.
+- **Guided tours:** every menu now has its own tour, written from the Help in the seven languages, that lights up the menu and then the page while it explains what it shows and how to use it.
+- **Assistant:** an animated mascot follows you from menu to menu, tells you what each one is for, offers the tour of the menu, the next thing to know or the Help, and is switched on or off in Preferences.
+- The animated picture of the menu sits beside its title in the top bar.
+- The connection state moved from the foot of the menu to the bottom status bar, and the menu uses the space it left.
+- The Sistema menu no longer squeezes "What the nodes send" against the audit log, which showed two copy buttons stacked.
+- Descriptive texts under the titles of the menus and tabs use the whole width of their card instead of wrapping in a narrow column.
+- The demonstration site is never uploaded to the server over a real design, and the status poll skips a hidden tab and a request that is still running.
+
 ## [0.7.4] - Motorised gates, garage doors and shutters, water heaters and tanks, and a bridge to the Electrical Designer
 
 - **Gates:** new looks for a gate - farm or field gate, sliding gate and cantilever gate - drawn in the plan (swing arc or sliding track) and in 3D, and a motorised gate shows its motor box and can be tied to a gate motor of the Devices menu.

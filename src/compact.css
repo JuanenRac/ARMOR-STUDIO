@@ -91,7 +91,8 @@
   .studio-frame .history-stat { padding: .3rem .6rem; }
 
   /* ---- system ---- */
-  .studio-frame .system-view { flex: 1 1 0; min-height: 0; display: grid; grid-template-rows: auto auto auto minmax(0, 1fr); gap: 4px; }
+  .studio-frame .system-view { flex: 1 1 0; min-height: 0; display: grid; grid-template-rows: auto auto auto auto minmax(0, 1fr); gap: 4px; }
+  .studio-frame .system-view .ingest-card { max-height: 30vh; overflow: auto; padding: .55rem .7rem; }
   .studio-frame .sys-hero { gap: 4px; } .studio-frame .sys-hero > div { padding: .45rem .8rem; border-radius: 14px; } .studio-frame .sys-hero strong { font-size: 1.25rem; }
   .studio-frame .sys-grid { gap: 4px; } .studio-frame .sys-grid .stack-card { padding: .55rem .7rem; }
   .studio-frame .audit-card { min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: .55rem .7rem; }

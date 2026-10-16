@@ -11,6 +11,7 @@
 import { useEffect, useRef, useState } from "react";
 import { readSite, saveSite } from "./api";
 import { applySiteDoc, buildSiteDoc, siteDocKey, type SiteDesign } from "./siteSync";
+import { isUntouchedDemo } from "./domain";
 
 export type SiteSyncStatus = "idle" | "saved" | "saving" | "offline";
 export type SiteDraftInfo = { savedAt: string };
@@ -75,7 +76,10 @@ export function useSiteSync({ origin, enabled, design, apply, onConflict, onNoti
             latest.current.onNotice?.("kept");
           }
         } else if (document.site) { take(document); if (draft && draft.origin === origin) writeDraft(null); }
-        else {
+        else if (isUntouchedDemo(latest.current.design)) {
+          // A new installation and a browser that never drew anything: its design is the example one, and it is not sent to the server as the real site (the phone would draw it on its radar). The first real change is saved as usual.
+          revision.current = document.revision; synced.current = keyRef.current;
+        } else {
           const saved = await saveSite(origin, document.revision, buildSiteDoc(latest.current.design));
           if (cancelled) return;
           if ("revision" in saved) { revision.current = saved.revision; synced.current = keyRef.current; }

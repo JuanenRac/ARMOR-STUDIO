@@ -8,18 +8,21 @@ import { TOURS, TOUR_TARGETS, moveStep, placeCard, stepKey } from "./tours";
 
 import chromeSource from "../components/chrome.tsx?raw";
 import configurationSource from "../ConfigurationPanel.tsx?raw";
-const sources: Record<string, string> = { "../components/chrome.tsx": chromeSource, "../ConfigurationPanel.tsx": configurationSource };
+import appSource from "../App.tsx?raw";
+import { menuTourCatalogues } from "./menuTours";
+const sources: Record<string, string> = { "../components/chrome.tsx": chromeSource, "../ConfigurationPanel.tsx": configurationSource, "../App.tsx": appSource };
+const MENU_KEYS = Object.keys(menuTourCatalogues.en);
 const source = (path: string): string => sources[path];
 
 describe("the guided tours", () => {
   it("have a title and a body for every step, and a name and summary for every tour, in the seven languages", () => {
-    const keys = new Set(TOUR_KEYS);
+    const keys = new Set([...TOUR_KEYS, ...MENU_KEYS]);
     for (const tour of TOURS) {
       expect(keys.has(`tour_${tour.id}`), tour.id).toBe(true);
       expect(keys.has(`tour_${tour.id}_s`), tour.id).toBe(true);
       tour.steps.forEach((_step, index) => { for (const part of ["t", "b"] as const) expect(keys.has(stepKey(tour.id, index, part)), `${tour.id} ${index} ${part}`).toBe(true); });
     }
-    for (const language of locales) for (const key of [...TOUR_KEYS, ...PREFS_KEYS]) {
+    for (const language of locales) for (const key of [...TOUR_KEYS, ...MENU_KEYS, ...PREFS_KEYS]) {
       const sentence = text(language, key);
       expect(sentence, `${language} ${key}`).not.toBe(key);
       expect(sentence.trim().length, `${language} ${key}`).toBeGreaterThan(0);
@@ -33,7 +36,7 @@ describe("the guided tours", () => {
   });
 
   it("only light up parts of the page that are marked in it, and visit menus that exist", () => {
-    const page = [source("../components/chrome.tsx"), source("../ConfigurationPanel.tsx")].join("\n");
+    const page = [source("../components/chrome.tsx"), source("../ConfigurationPanel.tsx"), source("../App.tsx")].join("\n");
     const menus = new Set<string>(NAV.map(([view]) => view));
     for (const target of TOUR_TARGETS) {
       if (target.startsWith("nav-")) expect(menus.has(target.slice(4)), target).toBe(true);

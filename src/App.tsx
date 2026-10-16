@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 import { ConfirmHost } from "./askConfirm";
-import { useCriticalAlarmAlert } from "./alarmAlert";
+import { useAlarmAnnouncer } from "./alerts/useAlarmAnnouncer";
+import { AlarmPopups } from "./alerts/AlarmPopups";
+import { Assistant } from "./assistant/Assistant";
+import type { RouteContext } from "./alerts/route";
 import { getPrefs, openingView, setPrefs, usePrefs } from "./prefs";
 import { TourHost } from "./tour/TourHost";
 import { RichTooltips } from "./tour/RichTooltips";
@@ -73,6 +76,7 @@ import "./themes.css";
 import "./selects.css";
 import "./actionButtons.css";
 import "./ui-system.css";
+import "./wide-text.css";
 
 const studioVersion = manifest.version;
 
@@ -141,7 +145,14 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const networkPoll = usePolled(() => listNetwork(origin), 5000, origin);
   const devices = devicePoll.data?.devices ?? [];
   const alarms = alarmPoll.data;
-  useCriticalAlarmAlert(alarmPoll.data, t("alarmNewCritical"), true, { sound: prefs.alertSound, notification: prefs.alertNotifications });
+  const alertContext = useMemo<RouteContext>(() => ({
+    panelNodes: new Set((alarmNodesPoll.data?.nodes ?? []).map(item => item.node_id)),
+    solarNodes: new Set([...(solarPoll.data?.devices ?? []).map(item => item.node_id), ...(solarPoll.data?.waiting ?? []).map(item => item.node_id)]),
+    electricalNodes: new Set((electricalPoll.data?.nodes ?? []).map(item => item.node_id)),
+    cameras: new Set(cameras.map(camera => camera.id)),
+  }), [alarmNodesPoll.data, solarPoll.data, electricalPoll.data, cameras]);
+  const announcer = useAlarmAnnouncer({ alarms: alarmPoll.data, t, language, armed: state.mode === "armed", enabled: true, sound: prefs.alertSound, notification: prefs.alertNotifications, context: alertContext,
+    go: target => { if (target.camera) setSelectedCamera(target.camera); setView(target.view); } });
   // the menu the person is in is remembered for "open where I was"; the first visit starts the welcome tour
   useEffect(() => { if (getPrefs().lastView !== view) setPrefs({ lastView: view }); }, [view]);
   useEffect(() => { if (!shouldAutoStart()) return undefined; const timer = window.setTimeout(() => { if (shouldAutoStart()) startTour("welcome"); }, 1400); return () => window.clearTimeout(timer); }, []);
@@ -333,8 +344,8 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
 
   const serverName = (() => { try { return new URL(origin).host; } catch { return origin; } })();
   return <SessionUserContext.Provider value={sessionUser}><KnownNodesContext.Provider value={knownNodes}><StreamRenewContext.Provider value={renewStream}><div className="studio-frame"><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
-    <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} connection={connection} alarmBadge={alarmsPending} t={t} />
-    <section className="main-stage">
+    <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} alarmBadge={alarmsPending} t={t} />
+    <section className="main-stage" data-tour="stage">
       <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} t={t} />
       {panels[view]}
     </section>
@@ -342,6 +353,8 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     <TourHost t={t} view={view} setView={setView} />
     <RichTooltips t={t} />
     {helpOpen && <HelpDialog initial={view} close={() => setHelpOpen(false)} t={t} />}
+    <Assistant view={view} t={t} openHelp={() => setHelpOpen(true)} />
+    <AlarmPopups popups={announcer.popups} open={announcer.open} dismiss={announcer.dismiss} dismissAll={announcer.dismissAll} t={t} />
     {aboutOpen && <AboutDialog version={studioVersion} revision={state.revision} close={() => setAboutOpen(false)} t={t} />}
     {versionsOf && <DesignVersionsDialog kind={versionsOf} origin={origin} t={t} close={() => setVersionsOf(null)}
       draft={versionsOf === "site" ? siteSync.draft : null} restoreDraft={siteSync.restoreDraft}

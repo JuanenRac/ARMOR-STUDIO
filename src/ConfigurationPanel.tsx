@@ -99,7 +99,7 @@ export function ConfigurationPanel(props: Props) {
     {tab === "files" && <FilesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "installation" && <InstallationPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "notifications" && <NotificationsPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
-    {tab === "preferences" && <PreferencesPanel t={t} />}
+    {tab === "preferences" && <PreferencesPanel t={t} language={props.language} />}
     {tab === "updates" && <UpdatesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "console" && <ConsolePanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "firmware" && <FirmwarePanel t={t} origin={props.origin} isAdmin={props.isAdmin} network={props.network ?? null} />}

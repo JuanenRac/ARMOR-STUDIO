@@ -15,3 +15,34 @@
   .help-nav { flex-direction: row; flex-wrap: wrap; overflow: visible; }
   .help-text { border-left: 0; padding-left: 0; overflow: visible; }
 }
+
+/* The book: wide and short, a picture beside the text, levels at the top and arrows at the foot. */
+.about-dialog.help-dialog { width: min(1240px, 100%); height: min(760px, calc(100vh - 2rem)); padding: 1.1rem 1.4rem; gap: .6rem; }
+.help-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; padding-right: 2.4rem; }
+.help-head h2 { margin: 0; font-size: 1.35rem; } .help-head .eyebrow { margin: 0; }
+.help-levels { display: flex; align-items: center; gap: .3rem; flex-wrap: wrap; } .help-levels > span { font-size: .72rem; color: #85a9b3; margin-right: .3rem; }
+.help-levels button { padding: .3rem .7rem; border-radius: 999px; font-size: .76rem; }
+.help-levels button.active { background: linear-gradient(90deg, #14505c, #0f3a46); border-color: #2f8ea0; color: #e9ffff; font-weight: 600; }
+.help-body { grid-template-columns: 200px minmax(0, 1fr); }
+.help-page { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 1.2rem; overflow-y: auto; padding: .3rem .6rem .4rem 1.1rem; border-left: 1px solid #1e4854; border-radius: 0 12px 12px 0; background: linear-gradient(100deg, rgba(14, 38, 50, .55), rgba(8, 22, 30, .2)); animation: help-turn-next .35s ease both; }
+.help-page.turn-prev { animation-name: help-turn-prev; }
+.help-art { display: grid; align-content: start; justify-items: center; gap: .6rem; padding-top: .6rem; text-align: center; } .help-art small { color: #85a9b3; font-size: .72rem; }
+.help-art .tour-art { width: 100%; max-width: 170px; height: auto; filter: drop-shadow(0 0 14px rgba(0, 229, 255, .25)); }
+.help-page .help-text { border-left: 0; padding: 0; overflow: visible; max-width: none; }
+.help-page .help-text p.lead { font-size: .95rem; color: #e3f6fa; }
+.help-more { font-size: .74rem; }
+.help-tech { margin-top: .8rem; padding: .6rem .8rem; border: 1px solid #1f4e5a; border-radius: 10px; background: rgba(0, 0, 0, .25); }
+.help-tech ul { list-style: none; margin: .4rem 0; padding: 0; display: flex; flex-wrap: wrap; gap: .3rem .5rem; } .help-tech code { font-size: .74rem; padding: .1rem .4rem; border-radius: 6px; background: #0b202a; color: #9fd8e3; }
+.help-tech small { color: #85a9b3; }
+.help-actions { display: flex; justify-content: space-between; align-items: center; gap: .8rem; flex-wrap: wrap; } .help-actions > div { display: flex; gap: .5rem; align-items: center; }
+.help-pager span { font-size: .78rem; color: #a7c4cc; min-width: 9rem; text-align: center; }
+.help-pager button { width: 2.4rem; height: 2.2rem; font-size: 1.3rem; line-height: 1; padding: 0; }
+@keyframes help-turn-next { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+@keyframes help-turn-prev { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
+html[data-motion="off"] .help-page, html[data-motion="reduced"] .help-page { animation: none; }
+@media (max-width: 900px) { .help-page { grid-template-columns: 1fr; } .help-art { grid-auto-flow: column; justify-content: start; align-items: center; } .help-art .tour-art { max-width: 90px; } }
+@media (max-width: 760px) { .help-body { grid-template-columns: 1fr; } .about-dialog.help-dialog { height: calc(100vh - 1rem); } }
+
+/* The animated picture of the menu, beside its title. */
+.top-art { display: inline-flex; flex: 0 0 auto; opacity: .9; } .top-art .tour-art { width: 56px; height: auto; filter: drop-shadow(0 0 8px rgba(0, 229, 255, .3)); }
+@media (max-width: 1100px) { .top-art { display: none; } }

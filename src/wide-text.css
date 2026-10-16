@@ -1,0 +1,9 @@
+/* Descriptive texts use the whole width of their card, at any language or font size, instead of a narrow column that wraps them over many lines. */
+.main-stage .muted,
+.main-stage .solar-title .muted,
+.main-stage .ov-hero .muted,
+.main-stage .electrical-designer .ed-head .muted,
+.main-stage :is(.devices-empty, .solar-empty) p:not(#ui) { max-width: none; width: 100%; overflow-wrap: anywhere; text-wrap: pretty; }
+.main-stage .video-integration { max-width: none; }
+.main-stage :is(.stack-card, .config-panel, .devices-head, .alarm-hero, .sys-head, .ed-head) > p,
+.main-stage :is(.stack-card, .config-panel) > .muted { max-width: none; }

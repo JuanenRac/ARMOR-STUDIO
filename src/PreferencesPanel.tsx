@@ -7,13 +7,14 @@ import { askConfirm } from "./askConfirm";
 import { LIMITS, MOTION_MODES, DENSITIES, TOOLTIP_MODES, VIEWS, markTour, resetPrefs, setPrefs, usePrefs, type StartView } from "./prefs";
 import { TOURS } from "./tour/tours";
 import { startTour } from "./tour/tourStore";
+import { AlertSettingsPanel } from "./alerts/AlertSettingsPanel";
 import { TourArt } from "./tour/TourArt";
 import "./tour/tour.css";
 import "./preferences.css";
 
 const format = (template: string, args: ReadonlyArray<string | number>): string => template.replace(/\{(\d+)\}/g, (_match, index: string) => String(args[Number(index)] ?? ""));
 
-export function PreferencesPanel({ t }: { t: (key: string) => string }) {
+export function PreferencesPanel({ t, language = "en" }: { t: (key: string) => string; language?: string }) {
   const prefs = usePrefs();
   const seen = new Set(prefs.toursDone);
   const reset = async () => { if (await askConfirm(t("pf_reset_confirm"), t)) resetPrefs(); };
@@ -29,6 +30,7 @@ export function PreferencesPanel({ t }: { t: (key: string) => string }) {
       <article className="stack-card pf-card">
         <h3>{t("pf_section_help")}</h3>
         {toggle("pf_tutorial", "pf_tutorial_h", prefs.tutorial, tutorial => setPrefs({ tutorial }))}
+        {toggle("pf_assistant", "pf_assistant_h", prefs.assistant, assistant => setPrefs({ assistant }))}
         {toggle("pf_autostart", null, prefs.tourAutoStart, tourAutoStart => setPrefs({ tourAutoStart }), !prefs.tutorial)}
         {choose("tooltips", "pf_tooltips", TOOLTIP_MODES, prefs.tooltips, tooltips => setPrefs({ tooltips }), item => `pf_tooltips_${item}`)}
         <p className="muted pf-hint">{t("pf_tooltips_h")}</p>
@@ -60,6 +62,8 @@ export function PreferencesPanel({ t }: { t: (key: string) => string }) {
         <div className="pf-actions"><button className="danger" onClick={() => void reset()}>{t("pf_reset")}</button></div>
       </article>
     </div>
+
+    <AlertSettingsPanel t={t} language={language} />
 
     <article className="stack-card pf-tours">
       <h3>{t("pf_tours")}</h3>

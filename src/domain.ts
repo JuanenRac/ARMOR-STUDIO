@@ -211,6 +211,12 @@ export const INITIAL_ROOF_ITEMS: RoofItem[] = [
   { id: "antenna-01", buildingId: "building-01", kind: "antenna", x: 17.5, y: 18, width: 0.1, depth: 0.1, height: 3, rotation: 0, tilt: 0 },
 ];
 export const INITIAL_WALL_LAMPS: WallLamp[] = [{ id: "wall-lamp-01", buildingId: "building-01", edge: 1, offset: 4, z: 2.4, reach: 0.4 }];
+/** Whether a design is still the example one Studio starts with (nothing of it was drawn by the person): an example is never sent to the server as if it were the real site. */
+export function isUntouchedDemo(design: { terrain: Terrain; buildings: Building[]; openings: Opening[]; roofItems: RoofItem[]; features: SiteFeature[]; cameras: Camera[]; sensors: Sensor[] }): boolean {
+  const same = (a: unknown, b: unknown): boolean => JSON.stringify(a) === JSON.stringify(b);
+  return same(design.terrain, INITIAL_TERRAIN) && same(design.buildings, INITIAL_BUILDINGS) && same(design.openings, INITIAL_OPENINGS) && same(design.roofItems, INITIAL_ROOF_ITEMS) && same(design.features, INITIAL_FEATURES)
+    && same(design.sensors, INITIAL_SENSORS) && design.cameras.every(camera => INITIAL_CAMERAS.some(initial => initial.id === camera.id));
+}
 export const INITIAL_FEATURES: SiteFeature[] = [
   { id: "lamp-01", kind: "lamp", x: 13, y: 9, z: 0, width: 0.12, depth: 0.12, height: 5, rotation: 0, slope: 0 },
   { id: "lamp-02", kind: "lamp", x: 45, y: 10, z: 0, width: 0.12, depth: 0.12, height: 5, rotation: 0, slope: 0 },
