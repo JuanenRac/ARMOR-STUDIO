@@ -5,7 +5,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import type { AlarmSourceType, Alarm, Severity } from "../api";
-import { AGES, BUILT_IN_SOUNDS, GENDERS, LIMITS, REDIRECTS, SEVERITIES, SOURCES, setAlerts, soundFor, useAlerts, type AlertSettings } from "./settings";
+import { AGES, BUILT_IN_SOUNDS, GENDERS, LIMITS, REDIRECTS, SEVERITIES, SOURCES, VOICE_STYLES, setAlerts, soundFor, useAlerts, type AlertSettings } from "./settings";
 import { addSound, listSounds, listVoices, playSound, removeSound, speak, speechAvailable, stopSound, forgetSoundUrl, type StoredSound } from "./sounds";
 import { alarmSentence } from "./route";
 
@@ -102,6 +102,8 @@ export function AlertSettingsPanel({ t, language }: Props) {
             {GENDERS.map(gender => <option key={gender} value={gender}>{t(`al_gender_${gender}`)}</option>)}</select></label>
           <label>{t("al_voice_age")}<select value={settings.voice.age} onChange={event => setVoice({ age: event.target.value as typeof AGES[number] })}>
             {AGES.map(age => <option key={age} value={age}>{t(`al_age_${age}`)}</option>)}</select></label>
+          <label>{t("al_voice_style")}<select value={settings.voice.style} onChange={event => setVoice({ style: event.target.value as typeof VOICE_STYLES[number] })}>
+            {VOICE_STYLES.map(style => <option key={style} value={style}>{t(`al_style_${style}`)}</option>)}</select></label>
           <label className="pf-range">{t("al_voice_rate")}: <b>{settings.voice.rate} %</b>
             <input type="range" min={LIMITS.rate[0]} max={LIMITS.rate[1]} step={5} value={settings.voice.rate} onChange={event => setVoice({ rate: Number(event.target.value) })} /></label>
           <h4>{t("al_voice_say")}</h4>

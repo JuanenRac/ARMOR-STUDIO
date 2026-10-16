@@ -14,9 +14,12 @@ export const BUILT_IN_SOUNDS = ["none", "siren", "klaxon", "beep", "pulse", "chi
 export const REDIRECTS = ["never", "critical", "all"] as const;
 export const GENDERS = ["any", "female", "male"] as const;
 export const AGES = ["child", "adult", "senior"] as const;
+/** How the voice speaks: plain, like an action hero (quick, witty, sure of itself), like a dark lord (slow, deep, imposing) or theatrical (cold whispers and dramatic peaks). */
+export const VOICE_STYLES = ["plain", "hero", "dark", "chaos"] as const;
 export type Redirect = (typeof REDIRECTS)[number];
 export type Gender = (typeof GENDERS)[number];
 export type Age = (typeof AGES)[number];
+export type VoiceStyle = (typeof VOICE_STYLES)[number];
 
 export type AlertSettings = {
   /** Everything silent: no sound and no voice (the pop-ups stay). */
@@ -29,7 +32,7 @@ export type AlertSettings = {
   sourceSounds: Partial<Record<AlarmSourceType, string>>;
   mutedSeverities: Severity[];
   mutedSources: AlarmSourceType[];
-  voice: { enabled: boolean; language: string; gender: Gender; age: Age; rate: number; say: { type: boolean; severity: boolean; source: boolean } };
+  voice: { enabled: boolean; language: string; gender: Gender; age: Age; style: VoiceStyle; rate: number; say: { type: boolean; severity: boolean; source: boolean } };
   popups: { enabled: boolean; seconds: number; blink: boolean; onlyWhileArmed: boolean; maxOnScreen: number };
   /** Take the person to the menu where the alarm is handled as soon as it comes in. */
   redirect: Redirect;
@@ -41,7 +44,7 @@ export const DEFAULT_ALERTS: AlertSettings = {
   muted: false, volume: 70,
   sounds: { critical: "siren", high: "klaxon", warning: "chime" },
   sourceSounds: {}, mutedSeverities: [], mutedSources: [],
-  voice: { enabled: false, language: "", gender: "any", age: "adult", rate: 100, say: { type: true, severity: true, source: true } },
+  voice: { enabled: false, language: "", gender: "any", age: "adult", style: "plain", rate: 100, say: { type: true, severity: true, source: true } },
   popups: { enabled: true, seconds: 15, blink: true, onlyWhileArmed: false, maxOnScreen: 4 },
   redirect: "never", blinkTitle: true,
 };
@@ -74,7 +77,7 @@ export function parseAlerts(raw: string | null): AlertSettings {
     muted: bool(source.muted, d.muted), volume: num(source.volume, d.volume, LIMITS.volume),
     sounds: { critical: sound(sounds.critical, d.sounds.critical), high: sound(sounds.high, d.sounds.high), warning: sound(sounds.warning, d.sounds.warning) },
     sourceSounds, mutedSeverities: subset(SEVERITIES, source.mutedSeverities), mutedSources: subset(SOURCES, source.mutedSources),
-    voice: { enabled: bool(voice.enabled, d.voice.enabled), language, gender: oneOf(GENDERS, voice.gender, d.voice.gender), age: oneOf(AGES, voice.age, d.voice.age), rate: num(voice.rate, d.voice.rate, LIMITS.rate),
+    voice: { enabled: bool(voice.enabled, d.voice.enabled), language, gender: oneOf(GENDERS, voice.gender, d.voice.gender), age: oneOf(AGES, voice.age, d.voice.age), style: oneOf(VOICE_STYLES, voice.style, d.voice.style), rate: num(voice.rate, d.voice.rate, LIMITS.rate),
       say: { type: bool(say.type, true), severity: bool(say.severity, true), source: bool(say.source, true) } },
     popups: { enabled: bool(popups.enabled, d.popups.enabled), seconds: num(popups.seconds, d.popups.seconds, LIMITS.seconds), blink: bool(popups.blink, d.popups.blink), onlyWhileArmed: bool(popups.onlyWhileArmed, d.popups.onlyWhileArmed), maxOnScreen: num(popups.maxOnScreen, d.popups.maxOnScreen, LIMITS.onScreen) },
     redirect: oneOf(REDIRECTS, source.redirect, d.redirect), blinkTitle: bool(source.blinkTitle, d.blinkTitle),

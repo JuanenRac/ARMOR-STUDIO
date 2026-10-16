@@ -4,6 +4,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import type { AlertSettings, Age, Gender } from "./settings";
+import { speechParts } from "./voiceStyle";
 
 export const MAX_UPLOAD_BYTES = 1_500_000;
 export const MAX_SOUNDS = 12;
@@ -178,14 +179,18 @@ export function speak(message: string, settings: AlertSettings, interfaceLanguag
   if (!speechAvailable() || settings.muted || !settings.voice.enabled || !message.trim()) return false;
   try {
     const language = speechLanguage(settings.voice.language, interfaceLanguage);
-    const utterance = new SpeechSynthesisUtterance(message.slice(0, 240));
-    utterance.lang = language;
     const voice = pickVoice(listVoices(), language, settings.voice.gender);
-    if (voice) utterance.voice = voice;
     const age = AGE_VOICE[settings.voice.age];
-    utterance.pitch = age.pitch; utterance.rate = (settings.voice.rate / 100) * age.rate;
-    utterance.volume = Math.max(0, Math.min(1, settings.volume / 100));
-    window.speechSynthesis.speak(utterance);
+    // the style may cut the message in stretches (the theatrical one whispers and then rises): each is spoken in turn
+    for (const part of speechParts(message, settings.voice.style, language)) {
+      const utterance = new SpeechSynthesisUtterance(part.text.slice(0, 240));
+      utterance.lang = language;
+      if (voice) utterance.voice = voice;
+      utterance.pitch = Math.max(0, Math.min(2, age.pitch * part.pitch));
+      utterance.rate = Math.max(0.1, Math.min(4, (settings.voice.rate / 100) * age.rate * part.rate));
+      utterance.volume = Math.max(0, Math.min(1, (settings.volume / 100) * part.volume));
+      window.speechSynthesis.speak(utterance);
+    }
     return true;
   } catch { return false; }
 }
