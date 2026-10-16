@@ -4,6 +4,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { ViewTabs } from "./components/ViewTabs";
+import { useViewActive } from "./viewSlots";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { deleteHistory, listHistory, readHistorySummary, readRules, saveRules, type ArmorEvent, type EventType, type HistorySummary, type Rules, type Zone } from "./api";
 import { DEFAULT_FILTERS, DEFAULT_ZONE_VIEW, describeEvent, emptyZoneDraft, eventsToCsv, historyQuery, pixelToMm, rectFromDrag, zoneFromDraft, type HistoryFilters, type ZoneDraft } from "./history";
@@ -45,6 +46,7 @@ function EventPanel({ origin, t }: { origin: string; t: Translate }) {
   const [next, setNext] = useState<number | null>(null);
   const [summary, setSummary] = useState<HistorySummary | null>(null);
   const [live, setLive] = useState(true);
+  const active = useViewActive();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState<number | null>(null);
@@ -67,10 +69,10 @@ function EventPanel({ origin, t }: { origin: string; t: Translate }) {
   useEffect(() => { setLoading(true); void refresh(); }, [refresh]);
   // Live refresh keeps the newest events flowing in; it is paused while a page beyond the first is open or a deletion awaits.
   useEffect(() => {
-    if (!live || pending) return;
+    if (!live || pending || !active) return;
     const timer = window.setInterval(() => { if (next === null || events.length <= PAGE) void refresh(); }, 5_000);
     return () => window.clearInterval(timer);
-  }, [live, pending, refresh, next, events.length]);
+  }, [live, pending, active, refresh, next, events.length]);   // not while the menu is hidden
 
   const more = async () => {
     if (next === null) return;

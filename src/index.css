@@ -5,14 +5,14 @@
   .studio-shell { height:100dvh; max-height:1080px; overflow:hidden; }
   .main-stage { display:flex; flex-direction:column; height:100dvh; max-height:1080px; overflow:hidden; padding:1rem clamp(1rem,3vw,3rem); }
   .topbar { flex:0 0 auto; padding-bottom:.8rem; }
-  .main-stage > .metric-strip { flex:0 0 auto; margin:.8rem 0; }
-  .main-stage > .content-grid:not(.radar-grid),
-  .main-stage > .camera-workspace,
-  .main-stage > .layout-workspace,
-  .main-stage > .configuration,
-  .main-stage > .media-workspace,
-  .main-stage > .radar-grid { flex:1 1 0; min-height:0; max-height:none; margin-top:0; }
-  .main-stage > .content-grid:not(.radar-grid), .main-stage > .radar-grid { overflow:hidden; }
+  .main-stage > .view-slot > .metric-strip { flex:0 0 auto; margin:.8rem 0; }
+  .main-stage > .view-slot > .content-grid:not(.radar-grid),
+  .main-stage > .view-slot > .camera-workspace,
+  .main-stage > .view-slot > .layout-workspace,
+  .main-stage > .view-slot > .configuration,
+  .main-stage > .view-slot > .media-workspace,
+  .main-stage > .view-slot > .radar-grid { flex:1 1 0; min-height:0; max-height:none; margin-top:0; }
+  .main-stage > .view-slot > .content-grid:not(.radar-grid), .main-stage > .view-slot > .radar-grid { overflow:hidden; }
   .overview-map, .content-grid > .stack-card, .radar-grid > .stack-card { min-height:0; overflow:auto; }
   .camera-workspace, .configuration, .media-workspace { overflow:auto; }
   .camera-workspace { display:flex; flex-direction:column; }
@@ -66,3 +66,7 @@ html[data-armor-theme="Midnight"] body{background:#020611}html[data-armor-theme=
 .demo-badge{padding:.22rem .6rem;border:1px solid #FFB020;border-radius:999px;background:rgba(255,176,32,.12);color:#FFB020;font:600 .68rem "DM Mono","Cascadia Mono",ui-monospace,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase}
 
 .live-next{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+
+/* a menu in its place: the wrapper takes no part in the layout, and a hidden one takes no room */
+.view-slot { display: contents; }
+.view-slot[hidden] { display: none; }

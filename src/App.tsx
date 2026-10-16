@@ -16,6 +16,7 @@ import { shouldAutoStart, startTour } from "./tour/tourStore";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { acknowledgeAlarm, listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
+import { ViewSlot, viewsToDraw } from "./viewSlots";
 import { AboutDialog, ConfirmDialog, HelpDialog, PinDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
 import { DesignVersionsDialog } from "./DesignVersionsDialog";
 import { SessionUserContext } from "./sessionContext";
@@ -32,6 +33,9 @@ import {
   DEFAULT_THEME, INITIAL_BUILDINGS, INITIAL_CAMERAS, INITIAL_DIMENSIONS, INITIAL_FEATURES, INITIAL_OPENINGS, INITIAL_ROOF_ITEMS, INITIAL_SENSORS, INITIAL_TERRAIN, INITIAL_WALL_LAMPS, LANGUAGES, THEMES,
   type Building, type Camera, type DevicePlacement, type Dimensions, type GridSize, type LanguageCode, type Opening, type RoofItem, type Sensor, type SiteFeature, type Terrain, type Theme, type View, type WallLamp,
 } from "./domain";
+import { NAV } from "./domain";
+
+const VIEW_ORDER = NAV.map(([key]) => key);
 import type { SiteModel } from "./designer/ops";
 import { usePolled, useFullscreen, useCameraReachability, useServerCameras, useServerInfo, useServerStatus, useSessionUser, useStreamUrls } from "./hooks";
 import { text } from "./i18n";
@@ -310,6 +314,8 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     expand(cameras[(index + offset + cameras.length) % cameras.length].id);
   };
 
+  const visitedViews = useRef(new Set<View>());
+  const shownPanels = useRef(new Map<View, ReactNode>());
   const panels: Record<View, ReactNode> = {
     overview: <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} />,
     alarms: <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} />,
@@ -349,7 +355,11 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} alarmBadge={alarmsPending} t={t} />
     <section className="main-stage" data-tour="stage">
       <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={sessionUser.user?.role === "viewer"} checkPerimeter={() => setCheckOpen(true)} t={t} />
-      {panels[view]}
+      {viewsToDraw(VIEW_ORDER, view, visitedViews.current).map(shown => {
+        // a hidden menu keeps the last thing it was given (the same element: React does not draw it again every second); it is refreshed when it is shown
+        if (shown === view) shownPanels.current.set(shown, panels[shown]);
+        return <ViewSlot key={shown} active={shown === view}>{shownPanels.current.get(shown)}</ViewSlot>;
+      })}
     </section>
     {expandedCamera && <CameraFullscreen camera={expandedCamera} cameras={cameras} origin={origin} recording={recordingCameraIds.includes(expandedCamera.id)} t={t} close={() => setExpandedCameraId("")} fullScreen={fullScreen} step={stepExpanded} snapshot={() => void saveSnapshot(expandedCamera)} toggleRecording={() => void toggleRecording(expandedCamera)} invokePtz={command => commandPtz(expandedCamera, command)} />}
     <TourHost t={t} view={view} setView={setView} />

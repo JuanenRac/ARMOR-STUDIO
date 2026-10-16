@@ -2,6 +2,7 @@
  * Local camera evidence library. Media files never pass through browser storage:
  * they are served by the loopback ARMOR media gateway on demand.
  */
+import { useViewActive } from "./viewSlots";
 import { askConfirm } from "./askConfirm";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { deleteAllMedia, deleteMedia, listMedia, mediaUrl, setMediaProtected, readMediaProof, type MediaItem } from "./api";
@@ -11,6 +12,7 @@ type Filter = "all" | "snapshot" | "recording";
 const size = (bytes: number) => bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 
 export function MediaLibrary({ origin, cameras, t }: { origin: string; cameras: Array<{ id: string; name: string }>; t: (key: string) => string }) {
+  const active = useViewActive();
   const [items, setItems] = useState<MediaItem[]>([]);
   const [activeCameraIds, setActiveCameraIds] = useState<string[]>([]);
   const [selectedId, setSelectedId] = useState("");
@@ -27,10 +29,11 @@ export function MediaLibrary({ origin, cameras, t }: { origin: string; cameras: 
     finally { setLoading(false); }
   }, [origin, t]);
   useEffect(() => {
+    if (!active) return;   // a hidden menu does not ask; it asks as soon as it is shown
     void refresh();
     const timer = window.setInterval(() => void refresh(), 5_000);
     return () => window.clearInterval(timer);
-  }, [refresh]);
+  }, [refresh, active]);
   const visible = useMemo(() => items.filter(item => filter === "all" || item.kind === filter), [items, filter]);
   const selected = visible.find(item => item.id === selectedId) ?? items.find(item => item.id === selectedId) ?? visible[0];
   const cameraName = (id: string) => cameras.find(camera => camera.id === id)?.name ?? id;

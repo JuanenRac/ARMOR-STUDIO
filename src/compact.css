@@ -21,7 +21,7 @@
   .studio-frame .icon-button { width: 28px; height: 28px; border-radius: 8px; font-size: .9rem; }
   .studio-frame .top-status { gap: .5rem; font-size: .62rem; }
   .studio-frame .mode-button { padding: .32rem .6rem; }
-  .studio-frame .main-stage > section, .studio-frame .main-stage > article { margin-top: 0; }
+  .studio-frame .main-stage > .view-slot > section, .studio-frame .main-stage > .view-slot > article { margin-top: 0; }
   .studio-frame .status-bar { flex-basis: 34px; height: 34px; }
 
   /* ---- headings that repeat the title in the top bar: a single line of text is enough ---- */

@@ -3,6 +3,8 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useState } from "react";
+import { setAlerts, useAlerts } from "../alerts/settings";
+import { stopSound } from "../alerts/sounds";
 import type { ServerInfo } from "../api";
 import { NAV_GROUPS, type View } from "../domain";
 import { getPrefs as getPrefsForHelp } from "../prefs";
@@ -48,6 +50,14 @@ export function Sidebar({ view, setView, sidebarOpen, toggle, alarmBadge, t }: {
   </aside>;
 }
 
+/** Mutes (or turns back on) the sounds and the voice of the alarms, beside the help button. A muted console still shows the pop-ups; what is playing stops at once. */
+function MuteButton({ t }: { t: Translate }) {
+  const muted = useAlerts().muted;
+  const label = muted ? t("al_unmute_btn") : t("al_mute_btn");
+  return <button type="button" className={`icon-button mute-button ${muted ? "active" : ""}`} data-tour="mute" title={label} aria-label={label} aria-pressed={muted}
+    onClick={() => { setAlerts({ muted: !muted }); if (!muted) stopSound(); }}>{muted ? "🔇" : "🔊"}</button>;
+}
+
 export function TopBar({ view, revision, mode, demo, siteStatus, fullScreen, isFullScreen, openAbout, openHelp, toggleMode, readOnly = false, checkPerimeter, t }: {
   view: View; revision: number; mode: "armed" | "disarmed"; demo: boolean; /** Whether the design is kept on the server. */ siteStatus: "idle" | "saved" | "saving" | "offline"; fullScreen: () => void; /** True while the page is fullscreen: the same button then leaves it. */ isFullScreen: boolean; openAbout: () => void; openHelp: () => void; /** Arm when disarmed, disarm when armed (after asking). */ toggleMode: () => void; /** A viewer only looks: the arm button is off. */ readOnly?: boolean; /** Look at what would stop the perimeter from being ready, without arming. */ checkPerimeter?: () => void; t: Translate;
 }) {
@@ -57,6 +67,7 @@ export function TopBar({ view, revision, mode, demo, siteStatus, fullScreen, isF
       {demo && <span className="demo-badge" title={t("offlineDemo")}>{t("offlineDemo")}</span>}
       <button className={`icon-button ${isFullScreen ? "active" : ""}`} title={isFullScreen ? t("exitFullscreen") : t("fullscreen")} aria-label={isFullScreen ? t("exitFullscreen") : t("fullscreen")} aria-pressed={isFullScreen} onClick={fullScreen}>{isFullScreen ? "🗗" : "⛶"}</button>
       {checkPerimeter && <button className="icon-button" title={t("pre_check")} aria-label={t("pre_check")} onClick={checkPerimeter}>✔</button>}
+      <MuteButton t={t} />
       <button className="icon-button help-button" data-tour="help" title={t("helpButton")} aria-label={t("helpButton")} onClick={openHelp}>?</button>
       <button className="icon-button about-button" title={t("about")} onClick={openAbout}>i</button>
       {siteStatus !== "idle" && <span className={`site-sync ${siteStatus}`} title={t(`siteSync_${siteStatus}`)}>{siteStatus === "saved" ? "☁✓" : siteStatus === "saving" ? "☁…" : "☁!"}</span>}

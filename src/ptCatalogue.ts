@@ -2994,6 +2994,8 @@ export const PT_CATALOGUE: Record<string, string> = {
  "al_style_hero": "Herói de ação (rápido, engenhoso, sarcástico)",
  "al_style_dark": "Senhor das trevas (lento, grave, imponente)",
  "al_style_chaos": "Teatral (sussurrante, imprevisível)",
+ "al_mute_btn": "Silenciar os sons e a voz dos alarmes",
+ "al_unmute_btn": "Voltar a ativar os sons e a voz dos alarmes",
  "al_voice_rate": "Velocidade",
  "al_voice_say": "O que diz",
  "al_say_severity": "A gravidade",
