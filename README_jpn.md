@@ -15,39 +15,57 @@
   <a href="README_por.md">🇵🇹 Português</a>
 </p>
 
-### 運用と設計のコンソール：カメラ、レーダー、アラーム、太陽光発電、証拠、サイトの平面図
+### 運用・設計コンソール：カメラ、レーダー、警報、エネルギー、ローカルネットワーク、証拠、サイト図、設備の保守
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-GPL%203.0-blue.svg" alt="GPL 3.0">
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
-  <img src="https://img.shields.io/badge/Languages-7-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-203%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Maturity-functional-00E5FF.svg" alt="Maturity">
+  <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
+  <img src="https://img.shields.io/badge/Tests-449%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Version-0.7.9-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**正直さのチェック - 今日動いているもの:** Studio は [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) と通信し、203 件の単体テスト（設定の読み取り、カメラの統合、太陽光グラフの計算、7 言語すべてでの各メニューの描画、静的ホスト）で網羅されています。**実証されていないもの：** すべての実カメラでのライブ映像と PTZ、実際のインバーターやバッテリーでの太陽光メニュー、そして正式なアクセシビリティやユーザビリティの評価。サーバーに接続できない間、Studio はデモデータを表示し、上部バーでそう伝えます。
+**正直さのチェック - 今日動いているもの:** Studio は [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) と通信し、449 件のユニットテスト（設定の解析、カメラの統合、ソーラーグラフの計算、設計ツールの幾何と検査、警報アナウンサー、アシスタントの辞書、8 言語での全メニューの描画、静的ホスト）とブラウザテストでカバーされています。CM5 テストベンチで、実際のサーバー、実際の IP カメラ、基板上のレーダーノードと組み合わせて日常的に動作しており、ヘルプの画像は例示データで作られています。**まだ**証明されていないもの：あらゆるカメラでのライブ映像と PTZ、実機でのソーラー・電気・警報盤・タッチパネルのメニュー（存在するのはレーダーノードのみ）、正式なアクセシビリティ・ユーザビリティ評価。サーバーに接続できない間、Studio はデモデータを表示し、上部バーでそれを示します。
 
 ---
+
+## 📋 ひと目で
+
+| | |
+|---|---|
+| バージョン | `0.7.9` |
+| 成熟度 | 確立 |
+| テスト | 449 (`npm test`) |
+| 技術 | React 19 / TypeScript / Vite |
+| 実機での確認 | CM5 テストベンチ（実サーバー、実際の IP カメラ、実際のレーダーノード）で毎日使用。ソーラー・電気・警報盤・タッチパネルのメニューは実ノードを待っています |
 
 ## 🎯 概要
 
 **ARMOR-STUDIO** はオペレーターのコンソールです。カメラのパスワード、RTSP アドレス、トークンを決して持ちません。ユーザー名とパスワードでサーバーにサインインし、8 時間の **HttpOnly** セッションを受け取り、権限の要る操作はすべてそのセッションを通ります。
 
-* **カメラモニター：** 枠に収まる 1、2、4、6、8、9、12、16 タイル（16:9、マトリクス全体が見え、切り取りなし）、範囲を制限した PTZ パッド付きの最大化表示、スナップショットと MP4 録画。**録画ライブラリ**で証拠を絞り込み、プレビュー、再生、保護、削除できます。
-* **アラーム、デバイス、自動化：** 今すぐ人の対応が必要なものを、確認応答と閉じた記録とともに。煙、ガス、浸水、ドア、窓、動き、気候、プラグ、照明、サイレン、鍵のデバイスを Wi-Fi、Zigbee、Bluetooth、有線で（Zigbee2MQTT、Tasmota、Shelly のプリセット付き）。出来事に応じてデバイスを切り替える規則。大きな警戒 / 解除ボタン。
-* **太陽光発電：** *インバーター*メニューは家をアニメーションするエネルギーの流れとして描き（パネル、系統、インバーター、バッテリー、負荷。電力が大きいほど破線が速く流れます）、ゲージ、測定値、文章で示す警告、履歴グラフを表示します。*バッテリー*メニューは各スタックを液面付きで示し、**容量**（残りと満容量、Ah と kWh、サイクル数、型式）、各モジュール、そして**すべてのセル**を電圧とミリボルト単位のばらつき付きのバーで表示し、充電、電圧、電流、セルの範囲、温度のグラフを出します。
-* **概要とシステム：** 周辺の状態、部位ごとに 1 タイル、すべてのデバイスを載せた設計のライブマップ、管理者向けの監査記録のあるシステムページ。
-* **レーダー：** サイト設計（地形、建物、カメラ、レーダーとその範囲）から描くライブマップに、各レーダーが報告するターゲット、その最近の軌跡、無視ゾーンを表示。ノードの状態もライブで、沈黙したノードは*期限切れ*と表示。各ノード専用のパネルへワンクリックで移れます。
-* **サイトデザイナー：** 地形（長方形または任意の形、長さは数値入力）を描き、複数階で 5 種類の屋根を持つ建物、任意の階と高さのドアと窓、街灯、煙突、太陽光パネル、アンテナ、柱、マスト、道路、小道を置き、カメラとレーダーを好きな場所に置きます。CAD 風の 2D 平面図と、周回、階ごとの切断、編集ができる 3D ビュー。元に戻す・やり直し。
-* **設定：** サーバーアドレス、カメラ（ONVIF/RTSP）、探索、ユーザー（自分のアカウント、管理者にはユーザー、ロール、パスワードの一覧）、テーマと言語。**認証情報を含まない**持ち運び可能なサイトのエクスポート。
-* **7 言語**（英語、スペイン語、ドイツ語、フランス語、イタリア語、日本語、中国語）と 11 のテーマ。既定のテーマの名前は *Armor* です。
-* **機器を登録：** 「インバーター」と「バッテリー」メニューで、各インバーターやバッテリースタックを名前、モデル（Voltronic、MPP Solar、Pylontech US2000 / US3000 / US5000、ANT-BMS）、接続（RS232、RS485、USB、CAN、Wi-Fi）、ゲートウェイノードとともに追加します。最初の実測値を待つ間は「サンプルの測定値を表示」でメニューを試せます。
-* **電気設計：** 住宅の電気回路図（系統、電力量計、保護機器、切替スイッチ、配電、太陽光、インバーター、蓄電池、負荷。AC と DC）をポートと電線で描き、盤ごとにまとめ、インバーターや蓄電池をサーバーが読むソーラー機器に結びつけてリアルタイム値を表示し、チェック機能に見直させます（1 本の線に 2 つの電源、電流に対するブレーカーとケーブル、不足する保護、DC 電圧）。図面はサーバーに保存されます。これは図面です。今のところ何も開閉も計測もしません。
-* **警報設計：** 家の警報を描きます。制御盤、拡張、ドア・窓の接点、人感・煙・ガス・浸水の検知器、非常ボタン、サイレン、キーパッド、電源を、有線ループ、無線リンク、サイレン出力、データバス、電源でポート同士つなぎます。*警報制御盤*メニューで、描いた制御盤を実物に、センサーをそのゾーンに関連付けると、各要素がその制御盤の報告をライブで表示します。「制御盤にあるものを描く」で制御盤から図を埋め、チェックは誰も受けていないセンサー、サイレン・キーパッド・バックアップ電池のない制御盤、解除中に鳴らない煙センサーを警告します。図は以前のバージョンとともにサーバーに保存されます。
-* **グループ化されたメニューと対応するヘルプ：** 監視、セキュリティ、エネルギー、家とネットワーク、設計、管理。各グループは折りたたみ可能。すべての確認はページ内のダイアログで行われ（ブラウザーに黙らされません）、新しい重大アラームは音と通知で知らせ、証拠は自動削除から保護でき、ヘルプは全メニューを7言語で説明します。
+* **概要とシステム：**境界の状態、各部分のタイル（警報盤、レーダー、カメラ、デバイス、エネルギー、ネットワーク、サーバー）、すべてのデバイスと警報を載せた設計のライブマップ、注意が必要なもの。すべてスクロールなしの 1 画面で、管理者にはシステムページと監査記録があります。
+* **カメラモニター：**枠に収まる 1、2、4、6、8、9、12、16 タイル（16:9、マトリクス全体が見え、切り取りなし）、範囲を限った PTZ パッド付きの拡大表示、スナップショットと MP4 録画。**録画ライブラリ**で証拠のフィルター、プレビュー、再生、保護、削除、**保管証明**のダウンロードができます。
+* **警報：**今すぐ人が必要なものを、確認と終了記録とともに表示。**警戒前のチェック**と解除用 PIN、ライブマップ上の警報、重大度ごとの音、独自のスタイル（標準、アクションヒーロー、闇の支配者、劇的）を持つ音声読み上げ（何かが接続されたことも伝えます）、ポップアップ、ヘルプの隣のミュートボタン、適切なメニューへの任意のジャンプ。
+* **デバイスとオートメーション：**煙、ガス、浸水、ドア、窓、動き、気候、プラグ、照明、サイレン、鍵、シャッター、門扉、ガレージドア、給湯器を Wi-Fi、Zigbee、Bluetooth、有線で（Zigbee2MQTT、Tasmota、Shelly のプリセット付き）。あらゆる警報源（しきい値も可）から、何かが起きたときにデバイスを切り替えるルール、大きな警戒 / 解除ボタン。
+* **警報盤と警報デザイナー：**各 ARMOR-ALARM ノードの状態、ゾーンとイベント、ゾーンに結び付けた Zigbee センサー、そして家の警報（警報盤、接点、動き、煙・ガス・浸水検知器、サイレン、キーパッド、配線、無線リンク）を描き、描いた各要素を実際のゾーンに結び付けるデザイナー。
+* **ソーラーと電気のエネルギー：***インバーター*メニューは家をゲージ、数値、履歴グラフ付きのアニメーションするエネルギーフローとして描き、*バッテリー*は各スタックの容量、各モジュール、すべてのセルを表示し、*電気*は系統入力、各チャンネル、メーターの警報を表示します。どちらも機器（Voltronic、MPP Solar、Pylontech、ANT-BMS など）を登録でき、*例示の測定値を表示*ボタンで先にメニューを試せます。
+* **電気デザイナー：**家の電気図（系統、メーター、保護、切替器、配電、PV、インバーター、バッテリー、負荷、AC と DC）を描き、サーバーが読むソーラー機器に結び付けてライブ値を見て、検査に見直させます（1 本の線に 2 つの電源、電流に対するブレーカーとケーブルなど）。
+* **レーダー：**サイト設計から描いたライブマップに、各レーダーが報告する対象、その最近の経路、**無視する映像ゾーン**を表示。ノードのライブ状態（無応答は*古い*と表示）、各ノード自身のパネルへ 1 クリック。
+* **サイトデザイナー：**地形、複数階の建物（5 種類の屋根）、ドア、窓、街灯、煙突、ソーラーパネル、マスト、道路や小道を描き、カメラとレーダーを好きな場所に配置。CAD 風の 2D 図面と、階ごとに回転できる 3D 表示、元に戻す・やり直し、設計のバージョン。
+* **ローカルネットワーク：***ネットワーク*メニューは ARMOR-NETWORK ノードの報告（デバイス、停止、インターネットの状態、プロバイダーと場所付きの**公開アドレス**）を表示し、デバイスの命名、非表示、監視、スキャン・ping・あなたが渡したログインでの検査の指示ができ、*ネットワークデザイナー*がそれを描きます。
+* **自動撮影：***設定 > 自動撮影*で、システムが警戒中にカメラが何かを捉えると写真と動画を自動で撮影（枚数、間隔、クリップの長さ）し、無視する映像ゾーンをカメラのフレーム上に描きます。
+* **ノードファームウェアとアップデート：***ノードファームウェア*はフィールドノードを 1 台ずつ更新し、全体と各ノードにバーを表示し、警報で別メニューに移っても状態を保ちます。*アップデート*は GitHub から Studio とサーバーの新バージョン（新バージョンの更新内容も表示）、OS の更新、任意の保守コンソールをインストールします。
+* **グループ化された設定：**一般と設定項目、ユーザー・通知・自動撮影、ノードファームウェアとアップデート、サーバー・サービス・MQTT ブローカー・設定ファイル・インストール・コンソール。サイドバーの各メニューも折りたたみ可能なグループ（監視、セキュリティ、エネルギー、家とネットワーク、設計、管理）に分かれています。
+* **8 言語**（英語、スペイン語、ドイツ語、フランス語、イタリア語、日本語、中国語、ポルトガル語）と 11 のテーマ（既定は *Armor*）。言語、テーマ、天気の場所はブラウザではなくアカウントに従います。ロール：管理者、オペレーター、閲覧だけの **viewer**。
+* **システム全体を知っているヘルプ：**4 段階の詳しさを持つ本と各主要メニューの例示データ付き画像、メニューごとのガイドツアー、あらゆるもののヒント、そして**アシスタント**（どこへでもドラッグでき、好きな場所に固定でき、文字で質問できるマスコット）。8 言語の辞書と、空きのある側に開く吹き出し付き。作業中のメニューは、別のメニューを見ている間も開いたままです。
+
+## 🧩 A.R.M.O.R. での役割
+
+Studio はシステム全体を見渡すオペレーターの窓口です。ノードとは直接話さず、すべて [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) を通します（唯一の例外は各ノード自身のパネルへのリンク）。サイト、警報、電気設備、ネットワークの設計、ノードのファームウェアや設備自身のアップデートの操作、ヘルプとアシスタントもここにあります。同じサーバーを、スマートフォンの [ARMOR-ANDROID-CONTROL](https://github.com/JuanenRac/ARMOR-ANDROID-CONTROL) も使います。
 
 ## 🔄 アーキテクチャ
 
@@ -70,13 +88,20 @@ flowchart LR
 ```text
 ARMOR-STUDIO/
 ├── src/
-│   ├── App.tsx, domain.ts, settings.ts, cameras.ts, hooks.ts, api.ts, config.ts, i18n.ts
-│   ├── components/   camera, chrome, SiteMap
-│   ├── views/        overview, monitoring, RadarView, RadarSensors, AlarmsView, DevicesView, AutomationsView, InvertersView, BatteriesView, SystemView
-│   ├── designer/     geometry, ops, model, Plan2D, Viewport3D, Toolbox, Inspector
+│   ├── App.tsx, domain.ts, settings.ts, prefs.ts, cameras.ts, hooks.ts, api.ts, config.ts, i18n.ts, viewSlots.tsx
+│   ├── components/   camera, chrome (top bar, sidebar, Help), SiteMap
+│   ├── views/        overview, monitoring, RadarView, AlarmsView, AlarmPanelsView, DevicesView, AutomationsView, InvertersView, BatteriesView, ElectricalView, NetworkView, WeatherView, SystemView, ServicesView
+│   ├── designer/     the Site Designer: geometry, ops, model, Plan2D, Viewport3D, Toolbox, Inspector
 │   ├── electrical/   the Electrical Designer: model, ops, analysis (the checks), presets, symbols, sync
-│   ├── solarModel.ts, solarGraphics.tsx, solarText.ts   the arithmetic, the drawings and the words of the solar menus
-│   └── ...           ConfigurationPanel, UsersPanel, MediaLibrary, HistoryView, SiteDesignerInteractive, StudioLogin, one *Text.ts per area (7 languages)
+│   ├── alarm/        the Alarm Designer and the alarm panels' Zigbee links
+│   ├── network/      the Network Designer and the network model
+│   ├── alerts/       sounds, voice and its styles, pop-ups, the announcer of alarms and of connections
+│   ├── assistant/    the mascot, its dictionary in eight languages and where its bubble opens
+│   ├── tour/         a guided tour for every menu
+│   ├── weather/      the Weather menu: radar map, clouds, forecast
+│   └── ...           ConfigurationPanel (tabs: General, Preferences, Users, Notifications, Automatic capture, Node firmware, Updates, Server, Services, Broker, Files, Installation, Console), MediaLibrary, HistoryView, StudioLogin, one *Text.ts per area (eight languages)
+├── public/help/      the pictures of the Help, one set per language
+├── e2e/              browser tests (Playwright)
 ├── tools/            serve.mjs (+ tests)
 ├── docs/             security model
 └── images/           brand assets
@@ -84,11 +109,13 @@ ARMOR-STUDIO/
 
 ## 🛠️ 開発環境
 
+**必要なもの:** Node.js 22+, a running ARMOR-SERVER (otherwise Studio shows demonstration data)
+
 ```powershell
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 203 tests: designer geometry, settings, cameras, radar map, solar arithmetic, the electrical designer, every menu in seven languages, static host
+npm test            # 449 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```
@@ -103,12 +130,14 @@ $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # 
 * **[ARMOR-RADAR](https://github.com/JuanenRac/ARMOR-RADAR)** - ESP32-S3 用フィールドノードのファームウェア。レーダー 3 基と独自の Web パネル付き
 * **[ARMOR-SOLAR](https://github.com/JuanenRac/ARMOR-SOLAR)** - 太陽光インバーターとバッテリーのプロトコル、およびゲートウェイノードのメッセージ
 * **[ARMOR-ELECTRICAL](https://github.com/JuanenRac/ARMOR-ELECTRICAL)** - 電気ノード：電力量計、電力網の計測メッセージ、開閉のルール
+* **[ARMOR-ALARM](https://github.com/JuanenRac/ARMOR-ALARM)** - 警報ノードと警報盤：警戒区域、警戒セット、遅延、サイレン、PIN。サーバーがあってもなくても
 * **[ARMOR-HMI](https://github.com/JuanenRac/ARMOR-HMI)** - タッチパネル：壁面ディスプレイでのシステム状態表示、警戒・確認操作、音声アシスタントの拠点
 * **[ARMOR-NETWORK](https://github.com/JuanenRac/ARMOR-NETWORK)** - ローカルネットワーク：機器、インターネット、そして変化
 * **[ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER)** - 中央コーディネーター：テレメトリ、アラーム、デバイス、太陽光の測定値、カメラ
 * **ARMOR-STUDIO** (このリポジトリ) - Web コンソール：カメラ、レーダー、アラーム、太陽光発電、2D/3D サイト設計
 * **[ARMOR-ANDROID-CONTROL](https://github.com/JuanenRac/ARMOR-ANDROID-CONTROL)** - リアルタイム 2D/3D レーダー付きの Android オペレータークライアント
 * **[ARMOR-SERVER-AI](https://github.com/JuanenRac/ARMOR-SERVER-AI)** - 判断を説明し、決して動作しない視覚推論ポリシー
+* **[ARMOR-VISION](https://github.com/JuanenRac/ARMOR-VISION)** - Jetson Orin NX 向けのカメラのゾーン、マスク、検知ルール
 * **[ARMOR-VOICE-AI](https://github.com/JuanenRac/ARMOR-VOICE-AI)** - 偽造できない確認を備えたオフライン音声インテント
 * **[ARMOR-HARDWARE](https://github.com/JuanenRac/ARMOR-HARDWARE)** - 筐体、電子部品、ベンチ受け入れマトリクス
 * **[ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS)** - デプロイ、CM5 テストベンチ、バックアップ、TLS
