@@ -17,6 +17,7 @@ All notable changes to this project are documented here.
 - Pin, return to its place and voice are small icon buttons in a corner of the bubble.
 - The bubble opens on the side that has room and the mascot is easier to drag.
 - **Hints everywhere:** pointing at any control says what it is and what it does, in the eight languages; controls with no hint of their own get one from their kind and name (designer tools, tabs, filters, fields and tiles).
+- A check of every menu in the eight languages looks for texts that are really a missing key or a word glued from several; the hints of card-like controls (a radar, a power switch) now name them by their first words.
 - **Help pictures:** every main menu has a picture with example data in the Help, in the eight languages.
 - The assistant knows about signed firmware, network Zigbee and the voice styles, and answers questions about them.
 - The README is rewritten in the eight languages with screenshots taken at 1920x1080.

@@ -60,7 +60,18 @@ export function fallbackLabel(element: Element, kind: FallbackKind = fallbackKin
   const placeholder = clean(element.getAttribute("placeholder"));
   if (placeholder && kind === "type") return placeholder.slice(0, 60);
   if (element.tagName === "SELECT" || element.tagName === "INPUT" || element.tagName === "TEXTAREA") return "";
-  return clean(element.textContent).replace(/^[^\p{L}\p{N}]+/u, "").slice(0, 60);
+  return firstWords(element).replace(/^[^\p{L}\p{N}]+/u, "").slice(0, 60);
+}
+
+/** The first piece of text of a control, not all of it: a card-like button holds a name, a state and a counter, and glued together they read as one nonsense word. */
+function firstWords(element: Element): string {
+  const clean = (value: string | null | undefined): string => (value ?? "").replace(/\s+/g, " ").trim();
+  const walker = element.ownerDocument.createTreeWalker(element, 4 /* NodeFilter.SHOW_TEXT */);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const text = clean(node.textContent);
+    if (/\p{L}/u.test(text)) return text;
+  }
+  return clean(element.textContent);
 }
 
 /** The sentence of a hint. Empty when there is nothing to name. */
