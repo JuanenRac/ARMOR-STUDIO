@@ -63,6 +63,16 @@
 * **八种语言**（英语、西班牙语、德语、法语、意大利语、日语、中文和葡萄牙语）和十一种主题，默认主题名为 *Armor*；语言、主题和天气地点跟随账户，而不是浏览器。角色：管理员、操作员和只看不改的 **viewer**。
 * **了解整个系统的帮助：**一本有四个详细程度的书，每个主要菜单都有一张示例数据图片，每个菜单都有引导式导览，处处有提示，还有一个**助手**（可拖到任何位置、固定在想要的地方并可文字提问的吉祥物），带八种语言的词典，气泡会在有空位的一侧打开。你正在工作的菜单在你访问其他菜单时保持打开。
 
+## 🖼️ 屏幕截图
+
+在测试台上以 1920×1080 截取，使用示例数据，背后没有真实的安装。
+
+<table>
+<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="概览：周界状态、警报、雷达节点、能源和现场实时地图，一屏尽览。" width="100%"><br><sub>概览：周界状态、警报、雷达节点、能源和现场实时地图，一屏尽览。</sub></td><td width="50%" valign="top"><img src="images/screenshots/radar.png" alt="雷达：每个雷达看到的目标，显示在现场平面图上，并标出每个传感器的覆盖范围。" width="100%"><br><sub>雷达：每个雷达看到的目标，显示在现场平面图上，并标出每个传感器的覆盖范围。</sub></td></tr>
+<tr><td width="50%" valign="top"><img src="images/screenshots/inverters.png" alt="逆变器：太阳能板、电网、住宅和电池之间的能量流向，只读。" width="100%"><br><sub>逆变器：太阳能板、电网、住宅和电池之间的能量流向，只读。</sub></td><td width="50%" valign="top"><img src="images/screenshots/site-designer.png" alt="现场设计器：在 Studio 其余部分共用的平面图上绘制地形、建筑、摄像头和雷达。" width="100%"><br><sub>现场设计器：在 Studio 其余部分共用的平面图上绘制地形、建筑、摄像头和雷达。</sub></td></tr>
+<tr><td width="50%" valign="top"><img src="images/screenshots/electrical-designer.png" alt="电气设计器：住宅的交流和直流图纸及其检查，来自现成的示例。" width="100%"><br><sub>电气设计器：住宅的交流和直流图纸及其检查，来自现成的示例。</sub></td><td width="50%" valign="top"><img src="images/screenshots/alarm-panels.png" alt="报警主机：每台是否在布防、其防区以及最近发生的事件。" width="100%"><br><sub>报警主机：每台是否在布防、其防区以及最近发生的事件。</sub></td></tr>
+</table>
+
 ## 🧩 在 A.R.M.O.R. 中的角色
 
 Studio 是操作员观察整个系统的窗口。它从不直接与节点通信：一切都经过 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER)，只有它做决定（唯一的例外是指向每个节点自带面板的链接）。场地、报警、电气设施和网络也在这里设计，节点固件和系统自身的更新也从这里操作，帮助和助手也在这里。手机上的 [ARMOR-ANDROID-CONTROL](https://github.com/JuanenRac/ARMOR-ANDROID-CONTROL) 使用同一个服务器。
