@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { readConnection, saveConnection, type ConnectionState } from "./api";
 import { UsersPanel } from "./UsersPanel";
 import { BrokerPanel, FilesPanel, ServicesPanel } from "./AdminPanel";
@@ -26,7 +26,9 @@ type Props = {
 };
 
 const VIEWER_TABS: readonly string[] = ["general", "users", "preferences"];
-const tabs: Tab[] = ["general", "users", "server", "services", "broker", "files", "installation", "firmware", "updates", "console", "notifications", "capture", "preferences"];
+/** The tabs in groups, from what is the person's own to what is the system's: the interface; people, alerts and what is recorded; the nodes' firmware and Studio's updates; the server and what it runs on. */
+const tabGroups: Tab[][] = [["general", "preferences"], ["users", "notifications", "capture"], ["firmware", "updates"], ["server", "services", "broker", "files", "installation", "console"]];
+const tabs: Tab[] = tabGroups.flat();
 
 /** Can the browser reach something at this address at all? (no-cors: only a network failure rejects, which is what a wrong scheme or port gives.) */
 async function reachable(url: string): Promise<boolean> {
@@ -88,7 +90,7 @@ export function ConfigurationPanel(props: Props) {
   return <section className="configuration">
     <div className="panel-heading"><MenuTitle kind="configuration"><p className="eyebrow">{t("systemConfiguration")}</p><h2>{t("configuration")}</h2><p className="muted">{t("configurationHelp")}</p></MenuTitle></div>
     <div className="config-tabs" role="tablist" aria-label={t("configuration")} data-tour="config-tabs">
-      {tabs.filter(item => !props.isViewer || VIEWER_TABS.includes(item)).map(item => <button key={item} data-tour={`tab-${item}`} className={tab === item ? "active" : ""} role="tab" aria-selected={tab === item} onClick={() => setTab(item)}>{tabLabel(item)}</button>)}
+      {tabGroups.map(group => group.filter(item => !props.isViewer || VIEWER_TABS.includes(item))).filter(group => group.length > 0).map((group, position) => <Fragment key={group[0]}>{position > 0 && <span className="tab-sep" aria-hidden="true" />}{group.map(item => <button key={item} data-tour={`tab-${item}`} className={tab === item ? "active" : ""} role="tab" aria-selected={tab === item} onClick={() => setTab(item)}>{tabLabel(item)}</button>)}</Fragment>)}
     </div>
     {tab === "general" && <div className="config-grid">
       <article className="stack-card"><h3>{t("serverOrigin")}</h3><label>{t("serverOrigin")}<input value={props.origin} onChange={event => props.setOrigin(event.target.value)} inputMode="url" /></label><OriginCheck t={t} origin={props.origin} setOrigin={props.setOrigin} /><small>{props.connection}</small><p className={`operator-session ${props.operatorUnlocked ? "ready" : ""}`}>{props.operatorUnlocked ? t("studioAccessActive") : t("studioAccessWaiting")}</p><small>{t("studioAccessNotice")}</small><button onClick={props.savePreferences}>{t("savePreferences")}</button><button onClick={props.exportSite}>{t("exportSite")}</button></article>

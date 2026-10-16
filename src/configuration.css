@@ -73,3 +73,6 @@
 @media (max-width: 980px) { .fw-grid, .fw-targets { grid-template-columns: minmax(0, 1fr); } }
 /* The same buttons inside a row of Configuration > Services and of the broker card. */
 .adm-actions.svc-actions { margin: 0; padding: 0; border: 0; flex-wrap: nowrap; }
+
+/* a thin line between the groups of tabs */
+.config-tabs .tab-sep { align-self: stretch; width: 1px; margin: 0 .3rem; background: #285363; }
