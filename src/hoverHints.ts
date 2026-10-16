@@ -8,7 +8,9 @@
 import { locales, text, type Locale } from "./i18n";
 import { hintCatalogue } from "./hintText";
 import { hintsPt } from "./hintsPt";
+import { fallbackHint, fallbackKind, fallbackLabel } from "./hintFallback";
 
+const ACTIVE = "button, a[href], select, input:not([type=hidden]), textarea, summary, [role=tab], [role=button]";   // the controls that always say what they are, even with no row in the catalogue
 const CONTROLS = "button, a[href], select, input:not([type=hidden]), textarea, summary, [role=tab], [role=button], label, th, h3";
 export const normal = (value: string): string => value.replace(/\s+/g, " ").trim().toLowerCase();
 
@@ -74,7 +76,17 @@ function apply(element: Element, locale: Locale): void {
   let key: string | undefined;
   const words = wordsOf(element);
   key = keyFor(words, locale, element.closest("aside.sidebar nav") !== null);
-  if (!key) { if (owned) { html.removeAttribute("title"); delete html.dataset.hintKey; } return; }
+  if (!key) {
+    // no row in the catalogue: a control that can be used still says what it is and what it does (hintFallback.ts); a heading or a label does not need to
+    const current = html.getAttribute("title");
+    if (element.matches(ACTIVE) && !(current && !owned)) {
+      const kind = fallbackKind(element);
+      const hint = fallbackHint(kind, fallbackLabel(element, kind), locale);
+      if (hint) { if (current !== hint) html.title = hint; html.dataset.hintKey = "fallback"; return; }
+    }
+    if (owned) { html.removeAttribute("title"); delete html.dataset.hintKey; }
+    return;
+  }
   const hint = locale === "pt" ? (hintsPt[key] ?? hintCatalogue[key][0]) : hintCatalogue[key][locales.indexOf(locale)];
   const current = html.getAttribute("title");
   // A title the code wrote on purpose stays; one that only repeats the label (or one we wrote earlier) is replaced by the explanation.

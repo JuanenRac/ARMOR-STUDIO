@@ -87,7 +87,7 @@ export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras
       </article>
       <div className="ov-side">
         <article className="ov-card">
-          <header><h3>{t("alarms")}</h3><button className="link-button" onClick={() => setView("alarms")}>▸</button></header>
+          <header><h3>{t("alarms")}</h3><button className="link-button" title={t("alarms")} aria-label={t("alarms")} onClick={() => setView("alarms")}>▸</button></header>
           {active.length === 0 ? <p className="ov-ok">✓ {t("allClearHelp")}</p> : <ul className="ov-list">{active.slice(0, 5).map(alarm => <li key={alarm.id} className={alarm.severity}><span className={`severity-dot ${alarm.severity}`} /><div><strong>{t(`alarm_${alarm.code}`)}</strong><small className="alarm-source"><AlarmSource alarm={alarm} devices={devices} cameraNames={Object.fromEntries(cameras.map(camera => [camera.id, camera.name]))} t={t} /> · {ago(alarm.raised_at, now, t)}</small></div></li>)}</ul>}
         </article>
         <article className="ov-card">
