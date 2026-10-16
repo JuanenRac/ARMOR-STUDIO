@@ -11,6 +11,7 @@ All notable changes to this project are documented here.
 - **Overview redesign:** tiles for alarm panels, energy and network, and a layout that fits from 1093 px up to full HD without a vertical scrollbar.
 - **Release notes in Updates:** the changes of a program's new version are shown before installing it.
 - **Configuration in groups:** the tabs are ordered from the person's own settings to the system's, with a separator between groups.
+- **One General tab:** the server's address and ports now sit in General, with the address this browser uses and the interface settings, each card saying where it applies (only this browser, the server for every device, or how Studio looks for you).
 - **Voice styles:** the alarm voice can speak in original personalities (action hero, dark lord, theatrical), in the eight languages; none imitates a real person.
 - **A mascot that speaks:** the assistant reads its answers aloud, with a mouth that moves, a switch in Preferences and an icon in its bubble.
 - Pin, return to its place and voice are small icon buttons in a corner of the bubble.

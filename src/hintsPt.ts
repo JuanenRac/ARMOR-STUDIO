@@ -172,7 +172,6 @@ export const hintsPt: Record<string, string> = {
  "tabCameras": "Adicionar, editar e remover câmaras.",
  "tabDiscovery": "Procurar câmaras na rede local.",
  "tabVideo": "Qualidade do vídeo e opções PTZ.",
- "tabServer": "Onde está o servidor ARMOR e de onde se serve o Studio.",
  "tabUsers": "Quem pode iniciar sessão no Studio e com que direitos.",
  "savePreferences": "Guarda o endereço do servidor e as preferências neste navegador.",
  "saveUi": "Guarda o aspeto e o idioma da interface.",

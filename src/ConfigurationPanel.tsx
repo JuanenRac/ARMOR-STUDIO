@@ -13,7 +13,7 @@ import type { NetworkOverview } from "./networkModel";
 import "./configuration.css";
 import { MenuTitle } from "./menuLogos";
 
-type Tab = "general" | "users" | "server" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications" | "capture" | "preferences";
+type Tab = "general" | "users" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications" | "capture" | "preferences";
 type Props = {
   t: (key: string) => string;
   origin: string; setOrigin: (value: string) => void;
@@ -27,7 +27,7 @@ type Props = {
 
 const VIEWER_TABS: readonly string[] = ["general", "users", "preferences"];
 /** The tabs in groups, from what is the person's own to what is the system's: the interface; people, alerts and what is recorded; the nodes' firmware and Studio's updates; the server and what it runs on. */
-const tabGroups: Tab[][] = [["general", "preferences"], ["users", "notifications", "capture"], ["firmware", "updates"], ["server", "services", "broker", "files", "installation", "console"]];
+const tabGroups: Tab[][] = [["general", "preferences"], ["users", "notifications", "capture"], ["firmware", "updates"], ["services", "broker", "files", "installation", "console"]];
 const tabs: Tab[] = tabGroups.flat();
 
 /** Can the browser reach something at this address at all? (no-cors: only a network failure rejects, which is what a wrong scheme or port gives.) */
@@ -67,14 +67,14 @@ function ServerSettings({ t, origin, isAdmin }: { t: (key: string) => string; or
     setForm({ host: next.saved.host ?? "", port: next.saved.port === undefined ? "" : String(next.saved.port), studio_port: next.saved.studio_port === undefined ? "" : String(next.saved.studio_port) });
   };
   useEffect(() => { if (isAdmin) void readConnection(origin).then(apply).catch(() => setMessage(t("cs_admin_only"))); }, [origin, isAdmin]);   // eslint-disable-line react-hooks/exhaustive-deps
-  if (!isAdmin) return <article className="stack-card"><h3>{t("cs_title")}</h3><p className="muted">{t("cs_admin_only")}</p></article>;
+  if (!isAdmin) return <article className="stack-card"><p className="eyebrow">{t("gen_server_kicker")}</p><h3>{t("cs_title")}</h3><p className="muted">{t("cs_admin_only")}</p></article>;
   const save = async () => {
     const number = (value: string) => value.trim() === "" ? undefined : Number(value);
     try { apply(await saveConnection(origin, { host: form.host.trim() || undefined, port: number(form.port), studio_port: number(form.studio_port) })); setMessage(t("cs_done")); }
     catch (error) { setMessage(t("cs_error") + (error instanceof Error ? error.message : "")); }
   };
   const field = (key: "host" | "port" | "studio_port", label: string, help?: string) => <div className="camera-field"><label><span>{label}</span><input value={form[key]} inputMode={key === "host" ? "text" : "numeric"} placeholder={t("cs_leave_empty")} onChange={event => setForm(current => ({ ...current, [key]: event.target.value }))} /></label>{help && <p className="field-help">{help}</p>}</div>;
-  return <article className="stack-card camera-form"><h3>{t("cs_title")}</h3><p className="muted">{t("cs_help")}</p>
+  return <article className="stack-card camera-form"><p className="eyebrow">{t("gen_server_kicker")}</p><h3>{t("cs_title")}</h3><p className="muted">{t("cs_help")}</p>
     {state && <p className="notice"><b>{t("cs_active")}:</b> {state.active.host}:{state.active.port}{state.active.tls ? " (https)" : ""}</p>}
     {field("host", t("cs_host"), t("cs_host_help"))}{field("port", t("cs_port"))}{field("studio_port", t("cs_studio_port"))}
     <div className="camera-form-actions"><button className="primary" onClick={() => void save()}>{t("cs_save")}</button></div>
@@ -93,11 +93,11 @@ export function ConfigurationPanel(props: Props) {
       {tabGroups.map(group => group.filter(item => !props.isViewer || VIEWER_TABS.includes(item))).filter(group => group.length > 0).map((group, position) => <Fragment key={group[0]}>{position > 0 && <span className="tab-sep" aria-hidden="true" />}{group.map(item => <button key={item} data-tour={`tab-${item}`} className={tab === item ? "active" : ""} role="tab" aria-selected={tab === item} onClick={() => setTab(item)}>{tabLabel(item)}</button>)}</Fragment>)}
     </div>
     {tab === "general" && <div className="config-grid">
-      <article className="stack-card"><h3>{t("serverOrigin")}</h3><label>{t("serverOrigin")}<input value={props.origin} onChange={event => props.setOrigin(event.target.value)} inputMode="url" /></label><OriginCheck t={t} origin={props.origin} setOrigin={props.setOrigin} /><small>{props.connection}</small><p className={`operator-session ${props.operatorUnlocked ? "ready" : ""}`}>{props.operatorUnlocked ? t("studioAccessActive") : t("studioAccessWaiting")}</p><small>{t("studioAccessNotice")}</small><button onClick={props.savePreferences}>{t("savePreferences")}</button><button onClick={props.exportSite}>{t("exportSite")}</button></article>
-      <article className="stack-card"><h3>{t("interface")}</h3><label>{t("theme")}<select value={props.theme} onChange={event => props.setTheme(event.target.value)}>{props.themes.map(item => <option key={item}>{item}</option>)}</select></label><label>{t("language")}<select value={props.language} onChange={event => props.setLanguage(event.target.value)}>{props.languages.map(item => <option key={item.code} value={item.code}>{item.name}</option>)}</select></label><button onClick={props.savePreferences}>{t("saveUi")}</button></article>
+      <article className="stack-card"><p className="eyebrow">{t("gen_browser_kicker")}</p><h3>{t("gen_browser_title")}</h3><p className="muted">{t("gen_browser_help")}</p><label>{t("serverOrigin")}<input value={props.origin} onChange={event => props.setOrigin(event.target.value)} inputMode="url" /></label><OriginCheck t={t} origin={props.origin} setOrigin={props.setOrigin} /><small>{props.connection}</small><p className={`operator-session ${props.operatorUnlocked ? "ready" : ""}`}>{props.operatorUnlocked ? t("studioAccessActive") : t("studioAccessWaiting")}</p><small>{t("studioAccessNotice")}</small><button onClick={props.savePreferences}>{t("savePreferences")}</button><button onClick={props.exportSite}>{t("exportSite")}</button></article>
+      <ServerSettings t={t} origin={props.origin} isAdmin={props.isAdmin} />
+      <article className="stack-card"><p className="eyebrow">{t("gen_ui_kicker")}</p><h3>{t("interface")}</h3><label>{t("theme")}<select value={props.theme} onChange={event => props.setTheme(event.target.value)}>{props.themes.map(item => <option key={item}>{item}</option>)}</select></label><label>{t("language")}<select value={props.language} onChange={event => props.setLanguage(event.target.value)}>{props.languages.map(item => <option key={item.code} value={item.code}>{item.name}</option>)}</select></label><button onClick={props.savePreferences}>{t("saveUi")}</button></article>
     </div>}
     {tab === "users" && <UsersPanel t={t} origin={props.origin} />}
-    {tab === "server" && <ServerSettings t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "services" && <ServicesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "broker" && <BrokerPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "files" && <FilesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
