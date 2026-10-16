@@ -32,6 +32,7 @@ export function PreferencesPanel({ t, language = "en" }: { t: (key: string) => s
         {toggle("pf_tutorial", "pf_tutorial_h", prefs.tutorial, tutorial => setPrefs({ tutorial }))}
         {toggle("pf_assistant", "pf_assistant_h", prefs.assistant, assistant => setPrefs({ assistant }))}
         {toggle("pf_asst_autoopen", "pf_asst_autoopen_h", prefs.assistantAutoOpen, assistantAutoOpen => setPrefs({ assistantAutoOpen }), !prefs.assistant)}
+        {toggle("pf_asst_speak", "pf_asst_speak_h", prefs.assistantSpeak, assistantSpeak => setPrefs({ assistantSpeak }), !prefs.assistant)}
         {toggle("pf_asst_pinned", "pf_asst_pinned_h", prefs.assistantPinned, assistantPinned => setPrefs({ assistantPinned }), !prefs.assistant)}
         {choose("asstsize", "pf_asst_size", ASSISTANT_SIZES, prefs.assistantSize, assistantSize => setPrefs({ assistantSize }), item => `pf_asst_size_${item}`)}
         <div className="pf-actions"><button type="button" disabled={!prefs.assistant || (prefs.assistantX === null && !prefs.assistantPinned)} onClick={() => setPrefs({ assistantX: null, assistantY: null, assistantPinned: false })}>{t("pf_asst_reset")}</button></div>

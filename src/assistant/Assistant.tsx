@@ -12,6 +12,8 @@ import { setPrefs, usePrefs } from "../prefs";
 import { startTour, useActiveTour } from "../tour/tourStore";
 import { menuTourId } from "../tour/menuTours";
 import { placeBubble, type Side } from "./placement";
+import { getAlerts, useAlerts } from "../alerts/settings";
+import { speakAssistant, stopAssistantSpeech } from "../alerts/sounds";
 import { answer as answerQuestion, suggestions, type Answer } from "./engine";
 import type { Topic } from "./knowledge";
 import "./assistant.css";
@@ -19,13 +21,14 @@ import "./assistant.css";
 const SCALE = { small: 0.8, normal: 1, large: 1.35 } as const;
 const clamp = (value: number, low: number, high: number): number => Math.min(high, Math.max(low, value));
 
-export function Mascot({ talking, scale = 1 }: { talking: boolean; scale?: number }) {
-  return <svg className={`mascot ${talking ? "talking" : ""}`} viewBox="0 0 64 72" width={Math.round(56 * scale)} height={Math.round(63 * scale)} aria-hidden="true" focusable="false">
+export function Mascot({ talking, speaking = false, scale = 1 }: { talking: boolean; /** Reading aloud: the mouth opens and closes like a person talking. */ speaking?: boolean; scale?: number }) {
+  return <svg className={`mascot ${talking ? "talking" : ""} ${speaking ? "speaking" : ""}`} viewBox="0 0 64 72" width={Math.round(56 * scale)} height={Math.round(63 * scale)} aria-hidden="true" focusable="false">
     <line className="mascot-antenna" x1="32" y1="4" x2="32" y2="14" /><circle className="mascot-bulb" cx="32" cy="4" r="3" />
     <rect className="mascot-head" x="10" y="14" width="44" height="34" rx="12" />
     <rect className="mascot-visor" x="16" y="22" width="32" height="16" rx="8" />
     <circle className="mascot-eye" cx="25" cy="30" r="3.2" /><circle className="mascot-eye" cx="39" cy="30" r="3.2" />
     <path className="mascot-mouth" d="M26 43 Q32 47 38 43" />
+    <g className="mascot-speak"><g className="mascot-speak-open"><ellipse cx="32" cy="44" rx="6" ry="4.2" /></g></g>
     <rect className="mascot-body" x="18" y="50" width="28" height="16" rx="7" />
     <circle className="mascot-core" cx="32" cy="58" r="3" />
   </svg>;
@@ -45,6 +48,8 @@ export function Assistant({ view, t, language, go, openHelp }: { view: View; t: 
   const drag = useRef<{ x: number; y: number; left: number; top: number; moved: boolean } | null>(null);
   const dragged = useRef(false);
   const bubbleRef = useRef<HTMLDivElement>(null);
+  const alerts = useAlerts();
+  const [speaking, setSpeaking] = useState(false);   // the voice is reading right now: the mouth moves
   const [bubbleAt, setBubbleAt] = useState<{ side: Side; dx: number; dy: number; arrow: number } | null>(null);
   const [, setViewportTick] = useState(0);   // the window changed size: the bubble is placed again
   const hidden = away.has(view);
@@ -126,6 +131,24 @@ export function Assistant({ view, t, language, go, openHelp }: { view: View; t: 
     return () => watcher?.disconnect();
   });
 
+  // what the bubble says now, to be read aloud when the person asked for it
+  const sayNow = (() => {
+    if (!prefs.assistant || !open) return "";
+    if (reply) {
+      const head = reply.answer.kind === "topic" ? (t(`help_s_${reply.answer.topic.view}`) !== `help_s_${reply.answer.topic.view}` ? t(`help_s_${reply.answer.topic.view}`) : "") : reply.answer.kind === "help" ? t(`help_s_${reply.answer.view}`) : "";
+      const body = reply.answer.kind === "topic" || reply.answer.kind === "help" ? reply.answer.text : reply.answer.kind === "hello" ? t("asst_hi") : reply.answer.kind === "thanks" ? t("asst_thanks") : t("asst_none");
+      return `${head}. ${body}`;
+    }
+    const own = HELP_SECTIONS.some(item => item.id === view) ? t(`help_b_${view}`).split("\n\n").filter(item => item.trim()) : [];
+    return own.length > 0 ? `${t(`help_s_${view}`)}. ${own[tip % own.length]}` : t("asst_hello");
+  })();
+  const speakOn = prefs.assistantSpeak && !alerts.muted && !hidden && !tour;
+  useEffect(() => {
+    if (!speakOn || !sayNow) { stopAssistantSpeech(); setSpeaking(false); return; }
+    speakAssistant(sayNow, getAlerts(), language, { onStart: () => setSpeaking(true), onEnd: () => setSpeaking(false) });
+    return () => { stopAssistantSpeech(); setSpeaking(false); };
+  }, [speakOn, sayNow, language]);   // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!prefs.assistant || tour) return null;
   const section = HELP_SECTIONS.find(item => item.id === view);
   const paragraphs = section ? t(`help_b_${view}`).split("\n\n").filter(item => item.trim()) : [];
@@ -152,7 +175,7 @@ export function Assistant({ view, t, language, go, openHelp }: { view: View; t: 
   return <div className={`assistant ${classes}`} style={style} role="complementary" aria-label={t("asst_name")}>
     <button type="button" className="assistant-mascot" onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag} onKeyDown={arrow}
       onClick={() => { if (dragged.current) { dragged.current = false; return; } setOpen(value => !value); }}
-      title={prefs.assistantPinned ? (open ? t("asst_quiet") : t("asst_call")) : `${open ? t("asst_quiet") : t("asst_call")} · ${t("asst_drag_hint")}`} aria-expanded={open}><Mascot talking={open} scale={scale} /></button>
+      title={prefs.assistantPinned ? (open ? t("asst_quiet") : t("asst_call")) : `${open ? t("asst_quiet") : t("asst_call")} · ${t("asst_drag_hint")}`} aria-expanded={open}><Mascot talking={open && !prefs.assistantSpeak} speaking={speaking} scale={scale} /></button>
     {open && <div ref={bubbleRef} className={`assistant-bubble side-${bubbleAt?.side ?? "right"}`} role="status" style={bubbleAt ? { left: bubbleAt.dx, top: bubbleAt.dy, "--arrow": `${bubbleAt.arrow}px` } as React.CSSProperties : { visibility: "hidden" }}>
       {reply ? <>
         <small className="assistant-asked">{t("asst_you")}: {reply.asked}</small>
@@ -178,9 +201,12 @@ export function Assistant({ view, t, language, go, openHelp }: { view: View; t: 
         </div>
         <div className="assistant-chips"><small>{t("asst_try")}</small>{examples.map(example => <button key={example} type="button" onClick={() => ask(example)}>{example}</button>)}</div>
       </>}
-      <div className="assistant-tools">
-        <button type="button" onClick={() => { if (!prefs.assistantPinned && !free) { const box = document.querySelector<HTMLElement>(".assistant")?.getBoundingClientRect(); if (box) place(box.left, box.top); } setPrefs({ assistantPinned: !prefs.assistantPinned }); }}>{prefs.assistantPinned ? t("asst_unpin") : t("asst_pin")}</button>
-        {(free || prefs.assistantPinned) && <button type="button" onClick={() => setPrefs({ assistantX: null, assistantY: null, assistantPinned: false })}>{t("asst_home")}</button>}
+      <div className="assistant-corner">
+        <button type="button" className={prefs.assistantSpeak ? "on" : ""} aria-pressed={prefs.assistantSpeak} title={prefs.assistantSpeak ? t("asst_speak_on") : t("asst_speak_off")} aria-label={prefs.assistantSpeak ? t("asst_speak_on") : t("asst_speak_off")}
+          onClick={() => { if (prefs.assistantSpeak) { stopAssistantSpeech(); setSpeaking(false); } setPrefs({ assistantSpeak: !prefs.assistantSpeak }); }}>{prefs.assistantSpeak ? "🔊" : "🔇"}</button>
+        <button type="button" className={prefs.assistantPinned ? "on" : ""} aria-pressed={prefs.assistantPinned} title={prefs.assistantPinned ? t("asst_unpin") : t("asst_pin")} aria-label={prefs.assistantPinned ? t("asst_unpin") : t("asst_pin")}
+          onClick={() => { if (!prefs.assistantPinned && !free) { const box = document.querySelector<HTMLElement>(".assistant")?.getBoundingClientRect(); if (box) place(box.left, box.top); } setPrefs({ assistantPinned: !prefs.assistantPinned }); }}>📌</button>
+        {(free || prefs.assistantPinned) && <button type="button" title={t("asst_home")} aria-label={t("asst_home")} onClick={() => setPrefs({ assistantX: null, assistantY: null, assistantPinned: false })}>↩</button>}
       </div>
       <form className="assistant-ask" onSubmit={event => { event.preventDefault(); ask(question); }}>
         <input value={question} onChange={event => setQuestion(event.target.value)} placeholder={t("asst_ask_ph")} aria-label={t("asst_ask_ph")} maxLength={200} />

@@ -45,6 +45,8 @@ export type Prefs = {
   assistantSize: AssistantSize;
   /** Its bubble opens by itself when the menu changes. */
   assistantAutoOpen: boolean;
+  /** The mascot reads aloud what its bubble says (with the voice of the alarms; off by default). */
+  assistantSpeak: boolean;
   /** Where the person put it, as a fraction of the window (null: it follows the menu). */
   assistantX: number | null;
   assistantY: number | null;
@@ -56,7 +58,7 @@ export type Prefs = {
 
 export const DEFAULT_PREFS: Prefs = {
   tutorial: true, tourAutoStart: true, toursDone: [], tooltips: "rich", tooltipDelay: 450, motion: "full", density: "comfortable", textScale: 100,
-  startView: "overview", lastView: "overview", assistant: true, assistantPinned: false, assistantSize: "normal", assistantAutoOpen: true, assistantX: null, assistantY: null, alertSound: true, alertNotifications: true,
+  startView: "overview", lastView: "overview", assistant: true, assistantPinned: false, assistantSize: "normal", assistantAutoOpen: true, assistantSpeak: false, assistantX: null, assistantY: null, alertSound: true, alertNotifications: true,
 };
 
 export const LIMITS = { tooltipDelay: [150, 1500], textScale: [85, 130], tours: 40 } as const;
@@ -81,7 +83,7 @@ export function parsePrefs(raw: string | null): Prefs {
     tooltips: oneOf(TOOLTIP_MODES, source.tooltips, DEFAULT_PREFS.tooltips), tooltipDelay: number("tooltipDelay", DEFAULT_PREFS.tooltipDelay, LIMITS.tooltipDelay),
     motion: oneOf(MOTION_MODES, source.motion, DEFAULT_PREFS.motion), density: oneOf(DENSITIES, source.density, DEFAULT_PREFS.density), textScale: number("textScale", DEFAULT_PREFS.textScale, LIMITS.textScale),
     startView: start, lastView: oneOf(VIEWS, source.lastView, DEFAULT_PREFS.lastView), assistant: bool("assistant", DEFAULT_PREFS.assistant), assistantPinned: bool("assistantPinned", DEFAULT_PREFS.assistantPinned), assistantSize: oneOf(ASSISTANT_SIZES, source.assistantSize, DEFAULT_PREFS.assistantSize),
-    assistantAutoOpen: bool("assistantAutoOpen", DEFAULT_PREFS.assistantAutoOpen), ...fraction(source.assistantX, source.assistantY), alertSound: bool("alertSound", DEFAULT_PREFS.alertSound), alertNotifications: bool("alertNotifications", DEFAULT_PREFS.alertNotifications),
+    assistantAutoOpen: bool("assistantAutoOpen", DEFAULT_PREFS.assistantAutoOpen), assistantSpeak: bool("assistantSpeak", DEFAULT_PREFS.assistantSpeak), ...fraction(source.assistantX, source.assistantY), alertSound: bool("alertSound", DEFAULT_PREFS.alertSound), alertNotifications: bool("alertNotifications", DEFAULT_PREFS.alertNotifications),
   };
 }
 

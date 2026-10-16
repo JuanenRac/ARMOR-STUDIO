@@ -43,3 +43,17 @@ html[data-motion="off"] .assistant, html[data-motion="reduced"] .assistant { tra
 .assistant.pinned .assistant-mascot { cursor: pointer; }
 .assistant-tools { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .45rem; }
 .assistant-tools button { padding: .2rem .5rem; font-size: .68rem; opacity: .85; }
+
+/* the little buttons of the bubble live in its corner, apart from the actions of the answer */
+.assistant-corner { position: absolute; top: 6px; right: 8px; display: flex; gap: 4px; }
+.assistant-corner button { display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border-radius: 7px; font-size: .78rem; line-height: 1; opacity: .8; }
+.assistant-corner button:hover { opacity: 1; } .assistant-corner button.on { opacity: 1; border-color: #5df0c4; box-shadow: 0 0 0 1px rgba(93, 240, 196, .35); }
+.assistant-bubble > strong:first-child, .assistant-bubble > .assistant-asked:first-child { padding-right: 5.4rem; }
+.assistant-tools { display: none; }
+/* the mouth of the mascot while it reads aloud: it opens and closes unevenly, like a person talking */
+.mascot-speak { opacity: 0; transform-origin: 32px 44px; } .mascot-speak ellipse { fill: #04141a; stroke: #7df3ff; stroke-width: 1.2; }
+.mascot.speaking .mascot-mouth { opacity: 0; }
+.mascot.speaking .mascot-speak { opacity: 1; animation: mascot-jaw .31s ease-in-out infinite alternate; }
+.mascot.speaking .mascot-speak-open { transform-origin: 32px 44px; animation: mascot-lips .47s ease-in-out infinite alternate; }
+@keyframes mascot-jaw { from { transform: scaleY(.2); } to { transform: scaleY(1); } }
+@keyframes mascot-lips { from { transform: scaleX(.7); } to { transform: scaleX(1.05); } }

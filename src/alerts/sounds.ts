@@ -4,7 +4,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import type { AlertSettings, Age, Gender } from "./settings";
-import { speechParts } from "./voiceStyle";
+import { STYLE_VOICE, speechParts } from "./voiceStyle";
 
 export const MAX_UPLOAD_BYTES = 1_500_000;
 export const MAX_SOUNDS = 12;
@@ -174,6 +174,45 @@ export const AGE_VOICE: Record<Age, { pitch: number; rate: number }> = { child: 
 
 const LANGUAGE_TAG: Record<string, string> = { en: "en-GB", es: "es-ES", de: "de-DE", fr: "fr-FR", it: "it-IT", ja: "ja-JP", zh: "zh-CN", pt: "pt-PT" };
 export const speechLanguage = (setting: string, interfaceLanguage: string): string => setting || LANGUAGE_TAG[interfaceLanguage] || "en-GB";
+
+/** How the assistant is heard: the voice of the alarms (language, gender, age, speed, volume) with the pitch and pace of its style, and no extra lines around what it says. */
+export function assistantVoice(settings: AlertSettings, interfaceLanguage: string, text: string): { text: string; lang: string; pitch: number; rate: number; volume: number } {
+  const lang = speechLanguage(settings.voice.language, interfaceLanguage);
+  const age = AGE_VOICE[settings.voice.age], style = settings.voice.style === "chaos" ? { pitch: 1, rate: 1 } : STYLE_VOICE[settings.voice.style];
+  return {
+    text: text.replace(/\s+/g, " ").trim().slice(0, 600), lang,
+    pitch: Math.max(0, Math.min(2, age.pitch * style.pitch)), rate: Math.max(0.1, Math.min(4, (settings.voice.rate / 100) * age.rate * style.rate)), volume: Math.max(0, Math.min(1, settings.volume / 100)),
+  };
+}
+
+let assistantSpeaking = false;
+
+/** Stop the assistant's own speech (and nothing else when it is not talking). */
+export function stopAssistantSpeech(): void {
+  if (!assistantSpeaking) return;
+  assistantSpeaking = false;
+  try { window.speechSynthesis?.cancel(); } catch { /* no speech */ }
+}
+
+/** The assistant reads a text aloud. A new text takes the place of the one being read. The mute button silences it; whether the alarms' voice is on does not matter (the assistant has its own switch). */
+export function speakAssistant(text: string, settings: AlertSettings, interfaceLanguage: string, handlers: { onStart?: () => void; onEnd?: () => void } = {}): boolean {
+  if (!speechAvailable() || settings.muted || !text.trim()) return false;
+  try {
+    if (assistantSpeaking) window.speechSynthesis.cancel();
+    const spec = assistantVoice(settings, interfaceLanguage, text);
+    const utterance = new SpeechSynthesisUtterance(spec.text);
+    utterance.lang = spec.lang;
+    const voice = pickVoice(listVoices(), spec.lang, settings.voice.gender);
+    if (voice) utterance.voice = voice;
+    utterance.pitch = spec.pitch; utterance.rate = spec.rate; utterance.volume = spec.volume;
+    const done = () => { if (assistantSpeaking) { assistantSpeaking = false; handlers.onEnd?.(); } };
+    utterance.onstart = () => handlers.onStart?.();
+    utterance.onend = done; utterance.onerror = done;
+    assistantSpeaking = true;
+    window.speechSynthesis.speak(utterance);
+    return true;
+  } catch { assistantSpeaking = false; return false; }
+}
 
 export function speak(message: string, settings: AlertSettings, interfaceLanguage: string): boolean {
   if (!speechAvailable() || settings.muted || !settings.voice.enabled || !message.trim()) return false;
