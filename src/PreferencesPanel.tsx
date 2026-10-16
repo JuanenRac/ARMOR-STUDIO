@@ -4,7 +4,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { askConfirm } from "./askConfirm";
-import { LIMITS, MOTION_MODES, DENSITIES, TOOLTIP_MODES, VIEWS, markTour, resetPrefs, setPrefs, usePrefs, type StartView } from "./prefs";
+import { ASSISTANT_SIZES, LIMITS, MOTION_MODES, DENSITIES, TOOLTIP_MODES, VIEWS, markTour, resetPrefs, setPrefs, usePrefs, type StartView } from "./prefs";
 import { TOURS } from "./tour/tours";
 import { startTour } from "./tour/tourStore";
 import { AlertSettingsPanel } from "./alerts/AlertSettingsPanel";
@@ -31,6 +31,10 @@ export function PreferencesPanel({ t, language = "en" }: { t: (key: string) => s
         <h3>{t("pf_section_help")}</h3>
         {toggle("pf_tutorial", "pf_tutorial_h", prefs.tutorial, tutorial => setPrefs({ tutorial }))}
         {toggle("pf_assistant", "pf_assistant_h", prefs.assistant, assistant => setPrefs({ assistant }))}
+        {toggle("pf_asst_autoopen", "pf_asst_autoopen_h", prefs.assistantAutoOpen, assistantAutoOpen => setPrefs({ assistantAutoOpen }), !prefs.assistant)}
+        {toggle("pf_asst_pinned", "pf_asst_pinned_h", prefs.assistantPinned, assistantPinned => setPrefs({ assistantPinned }), !prefs.assistant)}
+        {choose("asstsize", "pf_asst_size", ASSISTANT_SIZES, prefs.assistantSize, assistantSize => setPrefs({ assistantSize }), item => `pf_asst_size_${item}`)}
+        <div className="pf-actions"><button type="button" disabled={!prefs.assistant || (prefs.assistantX === null && !prefs.assistantPinned)} onClick={() => setPrefs({ assistantX: null, assistantY: null, assistantPinned: false })}>{t("pf_asst_reset")}</button></div>
         {toggle("pf_autostart", null, prefs.tourAutoStart, tourAutoStart => setPrefs({ tourAutoStart }), !prefs.tutorial)}
         {choose("tooltips", "pf_tooltips", TOOLTIP_MODES, prefs.tooltips, tooltips => setPrefs({ tooltips }), item => `pf_tooltips_${item}`)}
         <p className="muted pf-hint">{t("pf_tooltips_h")}</p>

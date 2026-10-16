@@ -3,6 +3,7 @@ import { readConnection, saveConnection, type ConnectionState } from "./api";
 import { UsersPanel } from "./UsersPanel";
 import { BrokerPanel, FilesPanel, ServicesPanel } from "./AdminPanel";
 import { FirmwarePanel } from "./FirmwarePanel";
+import { CapturePanel } from "./CapturePanel";
 import { NotificationsPanel } from "./NotificationsPanel";
 import { InstallationPanel } from "./InstallationPanel";
 import { UpdatesPanel } from "./UpdatesPanel";
@@ -12,7 +13,7 @@ import type { NetworkOverview } from "./networkModel";
 import "./configuration.css";
 import { MenuTitle } from "./menuLogos";
 
-type Tab = "general" | "users" | "server" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications" | "preferences";
+type Tab = "general" | "users" | "server" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications" | "capture" | "preferences";
 type Props = {
   t: (key: string) => string;
   origin: string; setOrigin: (value: string) => void;
@@ -25,7 +26,7 @@ type Props = {
 };
 
 const VIEWER_TABS: readonly string[] = ["general", "users", "preferences"];
-const tabs: Tab[] = ["general", "users", "server", "services", "broker", "files", "installation", "firmware", "updates", "console", "notifications", "preferences"];
+const tabs: Tab[] = ["general", "users", "server", "services", "broker", "files", "installation", "firmware", "updates", "console", "notifications", "capture", "preferences"];
 
 /** Can the browser reach something at this address at all? (no-cors: only a network failure rejects, which is what a wrong scheme or port gives.) */
 async function reachable(url: string): Promise<boolean> {
@@ -100,6 +101,7 @@ export function ConfigurationPanel(props: Props) {
     {tab === "files" && <FilesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "installation" && <InstallationPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "notifications" && <NotificationsPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
+    {tab === "capture" && <CapturePanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "preferences" && <PreferencesPanel t={t} language={props.language} />}
     {tab === "updates" && <UpdatesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "console" && <ConsolePanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}

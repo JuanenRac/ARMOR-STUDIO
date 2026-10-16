@@ -47,4 +47,17 @@ describe("the preferences", () => {
     expect(openingView({ ...DEFAULT_PREFS, startView: "last", lastView: "network" })).toBe("network");
     expect(openingView(DEFAULT_PREFS)).toBe("overview");
   });
+
+  it("keeps where the assistant was put, only when both coordinates are there and inside the window", () => {
+    expect(parsePrefs(JSON.stringify({ assistantX: 0.25, assistantY: 0.75 }))).toMatchObject({ assistantX: 0.25, assistantY: 0.75 });
+    expect(parsePrefs(JSON.stringify({ assistantX: 0.25 }))).toMatchObject({ assistantX: null, assistantY: null });
+    expect(parsePrefs(JSON.stringify({ assistantX: 9, assistantY: -3 }))).toMatchObject({ assistantX: 1, assistantY: 0 });
+    expect(parsePrefs(JSON.stringify({ assistantX: "left", assistantY: "top" }))).toMatchObject({ assistantX: null, assistantY: null });
+  });
+
+  it("reads the pin, the size and the bubble of the assistant, with defaults for anything else", () => {
+    expect(parsePrefs(null)).toMatchObject({ assistantPinned: false, assistantSize: "normal", assistantAutoOpen: true });
+    expect(parsePrefs(JSON.stringify({ assistantPinned: true, assistantSize: "large", assistantAutoOpen: false }))).toMatchObject({ assistantPinned: true, assistantSize: "large", assistantAutoOpen: false });
+    expect(parsePrefs(JSON.stringify({ assistantSize: "huge", assistantPinned: "yes" }))).toMatchObject({ assistantSize: "normal", assistantPinned: false });
+  });
 });

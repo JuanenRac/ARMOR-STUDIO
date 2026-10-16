@@ -63,7 +63,9 @@ Apaga os itens selecionados com «Apagar selecionados», ou limpa em massa: tudo
 
 As fotografias e gravações fazem-se a partir do ecrã Câmaras (Fotografia e o botão vermelho de gravar).
 
-Prova de custódia: o botão «Prova de custódia» descarrega um ficheiro assinado pelo servidor com o tamanho, o SHA-256 da prova tal como está agora, quando foi feita e cada linha da auditoria sobre ela (quem a protegeu, quem pediu a sua impressão digital). Entregue-o junto com o ficheiro: o servidor pode dizer se o documento é autêntico e se o ficheiro ainda tem a mesma impressão digital.`],
+Prova de custódia: o botão «Prova de custódia» descarrega um ficheiro assinado pelo servidor com o tamanho, o SHA-256 da prova tal como está agora, quando foi feita e cada linha da auditoria sobre ela (quem a protegeu, quem pediu a sua impressão digital). Entregue-o junto com o ficheiro: o servidor pode dizer se o documento é autêntico e se o ficheiro ainda tem a mesma impressão digital.
+
+Captura automática: com o perímetro armado, quando uma câmara vê algo o servidor tira sozinho uma foto (ou várias, com uns segundos de intervalo) e grava um vídeo, e aparecem aqui com as outras. Quantas, quanto dura e de quanto em quanto se ajusta em Configuração > Captura automática.`],
   history: ["Histórico", `Tudo o que aconteceu, do mais recente para o mais antigo: cada mudança de nível de alerta de um nó, nós e câmaras a ficar ligados ou desligados, mudanças do modo de segurança, alarmes disparados, reconhecidos e terminados, e eventos de dispositivos e da rede. É o sítio para ver toda a história, também dos alarmes que já reconheceu.
 
 O resumo de cima conta os eventos guardados, os das últimas 24 horas, os alertas ALTOS e os incidentes de nós. Os filtros escolhem o tipo de evento, o nível de alerta e um período (de / até); a caixa de pesquisa procura qualquer texto. «Carregar eventos mais antigos» pede mais ao servidor. «Em direto» atualiza a cada cinco segundos e pode pausar-se. «Limpar histórico» apaga os eventos guardados mas não os alarmes.`],

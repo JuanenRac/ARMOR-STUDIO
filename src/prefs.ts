@@ -16,6 +16,8 @@ export type MotionMode = (typeof MOTION_MODES)[number];
 export type Density = (typeof DENSITIES)[number];
 /** Where Studio opens: a menu, or the one the person was in last. */
 export type StartView = View | "last";
+export const ASSISTANT_SIZES = ["small", "normal", "large"] as const;
+export type AssistantSize = (typeof ASSISTANT_SIZES)[number];
 
 export const VIEWS: readonly View[] = ["overview", "weather", "alarms", "alarmPanels", "cameras", "radar", "inverters", "batteries", "electrical", "devices", "automations", "record", "history", "network", "services", "siteDesigner", "electricalDesigner", "networkDesigner", "alarmDesigner", "system", "configuration"];
 
@@ -38,6 +40,14 @@ export type Prefs = {
   lastView: View;
   /** The mascot that guides from menu to menu. */
   assistant: boolean;
+  /** The mascot stays where it is: it is not dragged and it does not follow the menus. */
+  assistantPinned: boolean;
+  assistantSize: AssistantSize;
+  /** Its bubble opens by itself when the menu changes. */
+  assistantAutoOpen: boolean;
+  /** Where the person put it, as a fraction of the window (null: it follows the menu). */
+  assistantX: number | null;
+  assistantY: number | null;
   /** A new critical alarm is heard. */
   alertSound: boolean;
   /** A new critical alarm is shown as a notification of the browser. */
@@ -46,12 +56,16 @@ export type Prefs = {
 
 export const DEFAULT_PREFS: Prefs = {
   tutorial: true, tourAutoStart: true, toursDone: [], tooltips: "rich", tooltipDelay: 450, motion: "full", density: "comfortable", textScale: 100,
-  startView: "overview", lastView: "overview", assistant: true, alertSound: true, alertNotifications: true,
+  startView: "overview", lastView: "overview", assistant: true, assistantPinned: false, assistantSize: "normal", assistantAutoOpen: true, assistantX: null, assistantY: null, alertSound: true, alertNotifications: true,
 };
 
 export const LIMITS = { tooltipDelay: [150, 1500], textScale: [85, 130], tours: 40 } as const;
 const clamp = (value: number, low: number, high: number): number => Math.min(high, Math.max(low, value));
 const oneOf = <T extends string>(list: readonly T[], value: unknown, fallback: T): T => (typeof value === "string" && (list as readonly string[]).includes(value) ? (value as T) : fallback);
+
+/** The place of the mascot: both fractions of the window, or neither. */
+const fraction = (x: unknown, y: unknown): { assistantX: number | null; assistantY: number | null } =>
+  typeof x === "number" && typeof y === "number" && Number.isFinite(x) && Number.isFinite(y) ? { assistantX: clamp(x, 0, 1), assistantY: clamp(y, 0, 1) } : { assistantX: null, assistantY: null };
 
 /** Read stored preferences: anything that is not what it should be falls back to its default, and nothing the page did not write is trusted. */
 export function parsePrefs(raw: string | null): Prefs {
@@ -66,7 +80,8 @@ export function parsePrefs(raw: string | null): Prefs {
     tutorial: bool("tutorial", DEFAULT_PREFS.tutorial), tourAutoStart: bool("tourAutoStart", DEFAULT_PREFS.tourAutoStart), toursDone: done,
     tooltips: oneOf(TOOLTIP_MODES, source.tooltips, DEFAULT_PREFS.tooltips), tooltipDelay: number("tooltipDelay", DEFAULT_PREFS.tooltipDelay, LIMITS.tooltipDelay),
     motion: oneOf(MOTION_MODES, source.motion, DEFAULT_PREFS.motion), density: oneOf(DENSITIES, source.density, DEFAULT_PREFS.density), textScale: number("textScale", DEFAULT_PREFS.textScale, LIMITS.textScale),
-    startView: start, lastView: oneOf(VIEWS, source.lastView, DEFAULT_PREFS.lastView), assistant: bool("assistant", DEFAULT_PREFS.assistant), alertSound: bool("alertSound", DEFAULT_PREFS.alertSound), alertNotifications: bool("alertNotifications", DEFAULT_PREFS.alertNotifications),
+    startView: start, lastView: oneOf(VIEWS, source.lastView, DEFAULT_PREFS.lastView), assistant: bool("assistant", DEFAULT_PREFS.assistant), assistantPinned: bool("assistantPinned", DEFAULT_PREFS.assistantPinned), assistantSize: oneOf(ASSISTANT_SIZES, source.assistantSize, DEFAULT_PREFS.assistantSize),
+    assistantAutoOpen: bool("assistantAutoOpen", DEFAULT_PREFS.assistantAutoOpen), ...fraction(source.assistantX, source.assistantY), alertSound: bool("alertSound", DEFAULT_PREFS.alertSound), alertNotifications: bool("alertNotifications", DEFAULT_PREFS.alertNotifications),
   };
 }
 

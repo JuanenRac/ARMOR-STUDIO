@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here.
 
+## [0.7.8] - Automatic capture, a movable assistant and the public connection in Network
+
+- **Automatic capture:** a new tab in Configuration sets what the server takes by itself when a camera sees something while the perimeter is armed.
+- It can take photos (one or up to sixty, from one to three hundred seconds apart) and record a video of three to three hundred seconds; each part can be switched off on its own.
+- A cooldown of five seconds to an hour leaves a camera alone after a capture, so that somebody walking in front of it does not fill the disk.
+- The latest automatic captures are listed next to the settings; everybody who may look sees the values and only an administrator changes them.
+- **A movable assistant:** drag the mascot anywhere in the window, or move it with the arrow keys, and its bubble opens to the side that has room.
+- **Pin it:** "Pin here" in its bubble, or the same in Preferences, leaves it where it is and it no longer follows the menus; "Back to its place" puts it back.
+- Preferences also choose its size (small, normal or large) and whether its bubble opens by itself in every menu.
+- **The public connection in Network:** a card right under the internet state shows your public IP (with a button to copy it), the provider and its network number (ASN), the place with its flag and the country in your language, the time there, IPv4 or IPv6, the reverse name and since when the address has not changed.
+- **Help, tours and assistant:** the new tab, the movable assistant and the public connection are explained in every language, and the assistant answers questions about them ("how do I make the cameras take a photo and a video", "how do I move the assistant", "what is my public IP").
+- All the new texts exist in the eight languages, and tests check the new preferences, the public address facts and that every question of the dictionary still finds its task.
+
 ## [0.7.7] - Alarms on the live map and Zigbee sensors for the zones of the alarm panels
 
 - **Ask the assistant in words:** the mascot has a text box; write what you want to do ("how do I arm the alarm", "a node does not answer") and it answers with the steps.

@@ -371,6 +371,11 @@ export async function firmwareUpload(origin: string, file: File): Promise<Firmwa
 
 export type NotificationsStatus = { webhook: boolean; mqtt: boolean; telegram: boolean; ntfy: boolean; homeassistant: boolean; language: string };
 export type NotificationTestResult = { channel: string; ok: boolean; detail: string };
+/** What the server takes by itself when a camera sees something while the perimeter is armed. */
+export type CaptureSettings = { enabled: boolean; photo: boolean; photo_count: number; photo_interval_s: number; video: boolean; video_seconds: number; cooldown_s: number };
+export type CaptureRecord = { camera_id: string; at: string; photos: number; video: boolean };
+export const readCaptureSettings = (origin: string) => userCall<{ settings: CaptureSettings; recent: CaptureRecord[] }>(origin, "GET", "/api/v1/capture-settings");
+export const saveCaptureSettings = (origin: string, settings: CaptureSettings) => userCall<{ settings: CaptureSettings }>(origin, "PUT", "/api/v1/capture-settings", settings);
 export const notificationsStatus = (origin: string) => userCall<NotificationsStatus>(origin, "GET", "/api/v1/admin/notifications");
 export const notificationsTest = (origin: string, channel?: string) => userCall<{ results: NotificationTestResult[] }>(origin, "POST", "/api/v1/admin/notifications/test", channel ? { channel } : {});
 export const changeAccount = (origin: string, change: { currentPassword: string; username?: string; newPassword?: string }) => userCall<StudioUser>(origin, "PATCH", "/api/v1/account", change);

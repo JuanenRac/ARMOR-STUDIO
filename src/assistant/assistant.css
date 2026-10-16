@@ -31,3 +31,14 @@ html[data-motion="off"] .assistant, html[data-motion="reduced"] .assistant { tra
 .assistant-ask { display: flex; gap: .35rem; margin-top: .55rem; }
 .assistant-ask input { flex: 1; min-width: 0; padding: .3rem .55rem; font-size: .78rem; border-radius: 8px; }
 .assistant-ask button { padding: .3rem .7rem; font-size: .75rem; }
+
+/* put where the person wants it: no flying, the bubble opens to the side that has room */
+.assistant.free, .assistant-call.free { right: auto; bottom: auto; flex-direction: row; }
+.assistant.free.flip, .assistant-call.free.flip { flex-direction: row-reverse; }
+.assistant.flip:not(.corner) .assistant-bubble::before { left: auto; right: -7px; transform: rotate(225deg); }
+.assistant.dragging { transition: none; }
+.assistant.dragging .assistant-mascot { cursor: grabbing; animation: none; }
+.assistant:not(.pinned) .assistant-mascot { cursor: grab; touch-action: none; }
+.assistant.pinned .assistant-mascot { cursor: pointer; }
+.assistant-tools { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .45rem; }
+.assistant-tools button { padding: .2rem .5rem; font-size: .68rem; opacity: .85; }
