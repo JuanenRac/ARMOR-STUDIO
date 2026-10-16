@@ -3,7 +3,7 @@
  * light up the page itself while the text goes through what the menu shows, how it is used and what else it can do. Titles and bodies are the Help's own, in the seven languages.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import { HELP_SECTIONS } from "../helpText";
+import { HELP_SECTIONS, HELP_PT } from "../helpText";
 import type { View } from "../domain";
 import type { Tour, TourStep } from "./tours";
 import { ART_OF_VIEW } from "./TourArt";
@@ -38,3 +38,21 @@ export const menuTourCatalogues: RowCatalogues = (() => {
   }
   return result;
 })();
+
+/** The same tours in Portuguese, from the Portuguese Help. */
+export const ptMenuTourCatalogue = (): Record<string, string> => {
+  const target: Record<string, string> = {};
+  for (const section of HELP_SECTIONS) {
+    if (section.id === "start" || section.id === "tips") continue;
+    const entry = HELP_PT[section.id];
+    if (!entry) continue;
+    const id = menuTourId(section.id);
+    const paragraphs = entry[1].split("\n\n").filter(item => item.trim());
+    const parts = [paragraphs[0], paragraphs[1] ?? paragraphs[0], paragraphs.slice(2).join("\n\n") || paragraphs[paragraphs.length - 1]];
+    target[`tour_${id}`] = entry[0];
+    target[`tour_${id}_s`] = summary(entry[1]);
+    target[`tour_${id}_0_t`] = entry[0]; target[`tour_${id}_0_b`] = paragraphs[0];
+    parts.forEach((part, index) => { target[`tour_${id}_${index + 1}_t`] = entry[0]; target[`tour_${id}_${index + 1}_b`] = part; });
+  }
+  return target;
+};

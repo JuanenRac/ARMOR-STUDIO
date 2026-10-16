@@ -11,7 +11,8 @@
   <a href="README_ita.md">🇮🇹 Italiano</a> |
   <a href="README_deu.md">🇩🇪 Deutsch</a> |
   <a href="README_zho.md">🇨🇳 简体中文</a> |
-  🇯🇵 <b>日本語</b>
+  🇯🇵 <b>日本語</b> |
+  <a href="README_por.md">🇵🇹 Português</a>
 </p>
 
 ### 運用と設計のコンソール：カメラ、レーダー、アラーム、太陽光発電、証拠、サイトの平面図

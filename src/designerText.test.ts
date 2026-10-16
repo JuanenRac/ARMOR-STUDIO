@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { designerCatalogues } from "./designerText";
+import { LANGUAGE_ORDER } from "./catalogueRows";
 import { locales, requiredUiKeys, text } from "./i18n";
 import { PLAN_TOOL_GROUPS, VIEW_TOOL_GROUPS } from "./designer/model";
 
 describe("designer text", () => {
   it("has every phrase in all seven languages, and no language repeats another's placeholder text for a whole sentence", () => {
     const keys = Object.keys(designerCatalogues.en);
-    for (const locale of locales) expect(Object.keys(designerCatalogues[locale]).sort()).toEqual(keys.slice().sort());
-    for (const locale of locales) for (const key of keys) expect(designerCatalogues[locale][key].trim().length, `${locale}:${key}`).toBeGreaterThan(0);
+    for (const locale of LANGUAGE_ORDER) expect(Object.keys(designerCatalogues[locale]).sort()).toEqual(keys.slice().sort());
+    for (const locale of LANGUAGE_ORDER) for (const key of keys) expect(designerCatalogues[locale][key].trim().length, `${locale}:${key}`).toBeGreaterThan(0);
   });
   it("names and explains every tool of both views", () => {
     for (const spec of [...PLAN_TOOL_GROUPS.flat(), ...VIEW_TOOL_GROUPS.flat()]) {

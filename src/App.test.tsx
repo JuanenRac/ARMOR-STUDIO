@@ -3,8 +3,8 @@ import { LANGUAGES } from "./domain";
 import { locales, requiredUiKeys, text } from "./i18n";
 
 describe("Studio internationalisation", () => {
-  it("has a complete catalogue for all seven supported languages", () => {
-    expect(locales).toHaveLength(7);
+  it("has a complete catalogue for all eight supported languages", () => {
+    expect(locales).toHaveLength(8);
     for (const locale of locales) {
       for (const key of requiredUiKeys) expect(text(locale, key).trim()).not.toHaveLength(0);
     }
@@ -26,7 +26,7 @@ describe("Studio internationalisation", () => {
 });
 
 describe("Studio help", () => {
-  it("explains every menu in all seven languages", async () => {
+  it("explains every menu in all eight languages", async () => {
     const { HELP_SECTIONS } = await import("./helpText");
     const { NAV } = await import("./domain");
     for (const [view] of NAV) expect(HELP_SECTIONS.some(section => section.id === view), view).toBe(true);

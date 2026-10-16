@@ -71,6 +71,16 @@ const ROWS: Record<string, Row> = {
   al_mute_src: ["Mute this source", "Silenciar este origen", "Diese Quelle stummschalten", "Couper cette source", "Silenzia questa origine", "この発生源をミュート", "静音此来源"],
   popupRegion: ["Alarm pop-ups", "Avisos de alarma", "Alarm-Hinweise", "Alertes d'alarme", "Avvisi di allarme", "アラームの通知", "报警弹窗"],
   popupCloseAll: ["Close all", "Cerrar todas", "Alle schließen", "Tout fermer", "Chiudi tutte", "すべて閉じる", "全部关闭"],
+  trigger_threshold: ["a reading goes above or below a value", "una lectura supera o baja de un valor", "ein Messwert über- oder unterschreitet einen Wert", "une mesure dépasse ou passe sous une valeur", "una lettura supera o scende sotto un valore", "測定値がしきい値を上回る／下回る", "读数高于或低于某个值"],
+  th_field: ["Reading", "Lectura", "Messwert", "Mesure", "Lettura", "測定項目", "读数"],
+  th_above: ["goes above", "supera", "steigt über", "dépasse", "supera", "を上回る", "高于"],
+  th_below: ["goes below", "baja de", "fällt unter", "passe sous", "scende sotto", "を下回る", "低于"],
+  th_value: ["Value", "Valor", "Wert", "Valeur", "Valore", "値", "数值"],
+  th_f_temperature: ["Temperature (°C)", "Temperatura (°C)", "Temperatur (°C)", "Température (°C)", "Temperatura (°C)", "温度 (°C)", "温度 (°C)"],
+  th_f_humidity: ["Humidity (%)", "Humedad (%)", "Feuchtigkeit (%)", "Humidité (%)", "Umidità (%)", "湿度 (%)", "湿度 (%)"],
+  th_f_battery: ["Battery (%)", "Batería (%)", "Batterie (%)", "Batterie (%)", "Batteria (%)", "電池 (%)", "电池 (%)"],
+  th_f_power_w: ["Power (W)", "Potencia (W)", "Leistung (W)", "Puissance (W)", "Potenza (W)", "電力 (W)", "功率 (W)"],
+  th_f_voltage_v: ["Voltage (V)", "Tensión (V)", "Spannung (V)", "Tension (V)", "Tensione (V)", "電圧 (V)", "电压 (V)"],
   popupGo: ["Open", "Abrir", "Öffnen", "Ouvrir", "Apri", "開く", "打开"],
 };
 

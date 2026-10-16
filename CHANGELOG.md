@@ -18,6 +18,8 @@ All notable changes to this project are documented here.
 - The connection state moved from the foot of the menu to the bottom status bar, and the menu uses the space it left.
 - The Sistema menu no longer squeezes "What the nodes send" against the audit log, which showed two copy buttons stacked.
 - Descriptive texts under the titles of the menus and tabs use the whole width of their card instead of wrapping in a narrow column.
+- **Threshold triggers:** an automation can start when a reading of a device (temperature, humidity, battery, power, voltage) goes above or below a value you type, not only when it changes state.
+- **Portuguese:** the console, its Help, its tours, its hover hints and the new sounds and assistant texts are available in Portuguese, the eighth language of the family, from the language selector.
 - The demonstration site is never uploaded to the server over a real design, and the status poll skips a hidden tab and a request that is still running.
 
 ## [0.7.4] - Motorised gates, garage doors and shutters, water heaters and tanks, and a bridge to the Electrical Designer

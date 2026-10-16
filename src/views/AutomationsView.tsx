@@ -31,6 +31,7 @@ export function AutomationsView({ t, origin, automations, reload, devices, now }
   const actuators = devices.filter(device => ACTUATOR_KINDS.includes(device.kind));
 
   const describeTrigger = (trigger: Trigger): string => {
+    if (trigger.type === "device" && typeof trigger.equals === "number") { const device = byId(trigger.device_id); return `${device?.name ?? trigger.device_id}: ${t(`th_f_${trigger.field}`)} ${t(trigger.op === "lt" ? "th_below" : "th_above")} ${trigger.equals}`; }
     if (trigger.type === "device") { const device = byId(trigger.device_id); return `${device?.name ?? trigger.device_id} ${t("becomes")} ${stateWord(trigger.field, trigger.equals, t)}`; }
     if (trigger.type === "mode") return t(trigger.mode === "armed" ? "modeArmedNotice" : "modeDisarmedNotice");
     const parts = [t("trigger_alarm")];
@@ -87,9 +88,17 @@ export function AutomationsView({ t, origin, automations, reload, devices, now }
 
       <div className="automation-row">
         <span className="step">{t("whenLabel")}</span>
-        <label>{t("whenLabel")}<select value={trigger?.type} onChange={event => setTrigger(event.target.value === "device" ? { type: "device", device_id: binary[0]?.id ?? "", field: MAIN_FIELD[binary[0]?.kind ?? "door"] ?? "open", equals: true } : event.target.value === "alarm" ? { type: "alarm" } : { type: "mode", mode: "armed" })}>
-          <option value="device">{t("trigger_device")}</option><option value="alarm">{t("trigger_alarm")}</option><option value="mode">{t("trigger_mode")}</option></select></label>
-        {trigger?.type === "device" && <>
+        <label>{t("whenLabel")}<select value={trigger?.type === "device" && typeof trigger.equals === "number" ? "threshold" : trigger?.type} onChange={event => setTrigger(event.target.value === "threshold" ? { type: "device", device_id: devices[0]?.id ?? "", field: "temperature", equals: 25, op: "gt" } : event.target.value === "device" ? { type: "device", device_id: binary[0]?.id ?? "", field: MAIN_FIELD[binary[0]?.kind ?? "door"] ?? "open", equals: true } : event.target.value === "alarm" ? { type: "alarm" } : { type: "mode", mode: "armed" })}>
+          <option value="device">{t("trigger_device")}</option><option value="threshold">{t("trigger_threshold")}</option><option value="alarm">{t("trigger_alarm")}</option><option value="mode">{t("trigger_mode")}</option></select></label>
+        {trigger?.type === "device" && typeof trigger.equals === "number" && <>
+          <label>{t("devices")}<select value={trigger.device_id} onChange={event => setTrigger({ ...trigger, device_id: event.target.value })}>
+            <option value="">{t("chooseDevice")}</option>{devices.map(device => <option key={device.id} value={device.id}>{device.name}</option>)}</select></label>
+          <label>{t("th_field")}<select value={trigger.field} onChange={event => setTrigger({ ...trigger, field: event.target.value })}>
+            {["temperature", "humidity", "battery", "power_w", "voltage_v"].map(field => <option key={field} value={field}>{t(`th_f_${field}`)}</option>)}</select></label>
+          <label>{t("becomes")}<select value={trigger.op ?? "gt"} onChange={event => setTrigger({ ...trigger, op: event.target.value as "gt" | "lt" })}><option value="gt">{t("th_above")}</option><option value="lt">{t("th_below")}</option></select></label>
+          <label>{t("th_value")}<input type="number" step="any" value={trigger.equals} onChange={event => setTrigger({ ...trigger, equals: Number(event.target.value) })} /></label>
+        </>}
+        {trigger?.type === "device" && typeof trigger.equals !== "number" && <>
           <label>{t("devices")}<select value={trigger.device_id} onChange={event => { const device = byId(event.target.value); setTrigger({ ...trigger, device_id: event.target.value, field: MAIN_FIELD[device?.kind ?? "door"] ?? trigger.field }); }}>
             <option value="">{t("chooseDevice")}</option>{binary.map(device => <option key={device.id} value={device.id}>{device.name}</option>)}</select></label>
           <label>{t("becomes")}<select value={String(trigger.equals)} onChange={event => setTrigger({ ...trigger, equals: event.target.value === "true" })}><option value="true">{stateWord(trigger.field, true, t)}</option><option value="false">{stateWord(trigger.field, false, t)}</option></select></label>

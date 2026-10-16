@@ -6,6 +6,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 import type { Locale } from "./i18n";
+import { HELP_PT_A } from "./helpPtA";
+import { HELP_PT_B } from "./helpPtB";
 
 type Seven = readonly [string, string, string, string, string, string, string];
 export type HelpSection = { id: string; title: Seven; body: Seven };
@@ -285,5 +287,15 @@ export const helpCatalogue = (locale: Locale): Record<string, string> => {
   const index = order.indexOf(locale);
   const out = sectionCatalogue(index);
   for (const [key, value] of Object.entries(UI)) out[key] = value[index];
+  return out;
+};
+
+/** The Help in Portuguese, one entry per menu: [title, body]. */
+export const HELP_PT: Record<string, readonly [string, string]> = { ...HELP_PT_A, ...HELP_PT_B };
+
+/** The sections of the Help in Portuguese, as catalogue entries (the labels of the window come from the Portuguese catalogue). */
+export const ptHelpCatalogue = (): Record<string, string> => {
+  const out: Record<string, string> = {};
+  for (const [id, [title, body]] of Object.entries(HELP_PT)) { out[`help_s_${id}`] = title; out[`help_b_${id}`] = body; }
   return out;
 };

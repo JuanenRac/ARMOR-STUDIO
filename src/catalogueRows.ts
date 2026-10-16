@@ -5,7 +5,7 @@
  */
 export type Row = readonly [en: string, es: string, de: string, fr: string, it: string, ja: string, zh: string];
 export const LANGUAGE_ORDER = ["en", "es", "de", "fr", "it", "ja", "zh"] as const;
-export type RowCatalogues = Record<(typeof LANGUAGE_ORDER)[number], Record<string, string>>;
+export type RowCatalogues = Record<(typeof LANGUAGE_ORDER)[number], Record<string, string>> & { pt?: Record<string, string> };
 
 export function cataloguesFromRows(rows: Record<string, Row>): RowCatalogues {
   const result = Object.fromEntries(LANGUAGE_ORDER.map(code => [code, {} as Record<string, string>])) as RowCatalogues;

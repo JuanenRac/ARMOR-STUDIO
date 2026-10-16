@@ -407,7 +407,7 @@ export type Alarm = {
 };
 /** Where an alarm can come from: the same closed list as the server and the contract. */
 export type AlarmSourceType = "node" | "camera" | "device" | "solar" | "electrical" | "network" | "alarm";
-export type Trigger = { type: "device"; device_id: string; field: string; equals: boolean | number } | { type: "alarm"; severity?: Severity; source_type?: AlarmSourceType; source_id?: string } | { type: "mode"; mode: "armed" | "disarmed" };
+export type Trigger = { type: "device"; device_id: string; field: string; equals: boolean | number; /** For a number: wait for it to go above (gt) or below (lt) `equals`; absent or eq waits for the value. */ op?: "eq" | "gt" | "lt" } | { type: "alarm"; severity?: Severity; source_type?: AlarmSourceType; source_id?: string } | { type: "mode"; mode: "armed" | "disarmed" };
 export type AutomationAction = { type: "device"; device_id: string; command: "on" | "off" | "toggle"; for_s?: number } | { type: "notify" };
 export type Automation = { id: string; name: string; enabled: boolean; trigger: Trigger; when_mode: "any" | "armed" | "disarmed"; actions: AutomationAction[]; created_at: string; last_run: string | null; runs: number };
 export type AutomationInput = { name?: string; enabled?: boolean; trigger?: Trigger; when_mode?: "any" | "armed" | "disarmed"; actions?: AutomationAction[] };

@@ -1,13 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { hintCatalogue } from "./hintText";
 import { keyFor, normal } from "./hoverHints";
+import { hintsPt } from "./hintsPt";
 import { locales, text } from "./i18n";
 
 describe("hover hints", () => {
-  it("every hint is written in all seven languages and is not empty", () => {
+  it("every hint is written in all eight languages and is not empty", () => {
     for (const [key, hint] of Object.entries(hintCatalogue)) {
-      expect(hint.length, key).toBe(locales.length);
+      expect(hint.length, key).toBe(locales.length - 1);   // the seven of the rows; Portuguese has its own file
       for (const line of hint) expect(line.trim().length, key).toBeGreaterThan(2);
+      expect(hintsPt[key]?.trim().length, `pt ${key}`).toBeGreaterThan(2);
     }
   });
   it("every hint belongs to a label that exists", () => {

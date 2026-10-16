@@ -166,7 +166,7 @@ export const DEFAULT_THEME: Theme = "Armor";
 
 export const LANGUAGES = [
   { code: "en", name: "English" }, { code: "es", name: "Español" }, { code: "de", name: "Deutsch" }, { code: "fr", name: "Français" },
-  { code: "it", name: "Italiano" }, { code: "ja", name: "日本語" }, { code: "zh", name: "中文" },
+  { code: "it", name: "Italiano" }, { code: "ja", name: "日本語" }, { code: "zh", name: "中文" }, { code: "pt", name: "Português" },
 ] as const;
 export type LanguageCode = (typeof LANGUAGES)[number]["code"];
 

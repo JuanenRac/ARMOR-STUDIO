@@ -7,6 +7,7 @@
  */
 import { locales, text, type Locale } from "./i18n";
 import { hintCatalogue } from "./hintText";
+import { hintsPt } from "./hintsPt";
 
 const CONTROLS = "button, a[href], select, input:not([type=hidden]), textarea, summary, [role=tab], [role=button], label, th, h3";
 export const normal = (value: string): string => value.replace(/\s+/g, " ").trim().toLowerCase();
@@ -74,7 +75,7 @@ function apply(element: Element, locale: Locale): void {
   const words = wordsOf(element);
   key = keyFor(words, locale, element.closest("aside.sidebar nav") !== null);
   if (!key) { if (owned) { html.removeAttribute("title"); delete html.dataset.hintKey; } return; }
-  const hint = hintCatalogue[key][locales.indexOf(locale)];
+  const hint = locale === "pt" ? (hintsPt[key] ?? hintCatalogue[key][0]) : hintCatalogue[key][locales.indexOf(locale)];
   const current = html.getAttribute("title");
   // A title the code wrote on purpose stays; one that only repeats the label (or one we wrote earlier) is replaced by the explanation.
   if (current && !owned && !words.includes(normal(current))) return;
