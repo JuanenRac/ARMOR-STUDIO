@@ -27,19 +27,12 @@ export async function studioSessionState(origin: string): Promise<SessionState> 
     return (await response.json() as { authenticated?: boolean }).authenticated ? "active" : "ended";
   } catch { return "unknown"; }
 }
-export async function studioSessionActive(origin: string): Promise<boolean> { return (await studioSessionState(origin)) === "active"; }
 export async function openStudioSession(origin: string, username: string, password: string): Promise<void> {
   const response = await timedFetch(endpoint(origin, "/api/v1/studio/session"), {
     method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession,
     body: JSON.stringify({ username, password }),
   });
   if (!response.ok) throw new Error(`Studio login returned ${response.status}`);
-}
-export async function openOperatorSession(origin: string, token: string): Promise<string> {
-  const response = await timedFetch(endpoint(origin, "/api/v1/operator/session"), { method: "POST", headers: { Accept: "application/json", Authorization: `Bearer ${token}` }, ...localSession });
-  if (!response.ok) throw new Error(`Operator session returned ${response.status}`);
-  const body = await response.json() as { expiresAt?: string };
-  return body.expiresAt ?? "";
 }
 export type WeatherPlace = { name: string; region: string; country: string; lat: number; lon: number };
 export type Preferences = { language?: string; theme?: string; weatherPlace?: WeatherPlace | null };
@@ -165,14 +158,6 @@ export function mediaUrl(origin: string, item: MediaItem): string {
   const kind = item.kind === "snapshot" ? "snapshots" : "recordings";
   return endpoint(origin, `/api/v1/media/${encodeURIComponent(item.cameraId)}/${kind}/${encodeURIComponent(item.file)}`);
 }
-export function eventSocket(origin: string, token: string, onState: (state: SystemState) => void, onClose: () => void): WebSocket {
-  const url = new URL(origin); url.protocol = url.protocol === "https:" ? "wss:" : "ws:"; url.pathname = "/api/v1/events";
-  const socket = new WebSocket(url); // Browsers cannot set Authorization headers; a production session exchanges a short-lived WS ticket.
-  socket.addEventListener("message", event => { const data = JSON.parse(String(event.data)) as { type?: string; state?: SystemState }; if (data.type === "state" && data.state) onState(data.state); });
-  socket.addEventListener("close", onClose);
-  void token; // Explicitly avoid storing or placing tokens in a URL.
-  return socket;
-}
 
 export type EventType = "alert" | "node" | "camera" | "mode" | "device" | "alarm";
 export type Reachability = "unknown" | "online" | "offline";
@@ -289,10 +274,6 @@ export async function sessionUserState(origin: string): Promise<SessionUserState
     const body = await response.json() as { authenticated?: boolean; user?: StudioUser };
     return body.authenticated && body.user ? { state: "user", user: body.user } : { state: "anonymous" };
   } catch (error) { return { state: "unknown", reason: error instanceof Error && error.name ? `${error.name}: ${error.message}`.slice(0, 120) : "no answer" }; }
-}
-/** Who is signed in (null when nobody is). */
-export async function readSessionUser(origin: string): Promise<StudioUser | null> {
-  try { return (await userCall<{ authenticated: boolean; user?: StudioUser }>(origin, "GET", "/api/v1/studio/session")).user ?? null; } catch { return null; }
 }
 /** What importing an installation file did (see ARMOR-SERVER's installation.ts). */
 export type InstallationReport = { applied: Record<string, string>; skipped: Record<string, string>; failed: Record<string, string>; cameras_need_credentials: string[] };
@@ -426,7 +407,7 @@ export type AlarmSourceType = "node" | "camera" | "device" | "solar" | "electric
 export type PreflightIssue = { kind: "node" | "panel" | "zone" | "camera" | "device" | "alarm"; level: "block" | "warn"; code: "node_offline" | "panel_silent" | "zone_open" | "camera_down" | "opening_open" | "device_offline" | "alarm_unseen"; id: string; detail?: string };
 export type Preflight = { ready: boolean; checked_at: string; blocking: number; warnings: number; issues: PreflightIssue[] };
 export async function readPreflight(origin: string): Promise<Preflight> {
-  const response = await fetch(`${origin}/api/v1/preflight`, { credentials: "include" });
+  const response = await timedFetch(endpoint(origin, "/api/v1/preflight"), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`preflight ${response.status}`);
   return response.json() as Promise<Preflight>;
 }
@@ -476,7 +457,7 @@ export async function saveSite(origin: string, revision: number, site: Record<st
   return { revision: (await response.json() as { revision: number }).revision };
 }
 
-/** The versions the server keeps of each of the three designs (what it had before the changes), to be taken back from. */
+/** The versions the server keeps of each of the four designs (site, electrical, network, alarm: what it had before the changes), to be taken back from. */
 export type DesignKind = "site" | "electrical" | "network" | "alarm";
 export type DesignVersion = { id: string; revision: number; saved_at: string; updated_by: string | null; counts: Record<string, number> };
 const DESIGN_ROUTE: Record<DesignKind, string> = { site: "/api/v1/site", electrical: "/api/v1/electrical/design", network: "/api/v1/network/design", alarm: "/api/v1/alarm/design" };
@@ -550,7 +531,7 @@ export type ZoneLink = { device_id: string; node_id: string; zone_id: string };
 export const listZoneLinks = (origin: string) => userCall<{ links: ZoneLink[] }>(origin, "GET", "/api/v1/alarm/zone-links");
 export const saveZoneLinks = (origin: string, links: ZoneLink[]) => userCall<{ links: ZoneLink[] }>(origin, "PUT", "/api/v1/alarm/zone-links", { links });
 export const alarmCommandsStatus = (origin: string) => userCall<{ enabled: boolean; pending: unknown[]; recent: AlarmCommandRecord[] }>(origin, "GET", "/api/v1/alarm/commands");
-/** Arm (away or stay, optionally leaving out the zones that are open) or disarm a panel. There is no PIN in it: the server, the node and the broker must all have allowed it. */
+/** Arm (away or stay, optionally leaving out the zones that are open) or disarm a panel. Arming needs no PIN, but the server, the node and the broker must all have allowed it; disarming sends the PIN of the person when the panel asks for one. */
 export const sendAlarmCommand = (origin: string, node: string, action: "arm" | "disarm", mode?: "away" | "stay", force = false, pin?: string) =>
   userCall<{ accepted: boolean; command_id: string }>(origin, "POST", "/api/v1/alarm/command", action === "arm" ? { node, action, mode, ...(force ? { force: true } : {}) } : { node, action, ...(pin ? { pin } : {}) });
 

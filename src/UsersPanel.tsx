@@ -35,7 +35,7 @@ export function UsersPanel({ t, origin }: Props) {
 
   // ---- my account ----
   const [account, setAccount] = useState({ username: "", current: "", next: "", repeat: "" });
-  useEffect(() => { if (me) setAccount(current => ({ ...current, username: me.username })); }, [me]);
+  useEffect(() => { if (me) setAccount(current => ({ ...current, username: me.username })); }, [me?.id, me?.username]);   // eslint-disable-line react-hooks/exhaustive-deps
   const saveAccount = async (event: FormEvent) => {
     event.preventDefault();
     if (account.next && account.next !== account.repeat) { say(t("passwordsDontMatch"), true); return; }

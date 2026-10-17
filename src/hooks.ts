@@ -7,6 +7,7 @@ import { createCameraStreamUrl, listCameraStatus, listCameraViews, listConfigure
 import { mergeServerCameras } from "./cameras";
 import { DEMO_STATE, type Camera } from "./domain";
 import type { SystemState } from "./types";
+import { useViewActive } from "./viewSlots";
 
 export type Connection = "synced" | "demo";
 
@@ -142,12 +143,29 @@ export function useClock(): Date {
   return now;
 }
 
-/** Something read from the server again and again while it is shown; `reload` asks for it right now (after a change). */
-export function usePolled<T>(load: () => Promise<T>, everyMs: number, key: unknown): { data: T | null; reload: () => void; failed: boolean } {
+/**
+ * Something read from the server again and again while it is shown; `reload` asks for it right now (after a change).
+ *
+ * A menu that stays open but hidden (see viewSlots) and a tab that is in the background do not ask: the console used to make about a hundred requests a minute more for every menu
+ * visited, which the server's limit counts against a viewer. `always` is for what the whole console needs even when nobody is looking at it (the alarms are announced from a background tab).
+ * Asking starts again at once - with an immediate read - when the menu is shown or the tab comes back.
+ */
+export function usePolled<T>(load: () => Promise<T>, everyMs: number, key: unknown, options: { always?: boolean } = {}): { data: T | null; reload: () => void; failed: boolean } {
   const [data, setData] = useState<T | null>(null);
   const [failed, setFailed] = useState(false);
   const [tick, setTick] = useState(0);
+  const viewActive = useViewActive();
+  const [tabVisible, setTabVisible] = useState(() => typeof document === "undefined" || document.visibilityState !== "hidden");
+  const always = options.always === true;
   useEffect(() => {
+    if (always) return;
+    const update = () => setTabVisible(document.visibilityState !== "hidden");
+    document.addEventListener("visibilitychange", update);
+    return () => document.removeEventListener("visibilitychange", update);
+  }, [always]);
+  const running = viewActive && (always || tabVisible);
+  useEffect(() => {
+    if (!running) return;
     let cancelled = false, busy = false;
     const pull = async () => {
       if (busy) return;
@@ -158,7 +176,7 @@ export function usePolled<T>(load: () => Promise<T>, everyMs: number, key: unkno
     void pull();
     const timer = window.setInterval(() => void pull(), everyMs);
     return () => { cancelled = true; window.clearInterval(timer); };
-  }, [key, everyMs, tick]);   // eslint-disable-line react-hooks/exhaustive-deps
+  }, [key, everyMs, tick, running]);   // eslint-disable-line react-hooks/exhaustive-deps
   return { data, reload: () => setTick(value => value + 1), failed };
 }
 

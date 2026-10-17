@@ -1,5 +1,5 @@
 /**
- * The words of Configuration > Node firmware (updating the firmware of the field nodes from Studio), in the seven languages.
+ * The words of Configuration > Node firmware (updating the firmware of the field nodes from Studio), in seven languages (the eighth, Portuguese, is in ptCatalogue.ts).
  * One row per phrase: en, es, de, fr, it, ja, zh.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */

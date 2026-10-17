@@ -1,5 +1,5 @@
 /**
- * The words of the administration screens (Configuration > Services, MQTT broker, Files) and of adopting a node, in the seven languages.
+ * The words of the administration screens (Configuration > Services, MQTT broker, Files) and of adopting a node, in seven languages (the eighth, Portuguese, is in ptCatalogue.ts).
  * One row per phrase: en, es, de, fr, it, ja, zh.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */

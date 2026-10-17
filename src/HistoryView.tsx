@@ -3,6 +3,7 @@
  * operator can tune (how long a condition must last, and zones to ignore).
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { downloadText } from "./download";
 import { ViewTabs } from "./components/ViewTabs";
 import { useViewActive } from "./viewSlots";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -13,13 +14,6 @@ import { MenuTitle } from "./menuLogos";
 
 type Translate = (key: string) => string;
 
-/** Save text as a file through the browser; nothing is uploaded anywhere. */
-function downloadText(filename: string, text: string, mime: string): void {
-  const url = URL.createObjectURL(new Blob([text], { type: mime }));
-  const link = document.createElement("a");
-  link.href = url; link.download = filename; link.click();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
 const FILTERS: Array<EventType | "all"> = ["all", "alarm", "alert", "device", "node", "camera", "mode"];
 
 type Notice = { kind: "info" | "error"; text: string } | null;
@@ -70,9 +64,9 @@ function EventPanel({ origin, t }: { origin: string; t: Translate }) {
   // Live refresh keeps the newest events flowing in; it is paused while a page beyond the first is open or a deletion awaits.
   useEffect(() => {
     if (!live || pending || !active) return;
-    const timer = window.setInterval(() => { if (next === null || events.length <= PAGE) void refresh(); }, 5_000);
+    const timer = window.setInterval(() => { if (events.length <= PAGE) void refresh(); }, 5_000);
     return () => window.clearInterval(timer);
-  }, [live, pending, active, refresh, next, events.length]);   // not while the menu is hidden
+  }, [live, pending, active, refresh, events.length]);   // not while the menu is hidden
 
   const more = async () => {
     if (next === null) return;

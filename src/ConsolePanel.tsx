@@ -4,6 +4,7 @@
  * with a time limit; the folder is remembered from one command to the next; the output comes in as it is printed; a running command can be stopped. Every command is in the audit trail.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { onSessionCleared } from "./sessionMemory";
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { ApiError, cancelConsoleJob, lockConsole, readConsole, readConsoleJob, runConsole, unlockConsole, type ConsoleJob, type ConsoleState } from "./api";
 import { CopyButton } from "./components/CopyButton";
@@ -26,6 +27,8 @@ export const QUICK: ReadonlyArray<{ key: string; command: string }> = [
 
 /** What is on the screen of the console is kept while the person is in another menu, and comes back: the commands, their output (a command that was still running goes on being followed), the folder and the history. */
 const memory: { origin: string; entries: Entry[]; cwd: string; history: string[]; offsets: Record<string, number> } = { origin: "", entries: [], cwd: "/root", history: [], offsets: {} };
+// What the console printed (and what was typed) is the signed-in person's: signing out empties it.
+onSessionCleared(() => { memory.origin = ""; memory.entries = []; memory.cwd = "/root"; memory.history = []; memory.offsets = {}; });
 
 const timeText = (seconds: number) => (seconds >= 3600 ? "1 h" : seconds >= 60 ? `${seconds / 60} min` : `${seconds} s`);
 

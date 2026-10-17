@@ -1,5 +1,5 @@
 /**
- * Interface phrases written one row per phrase in the seven languages (English, Spanish, German, French, Italian, Japanese, Chinese),
+ * Interface phrases written one row per phrase in seven languages (the eighth, Portuguese, is in ptCatalogue.ts) (English, Spanish, German, French, Italian, Japanese, Chinese),
  * so a phrase cannot be added in one language and forgotten in another.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */

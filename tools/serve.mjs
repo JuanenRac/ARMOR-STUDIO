@@ -72,7 +72,8 @@ const serverOrigins = parseServerOrigins(process.env.ARMOR_SERVER_ORIGIN).map(or
 const TYPES = {
   ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
   ".json": "application/json; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon",
-  ".woff2": "font/woff2", ".map": "application/json", ".txt": "text/plain; charset=utf-8",
+  ".woff2": "font/woff2", ".woff": "font/woff", ".map": "application/json", ".txt": "text/plain; charset=utf-8",
+  ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".gif": "image/gif", ".mp3": "audio/mpeg", ".wav": "audio/wav", ".ogg": "audio/ogg", ".webmanifest": "application/manifest+json",
 };
 
 // The only third parties the console talks to are the ones of the Weather menu (see src/weather/api.ts, which lists the same addresses and is checked against these): Open-Meteo for the
@@ -82,7 +83,8 @@ export const WEATHER_IMAGES = ["https://tilecache.rainviewer.com", "https://view
 
 // The console only talks to the configured server(s) and shows camera frames from them.
 export function contentSecurityPolicyFor(origins) {
-  const connect = ["'self'", ...(origins.length ? origins.flatMap(origin => [origin, origin.replace(/^http/, "ws")]) : ["http:", "ws:"]), ...WEATHER_CONNECT].join(" ");
+  // Without a configured server the page may talk to whichever the person signs in to - on plain http as on https (a server behind TLS used to be unreachable from a Studio served this way).
+  const connect = ["'self'", ...(origins.length ? origins.flatMap(origin => [origin, origin.replace(/^http/, "ws")]) : ["http:", "https:", "ws:", "wss:"]), ...WEATHER_CONNECT].join(" ");
   const media = ["'self'", "data:", "blob:", ...(origins.length ? origins : ["http:", "https:"])].join(" ");
   const images = [...media.split(" "), ...WEATHER_IMAGES].join(" ");
   return `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src ${images}; media-src ${media}; connect-src ${connect}; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`;

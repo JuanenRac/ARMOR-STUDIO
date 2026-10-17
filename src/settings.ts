@@ -3,6 +3,7 @@
  * damaged or hand-edited value can never break Studio or inject a bad shape.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { snapshotHasLogin } from "./snapshotLogin";
 import { readColour } from "./designer/colors";
 import { parseServerOrigin } from "./config";
 import { FEATURE_STYLES, FLOOR_STYLES, MAST_PART_KINDS, type DevicePlacement, type MastPart, LANGUAGES, THEMES, type Building, type Camera, type Dimensions, type LanguageCode, type Opening, type Point, type Roof, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type FeatureLink, type Terrain, type Theme, type WallLamp, BUILDING_USES, BUILDING_MATERIALS, OPENING_STYLES, LAMP_KINDS } from "./domain";
@@ -26,8 +27,9 @@ const list = <T>(value: unknown, limit: number, read: (item: unknown) => T | nul
 
 function readCamera(raw: unknown): Camera | null {
   if (!isRecord(raw) || !id(raw.id)) return null;
-  const name = label(raw.name, 80), host = label(raw.host, 253), snapshotUrl = label(raw.snapshotUrl, 500);
-  if (name === null || host === null || snapshotUrl === null) return null;
+  const name = label(raw.name, 80), host = label(raw.host, 253), shown = label(raw.snapshotUrl, 500);
+  if (name === null || host === null || shown === null) return null;
+  const snapshotUrl = snapshotHasLogin(shown) ? "" : shown;   // a login in the address is not kept (see snapshotLogin.ts)
   const camera: Camera = {
     id: raw.id, name, host, snapshotUrl, enabled: raw.enabled !== false,
     x: finite(raw.x) ? clamp(raw.x, 0, 100) : 50, y: finite(raw.y) ? clamp(raw.y, 0, 100) : 50,

@@ -48,6 +48,8 @@ export function routeFor(alarm: Alarm, ctx: RouteContext = {}): Target {
     case "electrical": return { view: "electrical" };
     case "network": return { view: "network" };
     case "device": return { view: "devices" };
+    // The panels (and a duress code typed on one) are looked after where the panels are.
+    case "alarm": return { view: "alarmPanels" };
     default: return { view: "alarms" };
   }
 }

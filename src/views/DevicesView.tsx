@@ -70,7 +70,7 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
     event.preventDefault();
     if (!form) return;
     const interval = Math.max(0, Math.round(Number(form.interval) || 0));
-    const input: Parameters<typeof createDevice>[1] = { name: form.name.trim(), kind: form.kind, protocol: form.protocol, location: form.location.trim(), expected_interval_s: interval, ...(form.risk ? { risk: form.risk as DeviceRisk } : {}) };
+    const input: Parameters<typeof createDevice>[1] = { name: form.name.trim(), kind: form.kind, protocol: form.protocol, location: form.location.trim(), expected_interval_s: interval, ...(form.risk ? { risk: form.risk as DeviceRisk } : form.id && ACTUATOR_KINDS.includes(form.kind) ? { risk: defaultRiskOf(form.kind) } : {}) };
     if (!form.id || form.touched) {
       const base = currentConnection(form);
       const source = base.source.type === "mqtt" ? { ...base.source, map: form.advanced ? textToMap(form.mapText) : base.source.map } : base.source;

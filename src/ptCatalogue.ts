@@ -3,6 +3,23 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 export const PT_CATALOGUE: Record<string, string> = {
+ "login_checking": "A verificar a sessão do Studio…",
+ "login_title": "Acesso de operador local",
+ "login_server": "Servidor",
+ "login_user": "Utilizador",
+ "login_password": "Palavra-passe",
+ "login_enter": "Entrar no Studio",
+ "login_busy": "A verificar…",
+ "login_failed": "Não foi possível iniciar sessão. Verifique o servidor, o utilizador e a palavra-passe.",
+ "login_note": "A palavra-passe só é enviada ao servidor para abrir uma sessão (um cookie HttpOnly que dura o que o servidor disser); o Studio não a guarda, e as funções das câmaras ficam ativas durante essa sessão sem nenhum token adicional.",
+ "default": "predefinido",
+ "bk_confirm_stop": "Parar o broker deixa todos os nós cegos até ele voltar a arrancar. Parar?",
+ "bk_confirm_restart": "Reiniciar o broker corta todos os nós durante alguns segundos. Reiniciar?",
+ "last_run_never": "nunca",
+ "snapshot_login_refused": "O endereço da imagem não pode conter utilizador nem palavra-passe (utilizador:palavra-passe@ ou ?pwd=...). Use os campos de utilizador e palavra-passe da câmara.",
+ "panel_account_notice": "Esta conta é de um painel de parede (ARMOR-ALARM ou ARMOR-HMI) e não pode usar o Studio. Inicie sessão com uma conta de administrador, operador ou observador.",
+ "media_photo": "FOTO",
+ "media_video": "VÍDEO",
  "pre_check": "Verificar o perímetro agora (sem armar)",
  "roleHelp_admin": "Altera tudo, incluindo utilizadores, serviços, firmware e atualizações.",
  "roleHelp_operator": "Atende alarmes, vê as câmaras, arma, desarma e comuta dispositivos; não gere utilizadores nem a máquina.",

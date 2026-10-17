@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import { readConnection, saveConnection, type ConnectionState } from "./api";
+import { parseServerOrigin } from "./config";
 import { UsersPanel } from "./UsersPanel";
 import { BrokerPanel, FilesPanel, ServicesPanel } from "./AdminPanel";
 import { FirmwarePanel } from "./FirmwarePanel";
@@ -85,6 +86,15 @@ function ServerSettings({ t, origin, isAdmin }: { t: (key: string) => string; or
 export function ConfigurationPanel(props: Props) {
   const { t } = props;
   const [tab, setTab] = useState<Tab>("general");
+  // The address is applied when the person finishes (leaves the box or presses Enter), not on every key: each key used to be "a new server" for the whole console.
+  const [draftOrigin, setDraftOrigin] = useState(props.origin);
+  useEffect(() => { setDraftOrigin(props.origin); }, [props.origin]);
+  const applyOrigin = (value: string) => {
+    const parsed = parseServerOrigin(value.trim());
+    if (parsed && parsed !== props.origin) props.setOrigin(parsed);
+    else setDraftOrigin(parsed ?? props.origin);   // not an address: the one in use comes back
+  };
+  const applyDraftOrigin = () => applyOrigin(draftOrigin);
   const tabLabel = (item: Tab) => t("tab" + item[0].toUpperCase() + item.slice(1));
 
   return <section className="configuration">
@@ -93,7 +103,7 @@ export function ConfigurationPanel(props: Props) {
       {tabGroups.map(group => group.filter(item => !props.isViewer || VIEWER_TABS.includes(item))).filter(group => group.length > 0).map((group, position) => <Fragment key={group[0]}>{position > 0 && <span className="tab-sep" aria-hidden="true" />}{group.map(item => <button key={item} data-tour={`tab-${item}`} className={tab === item ? "active" : ""} role="tab" aria-selected={tab === item} onClick={() => setTab(item)}>{tabLabel(item)}</button>)}</Fragment>)}
     </div>
     {tab === "general" && <div className="config-grid">
-      <article className="stack-card"><p className="eyebrow">{t("gen_browser_kicker")}</p><h3>{t("gen_browser_title")}</h3><p className="muted">{t("gen_browser_help")}</p><label>{t("serverOrigin")}<input value={props.origin} onChange={event => props.setOrigin(event.target.value)} inputMode="url" /></label><OriginCheck t={t} origin={props.origin} setOrigin={props.setOrigin} /><small>{props.connection}</small><p className={`operator-session ${props.operatorUnlocked ? "ready" : ""}`}>{props.operatorUnlocked ? t("studioAccessActive") : t("studioAccessWaiting")}</p><small>{t("studioAccessNotice")}</small><button onClick={props.savePreferences}>{t("savePreferences")}</button><button onClick={props.exportSite}>{t("exportSite")}</button></article>
+      <article className="stack-card"><p className="eyebrow">{t("gen_browser_kicker")}</p><h3>{t("gen_browser_title")}</h3><p className="muted">{t("gen_browser_help")}</p><label>{t("serverOrigin")}<input value={draftOrigin} onChange={event => setDraftOrigin(event.target.value)} onBlur={applyDraftOrigin} onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); applyDraftOrigin(); } }} inputMode="url" /></label><OriginCheck t={t} origin={draftOrigin} setOrigin={value => { setDraftOrigin(value); applyOrigin(value); }} /><small>{props.connection}</small><p className={`operator-session ${props.operatorUnlocked ? "ready" : ""}`}>{props.operatorUnlocked ? t("studioAccessActive") : t("studioAccessWaiting")}</p><small>{t("studioAccessNotice")}</small><button onClick={props.savePreferences}>{t("savePreferences")}</button><button onClick={props.exportSite}>{t("exportSite")}</button></article>
       <ServerSettings t={t} origin={props.origin} isAdmin={props.isAdmin} />
       <article className="stack-card"><p className="eyebrow">{t("gen_ui_kicker")}</p><h3>{t("interface")}</h3><label>{t("theme")}<select value={props.theme} onChange={event => props.setTheme(event.target.value)}>{props.themes.map(item => <option key={item}>{item}</option>)}</select></label><label>{t("language")}<select value={props.language} onChange={event => props.setLanguage(event.target.value)}>{props.languages.map(item => <option key={item.code} value={item.code}>{item.name}</option>)}</select></label><button onClick={props.savePreferences}>{t("saveUi")}</button></article>
     </div>}

@@ -11,6 +11,7 @@ import {
 } from "./api";
 import { ConfirmDialog } from "./components/chrome";
 import { ActionIcon, actionsFor, type ServiceAction } from "./views/ServicesView";
+import { askConfirm } from "./askConfirm";
 import type { ServiceState } from "./api";
 
 type Translate = (key: string) => string;
@@ -160,6 +161,8 @@ export function BrokerPanel({ t, origin, isAdmin }: Props) {
   if (gate !== "ready") return <Gate t={t} state={gate} />;
 
   const act = async (action: ServiceAction) => {
+    // Stopping the broker leaves every node blind, and restarting it cuts them off for a few seconds: the Services menu asks first, and so does this one.
+    if ((action === "stop" || action === "restart") && !(await askConfirm(t(action === "stop" ? "bk_confirm_stop" : "bk_confirm_restart"), t))) return;
     setBusy(true);
     try { await adminServiceAction(origin, "mosquitto", action); setMessage({ text: t("adm_done"), bad: false }); } catch (error) { setMessage({ text: explain(t, error), bad: true }); }
     window.setTimeout(() => { void reload(); setBusy(false); }, 2000);

@@ -1,5 +1,5 @@
 /**
- * The Help window of Studio: one section for every menu, in the seven languages, built the same way as the node panels' help (a list of
+ * The Help window of Studio: one section for every menu, in seven languages (the eighth, Portuguese, is in ptCatalogue.ts), built the same way as the node panels' help (a list of
  * sections on the left, the chosen one on the right). Every section is [en, es, de, fr, it, ja, zh] for its title and for its body; a blank
  * line in a body starts a new paragraph.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D)

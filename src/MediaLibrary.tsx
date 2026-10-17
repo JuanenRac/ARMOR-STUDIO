@@ -2,6 +2,7 @@
  * Local camera evidence library. Media files never pass through browser storage:
  * they are served by the loopback ARMOR media gateway on demand.
  */
+import { downloadText } from "./download";
 import { useViewActive } from "./viewSlots";
 import { askConfirm } from "./askConfirm";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -45,11 +46,7 @@ export function MediaLibrary({ origin, cameras, t }: { origin: string; cameras: 
     if (!selected) return;
     try {
       const text = await readMediaProof(origin, selected);
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(new Blob([text], { type: "application/json" }));
-      link.download = `${selected.file}.proof.json`;
-      link.click();
-      URL.revokeObjectURL(link.href);
+      downloadText(`${selected.file}.proof.json`, text, "application/json");
     } catch { setMessage(t("mediaFailed")); }
   };
   const removeSelected = async () => {
@@ -74,11 +71,11 @@ export function MediaLibrary({ origin, cameras, t }: { origin: string; cameras: 
         {loading && <p className="muted">…</p>}
         {!loading && !visible.length && <p className="media-empty">{t("noMedia")}</p>}
         {visible.map(item => <button key={item.id} className={`media-item ${selected?.id === item.id ? "selected" : ""}`} onClick={() => setSelectedId(item.id)}>
-          <span className={`media-kind ${item.kind}`}>{item.kind === "snapshot" ? "PHOTO" : "VIDEO"}</span><span className="media-item-copy"><strong>{cameraName(item.cameraId)}</strong><small>{new Date(item.createdAt).toLocaleString()}</small></span><small>{size(item.bytes)}</small>
+          <span className={`media-kind ${item.kind}`}>{item.kind === "snapshot" ? t("media_photo") : t("media_video")}</span><span className="media-item-copy"><strong>{cameraName(item.cameraId)}</strong><small>{new Date(item.createdAt).toLocaleString()}</small></span><small>{size(item.bytes)}</small>
         </button>)}
       </aside>
       <article className="media-preview">
-        {selected ? <><div className="preview-stage">{selected.kind === "snapshot" ? <img src={mediaUrl(origin, selected)} alt={`${t("snapshot")}: ${cameraName(selected.cameraId)}`} /> : <video key={selected.id} src={mediaUrl(origin, selected)} controls preload="metadata" />}</div><footer className="preview-footer"><div><span className={`media-kind ${selected.kind}`}>{selected.kind === "snapshot" ? "PHOTO" : "VIDEO"}</span><h3>{cameraName(selected.cameraId)}</h3><p>{t("createdAt")}: {new Date(selected.createdAt).toLocaleString()} · {t("fileSize")}: {size(selected.bytes)}</p></div><button onClick={() => void toggleProtection()} title={t("mediaProtectedNote")}>{selected.protected ? t("mediaUnprotect") : t("mediaProtect")}</button><button onClick={() => void downloadProof()} title={t("mediaProofNote")}>{t("mediaProof")}</button><button className="danger-button" onClick={() => void removeSelected()}>{t("deleteMedia")}</button></footer></> : <div className="media-empty preview-empty"><span>◉</span><p>{t("selectMedia")}</p></div>}
+        {selected ? <><div className="preview-stage">{selected.kind === "snapshot" ? <img src={mediaUrl(origin, selected)} alt={`${t("snapshot")}: ${cameraName(selected.cameraId)}`} /> : <video key={selected.id} src={mediaUrl(origin, selected)} controls preload="metadata" />}</div><footer className="preview-footer"><div><span className={`media-kind ${selected.kind}`}>{selected.kind === "snapshot" ? t("media_photo") : t("media_video")}</span><h3>{cameraName(selected.cameraId)}</h3><p>{t("createdAt")}: {new Date(selected.createdAt).toLocaleString()} · {t("fileSize")}: {size(selected.bytes)}</p></div><button onClick={() => void toggleProtection()} title={t("mediaProtectedNote")}>{selected.protected ? t("mediaUnprotect") : t("mediaProtect")}</button><button onClick={() => void downloadProof()} title={t("mediaProofNote")}>{t("mediaProof")}</button><button className="danger-button" onClick={() => void removeSelected()}>{t("deleteMedia")}</button></footer></> : <div className="media-empty preview-empty"><span>◉</span><p>{t("selectMedia")}</p></div>}
       </article>
     </div>
   </section>;

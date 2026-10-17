@@ -1,5 +1,5 @@
 /**
- * The phrases of the versions of a design (the list of what the server kept and the unsaved copy of this browser), in the seven languages.
+ * The phrases of the versions of a design (the list of what the server kept and the unsaved copy of this browser), in seven languages (the eighth, Portuguese, is in ptCatalogue.ts).
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { cataloguesFromRows, type Row } from "./catalogueRows";

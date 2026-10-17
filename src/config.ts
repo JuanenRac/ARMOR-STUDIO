@@ -20,10 +20,13 @@ export function parseServerOrigin(value: unknown): string | null {
  * serves it as /armor-config.json, so one build can run on any test bench or
  * installation. Returns null when the file is absent or invalid.
  */
-export async function loadDeploymentOrigin(fetcher: typeof fetch = fetch): Promise<string | null> {
+export async function loadDeploymentOrigin(fetcher: typeof fetch = fetch, here: string | undefined = typeof window === "undefined" ? undefined : window.location.origin): Promise<string | null> {
   try {
     const response = await fetcher("/armor-config.json", { headers: { Accept: "application/json" }, cache: "no-store" });
     if (!response.ok) return null;
-    return parseServerOrigin((await response.json() as { serverOrigin?: unknown }).serverOrigin);
+    const value = (await response.json() as { serverOrigin?: unknown }).serverOrigin;
+    // "same-origin": the server is whatever answers at the address this page was opened with (the container's nginx proxies /api/ to it).
+    if (value === "same-origin") return here ? parseServerOrigin(here) : null;
+    return parseServerOrigin(value);
   } catch { return null; }
 }

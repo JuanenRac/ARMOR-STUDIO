@@ -72,7 +72,7 @@ export function useAlarmAnnouncer(options: Options): { popups: Popup[]; dismiss:
     }
     try {
       if (now.notification && fresh.some(alarm => alarm.severity === "critical") && typeof Notification !== "undefined" && Notification.permission === "granted") {
-        new Notification(now.t("alarmNewCritical"), { body: fresh.map(alarm => alarm.code).join(", "), tag: "armor-critical", requireInteraction: true });
+        new Notification(now.t("alarmNewCritical"), { body: fresh.map(alarm => now.t(`alarm_${alarm.code}`)).join(", "), tag: "armor-critical", requireInteraction: true });
       }
     } catch { /* a notification that cannot be shown is not worth an error */ }
     const goes = settings.redirect === "all" || (settings.redirect === "critical" && first.severity === "critical");

@@ -95,15 +95,37 @@ function apply(element: Element, locale: Locale): void {
   html.dataset.hintKey = key;
 }
 
+/** Above this many places to look at, a full pass over the page is cheaper than the list. */
+const MANY = 150;
+
 /** Start watching the page; call the returned function to stop. */
 export function installHoverHints(): () => void {
   let scheduled = 0;
-  const scan = () => { scheduled = 0; const locale = currentLocale(); document.querySelectorAll(CONTROLS).forEach(element => apply(element, locale)); };
+  let everything = true;
+  const pending = new Set<Element>();
+  const scanTree = (root: Element, locale: Locale) => { if (root.matches(CONTROLS)) apply(root, locale); root.querySelectorAll(CONTROLS).forEach(element => apply(element, locale)); };
+  const scan = () => {
+    scheduled = 0;
+    const locale = currentLocale();
+    if (everything || pending.size > MANY) document.querySelectorAll(CONTROLS).forEach(element => apply(element, locale));
+    else for (const root of pending) if (root.isConnected) scanTree(root, locale);
+    everything = false; pending.clear();
+  };
   const later = () => { if (!scheduled) scheduled = window.setTimeout(scan, 120); };
+  // Only what changed is looked at: the clock of the status bar and every other second-by-second redraw used to make a pass over the whole page (every menu kept open, every drawing) each time.
+  const watch = (records: MutationRecord[]) => {
+    for (const record of records) {
+      const target = record.target.nodeType === Node.ELEMENT_NODE ? record.target as Element : record.target.parentElement;
+      const control = target?.closest(CONTROLS);   // a control whose words changed says something else now
+      if (control) pending.add(control);
+      record.addedNodes.forEach(node => { if (node.nodeType === Node.ELEMENT_NODE) pending.add(node as Element); });
+    }
+    if (pending.size > 0) later();
+  };
   scan();
-  const observer = new MutationObserver(later);
+  const observer = new MutationObserver(watch);
   observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-  const language = new MutationObserver(later);
+  const language = new MutationObserver(() => { everything = true; later(); });
   language.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
   return () => { observer.disconnect(); language.disconnect(); if (scheduled) window.clearTimeout(scheduled); };
 }

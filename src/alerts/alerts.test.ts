@@ -38,7 +38,7 @@ describe("where an alarm leads", () => {
     expect(routeFor(alarm({ source: { type: "solar", id: "s" }, code: "solar_battery_low" })).view).toBe("batteries");
     expect(routeFor(alarm({ source: { type: "electrical", id: "e" } })).view).toBe("electrical");
     expect(routeFor(alarm({ source: { type: "network", id: "n" } })).view).toBe("network");
-    expect(routeFor(alarm({ source: { type: "alarm", id: "x" } })).view).toBe("alarms");
+    expect(routeFor(alarm({ source: { type: "alarm", id: "x" } })).view).toBe("alarmPanels");
   });
   it("says only the parts that were asked for", () => {
     expect(alarmSentence(alarm({}), t, { type: true, severity: false, source: true })).toBe("alarm_intrusion. source_node radar-1");

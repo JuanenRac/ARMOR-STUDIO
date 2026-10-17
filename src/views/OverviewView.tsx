@@ -20,7 +20,7 @@ import "./overview.css";
 import { MenuLogo } from "../menuLogos";
 
 type Props = {
-  t: Translate; origin: string; mode: "armed" | "disarmed"; toggleMode: () => void; demo: boolean;
+  t: Translate; origin: string; mode: "armed" | "disarmed"; toggleMode: () => void; demo: boolean; /** A viewer cannot arm or disarm. */ readOnly?: boolean;
   nodes: NodeState[]; cameras: readonly Camera[]; reachability: Record<string, Reachability>; devices: StudioDevice[]; alarms: { active: Alarm[]; recent: Alarm[] } | null;
   model: SiteModel; dimensions: Dimensions; setView: (view: View) => void; onDevice: (id: string) => void; now: number;
   /** What the other parts of Studio last read (null: not read yet): the alarm panels, the solar equipment, the electrical nodes and the network node. */
@@ -36,7 +36,7 @@ function Tile({ colour, label, value, sub, onClick, alert, icon }: { colour: str
   </button>;
 }
 
-export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras, reachability, devices, alarms, model, dimensions, setView, onDevice, now, panels = null, solar = null, electrical = null, network = null }: Props) {
+export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras, reachability, devices, alarms, model, dimensions, setView, onDevice, now, panels = null, solar = null, electrical = null, network = null, readOnly = false }: Props) {
   const system = usePolled(() => readSystem(origin), 6000, origin).data;
   const feed = usePolled(() => listHistory(origin, { limit: 12 }), 5000, origin).data?.events ?? [];
   const active = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at);
@@ -65,7 +65,7 @@ export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras
       <div className="ov-hero-state">
         <span className={`ov-pulse ${mode}`} />
         <div><small>{t("sysMode")}</small><strong>{mode === "armed" ? t("armed") : t("disarmed")}</strong></div>
-        <button className={`mode-big ${mode}`} onClick={toggleMode} disabled={demo}>{mode === "armed" ? t("disarmSystem") : t("armSystem")}</button>
+        <button className={`mode-big ${mode}`} onClick={toggleMode} disabled={demo || readOnly}>{mode === "armed" ? t("disarmSystem") : t("armSystem")}</button>
       </div>
     </header>
 

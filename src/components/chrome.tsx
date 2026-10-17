@@ -3,6 +3,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useState } from "react";
+import { useDialogFocus } from "./useDialogFocus";
 import { setAlerts, useAlerts } from "../alerts/settings";
 import { stopSound } from "../alerts/sounds";
 import type { ServerInfo } from "../api";
@@ -78,8 +79,9 @@ export function TopBar({ view, revision, mode, demo, siteStatus, fullScreen, isF
 }
 
 export function AboutDialog({ version, revision, close, t }: { version: string; revision: number; close: () => void; t: Translate }) {
+  const dialog = useDialogFocus<HTMLElement>(close);
   return <div className="modal-backdrop" role="presentation" onMouseDown={close}>
-    <section className="about-dialog" role="dialog" aria-modal="true" aria-labelledby="about-title" onMouseDown={event => event.stopPropagation()}>
+    <section ref={dialog.ref} onKeyDown={dialog.onKeyDown} className="about-dialog" role="dialog" aria-modal="true" aria-labelledby="about-title" onMouseDown={event => event.stopPropagation()}>
       <button className="modal-close" onClick={close} aria-label={t("close")}>×</button>
       <div className="about-orbit"><span>A</span></div>
       <p className="eyebrow">AUTONOMOUS RADAR &amp; MULTIMODAL OBSERVATION RANGE</p>
@@ -114,8 +116,9 @@ export function HelpDialog({ close, initial, t, language }: { close: () => void;
   const paragraphs = t(`help_b_${section.id}`).split("\n\n");
   const shown = level === "simple" ? paragraphs.slice(0, 1) : level === "medium" ? paragraphs.slice(0, 2) : paragraphs;
   const tech = HELP_TECH[section.id];
+  const dialog = useDialogFocus<HTMLElement>();
   return <div className="modal-backdrop" role="presentation" onMouseDown={close} onKeyDown={event => { if (event.key === "Escape") close(); else if (event.key === "ArrowRight" && !(event.target instanceof HTMLSelectElement)) go(index + 1); else if (event.key === "ArrowLeft" && !(event.target instanceof HTMLSelectElement)) go(index - 1); }}>
-    <section className="about-dialog help-dialog" role="dialog" aria-modal="true" aria-labelledby="help-title" onMouseDown={event => event.stopPropagation()}>
+    <section ref={dialog.ref} onKeyDown={dialog.onKeyDown} className="about-dialog help-dialog" role="dialog" aria-modal="true" aria-labelledby="help-title" onMouseDown={event => event.stopPropagation()}>
       <button className="modal-close" onClick={close} aria-label={t("close")}>×</button>
       <header className="help-head">
         <div><p className="eyebrow">A.R.M.O.R. STUDIO</p><h2 id="help-title">{t("helpTitle")}</h2></div>
@@ -151,8 +154,9 @@ export function HelpDialog({ close, initial, t, language }: { close: () => void;
 
 /** A confirmation in the page itself: unlike the browser's own confirm() it cannot be switched off by the browser ("stop this page from creating dialogs"), which left the arm button doing nothing. */
 export function ConfirmDialog({ title, text, confirmLabel, danger, confirm, cancel, t }: { title: string; text: string; confirmLabel: string; danger?: boolean; confirm: () => void; cancel: () => void; t: Translate }) {
+  const dialog = useDialogFocus<HTMLElement>();
   return <div className="modal-backdrop" role="presentation" onMouseDown={cancel} onKeyDown={event => { if (event.key === "Escape") cancel(); }}>
-    <section className="about-dialog confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-text" onMouseDown={event => event.stopPropagation()}>
+    <section ref={dialog.ref} onKeyDown={dialog.onKeyDown} className="about-dialog confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-text" onMouseDown={event => event.stopPropagation()}>
       <h2 id="confirm-title">{title}</h2>
       <p id="confirm-text">{text}</p>
       <div className="confirm-actions">
@@ -166,8 +170,9 @@ export function ConfirmDialog({ title, text, confirmLabel, danger, confirm, canc
 /** Disarming asks for the PIN: the field is there for everybody, and the server only insists for a user who has one (or when the installation requires it). */
 export function PinDialog({ title, text, confirmLabel, confirm, cancel, t }: { title: string; text: string; confirmLabel: string; confirm: (pin: string) => void; cancel: () => void; t: Translate }) {
   const [pin, setPin] = useState("");
+  const dialog = useDialogFocus<HTMLFormElement>();
   return <div className="modal-backdrop" role="presentation" onMouseDown={cancel} onKeyDown={event => { if (event.key === "Escape") cancel(); }}>
-    <form className="about-dialog confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="pin-title" aria-describedby="pin-text" onMouseDown={event => event.stopPropagation()}
+    <form ref={dialog.ref} onKeyDown={dialog.onKeyDown} className="about-dialog confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="pin-title" aria-describedby="pin-text" onMouseDown={event => event.stopPropagation()}
       onSubmit={event => { event.preventDefault(); confirm(pin); }}>
       <h2 id="pin-title">{title}</h2>
       <p id="pin-text">{text}</p>

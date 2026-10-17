@@ -1,5 +1,5 @@
 /**
- * The phrases of the technical settings of the server (address and ports) and of the camera settings that now live in the Cameras menu, in the seven languages.
+ * The phrases of the technical settings of the server (address and ports) and of the camera settings that now live in the Cameras menu, in seven languages (the eighth, Portuguese, is in ptCatalogue.ts).
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { cataloguesFromRows, type Row } from "./catalogueRows";

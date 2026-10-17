@@ -5,19 +5,20 @@ const password = process.env.ARMOR_STUDIO_PASSWORD ?? "";
 
 async function signIn(page: Page): Promise<void> {
   await page.goto("/");
-  await page.getByLabel("Usuario").fill(user);
-  await page.getByLabel("Contraseña").fill(password);
-  await page.getByRole("button", { name: "Entrar a Studio" }).click();
+  // The sign-in screen speaks the language of the browser, so the fields are found by their test ids and not by their words.
+  await page.getByTestId("login-user").fill(user);
+  await page.getByTestId("login-password").fill(password);
+  await page.getByTestId("login-submit").click();
   await expect(page.locator(".sidebar")).toBeVisible();
 }
 
 test("the login screen shows and refuses a wrong password", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "A.R.M.O.R. Studio" })).toBeVisible();
-  await page.getByLabel("Usuario").fill("nobody");
-  await page.getByLabel("Contraseña").fill("not-the-password");
-  await page.getByRole("button", { name: "Entrar a Studio" }).click();
-  await expect(page.getByRole("alert")).toContainText("No se pudo iniciar sesión");
+  await page.getByTestId("login-user").fill("nobody");
+  await page.getByTestId("login-password").fill("not-the-password");
+  await page.getByTestId("login-submit").click();
+  await expect(page.getByRole("alert")).toBeVisible();
 });
 
 test.describe("signed in", () => {

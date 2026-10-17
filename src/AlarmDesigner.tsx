@@ -5,6 +5,7 @@
  * the keyboard); the model, the operations, the checks and the storage of the drawing are in ./alarm.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { useViewActive } from "./viewSlots";
 import { askConfirm } from "./askConfirm";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { FRAME_COLOURS, type FrameColour } from "./electrical/model";
@@ -230,12 +231,15 @@ export function AlarmDesigner({ t, design, setDesign, status, panels, openVersio
   };
 
   // ---- the keyboard ----
+  // The designers stay open (hidden) after they are visited: a hidden one must not answer the keys pressed in another menu - it moved, deleted and undid things nobody saw, and saved them.
+  const viewActive = useViewActive();
   const selectionRef = useRef(selection);
   selectionRef.current = selection;
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      if (!viewActive) return;
       const target = event.target as HTMLElement | null;
-      if (target && (target.tagName === "INPUT" || target.tagName === "SELECT" || target.tagName === "TEXTAREA")) return;
+      if (target && (target.tagName === "INPUT" || target.tagName === "SELECT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
       const key = event.key.toLowerCase();
       if ((event.ctrlKey || event.metaKey) && key === "z") { event.preventDefault(); if (event.shiftKey) redo(); else undo(); return; }
       if ((event.ctrlKey || event.metaKey) && key === "y") { event.preventDefault(); redo(); return; }

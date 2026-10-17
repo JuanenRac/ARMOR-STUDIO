@@ -1,5 +1,5 @@
 /**
- * The labels of the facts an alarm carries (which device, which address, which port...) and the words of the alarm controls, in the seven languages.
+ * The labels of the facts an alarm carries (which device, which address, which port...) and the words of the alarm controls, in seven languages (the eighth, Portuguese, is in ptCatalogue.ts).
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { cataloguesFromRows, type Row } from "./catalogueRows";

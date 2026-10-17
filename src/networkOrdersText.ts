@@ -1,5 +1,5 @@
 /**
- * The phrases of the manual orders, hiding and watching devices, the public connection and the services of the Network menu, in the seven languages.
+ * The phrases of the manual orders, hiding and watching devices, the public connection and the services of the Network menu, in seven languages (the eighth, Portuguese, is in ptCatalogue.ts).
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { cataloguesFromRows, type Row } from "./catalogueRows";

@@ -1,5 +1,5 @@
 /**
- * The phrases of the list of what the nodes send (System menu), in the seven languages.
+ * The phrases of the list of what the nodes send (System menu), in seven languages (the eighth, Portuguese, is in ptCatalogue.ts).
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { cataloguesFromRows, type Row } from "./catalogueRows";

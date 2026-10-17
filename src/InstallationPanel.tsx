@@ -4,6 +4,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useRef, useState } from "react";
+import { downloadText } from "./download";
 import { ApiError, installationExport, installationImport, type InstallationReport } from "./api";
 
 type Translate = (key: string, ...args: Array<string | number>) => string;
@@ -58,11 +59,7 @@ export function InstallationPanel({ t, origin, isAdmin }: Props) {
     setBusy(true); setMessage(""); setReport(null);
     try {
       const file = await installationExport(origin);
-      const url = URL.createObjectURL(new Blob([JSON.stringify(file, null, 2)], { type: "application/json" }));
-      const link = document.createElement("a");
-      link.href = url; link.download = `armor-installation-${new Date().toISOString().slice(0, 10)}.json`;
-      link.click();
-      URL.revokeObjectURL(url);
+      downloadText(`armor-installation-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(file, null, 2), "application/json");
       setMessage(t("in_exported"));
     } catch (error) { setMessage(explain(t, error)); } finally { setBusy(false); }
   };

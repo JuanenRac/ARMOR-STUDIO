@@ -5,6 +5,7 @@
  */
 import { IgnoreZonesEditor } from "./IgnoreZonesEditor";
 import { askConfirm } from "./askConfirm";
+import { snapshotHasLogin } from "./snapshotLogin";
 import { useEffect, useState } from "react";
 import { configureCamera, deleteCamera, discoverCameraStreams, type CameraConnection, type DiscoveredCamera } from "./api";
 import "./configuration.css";
@@ -23,7 +24,8 @@ type Props = {
 };
 
 const emptyConnection = (): CameraConnection => ({ id: "", name: "", host: "", snapshotUrl: "", rtspPath: "", previewPath: "", username: "", password: "", onvifPort: 80, rtspPort: 554 });
-const sessionCredentials = new Map<string, Pick<CameraConnection, "username" | "password">>();
+// No password is kept here after it is sent: the server keeps the credentials (encrypted), an empty password with the same user name keeps them, and a Map that lived as long as the tab
+// filled the password again for whoever signed in next on a shared computer.
 
 export function CameraSettings(props: Props) {
   const { t } = props;
@@ -38,9 +40,8 @@ export function CameraSettings(props: Props) {
 
   useEffect(() => {
     if (!selected) return;
-    const credentials = sessionCredentials.get(selected.id);
     setForm({ id: selected.id, name: selected.name, host: selected.host === "Not configured" ? "" : selected.host,
-      snapshotUrl: selected.snapshotUrl, rtspPath: selected.rtspPath ?? "", previewPath: selected.previewPath ?? "", username: credentials?.username ?? selected.username ?? "", password: credentials?.password ?? "", onvifPort: selected.onvifPort ?? 80, rtspPort: selected.rtspPort ?? 554 });
+      snapshotUrl: selected.snapshotUrl, rtspPath: selected.rtspPath ?? "", previewPath: selected.previewPath ?? "", username: selected.username ?? "", password: "", onvifPort: selected.onvifPort ?? 80, rtspPort: selected.rtspPort ?? 554 });
   }, [selectedId, selected?.id]);   // eslint-disable-line react-hooks/exhaustive-deps
 
   const update = <K extends keyof CameraConnection>(key: K, value: CameraConnection[K]) => setForm(current => ({ ...current, [key]: value }));
@@ -48,9 +49,10 @@ export function CameraSettings(props: Props) {
   const newCamera = () => { setSelectedId(""); setForm(emptyConnection()); setMessage(""); };
   const saveCamera = async () => {
     if (!form.name.trim() || !form.host.trim()) { setMessage(t("cameraRequired")); return; }
+    if (snapshotHasLogin(form.snapshotUrl)) { setMessage(t("snapshot_login_refused")); return; }
     try {
       const saved = await configureCamera(props.origin, { ...form, id: form.id || "cam-" + crypto.randomUUID().slice(0, 8) });
-      sessionCredentials.set(saved.id, { username: form.username, password: form.password });
+      setForm(current => ({ ...current, password: "" }));   // sent: it is not kept
       props.onCameraSaved({ ...saved, enabled: selected?.enabled ?? true, x: selected?.x ?? 50, y: selected?.y ?? 50 });
       selectCamera(saved.id);
       setForm(current => ({ ...current, id: saved.id }));

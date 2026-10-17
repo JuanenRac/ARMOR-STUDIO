@@ -73,7 +73,7 @@ export function parseElectricalDoc(document: unknown): Design | undefined {
     if (!isRecord(raw) || typeof raw.id !== "string" || !ID.test(raw.id) || frameIds.has(raw.id)) continue;
     const x = coordinate(raw.x), y = coordinate(raw.y), w = coordinate(raw.w), h = coordinate(raw.h);
     if (x === undefined || y === undefined || w === undefined || h === undefined || w < 40 || h < 40 || w > 20000 || h > 20000) continue;
-    const colour = typeof raw.colour === "string" && raw.colour in FRAME_COLOURS ? raw.colour as FrameColour : "cyan";
+    const colour = typeof raw.colour === "string" && Object.hasOwn(FRAME_COLOURS, raw.colour) ? raw.colour as FrameColour : "cyan";
     frames.push({ id: raw.id, name: typeof raw.name === "string" ? raw.name.slice(0, 60) : "", x, y, w, h, colour }); frameIds.add(raw.id);
   }
   return { elements, wires, frames };

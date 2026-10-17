@@ -69,7 +69,7 @@ export function parseAlarmDoc(document: unknown): Design | undefined {
     if (!isRecord(raw) || typeof raw.id !== "string" || !ID.test(raw.id) || frameIds.has(raw.id)) continue;
     const x = coordinate(raw.x), y = coordinate(raw.y), w = coordinate(raw.w), h = coordinate(raw.h);
     if (x === undefined || y === undefined || w === undefined || h === undefined || w < 40 || h < 40 || w > 20000 || h > 20000) continue;
-    const colour = typeof raw.colour === "string" && raw.colour in FRAME_COLOURS ? raw.colour as FrameColour : "cyan";
+    const colour = typeof raw.colour === "string" && Object.hasOwn(FRAME_COLOURS, raw.colour) ? raw.colour as FrameColour : "cyan";
     frames.push({ id: raw.id, name: typeof raw.name === "string" ? raw.name.slice(0, 60) : "", x, y, w, h, colour }); frameIds.add(raw.id);
   }
   return { elements, wires, frames };
@@ -80,13 +80,3 @@ export function applyAlarmDoc(document: unknown, current: Design): Design {
   return parseAlarmDoc(document) ?? current;
 }
 
-export const ALARM_LOCAL_KEY = "armor-studio-alarm-design-v1";
-export function loadLocalAlarmDesign(): Design | undefined {
-  try {
-    const raw = window.localStorage.getItem(ALARM_LOCAL_KEY);
-    return raw ? parseAlarmDoc(JSON.parse(raw)) : undefined;
-  } catch { return undefined; }   // storage may be blocked, or hold something else
-}
-export function saveLocalAlarmDesign(design: Design): void {
-  try { window.localStorage.setItem(ALARM_LOCAL_KEY, JSON.stringify(buildAlarmDoc(design))); } catch { /* storage may be full or blocked */ }
-}

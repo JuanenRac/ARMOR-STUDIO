@@ -5,6 +5,8 @@
  * Laid out in two columns: the nodes on the left; the firmware, the access and the start on the right; the progress under both.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { onSessionCleared } from "./sessionMemory";
+import { nodeKindOf } from "./nodeKind";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { CopyButton } from "./components/CopyButton";
 import {
@@ -22,13 +24,6 @@ export type FoundNode = { ip: string; nodeId?: string; hostname?: string; online
 
 const HOST_PREFIX = "armor-";
 
-/** The kind a device's web panel says it is, from the title banner the network node reads when it probes port 80 or 443. */
-function kindOf(device: { ports?: readonly { banner?: string }[] }): FirmwareKind | undefined {
-  const banners = (device.ports ?? []).map(port => port.banner ?? "").join(" ").toLowerCase();
-  for (const kind of FIRMWARE_KINDS) if (banners.includes(kind)) return kind;
-  return undefined;
-}
-
 /** Every device of the network that looks like an A.R.M.O.R. node (its host name starts with "armor-", or its maker is Espressif), the ones already in the system included. */
 export function firmwareNodes(network: NetworkOverview | null): FoundNode[] {
   const seen = new Set<string>(), found: FoundNode[] = [];
@@ -38,7 +33,7 @@ export function firmwareNodes(network: NetworkOverview | null): FoundNode[] {
       const named = Boolean(hostname?.startsWith(HOST_PREFIX)), espressif = /espressif/i.test(device.vendor ?? "");
       if ((!named && !espressif) || seen.has(device.ip)) continue;
       seen.add(device.ip);
-      const kind = kindOf(device);
+      const kind = nodeKindOf(device);
       found.push({ ip: device.ip, online: device.online, hostname: device.hostname, ...(named && hostname ? { nodeId: hostname.slice(HOST_PREFIX.length) } : {}), ...(kind ? { kind } : {}) });
     }
   }
@@ -81,6 +76,7 @@ const KEPT = new Map<string, unknown>();
 /** For the tests: what the panel remembers. */
 export const firmwareMemory = KEPT;
 let keptOrigin = "";
+onSessionCleared(() => { KEPT.clear(); keptOrigin = ""; });
 function useKept<T>(key: string, initial: T): [T, (value: T | ((current: T) => T)) => void] {
   const [value, setValue] = useState<T>(() => (KEPT.has(key) ? KEPT.get(key) as T : initial));
   const set = (next: T | ((current: T) => T)) => setValue(current => { const resolved = typeof next === "function" ? (next as (current: T) => T)(current) : next; KEPT.set(key, resolved); return resolved; });
@@ -115,13 +111,20 @@ export function FirmwarePanel({ t, origin, isAdmin, network }: Props) {
   const lastKind = useRef(kind);
   useEffect(() => { if (lastKind.current === kind) return; lastKind.current = kind; setPicked(new Set()); setRelease(null); setMessage(""); }, [kind]);   // the first run is the panel opening again: what was picked stays
 
-  // While a job runs, ask the server how it stands, twice a second.
+  // While a job runs, ask the server how it stands, twice a second - less often while it does not answer, and not at all about a job it no longer knows (it restarted).
   useEffect(() => {
     if (!running) return;
-    const timer = window.setInterval(() => {
-      firmwareJob(origin, jobId.current).then(next => setJob(next)).catch(error => setMessage(explain(t, error)));
-    }, 500);
-    return () => window.clearInterval(timer);
+    let cancelled = false, timer = 0, failures = 0;
+    const ask = () => {
+      firmwareJob(origin, jobId.current).then(next => { failures = 0; if (!cancelled) setJob(next); }).catch(error => {
+        if (cancelled) return;
+        failures += 1;
+        setMessage(explain(t, error));
+        if (error instanceof ApiError && error.status === 404) { setJob(current => current && { ...current, state: "failed", error: current.error ?? "no_such_job" }); failures = -1; }
+      }).finally(() => { if (!cancelled && failures >= 0) timer = window.setTimeout(ask, Math.min(500 * 2 ** Math.min(failures, 4), 8000)); });
+    };
+    timer = window.setTimeout(ask, 500);
+    return () => { cancelled = true; window.clearTimeout(timer); };
   }, [running, origin]);   // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isAdmin) return <article className="stack-card"><h3>{t("fw_title")}</h3><p className="muted">{t("cs_admin_only")}</p></article>;

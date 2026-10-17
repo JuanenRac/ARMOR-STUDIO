@@ -1,5 +1,5 @@
 /**
- * The phrases of the Services menu (every program and field node of the system, running or not), in the seven languages.
+ * The phrases of the Services menu (every program and field node of the system, running or not), in seven languages (the eighth, Portuguese, is in ptCatalogue.ts).
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { cataloguesFromRows, type Row } from "./catalogueRows";

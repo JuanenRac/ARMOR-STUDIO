@@ -1,5 +1,5 @@
 /**
- * The words of Configuration > Notifications (where the alarms are sent: the signed webhook, MQTT, Telegram, Home Assistant, and a test of each), in the seven languages.
+ * The words of Configuration > Notifications (where the alarms are sent: the signed webhook, MQTT, Telegram, Home Assistant, and a test of each), in seven languages (the eighth, Portuguese, is in ptCatalogue.ts).
  * One row per phrase: en, es, de, fr, it, ja, zh.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */

@@ -1,5 +1,5 @@
 /**
- * The hover hints of the whole console, in the seven languages, keyed by the key of the label they explain (see hoverHints.ts).
+ * The hover hints of the whole console, in seven languages (the eighth, Portuguese, is in ptCatalogue.ts), keyed by the key of the label they explain (see hoverHints.ts).
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D)
  * SPDX-License-Identifier: GPL-3.0-or-later
  */

@@ -60,7 +60,7 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
   const [message, setMessage] = useState("");
   const [waiting, setWaiting] = useState(false);
   const [notesOpen, setNotesOpen] = useState<ReadonlySet<string>>(new Set());   // the programs whose release notes are shown
-  const logEnd = useRef<HTMLDivElement>(null);
+  const logEnd = useRef<HTMLSpanElement>(null);
   const restored = useRef(false);
   const logLines = useRef<string[]>([]);
   const running = job !== null && job.state === "running";
@@ -213,7 +213,7 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
       {job.state === "failed" && <p className="notice" role="alert">{explainMaintenance(t, job.error.split(": ").pop() ?? "generic")}</p>}
       {studioUpdated && <button className="primary" onClick={() => window.location.reload()}>{t("mt_reload")}</button>}
       <div className="log-head"><h4>{t("mt_log")}</h4><CopyButton t={t} text={() => job.log.join("\n")} /></div>
-      <pre className="mt-log" aria-live="polite">{job.log.join("\n")}<div ref={logEnd} /></pre>
+      <pre className="mt-log" aria-live="polite">{job.log.join("\n")}<span ref={logEnd} /></pre>
     </article>}
 
     {overview && overview.history.length > 0 && <article className="stack-card">

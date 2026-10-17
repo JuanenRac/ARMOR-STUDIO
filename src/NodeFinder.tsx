@@ -11,6 +11,7 @@ import { KnownNodesContext } from "./knownNodes";
 import "./actionButtons.css";
 import type { Translate } from "./components/camera";
 import type { NetworkOverview } from "./networkModel";
+import { nodeKindOf } from "./nodeKind";
 
 export type NodeKind = "radar" | "solar" | "electrical" | "alarm";
 export type NodeCandidate = {
@@ -19,17 +20,10 @@ export type NodeCandidate = {
   kind?: NodeKind;
 };
 
-/** The kind a device's web panel says it is, from the title banner the network node reads when it probes port 80 or 443 ("A.R.M.O.R. radar", "...solar", "...electrical"). */
-function kindIn(text: string): NodeKind | undefined {
-  if (text.includes("radar")) return "radar";
-  if (text.includes("solar")) return "solar";
-  if (text.includes("electric") || text.includes("elec-")) return "electrical";
-  if (text.includes("alarm")) return "alarm";
-  return undefined;
-}
-/** The kind of a node: what its own panel says (the banner), and failing that what its name says ("nodo-radar-1" is a radar node) - a node switched off has no banner. */
+/** The kind of a node (see nodeKind.ts); a touch panel is not one of the kinds this search offers. */
 function kindOf(device: { hostname?: string; ports?: readonly { banner?: string }[] }): NodeKind | undefined {
-  return kindIn((device.ports ?? []).map(port => port.banner ?? "").join(" ").toLowerCase()) ?? kindIn((device.hostname ?? "").toLowerCase());
+  const kind = nodeKindOf(device);
+  return kind === "hmi" ? undefined : kind;
 }
 
 const HOST_PREFIX = "armor-";

@@ -21,10 +21,24 @@ All notable changes to this project are documented here.
 - **Help pictures:** every main menu has a picture with example data in the Help, in the eight languages.
 - The assistant knows about signed firmware, network Zigbee and the voice styles, and answers questions about them.
 - The README is rewritten in the eight languages with screenshots taken at 1920x1080.
+- **Drawings kept per server:** the site, electrical, network and alarm drawings are saved in the browser for each server, with the revision they were made from; an edit made while the connection was down is sent when it returns, and one server's plan is never offered to another. A short break in the session check no longer reads the server's copy over what was being edited, and a save that comes due during a read waits for it instead of being lost. One shared code now keeps the three drawings in step.
+- **One server at a time:** the address in Configuration is applied when it is finished, signing out closes the session on the server that opened it, and the server Studio talks to is always the one the person signed in to.
+- **Nothing left behind after signing out:** the output of the console and the firmware job are forgotten, and no camera password is kept in the page.
+- **Hidden menus stop asking:** a menu that stays open but hidden, and a tab in the background, no longer poll the server (the alarms keep arriving); this ends the 429 refusals a viewer got after visiting several menus.
+- **Keys of the three designers** only act in the designer that is on screen: a hidden one moved, deleted and undid things nobody saw.
+- **The sign-in screen speaks the language of the browser** (or the last one used), says what the session is, and works with the browser's storage blocked.
+- **Container image:** every location of the nginx sends the security headers, the pictures of the Help are included, the server's address is the one the page was opened with, and the real client address reaches the server.
+- A viewer sees the alarms and the arm button disabled instead of a refusal; an account of a wall panel is told it cannot use Studio.
+- An intruder seen by a radar opens the camera that sees that radar; an alarm from a panel opens the panels.
+- The notification of a critical alarm names it in words, "last run" of an automation shows minutes or hours, "default" in the risk of a device and the photo / video labels are translated, and the missing Japanese and Chinese texts of the site designer are in place. Tests now fail on a phrase left in English or on a key that does not exist.
+- The risk of a device can go back to its default, the history no longer jumps back to its first page, a firmware job that the server forgot ends instead of spinning, stopping or restarting the broker asks first, and a failed PTZ command is no longer an unhandled error.
+- A snapshot address that carries a login is refused and never stored; a colour such as `toString` in an imported drawing is no longer accepted.
+- The static host knows the picture, sound and font types and lets a Studio served without a configured server reach an https server.
+- **Documentation:** the security model is rewritten, and the README (in the eight languages) now describes the session, the weather exception, the environment variables and the container.
 
 ## [0.7.9] - Zones of the picture to ignore
 
-- **Zones to ignore:** Configuration > Cameras shows, under the settings of a saved camera, its live picture with the zones that the observation service ignores drawn over it.
+- **Zones to ignore:** the settings of the Cameras menu show, under the settings of a saved camera, its live picture with the zones that the observation service ignores drawn over it.
 - Dragging on the picture draws a new zone (a rectangle, in whichever direction you drag), and a click or a thin sliver is not a zone.
 - Each zone is listed with its place and size in per cent and can be removed on its own, or all of them at once, before saving.
 - At most sixteen zones per camera, and the server's answer to a wrong zone is told instead of being lost.
@@ -172,7 +186,7 @@ All notable changes to this project are documented here.
 - **Disarming asks for the PIN** (the system, and an alarm panel from its card) in a dialog of the page, with the refusals told in the seven languages (wrong PIN, locked, none set). **Configuration > Users** sets, changes and removes the PIN and the duress PIN: yours after confirming your password, anybody's for an administrator; the list says who has one. The alarm of a disarm under duress and the origin "alarm panels" have their words.
 - The firmware screen updates alarm panels too, adopting a node gives it the account of its kind, and the broker accounts can be of an alarm panel.
 
-## [0.6.8] - In progress
+## [0.6.8] - The installation as one file, what an inverter says about itself and merging buildings
 
 - **The installation as one file:** *Configuration > Installation* downloads the whole installation (never a password, token or key) and imports a file, with the parts to import ticked and a report of what was applied, what was left alone and what did not check out (and which cameras need their user name and password typed in), in the seven languages; the users' page offers the new `panel` role for a wall panel's own account.
 - **What an inverter says about itself** in the Inverters menu: a card with its serial number and firmware, the energy its panels have made in all and its ratings and settings (rated output, the battery's voltages and currents, the type of battery, the priority of the output source and of the charger, the input range), in the seven languages; nothing when the unit said none of it.

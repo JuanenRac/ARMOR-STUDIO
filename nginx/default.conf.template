@@ -5,21 +5,23 @@
 # ${ARMOR_SERVER_UPSTREAM} come from the environment). The browser talks only to
 # this origin: /api/ is proxied to ARMOR-SERVER, so the session cookie is
 # same-origin and no CORS opening is needed.
+
+# A WebSocket upgrade only when the client asks for one: "Connection: upgrade" on every request is not what an ordinary one should carry.
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ""      close;
+}
+
 server {
     listen 80;
     server_name _;
     root /usr/share/nginx/html;
     index index.html;
 
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header Referrer-Policy "no-referrer" always;
-    add_header Cross-Origin-Opener-Policy "same-origin" always;
-    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tilecache.rainviewer.com https://view.eumetsat.int https://server.arcgisonline.com; media-src 'self' blob:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://air-quality-api.open-meteo.com https://api.rainviewer.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'" always;
-
-    # Tells Studio which server to start with: this very origin.
+    # Tells Studio which server to start with: "same-origin" (the address the browser used to open this page, whichever it is - a LAN address, a name) unless the deployment names one.
     location = /armor-config.json {
         default_type application/json;
+        include /etc/nginx/snippets/security_headers.conf;
         add_header Cache-Control "no-store" always;
         return 200 '{"serverOrigin":"${ARMOR_PUBLIC_ORIGIN}"}';
     }
@@ -32,21 +34,28 @@ server {
     location /api/ {
         proxy_pass http://${ARMOR_SERVER_UPSTREAM};
         proxy_http_version 1.1;
-        proxy_set_header Host $host;
+        # The server must see who is really asking (its sign-in limits count each client, its audit trail names the address) and the host WITH its port (its WebSocket
+        # origin check compares them).
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
+        proxy_set_header Connection $connection_upgrade;
         # Live video and recordings are long-lived streams.
         proxy_buffering off;
         proxy_read_timeout 1h;
     }
 
     location /assets/ {
+        include /etc/nginx/snippets/security_headers.conf;
         expires 1y;
         add_header Cache-Control "public, immutable" always;
         try_files $uri =404;
     }
 
     location / {
+        include /etc/nginx/snippets/security_headers.conf;
         add_header Cache-Control "no-cache" always;
         try_files $uri /index.html;
     }

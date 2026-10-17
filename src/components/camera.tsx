@@ -76,21 +76,23 @@ function HoldButton({ command, label, title, enabled, invoke }: { command: strin
   const repeat = useRef<number | undefined>(undefined);
   const pressedAt = useRef(0);
   const held = useRef(false);
+  // A move or a stop the camera did not take is not an error of the page: the pad says nothing, as before, and the console stays quiet.
+  const send = (value: string): void => { invoke(value).catch(() => undefined); };
   const release = () => {
     if (!held.current) return;
     held.current = false;
     window.clearInterval(repeat.current);
     const wait = Math.max(0, PTZ_MIN_MOVE_MS - (Date.now() - pressedAt.current));
-    window.setTimeout(() => void invoke("stop"), wait);
+    window.setTimeout(() => send("stop"), wait);
   };
   const press = () => {
     if (!enabled || held.current) return;
     held.current = true;
     pressedAt.current = Date.now();
-    void invoke(command);
-    repeat.current = window.setInterval(() => void invoke(command), PTZ_REPEAT_MS);
+    send(command);
+    repeat.current = window.setInterval(() => send(command), PTZ_REPEAT_MS);
   };
-  useEffect(() => () => { window.clearInterval(repeat.current); if (held.current) void invoke("stop"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => { window.clearInterval(repeat.current); if (held.current) send("stop"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return <button
     type="button" disabled={!enabled} title={title} aria-label={title}
     onPointerDown={event => { event.preventDefault(); event.currentTarget.setPointerCapture?.(event.pointerId); press(); }}

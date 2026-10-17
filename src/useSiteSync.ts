@@ -32,6 +32,8 @@ export function useSiteSync({ origin, enabled, design, apply, onConflict, onNoti
 }): { status: SiteSyncStatus; draft: SiteDraftInfo | null; restoreDraft: () => void; restoreDocument: (site: Record<string, unknown>) => void } {
   const [status, setStatus] = useState<SiteSyncStatus>("idle");
   const [kept, setKept] = useState<SiteDraftInfo | null>(null);
+  // Raised when the first answer has been dealt with: the save below must look again even if the design on screen did not change (it was already the unsent one).
+  const [loaded, setLoaded] = useState(0);
   const revision = useRef<number | null>(null);
   const synced = useRef("");
   const busy = useRef(false);
@@ -41,6 +43,7 @@ export function useSiteSync({ origin, enabled, design, apply, onConflict, onNoti
   const keyRef = useRef(key);
   keyRef.current = key;
   const startKey = useRef<string | null>(null);
+  const seenOrigin = useRef<string | null>(null);
 
   const take = (document: { revision: number; site: Record<string, unknown> | null }) => {
     const next = applySiteDoc(document.site, latest.current.design);
@@ -51,11 +54,14 @@ export function useSiteSync({ origin, enabled, design, apply, onConflict, onNoti
 
   // First load, and again whenever the server changes.
   useEffect(() => {
-    revision.current = null; synced.current = ""; startKey.current = keyRef.current;
-    if (!enabled) return;
+    // Only a different server starts it again: the session check flickering (a minute without an answer) used to read the server's copy over what had been edited meanwhile.
+    if (seenOrigin.current !== origin) { seenOrigin.current = origin; revision.current = null; synced.current = ""; startKey.current = keyRef.current; }
+    if (!enabled || revision.current !== null) return;
     let cancelled = false;
+    let retry = 0;
     const start = async () => {
       busy.current = true;
+      let failed = false;
       try {
         const document = await readSite(origin);
         if (cancelled) return;
@@ -86,11 +92,14 @@ export function useSiteSync({ origin, enabled, design, apply, onConflict, onNoti
           else take(saved.conflict);
         }
         setStatus("saved");
-      } catch { if (!cancelled) setStatus("offline"); }
-      busy.current = false;
+        setLoaded(count => count + 1);
+      } catch { failed = true; if (!cancelled) setStatus("offline"); }
+      finally { busy.current = false; }
+      // A server that did not answer is asked again, not forgotten until the next flicker.
+      if (failed && !cancelled) retry = window.setTimeout(() => void start(), 5000);
     };
     void start();
-    return () => { cancelled = true; };
+    return () => { cancelled = true; window.clearTimeout(retry); };
   }, [origin, enabled]);   // eslint-disable-line react-hooks/exhaustive-deps
 
   // What has not reached the server is kept in this browser too, as soon as there is any.
@@ -107,19 +116,24 @@ export function useSiteSync({ origin, enabled, design, apply, onConflict, onNoti
   useEffect(() => {
     if (!enabled || revision.current === null || key === synced.current) return;
     setStatus("saving");
-    const timer = window.setTimeout(async () => {
-      if (busy.current || revision.current === null) return;
+    let timer = 0;
+    let cancelled = false;
+    // A save that comes due during a read or another save waits for it (it used to be dropped, and the status stayed on "saving" until the next edit).
+    const run = async () => {
+      if (cancelled || revision.current === null) return;
+      if (busy.current) { timer = window.setTimeout(() => void run(), 400); return; }
       busy.current = true;
       const savedKey = keyRef.current;
       try {
         const saved = await saveSite(origin, revision.current, buildSiteDoc(latest.current.design));
-        if ("revision" in saved) { revision.current = saved.revision; synced.current = savedKey; if (savedKey === keyRef.current) writeDraft(null); setStatus("saved"); }
+        if ("revision" in saved) { revision.current = saved.revision; synced.current = savedKey; if (savedKey === keyRef.current) writeDraft(null); setStatus(savedKey === keyRef.current ? "saved" : "saving"); }
         else { take(saved.conflict); latest.current.onConflict(); setStatus("saved"); }
       } catch { setStatus("offline"); }
       busy.current = false;
-    }, SAVE_DELAY_MS);
-    return () => window.clearTimeout(timer);
-  }, [key, enabled, origin]);
+    };
+    timer = window.setTimeout(() => void run(), SAVE_DELAY_MS);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [key, enabled, origin, loaded]);
 
   // Pick up what another browser saved, unless there is an unsaved change here.
   useEffect(() => {

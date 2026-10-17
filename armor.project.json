@@ -8,15 +8,14 @@
   "technologies": [
     "React",
     "TypeScript",
-    "WebSocket",
     "REST",
     "Canvas"
   ],
-  "deployment_target": "Browser served by central server",
+  "deployment_target": "Browser console served by its own static host or by the nginx of the container image",
   "maturity": "established",
   "family": "Clients",
   "parent": "ARMOR-SERVER",
   "native_version": "0.7.9",
   "build": "npm run typecheck && npm test && npm run build",
-  "notes": "Operational browser dashboard for the A.R.M.O.R. server API. Credentials are never persisted by Studio."
+  "notes": "Operational browser dashboard for the A.R.M.O.R. server API. Studio keeps no password, token or session in the browser; it keeps, per server, the drawings, the camera names and addresses and the preferences."
 }

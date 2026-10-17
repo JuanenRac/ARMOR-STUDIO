@@ -6,7 +6,7 @@
 import { askConfirm } from "../askConfirm";
 import { useState, type FormEvent } from "react";
 import { ApiError, createAutomation, deleteAutomation, runAutomation, updateAutomation, type Automation, type AutomationAction, type AlarmSourceType, type AutomationInput, type StudioDevice, type Trigger } from "../api";
-import { ACTUATOR_KINDS, MAIN_FIELD, OPENING_KINDS, isOpeningKind } from "../deviceKinds";
+import { ACTUATOR_KINDS, MAIN_FIELD, OPENING_KINDS, ago, isOpeningKind } from "../deviceKinds";
 import type { Translate } from "../components/camera";
 import "./alarms.css";
 import { MenuTitle } from "../menuLogos";
@@ -137,7 +137,7 @@ export function AutomationsView({ t, origin, automations, reload, devices, now }
           {automation.when_mode !== "any" && <span><b>{t("andModeLabel")}</b><em>{modeWord(automation.when_mode)}</em></span>}
           {automation.actions.map((action, index) => <span key={index}><b>{index === 0 ? t("thenLabel") : "+"}</b>{describeAction(action)}</span>)}
         </div>
-        <div className="automation-meta"><span>{t("lastRun")}: {automation.last_run ? `${Math.max(0, Math.round((now - Date.parse(automation.last_run)) / 1000))} s` : t("neverRun")}</span><span>{automation.runs} {t("runsTotal")}</span></div>
+        <div className="automation-meta"><span>{t("lastRun")}: {automation.last_run ? ago(automation.last_run, now, t) : t("neverRun")}</span><span>{automation.runs} {t("runsTotal")}</span></div>
         <div className="automation-actions">
           <button onClick={() => void act(() => runAutomation(origin, automation.id), t("runNowDone"))}>{t("runNow")}</button>
           <button onClick={() => setForm({ id: automation.id, name: automation.name, enabled: automation.enabled, trigger: automation.trigger, when_mode: automation.when_mode, actions: automation.actions })}>{t("editUser")}</button>

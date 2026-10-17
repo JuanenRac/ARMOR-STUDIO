@@ -1,5 +1,5 @@
 /**
- * The phrases of the Weather menu, in the seven languages: the weather codes, the wind and its compass points, the UV and air quality bands, the pollen, the moon, the warnings the forecast implies and
+ * The phrases of the Weather menu, in seven languages (the eighth, Portuguese, is in ptCatalogue.ts): the weather codes, the wind and its compass points, the UV and air quality bands, the pollen, the moon, the warnings the forecast implies and
  * the radar.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */

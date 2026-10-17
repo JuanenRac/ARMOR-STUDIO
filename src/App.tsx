@@ -3,6 +3,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D)
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+import { downloadText } from "./download";
 import { ConfirmHost } from "./askConfirm";
 import { useAlarmAnnouncer } from "./alerts/useAlarmAnnouncer";
 import { AlarmPopups } from "./alerts/AlarmPopups";
@@ -13,9 +14,11 @@ import { getPrefs, openingView, setPrefs, usePrefs } from "./prefs";
 import { TourHost } from "./tour/TourHost";
 import { RichTooltips } from "./tour/RichTooltips";
 import { shouldAutoStart, startTour } from "./tour/tourStore";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { acknowledgeAlarm, listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
+import { clearSessionMemory } from "./sessionMemory";
+import { cameraCoveringNode } from "./alerts/coverage";
 import { useConnectionAnnouncer } from "./alerts/useConnectionAnnouncer";
 import { ViewSlot, viewsToDraw } from "./viewSlots";
 import { AboutDialog, ConfirmDialog, HelpDialog, PinDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
@@ -43,22 +46,21 @@ import { text } from "./i18n";
 import { HistoryView } from "./HistoryView";
 import { MediaLibrary } from "./MediaLibrary";
 import { parseStudioSettings, serializeStudioSettings, SETTINGS_KEY, siteExport, type StudioSettings } from "./settings";
-import { SiteDesignerInteractive } from "./SiteDesignerInteractive";
-import { ElectricalDesigner } from "./ElectricalDesigner";
 import { EMPTY_DESIGN, type Design as ElectricalDesign } from "./electrical/model";
-import { loadLocalElectrical, saveLocalElectrical } from "./electrical/local";
+import { electricalAdapter } from "./electrical/useElectricalSync";
+import { alarmAdapter } from "./alarm/useAlarmDesignSync";
+import { networkAdapter } from "./network/useNetworkSync";
+import { loadLocalDesign } from "./useDesignSync";
 import { applyElectricalDoc } from "./electrical/sync";
 import { useElectricalSync } from "./electrical/useElectricalSync";
-import { NetworkDesigner } from "./NetworkDesigner";
-import { AlarmDesigner } from "./AlarmDesigner";
 import { EMPTY_DESIGN as EMPTY_ALARM_DESIGN, type Design as AlarmDesign } from "./alarm/model";
-import { applyAlarmDoc, loadLocalAlarmDesign, saveLocalAlarmDesign } from "./alarm/sync";
+import { applyAlarmDoc } from "./alarm/sync";
 import { useAlarmDesignSync } from "./alarm/useAlarmDesignSync";
 import { EMPTY_DESIGN as EMPTY_NETWORK_DESIGN, type Design as NetworkDesign } from "./network/model";
-import { applyNetworkDoc, loadLocalNetwork, saveLocalNetwork } from "./network/sync";
+import { applyNetworkDoc } from "./network/sync";
 import { useNetworkSync } from "./network/useNetworkSync";
 import { NetworkView } from "./views/NetworkView";
-import { StudioLogin } from "./StudioLogin";
+import { StudioLogin, loginLanguage } from "./StudioLogin";
 import { useSiteSync } from "./useSiteSync";
 import { AlarmsView } from "./views/AlarmsView";
 import { AutomationsView } from "./views/AutomationsView";
@@ -67,7 +69,6 @@ import { CameraMonitorView } from "./views/monitoring";
 import { OverviewView } from "./views/OverviewView";
 import { SystemView } from "./views/SystemView";
 import { ServicesView } from "./views/ServicesView";
-import { WeatherView } from "./views/WeatherView";
 import { RadarView } from "./views/RadarView";
 import { InvertersView } from "./views/InvertersView";
 import { BatteriesView } from "./views/BatteriesView";
@@ -86,8 +87,16 @@ import "./wide-text.css";
 
 const studioVersion = manifest.version;
 
-function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; onSignOut: () => void }) {
-  const [origin, setOrigin] = useState(initialOrigin);
+// The menus that bring the most code (the four designers and the weather map with its own library) are fetched the first time they are opened: the page used to carry all of them, and the
+// language tables, before the sign-in could even be shown.
+const SiteDesignerInteractive = lazy(() => import("./SiteDesignerInteractive").then(module => ({ default: module.SiteDesignerInteractive })));
+const ElectricalDesigner = lazy(() => import("./ElectricalDesigner").then(module => ({ default: module.ElectricalDesigner })));
+const NetworkDesigner = lazy(() => import("./NetworkDesigner").then(module => ({ default: module.NetworkDesigner })));
+const AlarmDesigner = lazy(() => import("./AlarmDesigner").then(module => ({ default: module.AlarmDesigner })));
+const WeatherView = lazy(() => import("./views/WeatherView").then(module => ({ default: module.WeatherView })));
+
+/** The console talks to ONE server: the address is the outer component's, the one the person signed in to; changing it signs in again. */
+function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOrigin: (value: string) => void; onSignOut: () => void }) {
   const [view, setView] = useState<View>(() => openingView(getPrefs()));
   const prefs = usePrefs();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -113,6 +122,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const [versionsOf, setVersionsOf] = useState<"site" | "electrical" | "network" | "alarm" | null>(null);
   const sessionUser = useSessionUser(origin);
   const isAdmin = sessionUser.user?.role === "admin";
+  const isViewer = sessionUser.user?.role === "viewer";
   const [pendingMode, setPendingMode] = useState<"armed" | "disarmed" | null>(null);
   const [checkOpen, setCheckOpen] = useState(false);
   const [now, setNow] = useState(() => Date.now());
@@ -125,7 +135,9 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const [selectedCamera, setSelectedCamera] = useState("cam-01");
   const [recordingCameraIds, setRecordingCameraIds] = useState<string[]>([]);
   const [discovered, setDiscovered] = useState<DiscoveredCamera[]>([]);
-  const t = (key: string) => text(language, key);
+  // The same function for as long as the language is the same: effects that list it among their dependencies (the rules of the history, the evidence library) were run again every second,
+  // when the clock of the console draws it anew, and replaced what the person was editing with the copy of the server.
+  const t = useCallback((key: string, ...args: Array<string | number>) => args.reduce<string>((value, arg, index) => value.split(`{${index}}`).join(String(arg)), text(language, key)), [language]);
   const [notice, setNotice] = useState(t("configuration"));
 
   const { state, connection: connectionState, latencyMs, apply: applyState } = useServerStatus(origin);
@@ -136,20 +148,20 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const connection = connectionState === "synced" ? t("serverSynchronized") : t("offlineDemo");
   const nodes = useMemo(() => Object.values(state.nodes).sort((a, b) => a.node_id.localeCompare(b.node_id)), [state]);
   const selected = cameras.find(camera => camera.id === selectedCamera) ?? cameras[0];
-  const devicePoll = usePolled(() => listDevices(origin), 2500, origin);
-  const alarmPoll = usePolled(() => listAlarms(origin), 2000, origin);
+  const devicePoll = usePolled(() => listDevices(origin), 2500, origin, { always: true });
+  const alarmPoll = usePolled(() => listAlarms(origin), 2000, origin, { always: true });
   // Which cameras are recording is the server's to say: after a reload the console used to think none was.
-  const recordingPoll = usePolled(() => listMedia(origin).then(result => result.activeCameraIds), 15_000, origin);
+  const recordingPoll = usePolled(() => listMedia(origin).then(result => result.activeCameraIds), 15_000, origin, { always: true });
   useEffect(() => { if (recordingPoll.data) setRecordingCameraIds(recordingPoll.data); }, [recordingPoll.data]);
-  const automationPoll = usePolled(() => listAutomations(origin), 5000, origin);
-  const solarPoll = usePolled(() => listSolar(origin), 4000, origin);
-  const electricalPoll = usePolled(() => listElectricalReadings(origin), 4000, origin);
-  const alarmNodesPoll = usePolled(() => listAlarmNodes(origin), 3000, origin);
+  const automationPoll = usePolled(() => listAutomations(origin), 5000, origin, { always: true });
+  const solarPoll = usePolled(() => listSolar(origin), 4000, origin, { always: true });
+  const electricalPoll = usePolled(() => listElectricalReadings(origin), 4000, origin, { always: true });
+  const alarmNodesPoll = usePolled(() => listAlarmNodes(origin), 3000, origin, { always: true });
   const knownNodes = useMemo(() => ({
     ids: [...nodes.map(node => node.node_id), ...(solarPoll.data?.devices ?? []).map(device => device.node_id), ...(solarPoll.data?.waiting ?? []).map(item => item.node_id), ...(electricalPoll.data?.nodes ?? []).map(item => item.node_id), ...(alarmNodesPoll.data?.nodes ?? []).map(item => item.node_id)],
     ips: nodes.flatMap(node => (node.panel ? [node.panel.ip] : [])),
   }), [nodes, solarPoll.data, electricalPoll.data, alarmNodesPoll.data]);
-  const networkPoll = usePolled(() => listNetwork(origin), 5000, origin);
+  const networkPoll = usePolled(() => listNetwork(origin), 5000, origin, { always: true });
   const devices = devicePoll.data?.devices ?? [];
   const alarms = alarmPoll.data;
   const alertContext = useMemo<RouteContext>(() => ({
@@ -157,7 +169,9 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     solarNodes: new Set([...(solarPoll.data?.devices ?? []).map(item => item.node_id), ...(solarPoll.data?.waiting ?? []).map(item => item.node_id)]),
     electricalNodes: new Set((electricalPoll.data?.nodes ?? []).map(item => item.node_id)),
     cameras: new Set(cameras.map(camera => camera.id)),
-  }), [alarmNodesPoll.data, solarPoll.data, electricalPoll.data, cameras]);
+    // An intruder seen by a radar opens the camera that sees that radar (from the plan), and the radar's map only when no camera does.
+    cameraCovering: (nodeId: string) => cameraCoveringNode(nodeId, sensors, cameras, { x: dimensions.width / 2, y: dimensions.depth / 2 }),
+  }), [alarmNodesPoll.data, solarPoll.data, electricalPoll.data, cameras, sensors, dimensions]);
   // says aloud what connects: the sources are what the server last said about each kind (an unread source says nothing)
   const connectionSources = useMemo(() => ({
     node: nodes.map(node => ({ id: node.node_id, name: node.node_id, online: node.online && !node.stale })),
@@ -187,25 +201,29 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     let raw: string | null = null;
     try { raw = window.localStorage.getItem(SETTINGS_KEY); } catch { /* Storage may be blocked. */ }
     const saved = parseStudioSettings(raw);
-    if (saved.origin) setOrigin(saved.origin);
+    // The address saved with the settings is NOT applied: the server this person signed in to is the one they are using (it used to be replaced by whichever the browser remembered).
     if (saved.theme) setTheme(saved.theme);
     if (saved.language) setLanguage(saved.language);
     if (saved.sidebarOpen !== undefined) setSidebarOpen(saved.sidebarOpen);
-    if (saved.dimensions) setDimensions(saved.dimensions);
-    if (saved.cameras) setCameras(saved.cameras);
-    if (saved.sensors) setSensors(saved.sensors);
-    if (saved.terrain) setTerrain(saved.terrain);
-    if (saved.buildings) setBuildings(saved.buildings);
-    if (saved.openings) setOpenings(saved.openings);
-    if (saved.roofItems) setRoofItems(saved.roofItems);
-    if (saved.wallLamps) setWallLamps(saved.wallLamps);
-    if (saved.features) setFeatures(saved.features);
-    if (saved.placements) setPlacements(saved.placements);
-    const savedElectrical = loadLocalElectrical();
+    // The plan of the site kept here is the one of the server it was drawn for: a browser that last worked on another installation (the bench, then the house) does not bring that plan to this one.
+    if (!saved.origin || saved.origin === origin) {
+      if (saved.dimensions) setDimensions(saved.dimensions);
+      if (saved.cameras) setCameras(saved.cameras);
+      if (saved.sensors) setSensors(saved.sensors);
+      if (saved.terrain) setTerrain(saved.terrain);
+      if (saved.buildings) setBuildings(saved.buildings);
+      if (saved.openings) setOpenings(saved.openings);
+      if (saved.roofItems) setRoofItems(saved.roofItems);
+      if (saved.wallLamps) setWallLamps(saved.wallLamps);
+      if (saved.features) setFeatures(saved.features);
+      if (saved.placements) setPlacements(saved.placements);
+    }
+    // The drawings kept here are the ones of THIS server: the copies carry the address, so another installation's plan is never put in front of this one.
+    const savedElectrical = loadLocalDesign(electricalAdapter, origin, electrical);
     if (savedElectrical) setElectrical(savedElectrical);
-    const savedNetwork = loadLocalNetwork();
+    const savedNetwork = loadLocalDesign(networkAdapter, origin, networkDesign);
     if (savedNetwork) setNetworkDesign(savedNetwork);
-    const savedAlarm = loadLocalAlarmDesign();
+    const savedAlarm = loadLocalDesign(alarmAdapter, origin, alarmDesign);
     if (savedAlarm) setAlarmDesign(savedAlarm);
     setRestored(true);
   }, []);
@@ -231,13 +249,10 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     origin, enabled: restored && operatorUnlocked, design, onConflict: () => setNotice(t("siteConflict")), onNotice: kind => setNotice(t(kind === "recovered" ? "versionsDraftRecovered" : "versionsDraftNotice")),
     apply: next => { setDimensions(next.dimensions); setTerrain(next.terrain); setBuildings(next.buildings); setOpenings(next.openings); setRoofItems(next.roofItems); setWallLamps(next.wallLamps); setFeatures(next.features); setSensors(next.sensors); setPlacements(next.placements); setCameras(next.cameras); },
   });
-  const electricalStatus = useElectricalSync({ origin, enabled: restored && operatorUnlocked, design: electrical, apply: setElectrical, onConflict: () => setNotice(t("elConflict")) });
-  // The electrical drawing is also kept in this browser, so it is there when the server is not.
-  useEffect(() => { if (restored) saveLocalElectrical(electrical); }, [electrical, restored]);
-  const networkStatus = useNetworkSync({ origin, enabled: restored && operatorUnlocked, design: networkDesign, apply: setNetworkDesign, onConflict: () => setNotice(t("elConflict")) });
-  useEffect(() => { if (restored) saveLocalNetwork(networkDesign); }, [networkDesign, restored]);
-  const alarmDesignStatus = useAlarmDesignSync({ origin, enabled: restored && operatorUnlocked, design: alarmDesign, apply: setAlarmDesign, onConflict: () => setNotice(t("elConflict")) });
-  useEffect(() => { if (restored) saveLocalAlarmDesign(alarmDesign); }, [alarmDesign, restored]);
+  // The three drawings are also kept in this browser (for this server), so they are there when the server is not.
+  const electricalStatus = useElectricalSync({ origin, enabled: restored && operatorUnlocked, persist: restored, design: electrical, apply: setElectrical, onConflict: () => setNotice(t("elConflict")) });
+  const networkStatus = useNetworkSync({ origin, enabled: restored && operatorUnlocked, persist: restored, design: networkDesign, apply: setNetworkDesign, onConflict: () => setNotice(t("elConflict")) });
+  const alarmDesignStatus = useAlarmDesignSync({ origin, enabled: restored && operatorUnlocked, persist: restored, design: alarmDesign, apply: setAlarmDesign, onConflict: () => setNotice(t("elConflict")) });
   const applySite = (next: SiteModel) => {
     if (next.terrain !== site.terrain) setTerrain(next.terrain);
     if (next.buildings !== site.buildings) setBuildings(next.buildings);
@@ -266,10 +281,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
     return () => window.clearTimeout(timer);
   }, [restored, terrain, buildings, openings, roofItems, wallLamps, features, sensors, dimensions, cameras, placements]);   // eslint-disable-line react-hooks/exhaustive-deps
   const exportSettings = () => {
-    const url = URL.createObjectURL(new Blob([siteExport(currentSettings())], { type: "application/json" }));
-    const link = document.createElement("a");
-    link.href = url; link.download = "armor-studio-site-config.json"; link.click();
-    URL.revokeObjectURL(url);
+    downloadText("armor-studio-site-config.json", siteExport(currentSettings()), "application/json");
     setNotice(t("siteExported"));
   };
   // The question is asked in the page (ConfirmDialog), not with the browser's confirm(): a browser can switch that one off, and then the button did nothing at all.
@@ -328,8 +340,8 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
   const visitedViews = useRef(new Set<View>());
   const shownPanels = useRef(new Map<View, ReactNode>());
   const panels: Record<View, ReactNode> = {
-    overview: <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} panels={alarmNodesPoll.data ?? null} solar={solarPoll.data ?? null} electrical={electricalPoll.data ?? null} network={networkPoll.data ?? null} />,
-    alarms: <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} />,
+    overview: <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} readOnly={isViewer} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} panels={alarmNodesPoll.data ?? null} solar={solarPoll.data ?? null} electrical={electricalPoll.data ?? null} network={networkPoll.data ?? null} />,
+    alarms: <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} readOnly={isViewer} />,
     alarmPanels: <AlarmPanelsView openDesigner={() => setView("alarmDesigner")} t={t} origin={origin} nodes={alarmNodesPoll.data ?? null} unreachable={alarmNodesPoll.failed} network={networkPoll.data ?? null} isAdmin={isAdmin} now={now} />,
     electrical: <ElectricalView openDevices={() => setView("devices")} t={t} origin={origin} readings={electricalPoll.data ?? null} unreachable={electricalPoll.failed} design={electrical} openDesigner={() => setView("electricalDesigner")} network={networkPoll.data} now={now} />,
     inverters: <InvertersView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} network={networkPoll.data} />,
@@ -357,19 +369,21 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
       setTheme={value => { setTheme(value as Theme); savePreferences(origin, { theme: value }).catch(() => { /* kept locally at least */ }); }} language={language} languages={LANGUAGES}
       setLanguage={value => { setLanguage(value as LanguageCode); savePreferences(origin, { language: value }).catch(() => { /* kept locally at least */ }); }} isAdmin={isAdmin}
       connection={connection} network={networkPoll.data ?? null}
-      savePreferences={saveSettings} exportSite={exportSettings} operatorUnlocked={operatorUnlocked} isViewer={sessionUser.user?.role === "viewer"}
+      savePreferences={saveSettings} exportSite={exportSettings} operatorUnlocked={operatorUnlocked} isViewer={isViewer}
     />,
   };
 
   const serverName = (() => { try { return new URL(origin).host; } catch { return origin; } })();
+  // A wall-panel account is for the panels (ARMOR-ALARM, ARMOR-HMI), not for Studio: every menu would answer it with a refusal.
+  if (sessionUser.user?.role === "panel") return <main className="studio-login-shell"><div className="studio-login-card"><h1>A.R.M.O.R. Studio</h1><p role="alert">{t("panel_account_notice")}</p><button className="primary" onClick={onSignOut}>{t("signOut")}</button></div></main>;
   return <SessionUserContext.Provider value={sessionUser}><KnownNodesContext.Provider value={knownNodes}><StreamRenewContext.Provider value={renewStream}><div className="studio-frame"><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
     <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} alarmBadge={alarmsPending} t={t} />
     <section className="main-stage" data-tour="stage">
-      <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={sessionUser.user?.role === "viewer"} checkPerimeter={() => setCheckOpen(true)} t={t} />
+      <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={isViewer} checkPerimeter={() => setCheckOpen(true)} t={t} />
       {viewsToDraw(VIEW_ORDER, view, visitedViews.current).map(shown => {
         // a hidden menu keeps the last thing it was given (the same element: React does not draw it again every second); it is refreshed when it is shown
         if (shown === view) shownPanels.current.set(shown, panels[shown]);
-        return <ViewSlot key={shown} active={shown === view}>{shownPanels.current.get(shown)}</ViewSlot>;
+        return <ViewSlot key={shown} active={shown === view}><Suspense fallback={<p className="login-loading">{t("loading")}</p>}>{shownPanels.current.get(shown)}</Suspense></ViewSlot>;
       })}
     </section>
     {expandedCamera && <CameraFullscreen camera={expandedCamera} cameras={cameras} origin={origin} recording={recordingCameraIds.includes(expandedCamera.id)} t={t} close={() => setExpandedCameraId("")} fullScreen={fullScreen} step={stepExpanded} snapshot={() => void saveSnapshot(expandedCamera)} toggleRecording={() => void toggleRecording(expandedCamera)} invokePtz={command => commandPtz(expandedCamera, command)} />}
@@ -396,6 +410,7 @@ function StudioConsole({ initialOrigin, onSignOut }: { initialOrigin: string; on
 }
 
 export default function App() {
+  // A new address typed in Configuration starts from the beginning: the session is the one of the server it was opened with.
   const storedOrigin = (() => { try { return window.localStorage.getItem("armor-studio-origin"); } catch { return null; } })();
   const [origin, setOrigin] = useState(storedOrigin || DEFAULT_SERVER_ORIGIN);
   const [originReady, setOriginReady] = useState(Boolean(storedOrigin));
@@ -422,6 +437,10 @@ export default function App() {
     const timer = window.setInterval(checkSession, 60_000);
     return () => { cancelled = true; window.clearInterval(timer); window.clearTimeout(retry); };
   }, [origin, originReady]);
-  if (checking) return <main className="studio-login-shell"><p className="login-loading">Comprobando sesión de Studio…</p></main>;
-  return authenticated ? <StudioConsole initialOrigin={origin} onSignOut={() => { void closeStudioSession(origin); setAuthenticated(false); }} /> : <StudioLogin origin={origin} onAuthenticated={nextOrigin => { setOrigin(nextOrigin); setAuthenticated(true); }} />;
+  if (checking) return <main className="studio-login-shell"><p className="login-loading">{text(loginLanguage(), "login_checking")}</p></main>;
+  const changeOrigin = (next: string) => {
+    try { window.localStorage.setItem("armor-studio-origin", next); } catch { /* Storage may be blocked. */ }
+    setAuthenticated(false); setChecking(true); setOrigin(next);
+  };
+  return authenticated ? <StudioConsole origin={origin} setOrigin={changeOrigin} onSignOut={() => { void closeStudioSession(origin); clearSessionMemory(); setAuthenticated(false); }} /> : <StudioLogin origin={origin} onAuthenticated={nextOrigin => { setOrigin(nextOrigin); setAuthenticated(true); }} />;
 }

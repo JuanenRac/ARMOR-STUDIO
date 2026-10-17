@@ -1,5 +1,5 @@
 /**
- * Interface text of the Alarms and Automations menus, in the seven languages.
+ * Interface text of the Alarms and Automations menus, in seven languages (the eighth, Portuguese, is in ptCatalogue.ts).
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { cataloguesFromRows, type Row } from "./catalogueRows";
