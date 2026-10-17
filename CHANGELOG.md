@@ -5,6 +5,7 @@ All notable changes to this project are documented here.
 ## [Unreleased]
 
 - **Silence a siren without disarming:** in Alarm panels, while a panel's siren sounds, an administrator gets a "Silence siren" button that asks for the PIN of the signed-in user (the server checks it, a wrong one counts toward the same lockout as a wrong disarm PIN). The system stays armed and the alarm stays recorded; the card lists the new "siren silenced with the PIN" event, and the help and the assistant explain it in the eight languages.
+- **Encryption of the link to the broker, shown:** Configuration > MQTT broker has a small card that says whether the server talks to the broker over `mqtts://` and, when it trusts only the installation's own certificate authority (`ARMOR_MQTT_CA_FILE`), shows that authority's name, SHA-256 fingerprint and end date to compare with `armor_mqtt_tls.sh status`. The default (plain MQTT) is shown calmly, not as a problem, and no path or certificate text ever reaches the screen. In the eight languages, with tests.
 
 ## [0.8.0.3] - Guides control by control, a tidier Security menu, the way in from outside explained, and a voice that stops on time
 

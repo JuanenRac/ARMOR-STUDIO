@@ -627,7 +627,9 @@ export const readServices = (origin: string) => userCall<ServicesOverview>(origi
 export const readMetrics = (origin: string) => userCall<MachineMetrics>(origin, "GET", "/api/v1/system/metrics");
 /** Where the server listens and where Studio is served (see ARMOR-SERVER's connection.ts). */
 export type ConnectionSettings = { host?: string; port?: number; studio_port?: number };
-export type ConnectionState = { active: { host: string; port: number; tls: boolean; studio_origins: string[] }; saved: ConnectionSettings; restart_required: boolean };
+/** Whether the server's link to the MQTT broker is encrypted (mqtts) and, when the installation's own authority is pinned, which one (never a path or a key). */
+export type MqttTlsView = { configured: boolean; tls: boolean; pinned_ca: boolean; ca?: { fingerprint256: string; subject: string; valid_to: string } };
+export type ConnectionState = { active: { host: string; port: number; tls: boolean; studio_origins: string[] }; mqtt_tls?: MqttTlsView; saved: ConnectionSettings; restart_required: boolean };
 export const readConnection = (origin: string) => userCall<ConnectionState>(origin, "GET", "/api/v1/system/connection");
 export const saveConnection = (origin: string, settings: ConnectionSettings) => userCall<ConnectionState>(origin, "PUT", "/api/v1/system/connection", settings);
 export type NetworkOrderType = "scan_now" | "ping" | "traceroute" | "wake" | "ports" | "http" | "inspect";

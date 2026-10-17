@@ -12,7 +12,7 @@ import {
 import { ConfirmDialog } from "./components/chrome";
 import { ActionIcon, actionsFor, type ServiceAction } from "./views/ServicesView";
 import { askConfirm } from "./askConfirm";
-import type { ServiceState } from "./api";
+import { readConnection, type MqttTlsView, type ServiceState } from "./api";
 
 type Translate = (key: string) => string;
 type Props = { t: Translate; origin: string; isAdmin: boolean };
@@ -139,6 +139,23 @@ export function FilesPanel({ t, origin, isAdmin }: Props) {
 
 const ROLES = ["node", "solar-node", "electrical-node", "network-node", "alarm-node", "consumer", "device", "bridge"] as const;
 
+/** The state of the encryption of the server's link to the broker (an administrator's view): plain is the default and is not shown as a problem. */
+export function BrokerTlsCard({ t, state }: { t: (key: string) => string; state: MqttTlsView | null }) {
+  if (state === null) return null;
+  return <article className="stack-card adm-card adm-tls"><h3>{t("adm_tls_title")}</h3>
+    {!state.configured && <p className="muted">{t("adm_tls_none")}</p>}
+    {state.configured && !state.tls && <p className="muted">{t("adm_tls_off")}</p>}
+    {state.configured && state.tls && <>
+      <p className="hint"><strong>{t("adm_tls_on")}</strong></p>
+      {state.pinned_ca && state.ca
+        ? <><p className="muted">{t("adm_tls_pinned")}</p>
+          <dl className="kv"><dt>{t("adm_tls_subject")}</dt><dd className="mono">{state.ca.subject}</dd><dt>{t("adm_tls_fingerprint")}</dt><dd className="mono">{state.ca.fingerprint256}</dd><dt>{t("adm_tls_valid_to")}</dt><dd>{state.ca.valid_to.slice(0, 10)}</dd></dl>
+          <p className="hint">{t("adm_tls_compare")}</p></>
+        : <p className="muted">{t("adm_tls_unpinned")}</p>}
+    </>}
+  </article>;
+}
+
 export function BrokerPanel({ t, origin, isAdmin }: Props) {
   const gate = useAgent(origin, isAdmin);
   const [accounts, setAccounts] = useState<BrokerAccount[]>([]);
@@ -150,7 +167,10 @@ export function BrokerPanel({ t, origin, isAdmin }: Props) {
   const [removing, setRemoving] = useState<BrokerAccount | null>(null);
   const [opened, setOpened] = useState<string>("");
   const [busy, setBusy] = useState(false);
+  const [tls, setTls] = useState<MqttTlsView | null>(null);
   const reload = useCallback(async () => {
+    // The state of the encryption is a courtesy of the card: if it cannot be read the rest of the screen still works.
+    void readConnection(origin).then(connection => setTls(connection.mqtt_tls ?? null)).catch(() => setTls(null));
     try {
       const [list, all, known] = await Promise.all([adminAccounts(origin), adminServices(origin), adminFiles(origin)]);
       setAccounts(list.accounts); setService(all.services.find(item => item.id === "mosquitto") ?? null);
@@ -186,6 +206,8 @@ export function BrokerPanel({ t, origin, isAdmin }: Props) {
       {message.text && <p className={`notice ${message.bad ? "bad" : ""}`} role="status">{message.text}</p>}
       <p className="hint">{on ? t("adm_broker_on") : t("adm_broker_off")}</p>
     </article>
+
+    <BrokerTlsCard t={t} state={tls} />
 
     <article className="stack-card adm-card"><h3>{t("adm_accounts")} <small className="user-chip">{accounts.length}</small></h3><p className="muted">{t("adm_accounts_help")}</p>
       <form className="adm-form" onSubmit={event => void add(event)}>

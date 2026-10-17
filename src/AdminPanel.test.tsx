@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { ServiceRow } from "./AdminPanel";
+import { BrokerTlsCard, ServiceRow } from "./AdminPanel";
 import type { AdminService } from "./api";
 import { locales, requiredUiKeys, text } from "./i18n";
 
@@ -39,6 +39,40 @@ describe("the administration screens", () => {
   it("has every phrase the screens use in all seven languages", () => {
     const wanted = requiredUiKeys.filter(key => key.startsWith("adm_") || /^tab(Services|Broker|Files)$/.test(key));
     expect(wanted.length).toBeGreaterThan(60);
+    for (const locale of locales) for (const key of wanted) expect(text(locale, key).trim().length, `${locale} ${key}`).toBeGreaterThan(0);
+  });
+});
+
+describe("the card of the encryption of the link to the broker", () => {
+  const escaped = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#x27;").replace(/"/g, "&quot;");
+  const card = (locale: (typeof locales)[number], state: Parameters<typeof BrokerTlsCard>[0]["state"]) => renderToStaticMarkup(createElement(BrokerTlsCard, { t: key => text(locale, key), state }));
+  const authority = { fingerprint256: "AB:CD:EF:01:23:45:67:89:AB:CD:EF:01:23:45:67:89:AB:CD:EF:01:23:45:67:89:AB:CD:EF:01:23:45:67:89", subject: "O=A.R.M.O.R. installation, CN=A.R.M.O.R. MQTT authority (casa)", valid_to: "2036-01-02T03:04:05.000Z" };
+  it("shows nothing until the state is known", () => {
+    expect(card("en", null)).toBe("");
+  });
+  it("says plainly, and without alarm, that the default link is not encrypted, and that there is nothing to encrypt without a broker", () => {
+    for (const locale of locales) {
+      const plain = card(locale, { configured: true, tls: false, pinned_ca: false });
+      expect(plain, locale).toContain(text(locale, "adm_tls_title"));
+      expect(plain, locale).toContain(escaped(text(locale, "adm_tls_off")));
+      expect(plain, locale).not.toContain("bad");
+      expect(card(locale, { configured: false, tls: false, pinned_ca: false }), locale).toContain(escaped(text(locale, "adm_tls_none")));
+    }
+  });
+  it("shows that the link is encrypted and the fingerprint of the authority it trusts, in every language, but never a certificate or a path", () => {
+    for (const locale of locales) {
+      const html = card(locale, { configured: true, tls: true, pinned_ca: true, ca: authority });
+      expect(html, locale).toContain(escaped(text(locale, "adm_tls_on")));
+      expect(html, locale).toContain(authority.fingerprint256);
+      expect(html, locale).toContain("2036-01-02");
+      expect(html, locale).toContain(escaped(text(locale, "adm_tls_compare")));
+      expect(html).not.toContain("BEGIN");
+    }
+    expect(card("en", { configured: true, tls: true, pinned_ca: false })).toContain(escaped(text("en", "adm_tls_unpinned")));
+  });
+  it("has the phrases in all eight languages", () => {
+    const wanted = requiredUiKeys.filter(key => key.startsWith("adm_tls_"));
+    expect(wanted.length).toBe(10);
     for (const locale of locales) for (const key of wanted) expect(text(locale, key).trim().length, `${locale} ${key}`).toBeGreaterThan(0);
   });
 });
