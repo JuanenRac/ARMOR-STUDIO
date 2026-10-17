@@ -27,12 +27,27 @@ export async function studioSessionState(origin: string): Promise<SessionState> 
     return (await response.json() as { authenticated?: boolean }).authenticated ? "active" : "ended";
   } catch { return "unknown"; }
 }
-export async function openStudioSession(origin: string, username: string, password: string): Promise<void> {
+/** The first step of the sign-in. When the account has the second factor on, the answer is a challenge (no session yet) and `completeStudioSession` finishes it. */
+export type SignInStep = { done: true } | { done: false; challenge: string };
+export async function openStudioSession(origin: string, username: string, password: string): Promise<SignInStep> {
   const response = await timedFetch(endpoint(origin, "/api/v1/studio/session"), {
     method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession,
     body: JSON.stringify({ username, password }),
   });
+  const body = await response.json().catch(() => ({})) as { totp_required?: boolean; challenge?: string; code?: string };
+  if (response.status === 403 && body.code === "totp_setup_required") throw new ApiError(403, "totp_setup_required");
   if (!response.ok) throw new Error(`Studio login returned ${response.status}`);
+  if (body.totp_required && typeof body.challenge === "string") return { done: false, challenge: body.challenge };
+  return { done: true };
+}
+/** The second step: the challenge of the first and a code of the app (or a recovery code). */
+export async function completeStudioSession(origin: string, challenge: string, code: string): Promise<void> {
+  const response = await timedFetch(endpoint(origin, "/api/v1/studio/session/totp"), {
+    method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ challenge, code }),
+  });
+  if (response.ok) return;
+  const body = await response.json().catch(() => ({})) as { code?: string };
+  throw new ApiError(response.status, body.code ?? "generic");
 }
 export type WeatherPlace = { name: string; region: string; country: string; lat: number; lon: number };
 export type Preferences = { language?: string; theme?: string; weatherPlace?: WeatherPlace | null };
@@ -252,7 +267,10 @@ export type ListedUser = StudioUser & { createdAt: string; updatedAt: string; cu
 export class ApiError extends Error {
   constructor(readonly status: number, readonly code: string) { super(`${status} ${code}`); }
 }
-async function userCall<T>(origin: string, method: string, route: string, body?: unknown): Promise<T> {
+/** Set by the app: asks the person for their password (or a code) again and says whether they proved themselves. Critical actions from outside the house ask for it (see ElevationHost). */
+let elevationAsker: ((origin: string) => Promise<boolean>) | null = null;
+export const setElevationAsker = (asker: ((origin: string) => Promise<boolean>) | null): void => { elevationAsker = asker; };
+async function userCall<T>(origin: string, method: string, route: string, body?: unknown, retried = false): Promise<T> {
   const response = await timedFetch(endpoint(origin, route), {
     method, headers: { Accept: "application/json", ...(body === undefined ? {} : { "Content-Type": "application/json" }) }, ...localSession,
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -261,7 +279,10 @@ async function userCall<T>(origin: string, method: string, route: string, body?:
   const parsed = await response.json().catch(() => ({})) as { code?: string; error?: string } & T;
   // The administration answers `{ error: "a_code" }` (some of them with a line number, "invalid_line:3"); the users' answers carry a separate `code`.
   const machine = typeof parsed.error === "string" && /^[a-z_]+(:\d+)?$/.test(parsed.error) ? parsed.error : undefined;
-  if (!response.ok) throw new ApiError(response.status, parsed.code ?? machine ?? (response.status === 403 || response.status === 401 ? "forbidden" : "generic"));
+  if (!response.ok) {
+    if (response.status === 403 && parsed.code === "elevation_required" && !retried && elevationAsker && await elevationAsker(origin)) return userCall<T>(origin, method, route, body, true);
+    throw new ApiError(response.status, parsed.code ?? machine ?? (response.status === 403 || response.status === 401 ? "forbidden" : "generic"));
+  }
   return parsed;
 }
 /** Who is signed in: the user, nobody (the server said so), or unknown (it could not be asked - never to be taken as "not an administrator"). */
@@ -539,6 +560,20 @@ export const sendAlarmCommand = (origin: string, node: string, action: "arm" | "
 export const setMyPin = (origin: string, change: { currentPassword: string; pin?: string; duress_pin?: string; clear?: boolean }) => userCall<StudioUser>(origin, "PUT", "/api/v1/account/pin", change);
 export const setUserPin = (origin: string, id: string, pin: string, duress_pin?: string) => userCall<ListedUser>(origin, "PUT", `/api/v1/users/${encodeURIComponent(id)}/pin`, { pin, ...(duress_pin ? { duress_pin } : {}) });
 export const clearUserPin = (origin: string, id: string) => userCall<ListedUser>(origin, "DELETE", `/api/v1/users/${encodeURIComponent(id)}/pin`);
+
+// ---- security: the second factor, the sessions of the person, using the server from outside the house ------------------------------------------------
+export type SessionRow = { id: string; created: number; last_seen: number; origin: "local" | "remote"; ip: string; agent: string; current: boolean };
+export type TotpState = { enabled: boolean; recovery_left: number; policy: "off" | "remote" | "always" };
+export type RemoteCheck = { ip: string; origin: "local" | "remote"; session_origin: "local" | "remote" | null; protocol: string; forwarded_for: string | null; cookie_secure: boolean; trust_proxy: unknown; totp_policy: string; totp_enabled: boolean; remote_session_ttl_s: number; remote_idle_s: number; elevation_s: number };
+export const listMySessions = (origin: string) => userCall<{ sessions: SessionRow[] }>(origin, "GET", "/api/v1/studio/sessions");
+export const endMySession = (origin: string, id: string) => userCall<void>(origin, "DELETE", `/api/v1/studio/sessions/${encodeURIComponent(id)}`);
+export const endOtherSessions = (origin: string) => userCall<void>(origin, "POST", "/api/v1/studio/sessions/end-others");
+export const totpState = (origin: string) => userCall<TotpState>(origin, "GET", "/api/v1/studio/totp");
+export const totpSetup = (origin: string, password: string) => userCall<{ secret: string; uri: string }>(origin, "POST", "/api/v1/studio/totp/setup", { password });
+export const totpEnable = (origin: string, code: string) => userCall<{ enabled: true; recovery_codes: string[] }>(origin, "POST", "/api/v1/studio/totp/enable", { code });
+export const totpDisable = (origin: string, password: string) => userCall<void>(origin, "DELETE", "/api/v1/studio/totp", { password });
+export const elevateSession = (origin: string, proof: { password?: string; code?: string }) => userCall<{ elevated_for_s: number }>(origin, "POST", "/api/v1/studio/elevate", proof);
+export const remoteCheck = (origin: string) => userCall<RemoteCheck>(origin, "GET", "/api/v1/remote/check");
 
 // ---- the local network, as the ARMOR-NETWORK nodes see it -------------------------------------------------------------------------------
 export type NetworkDocument = { revision: number; updated_at: string | null; updated_by: string | null; network: Record<string, unknown> | null };

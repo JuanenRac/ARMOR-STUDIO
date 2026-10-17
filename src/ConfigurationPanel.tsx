@@ -10,11 +10,12 @@ import { InstallationPanel } from "./InstallationPanel";
 import { UpdatesPanel } from "./UpdatesPanel";
 import { ConsolePanel } from "./ConsolePanel";
 import { PreferencesPanel } from "./PreferencesPanel";
+import { SecurityPanel } from "./SecurityPanel";
 import type { NetworkOverview } from "./networkModel";
 import "./configuration.css";
 import { MenuTitle } from "./menuLogos";
 
-type Tab = "general" | "users" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications" | "capture" | "preferences";
+type Tab = "general" | "users" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications" | "capture" | "preferences" | "security";
 type Props = {
   t: (key: string) => string;
   origin: string; setOrigin: (value: string) => void;
@@ -26,9 +27,9 @@ type Props = {
   network?: NetworkOverview | null;
 };
 
-const VIEWER_TABS: readonly string[] = ["general", "users", "preferences"];
+const VIEWER_TABS: readonly string[] = ["general", "users", "preferences", "security"];
 /** The tabs in groups, from what is the person's own to what is the system's: the interface; people, alerts and what is recorded; the nodes' firmware and Studio's updates; the server and what it runs on. */
-const tabGroups: Tab[][] = [["general", "preferences"], ["users", "notifications", "capture"], ["firmware", "updates"], ["services", "broker", "files", "installation", "console"]];
+const tabGroups: Tab[][] = [["general", "preferences"], ["users", "security", "notifications", "capture"], ["firmware", "updates"], ["services", "broker", "files", "installation", "console"]];
 const tabs: Tab[] = tabGroups.flat();
 
 /** Can the browser reach something at this address at all? (no-cors: only a network failure rejects, which is what a wrong scheme or port gives.) */
@@ -108,6 +109,7 @@ export function ConfigurationPanel(props: Props) {
       <article className="stack-card"><p className="eyebrow">{t("gen_ui_kicker")}</p><h3>{t("interface")}</h3><label>{t("theme")}<select value={props.theme} onChange={event => props.setTheme(event.target.value)}>{props.themes.map(item => <option key={item}>{item}</option>)}</select></label><label>{t("language")}<select value={props.language} onChange={event => props.setLanguage(event.target.value)}>{props.languages.map(item => <option key={item.code} value={item.code}>{item.name}</option>)}</select></label><button onClick={props.savePreferences}>{t("saveUi")}</button></article>
     </div>}
     {tab === "users" && <UsersPanel t={t} origin={props.origin} />}
+    {tab === "security" && <SecurityPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "services" && <ServicesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "broker" && <BrokerPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "files" && <FilesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}

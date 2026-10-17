@@ -5,6 +5,7 @@
  */
 import { downloadText } from "./download";
 import { ConfirmHost } from "./askConfirm";
+import { ElevationHost } from "./ElevationHost";
 import { useAlarmAnnouncer } from "./alerts/useAlarmAnnouncer";
 import { AlarmPopups } from "./alerts/AlarmPopups";
 import { Assistant } from "./assistant/Assistant";
@@ -406,6 +407,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     highAlerts={nodes.filter(node => node.online && !node.stale && node.alert_level === "high").length}
     info={serverInfo} latencyMs={latencyMs} revision={state.revision} onSignOut={onSignOut} t={t} />
   <ConfirmHost />
+  <ElevationHost t={t} />
   </div></StreamRenewContext.Provider></KnownNodesContext.Provider></SessionUserContext.Provider>;
 }
 
