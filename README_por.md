@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-481%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.7.9-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Tests-449%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Version-0.8.0.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**Verificação de honestidade - o que funciona hoje:** O Studio fala com o [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) e está coberto por 481 testes unitários (leitura de definições, fusão de câmaras, a aritmética dos gráficos solares, a geometria e as verificações dos desenhadores, o anunciador de alarmes, o dicionário do assistente, cada menu desenhado nos oito idiomas, o servidor estático) e por testes no navegador. Funciona em uso diário contra a bancada de testes do CM5 com o servidor real, câmaras IP reais e um nó radar na sua placa; as imagens da Ajuda são feitas com dados de exemplo. O que **não** foi provado é o vídeo em direto e o PTZ com todas as câmaras possíveis, os menus solar, elétrico, de centrais de alarme e de painel tátil com equipamentos reais (só existe o nó radar) e uma revisão formal de acessibilidade ou usabilidade. Enquanto o servidor não é alcançado, o Studio mostra dados de demonstração e di-lo na barra superior.
+**Verificação de honestidade - o que funciona hoje:** O Studio fala com o [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) e está coberto por 449 testes unitários (leitura de definições, fusão de câmaras, a aritmética dos gráficos solares, a geometria e as verificações dos desenhadores, o anunciador de alarmes, o dicionário do assistente, cada menu desenhado nos oito idiomas, o servidor estático) e por testes no navegador. Funciona em uso diário contra a bancada de testes do CM5 com o servidor real, câmaras IP reais e um nó radar na sua placa; as imagens da Ajuda são feitas com dados de exemplo. O que **não** foi provado é o vídeo em direto e o PTZ com todas as câmaras possíveis, os menus solar, elétrico, de centrais de alarme e de painel tátil com equipamentos reais (só existe o nó radar) e uma revisão formal de acessibilidade ou usabilidade. Enquanto o servidor não é alcançado, o Studio mostra dados de demonstração e di-lo na barra superior.
 
 ---
 
@@ -37,15 +37,15 @@
 
 | | |
 |---|---|
-| Versão | `0.7.9` |
+| Versão | `0.8.0.0` |
 | Maturidade | Estabelecido |
-| Testes | 481 (`npm test`) |
+| Testes | 449 (`npm test`) |
 | Tecnologia | React 19 / TypeScript / Vite |
 | Em hardware real | Usado diariamente contra a bancada de testes do CM5 (servidor real, câmaras IP reais, um nó radar real); os menus solar, elétrico, de centrais de alarme e de painel tátil esperam nós reais |
 
 ## 🎯 Visão geral
 
-O **ARMOR-STUDIO** é a consola do operador. Nunca guarda uma palavra-passe de câmara, um endereço RTSP nem um token: inicia sessão no servidor com um nome de utilizador e palavra-passe, recebe uma sessão **HttpOnly** (7 dias por predefinição; o servidor define-a com `ARMOR_STUDIO_SESSION_TTL_MS`), e tudo o que é privilegiado viaja por essa sessão.
+O **ARMOR-STUDIO** é a consola do operador. Nunca guarda uma palavra-passe de câmara, um endereço RTSP nem um token: inicia sessão no servidor com um nome de utilizador e palavra-passe, recebe uma sessão **HttpOnly** de 8 horas, e tudo o que é privilegiado viaja por essa sessão.
 
 * **Resumo e sistema:** o estado do perímetro, um cartão para cada parte (centrais de alarme, radar, câmaras, dispositivos, energia, rede, servidor), um mapa vivo do desenho com cada dispositivo e alarme, e o que precisa de atenção, tudo num só ecrã sem deslocamento; uma página de sistema e um registo de auditoria para o administrador.
 * **Monitor de câmaras:** 1, 2, 4, 6, 8, 9, 12 ou 16 mosaicos que se ajustam à moldura (16:9, toda a matriz visível, sem cortes), uma vista ampliada com comando PTZ limitado, fotografia e gravação MP4; uma **biblioteca de gravações** para filtrar, pré-visualizar, reproduzir, proteger e apagar provas e descarregar uma **prova de custódia**.
@@ -59,8 +59,8 @@ O **ARMOR-STUDIO** é a consola do operador. Nunca guarda uma palavra-passe de c
 * **Rede local:** o menu *Rede* mostra o que o nó ARMOR-NETWORK comunica (dispositivos, falhas, o estado da internet e o **endereço público** com o fornecedor e o local), deixa dar nomes, ocultar e vigiar dispositivos, ordenar um varrimento, um ping ou uma inspeção com um acesso que der, e o *Desenhador de rede* desenha-a.
 * **Captura automática:** em *Configuração > Captura automática*, fotografias e vídeo feitos sozinhos quando uma câmara vê algo com o sistema armado (quantas fotografias, com que frequência, quanto dura um clipe), e as zonas da imagem a ignorar desenhadas sobre o quadro da câmara.
 * **Firmware dos nós e atualizações:** *Firmware dos nós* atualiza os nós de campo um a um, com uma barra para todo o trabalho e para cada nó, e mantém o seu estado se um alarme o levar a outro menu; *Atualizações* instala as novas versões do Studio e do servidor a partir do GitHub (mostrando as novidades da nova versão), as do sistema operativo e uma consola de manutenção opcional.
-* **Configuração em grupos:** Geral (com o endereço e as portas do servidor) e Preferências; Utilizadores, Notificações e Captura automática; Firmware dos nós e Atualizações; Serviços, Broker MQTT, Ficheiros de configuração, Instalação e Consola; e cada menu da barra lateral também está em grupos recolhíveis (Monitor, Segurança, Energia, Casa e rede, Desenho, Administração).
-* **Oito idiomas** (inglês, espanhol, alemão, francês, italiano, japonês, chinês e português) e dezasseis temas, o predefinido chamado *Armor*; o idioma, o tema e o local do tempo seguem a conta, não o navegador. Papéis: administrador, operador, **viewer**, que só observa, e a conta **panel** de um painel de parede (não pode entrar no Studio).
+* **Configuração em grupos:** Geral e Preferências; Utilizadores, Notificações e Captura automática; Firmware dos nós e Atualizações; Servidor, Serviços, Broker MQTT, Ficheiros de configuração, Instalação e Consola; e cada menu da barra lateral também está em grupos recolhíveis (Monitor, Segurança, Energia, Casa e rede, Desenho, Administração).
+* **Oito idiomas** (inglês, espanhol, alemão, francês, italiano, japonês, chinês e português) e onze temas, o predefinido chamado *Armor*; o idioma, o tema e o local do tempo seguem a conta, não o navegador. Papéis: administrador, operador e **viewer**, que só observa.
 * **Uma Ajuda que conhece todo o sistema:** um livro com quatro níveis de detalhe e uma imagem com dados de exemplo de cada menu principal, uma visita guiada para cada menu, dicas em tudo, e um **assistente** (uma mascote que pode arrastar para qualquer lugar, fixar onde quiser e a quem perguntar por escrito) com um dicionário em oito idiomas e um balão que se abre do lado que tem espaço. Os menus onde trabalha ficam abertos enquanto visita outro.
 
 ## 🖼️ Capturas de ecrã
@@ -84,16 +84,13 @@ flowchart LR
     B["Browser"] -->|"static files"| H["tools/serve.mjs (static host)"]
     B -->|"HttpOnly session, JSON, MJPEG"| S["ARMOR-SERVER"]
     H -->|"/armor-config.json"| B
-    B -->|"container image: one origin"| N["nginx (static files + /api/ proxy)"]
-    N -->|"/api/"| S
 ```
 
 ## 🔒 Modelo de segurança
 
 * **Sem segredos no navegador.** As palavras-passe das câmaras escrevem-se uma vez, enviam-se ao servidor e depois só se mostram como um estado «guardada» mascarado. As exportações do local retiram nomes de utilizador e indicadores de credenciais.
 * **As definições guardadas são entrada não fiável.** Leem-se valor a valor: uma origem, tema, idioma ou forma inválidos descartam-se, as posições limitam-se e as listas têm tamanho máximo.
-* **O que o navegador guarda.** Por cada servidor, uma cópia dos desenhos (local, elétrico, rede, alarme), os nomes e endereços das câmaras e as preferências; nunca uma palavra-passe, um token ou uma sessão. Terminar a sessão esvazia o que os menus guardam em memória (a saída da consola, o trabalho de firmware). Um endereço de imagem que leve utilizador e palavra-passe é recusado.
-* **Terceiros só para o tempo.** Os tipos de letra são locais. O menu Tempo, que não pede nada até a conta ter um local guardado, fala com o Open-Meteo (previsão), o RainViewer (radar de chuva), o EUMETSAT e o ArcGIS (imagem de satélite e mapa de base). O servidor estático e o nginx do contentor enviam `Content-Security-Policy: default-src 'self'` limitado ao servidor configurado e a esses serviços do tempo, `frame-ancestors 'none'`, `nosniff` e `no-referrer` em cada ficheiro, não só na página.
+* **Sem pedidos a terceiros.** Os tipos de letra são pilhas locais; o servidor estático envia `Content-Security-Policy: default-src 'self'` limitado ao servidor configurado, `frame-ancestors 'none'`, `nosniff` e `no-referrer`.
 * O vídeo em direto só se mostra através de um endereço de emissão que o servidor emite para um operador.
 
 ## 📂 Estrutura do repositório
@@ -112,7 +109,7 @@ ARMOR-STUDIO/
 │   ├── assistant/    the mascot, its dictionary in eight languages and where its bubble opens
 │   ├── tour/         a guided tour for every menu
 │   ├── weather/      the Weather menu: radar map, clouds, forecast
-│   └── ...           ConfigurationPanel (tabs: General, Preferences, Users, Notifications, Automatic capture, Node firmware, Updates, Services, Broker, Files, Installation, Console), MediaLibrary, HistoryView, StudioLogin, one *Text.ts per area (eight languages)
+│   └── ...           ConfigurationPanel (tabs: General, Preferences, Users, Notifications, Automatic capture, Node firmware, Updates, Server, Services, Broker, Files, Installation, Console), MediaLibrary, HistoryView, StudioLogin, one *Text.ts per area (eight languages)
 ├── public/help/      the pictures of the Help, one set per language
 ├── e2e/              browser tests (Playwright)
 ├── tools/            serve.mjs (+ tests)
@@ -128,14 +125,12 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 481 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
+npm test            # 449 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```
 
-O `tools/serve.mjs` lê `ARMOR_STUDIO_HOST` (predefinido `127.0.0.1`), `ARMOR_STUDIO_PORT` (`5178`), `ARMOR_STUDIO_DIST`, `ARMOR_CONNECTION_FILE` (o `connection.json` que um administrador guarda a partir do Studio: a sua porta do Studio manda), `TLS_CERT_PATH` com `TLS_KEY_PATH` (para servir também por https) e `ARMOR_SERVER_ORIGIN`, que pode listar vários servidores separados por vírgulas. O servidor deve ter `ARMOR_STUDIO_ORIGIN` igual ao endereço a partir do qual o Studio é servido (CORS).
-
-A imagem do contentor (`Dockerfile`) serve a compilação com nginx e reencaminha `/api/` para o servidor (`ARMOR_SERVER_UPSTREAM`): o navegador fala apenas com a origem própria do Studio, `ARMOR_PUBLIC_ORIGIN` vale `same-origin` salvo se uma instalação indicar outra, e não é preciso abrir o CORS. Para instalar todo o conjunto na bancada de testes CM5 veja o [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS).
+O `tools/serve.mjs` lê `ARMOR_STUDIO_HOST` (predefinido `127.0.0.1`), `ARMOR_STUDIO_PORT` (`5178`), `ARMOR_STUDIO_DIST` e `ARMOR_SERVER_ORIGIN`. Para instalar todo o conjunto na bancada de testes CM5 veja o [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS).
 
 ## 🔗 Projetos relacionados
 

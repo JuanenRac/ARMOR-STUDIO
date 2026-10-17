@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here.
 
-## [Unreleased] - Next version
+## [0.8.0.0] - A speaking assistant, the overview redesigned and drawings kept per server
 
 - **Connection announcements:** the alarm voice now says aloud when a node, a device or a camera connects, as it already did when one was lost.
 - A node that comes back is no longer called silent right after it reconnects: the server counts its silence from its return (server fix, shipped with this version).

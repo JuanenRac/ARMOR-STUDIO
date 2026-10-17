@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-481%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.7.9-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Tests-449%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Version-0.8.0.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 481 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary, every menu rendered in the eight languages, the static host) and by browser tests. It runs in daily use against the CM5 test bench with the real server, real IP cameras and a radar node on its board; the pictures of the Help are made with example data. What has **not** been proven is live video and PTZ against every possible camera, the solar, electrical, alarm-panel and touch-panel menus with real equipment (only the radar node exists) and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
+**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 449 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary, every menu rendered in the eight languages, the static host) and by browser tests. It runs in daily use against the CM5 test bench with the real server, real IP cameras and a radar node on its board; the pictures of the Help are made with example data. What has **not** been proven is live video and PTZ against every possible camera, the solar, electrical, alarm-panel and touch-panel menus with real equipment (only the radar node exists) and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
 
 ---
 
@@ -37,15 +37,15 @@
 
 | | |
 |---|---|
-| Version | `0.7.9` |
+| Version | `0.8.0.0` |
 | Maturity | Established |
-| Tests | 481 (`npm test`) |
+| Tests | 449 (`npm test`) |
 | Stack | React 19 / TypeScript / Vite |
 | On real hardware | Used daily against the CM5 test bench (real server, real IP cameras, a real radar node); the solar, electrical, alarm-panel and touch-panel menus wait for real nodes |
 
 ## 🎯 Overview
 
-**ARMOR-STUDIO** is the operator's console. It never holds a camera password, an RTSP address or a token: it signs in to the server with a username and password, receives an **HttpOnly** session (7 days by default; the server sets it with `ARMOR_STUDIO_SESSION_TTL_MS`), and everything privileged travels through that session.
+**ARMOR-STUDIO** is the operator's console. It never holds a camera password, an RTSP address or a token: it signs in to the server with a username and password, receives an 8-hour **HttpOnly** session, and everything privileged travels through that session.
 
 * **Overview and system:** the state of the perimeter, a tile for every part (alarm panels, radar, cameras, devices, energy, network, server), a live map of the design with every device and alarm, and what needs attention, all on one screen with no scrolling; a system page and an audit trail for an administrator.
 * **Camera monitor:** 1, 2, 4, 6, 8, 9, 12 or 16 tiles that fit their frame (16:9, the whole matrix visible, no cropping), a maximized view with a bounded PTZ pad, snapshot and MP4 record; a **record library** to filter, preview, play, protect and delete evidence and to download a **proof of custody**.
@@ -59,8 +59,8 @@
 * **Local network:** the *Network* menu shows what the ARMOR-NETWORK node reports (devices, outages, the internet's state and the **public address** with the provider and the place), lets you name, hide and watch devices, order a sweep, a ping or an inspection with a login you give, and the *Network Designer* draws it.
 * **Automatic capture:** in *Configuration > Automatic capture*, photos and video taken by themselves when a camera sees something while the system is armed (how many photos, how often, how long a clip), and the picture's zones to ignore drawn on the camera's frame.
 * **Node firmware and updates:** *Node firmware* updates the field nodes one by one, with a bar for the whole job and for every node, and keeps its state if an alarm takes you to another menu; *Updates* installs Studio's and the server's own new versions from GitHub (showing the release notes of the new version), the operating system's updates and an optional maintenance console.
-* **Configuration in groups:** General (with the server's address and ports) and Preferences; Users, Notifications and Automatic capture; Node firmware and Updates; Services, MQTT broker, Settings files, Installation and Console; each menu of the sidebar is also in foldable groups (Monitor, Security, Energy, House and network, Design, Administration).
-* **Eight languages** (English, Spanish, German, French, Italian, Japanese, Chinese and Portuguese) and sixteen themes, the default one called *Armor*; language, theme and the weather place follow the account, not the browser. Roles: an administrator, an operator, a **viewer** who only looks and a **panel** account that belongs to a wall panel (it cannot sign in to Studio).
+* **Configuration in groups:** General and Preferences; Users, Notifications and Automatic capture; Node firmware and Updates; Server, Services, MQTT broker, Settings files, Installation and Console; each menu of the sidebar is also in foldable groups (Monitor, Security, Energy, House and network, Design, Administration).
+* **Eight languages** (English, Spanish, German, French, Italian, Japanese, Chinese and Portuguese) and eleven themes, the default one called *Armor*; language, theme and the weather place follow the account, not the browser. Roles: an administrator, an operator and a **viewer** who only looks.
 * **A Help that knows the whole system:** a book with four levels of detail and a picture with example data of each main menu, a guided tour for every menu, tooltips on everything, and an **assistant** (a mascot you can drag anywhere, pin where you want and ask in writing) with a dictionary in eight languages and a bubble that opens on the side that has room. The menus where you are working stay open while you visit another one.
 
 ## 🖼️ Screenshots
@@ -84,16 +84,13 @@ flowchart LR
     B["Browser"] -->|"static files"| H["tools/serve.mjs (static host)"]
     B -->|"HttpOnly session, JSON, MJPEG"| S["ARMOR-SERVER"]
     H -->|"/armor-config.json"| B
-    B -->|"container image: one origin"| N["nginx (static files + /api/ proxy)"]
-    N -->|"/api/"| S
 ```
 
 ## 🔒 Security model
 
 * **No secrets in the browser.** Camera passwords are entered once, sent to the server and shown afterwards only as a masked "stored" state. Site exports drop usernames and credential flags.
 * **Stored settings are untrusted input.** They are parsed value by value: an invalid origin, theme, language or shape is dropped, positions are clamped and lists are capped.
-* **What the browser keeps.** For each server, a copy of the drawings (site, electrical, network, alarm), the names and addresses of the cameras and the preferences; never a password, a token or a session. Signing out empties what the menus hold in memory (the console's output, the firmware job). A snapshot address that carries a login is refused.
-* **Third parties only for the weather.** Fonts are local. The Weather menu, which asks nothing until the account has a place saved, talks to Open-Meteo (forecast), RainViewer (rain radar), EUMETSAT and ArcGIS (satellite image and base map). The static host and the container's nginx send `Content-Security-Policy: default-src 'self'` limited to the configured server and those weather services, `frame-ancestors 'none'`, `nosniff` and `no-referrer` on every file, not only on the page.
+* **No third-party requests.** Fonts are local stacks; the static host sends `Content-Security-Policy: default-src 'self'` limited to the configured server, `frame-ancestors 'none'`, `nosniff` and `no-referrer`.
 * Live video is shown only through a stream address the server issues to an operator.
 
 ## 📂 Repository Structure
@@ -112,7 +109,7 @@ ARMOR-STUDIO/
 │   ├── assistant/    the mascot, its dictionary in eight languages and where its bubble opens
 │   ├── tour/         a guided tour for every menu
 │   ├── weather/      the Weather menu: radar map, clouds, forecast
-│   └── ...           ConfigurationPanel (tabs: General, Preferences, Users, Notifications, Automatic capture, Node firmware, Updates, Services, Broker, Files, Installation, Console), MediaLibrary, HistoryView, StudioLogin, one *Text.ts per area (eight languages)
+│   └── ...           ConfigurationPanel (tabs: General, Preferences, Users, Notifications, Automatic capture, Node firmware, Updates, Server, Services, Broker, Files, Installation, Console), MediaLibrary, HistoryView, StudioLogin, one *Text.ts per area (eight languages)
 ├── public/help/      the pictures of the Help, one set per language
 ├── e2e/              browser tests (Playwright)
 ├── tools/            serve.mjs (+ tests)
@@ -128,14 +125,12 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 481 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
+npm test            # 449 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```
 
-`tools/serve.mjs` reads `ARMOR_STUDIO_HOST` (default `127.0.0.1`), `ARMOR_STUDIO_PORT` (`5178`), `ARMOR_STUDIO_DIST`, `ARMOR_CONNECTION_FILE` (the `connection.json` an administrator saves from Studio: its Studio port wins), `TLS_CERT_PATH` with `TLS_KEY_PATH` (to serve over https as well) and `ARMOR_SERVER_ORIGIN`, which may list several servers separated by commas. The server must have `ARMOR_STUDIO_ORIGIN` set to the address Studio is served from (CORS).
-
-The container image (`Dockerfile`) serves the build with nginx and proxies `/api/` to the server (`ARMOR_SERVER_UPSTREAM`): the browser talks only to Studio's own origin, `ARMOR_PUBLIC_ORIGIN` is `same-origin` unless a deployment names another, and no CORS opening is needed. To install the whole stack on the CM5 test bench see [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS).
+`tools/serve.mjs` reads `ARMOR_STUDIO_HOST` (default `127.0.0.1`), `ARMOR_STUDIO_PORT` (`5178`), `ARMOR_STUDIO_DIST` and `ARMOR_SERVER_ORIGIN`. To install the whole stack on the CM5 test bench see [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS).
 
 ## 🔗 Related Projects
 

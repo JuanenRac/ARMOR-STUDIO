@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-481%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.7.9-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Tests-449%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Version-0.8.0.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**正直さのチェック - 今日動いているもの:** Studio は [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) と通信し、481 件のユニットテスト（設定の解析、カメラの統合、ソーラーグラフの計算、設計ツールの幾何と検査、警報アナウンサー、アシスタントの辞書、8 言語での全メニューの描画、静的ホスト）とブラウザテストでカバーされています。CM5 テストベンチで、実際のサーバー、実際の IP カメラ、基板上のレーダーノードと組み合わせて日常的に動作しており、ヘルプの画像は例示データで作られています。**まだ**証明されていないもの：あらゆるカメラでのライブ映像と PTZ、実機でのソーラー・電気・警報盤・タッチパネルのメニュー（存在するのはレーダーノードのみ）、正式なアクセシビリティ・ユーザビリティ評価。サーバーに接続できない間、Studio はデモデータを表示し、上部バーでそれを示します。
+**正直さのチェック - 今日動いているもの:** Studio は [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) と通信し、449 件のユニットテスト（設定の解析、カメラの統合、ソーラーグラフの計算、設計ツールの幾何と検査、警報アナウンサー、アシスタントの辞書、8 言語での全メニューの描画、静的ホスト）とブラウザテストでカバーされています。CM5 テストベンチで、実際のサーバー、実際の IP カメラ、基板上のレーダーノードと組み合わせて日常的に動作しており、ヘルプの画像は例示データで作られています。**まだ**証明されていないもの：あらゆるカメラでのライブ映像と PTZ、実機でのソーラー・電気・警報盤・タッチパネルのメニュー（存在するのはレーダーノードのみ）、正式なアクセシビリティ・ユーザビリティ評価。サーバーに接続できない間、Studio はデモデータを表示し、上部バーでそれを示します。
 
 ---
 
@@ -37,15 +37,15 @@
 
 | | |
 |---|---|
-| バージョン | `0.7.9` |
+| バージョン | `0.8.0.0` |
 | 成熟度 | 確立 |
-| テスト | 481 (`npm test`) |
+| テスト | 449 (`npm test`) |
 | 技術 | React 19 / TypeScript / Vite |
 | 実機での確認 | CM5 テストベンチ（実サーバー、実際の IP カメラ、実際のレーダーノード）で毎日使用。ソーラー・電気・警報盤・タッチパネルのメニューは実ノードを待っています |
 
 ## 🎯 概要
 
-**ARMOR-STUDIO** はオペレーターのコンソールです。カメラのパスワード、RTSP アドレス、トークンを決して持ちません。ユーザー名とパスワードでサーバーにサインインし、**HttpOnly** セッション（既定は 7 日。サーバーが `ARMOR_STUDIO_SESSION_TTL_MS` で決めます）を受け取り、権限の要る操作はすべてそのセッションを通ります。
+**ARMOR-STUDIO** はオペレーターのコンソールです。カメラのパスワード、RTSP アドレス、トークンを決して持ちません。ユーザー名とパスワードでサーバーにサインインし、8 時間の **HttpOnly** セッションを受け取り、権限の要る操作はすべてそのセッションを通ります。
 
 * **概要とシステム：**境界の状態、各部分のタイル（警報盤、レーダー、カメラ、デバイス、エネルギー、ネットワーク、サーバー）、すべてのデバイスと警報を載せた設計のライブマップ、注意が必要なもの。すべてスクロールなしの 1 画面で、管理者にはシステムページと監査記録があります。
 * **カメラモニター：**枠に収まる 1、2、4、6、8、9、12、16 タイル（16:9、マトリクス全体が見え、切り取りなし）、範囲を限った PTZ パッド付きの拡大表示、スナップショットと MP4 録画。**録画ライブラリ**で証拠のフィルター、プレビュー、再生、保護、削除、**保管証明**のダウンロードができます。
@@ -59,8 +59,8 @@
 * **ローカルネットワーク：***ネットワーク*メニューは ARMOR-NETWORK ノードの報告（デバイス、停止、インターネットの状態、プロバイダーと場所付きの**公開アドレス**）を表示し、デバイスの命名、非表示、監視、スキャン・ping・あなたが渡したログインでの検査の指示ができ、*ネットワークデザイナー*がそれを描きます。
 * **自動撮影：***設定 > 自動撮影*で、システムが警戒中にカメラが何かを捉えると写真と動画を自動で撮影（枚数、間隔、クリップの長さ）し、無視する映像ゾーンをカメラのフレーム上に描きます。
 * **ノードファームウェアとアップデート：***ノードファームウェア*はフィールドノードを 1 台ずつ更新し、全体と各ノードにバーを表示し、警報で別メニューに移っても状態を保ちます。*アップデート*は GitHub から Studio とサーバーの新バージョン（新バージョンの更新内容も表示）、OS の更新、任意の保守コンソールをインストールします。
-* **グループ化された設定：**一般（サーバーのアドレスとポートを含む）と設定項目、ユーザー・通知・自動撮影、ノードファームウェアとアップデート、サービス・MQTT ブローカー・設定ファイル・インストール・コンソール。サイドバーの各メニューも折りたたみ可能なグループ（監視、セキュリティ、エネルギー、家とネットワーク、設計、管理）に分かれています。
-* **8 言語**（英語、スペイン語、ドイツ語、フランス語、イタリア語、日本語、中国語、ポルトガル語）と 16 のテーマ（既定は *Armor*）。言語、テーマ、天気の場所はブラウザではなくアカウントに従います。ロール：管理者、オペレーター、閲覧だけの **viewer**、壁面パネル用の **panel** アカウント（Studio にはサインインできません）。
+* **グループ化された設定：**一般と設定項目、ユーザー・通知・自動撮影、ノードファームウェアとアップデート、サーバー・サービス・MQTT ブローカー・設定ファイル・インストール・コンソール。サイドバーの各メニューも折りたたみ可能なグループ（監視、セキュリティ、エネルギー、家とネットワーク、設計、管理）に分かれています。
+* **8 言語**（英語、スペイン語、ドイツ語、フランス語、イタリア語、日本語、中国語、ポルトガル語）と 11 のテーマ（既定は *Armor*）。言語、テーマ、天気の場所はブラウザではなくアカウントに従います。ロール：管理者、オペレーター、閲覧だけの **viewer**。
 * **システム全体を知っているヘルプ：**4 段階の詳しさを持つ本と各主要メニューの例示データ付き画像、メニューごとのガイドツアー、あらゆるもののヒント、そして**アシスタント**（どこへでもドラッグでき、好きな場所に固定でき、文字で質問できるマスコット）。8 言語の辞書と、空きのある側に開く吹き出し付き。作業中のメニューは、別のメニューを見ている間も開いたままです。
 
 ## 🖼️ スクリーンショット
@@ -84,16 +84,13 @@ flowchart LR
     B["Browser"] -->|"static files"| H["tools/serve.mjs (static host)"]
     B -->|"HttpOnly session, JSON, MJPEG"| S["ARMOR-SERVER"]
     H -->|"/armor-config.json"| B
-    B -->|"container image: one origin"| N["nginx (static files + /api/ proxy)"]
-    N -->|"/api/"| S
 ```
 
 ## 🔒 セキュリティモデル
 
 * **ブラウザーにシークレットはありません。** カメラのパスワードは一度入力してサーバーに送り、その後はマスクされた「保存済み」の状態でしか表示されません。サイトのエクスポートはユーザー名と認証情報のフラグを除きます。
 * **保存された設定は信頼できない入力です。** 値ごとに読み取られ、無効なオリジン、テーマ、言語、形は捨てられ、位置は範囲内に収められ、リストは上限が設けられます。
-* **ブラウザーが保持するもの。** サーバーごとに、図面（サイト、電気、ネットワーク、アラーム）のコピー、カメラの名前とアドレス、設定。パスワード、トークン、セッションは保持しません。サインアウトすると、メニューがメモリに持つもの（コンソールの出力、ファームウェアの作業）は空になります。ログイン情報を含むスナップショットのアドレスは拒否されます。
-* **サードパーティは天気のためだけです。** フォントはローカルのものです。天気メニューは、アカウントに場所が保存されるまで何も要求せず、Open-Meteo（予報）、RainViewer（雨雲レーダー）、EUMETSAT と ArcGIS（衛星画像と地図）と通信します。静的ホストとコンテナの nginx は、設定されたサーバーとこれらの気象サービスに限定した `Content-Security-Policy: default-src 'self'`、`frame-ancestors 'none'`、`nosniff`、`no-referrer` を、ページだけでなくすべてのファイルに付けて送ります。
+* **サードパーティへのリクエストはありません。** フォントはローカルのものです。静的ホストは、設定されたサーバーに限定した `Content-Security-Policy: default-src 'self'`、`frame-ancestors 'none'`、`nosniff`、`no-referrer` を送ります。
 * ライブ映像は、サーバーがオペレーターに発行するストリームアドレスを通じてのみ表示されます。
 
 ## 📂 リポジトリの構成
@@ -112,7 +109,7 @@ ARMOR-STUDIO/
 │   ├── assistant/    the mascot, its dictionary in eight languages and where its bubble opens
 │   ├── tour/         a guided tour for every menu
 │   ├── weather/      the Weather menu: radar map, clouds, forecast
-│   └── ...           ConfigurationPanel (tabs: General, Preferences, Users, Notifications, Automatic capture, Node firmware, Updates, Services, Broker, Files, Installation, Console), MediaLibrary, HistoryView, StudioLogin, one *Text.ts per area (eight languages)
+│   └── ...           ConfigurationPanel (tabs: General, Preferences, Users, Notifications, Automatic capture, Node firmware, Updates, Server, Services, Broker, Files, Installation, Console), MediaLibrary, HistoryView, StudioLogin, one *Text.ts per area (eight languages)
 ├── public/help/      the pictures of the Help, one set per language
 ├── e2e/              browser tests (Playwright)
 ├── tools/            serve.mjs (+ tests)
@@ -128,14 +125,12 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 481 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
+npm test            # 449 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```
 
-`tools/serve.mjs` は `ARMOR_STUDIO_HOST`（既定 `127.0.0.1`）、`ARMOR_STUDIO_PORT`（`5178`）、`ARMOR_STUDIO_DIST`、`ARMOR_CONNECTION_FILE`（管理者が Studio から保存する `connection.json`。その Studio のポートが優先されます）、`TLS_CERT_PATH` と `TLS_KEY_PATH`（https でも配信する場合）、`ARMOR_SERVER_ORIGIN`（カンマ区切りで複数のサーバーを並べられます）を読みます。サーバー側では `ARMOR_STUDIO_ORIGIN` を Studio が配信されるアドレスに合わせる必要があります（CORS）。
-
-コンテナイメージ（`Dockerfile`）は nginx でビルドを配信し、`/api/` をサーバー（`ARMOR_SERVER_UPSTREAM`）へ中継します。ブラウザーは Studio 自身のオリジンとだけ通信し、`ARMOR_PUBLIC_ORIGIN` は展開先が別のものを指定しない限り `same-origin` で、CORS を開く必要はありません。CM5 テストベンチにスタック全体をインストールするには [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS) を参照。
+`tools/serve.mjs` は `ARMOR_STUDIO_HOST`（既定 `127.0.0.1`）、`ARMOR_STUDIO_PORT`（`5178`）、`ARMOR_STUDIO_DIST`、`ARMOR_SERVER_ORIGIN` を読みます。CM5 テストベンチにスタック全体をインストールするには [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS) を参照。
 
 ## 🔗 関連プロジェクト
 

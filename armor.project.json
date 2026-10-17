@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "ecosystem": "A.R.M.O.R.",
   "name": "ARMOR-STUDIO",
-  "version": "0.7.9",
+  "version": "0.8.0.0",
   "role": "Web administration and calibration console",
   "stack": "React 19 / TypeScript / Vite",
   "technologies": [
@@ -15,7 +15,7 @@
   "maturity": "established",
   "family": "Clients",
   "parent": "ARMOR-SERVER",
-  "native_version": "0.7.9",
+  "native_version": "0.8.0.0",
   "build": "npm run typecheck && npm test && npm run build",
   "notes": "Operational browser dashboard for the A.R.M.O.R. server API. Studio keeps no password, token or session in the browser; it keeps, per server, the drawings, the camera names and addresses and the preferences."
 }
