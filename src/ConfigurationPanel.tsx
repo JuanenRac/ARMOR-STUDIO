@@ -68,14 +68,14 @@ function ServerSettings({ t, origin, isAdmin }: { t: (key: string) => string; or
     setForm({ host: next.saved.host ?? "", port: next.saved.port === undefined ? "" : String(next.saved.port), studio_port: next.saved.studio_port === undefined ? "" : String(next.saved.studio_port) });
   };
   useEffect(() => { if (isAdmin) void readConnection(origin).then(apply).catch(() => setMessage(t("cs_admin_only"))); }, [origin, isAdmin]);   // eslint-disable-line react-hooks/exhaustive-deps
-  if (!isAdmin) return <article className="stack-card"><p className="eyebrow">{t("gen_server_kicker")}</p><h3>{t("cs_title")}</h3><p className="muted">{t("cs_admin_only")}</p></article>;
+  if (!isAdmin) return <article className="stack-card wide-card"><p className="eyebrow">{t("gen_server_kicker")}</p><h3>{t("cs_title")}</h3><p className="muted">{t("cs_admin_only")}</p></article>;
   const save = async () => {
     const number = (value: string) => value.trim() === "" ? undefined : Number(value);
     try { apply(await saveConnection(origin, { host: form.host.trim() || undefined, port: number(form.port), studio_port: number(form.studio_port) })); setMessage(t("cs_done")); }
     catch (error) { setMessage(t("cs_error") + (error instanceof Error ? error.message : "")); }
   };
   const field = (key: "host" | "port" | "studio_port", label: string, help?: string) => <div className="camera-field"><label><span>{label}</span><input value={form[key]} inputMode={key === "host" ? "text" : "numeric"} placeholder={t("cs_leave_empty")} onChange={event => setForm(current => ({ ...current, [key]: event.target.value }))} /></label>{help && <p className="field-help">{help}</p>}</div>;
-  return <article className="stack-card camera-form"><p className="eyebrow">{t("gen_server_kicker")}</p><h3>{t("cs_title")}</h3><p className="muted">{t("cs_help")}</p>
+  return <article className="stack-card camera-form wide-card"><p className="eyebrow">{t("gen_server_kicker")}</p><h3>{t("cs_title")}</h3><p className="muted">{t("cs_help")}</p>
     {state && <p className="notice"><b>{t("cs_active")}:</b> {state.active.host}:{state.active.port}{state.active.tls ? " (https)" : ""}</p>}
     {field("host", t("cs_host"), t("cs_host_help"))}{field("port", t("cs_port"))}{field("studio_port", t("cs_studio_port"))}
     <div className="camera-form-actions"><button className="primary" onClick={() => void save()}>{t("cs_save")}</button></div>

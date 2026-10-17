@@ -11,8 +11,8 @@ export function parseReleaseNotes(notes: string): NoteLine[] {
     const line = raw.trim();
     if (!line || /^#{1,6}\s/.test(line)) continue;   // blank lines and headings (the version is already in the title)
     const item = /^[-*]\s+(.*)$/.exec(line);
-    lines.push({ kind: item ? "item" : "text", text: (item ? item[1]! : line).replace(/[*_`]/g, "").slice(0, 600) });
-    if (lines.length >= 60) break;
+    lines.push({ kind: item ? "item" : "text", text: (item ? item[1]! : line).replace(/[*_`]/g, "").slice(0, 1500) });
+    if (lines.length >= 300) break;
   }
   return lines;
 }

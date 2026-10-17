@@ -78,7 +78,12 @@
 .config-tabs .tab-sep { align-self: stretch; width: 1px; margin: 0 .3rem; background: #285363; }
 
 /* the release notes of a program, under its row in Updates */
-.mt-notes { padding: .55rem .8rem; margin: .1rem 0 .5rem; border: 1px solid #285363; border-radius: 8px; background: #071923; max-height: 16rem; overflow-y: auto; }
+.mt-notes { padding: .55rem .8rem; margin: .1rem 0 .5rem; border: 1px solid #285363; border-radius: 8px; background: #071923; max-height: 30rem; overflow-y: auto; }
 .mt-notes strong { display: block; margin-bottom: .35rem; color: #e9ffff; font-size: .78rem; }
 .mt-notes ul { margin: 0; padding-left: 1.1rem; } .mt-notes li { margin: 0 0 .3rem; font-size: .74rem; line-height: 1.45; color: #c3dde3; }
 .mt-notes .mt-notes-text { list-style: none; margin-left: -1.1rem; }
+
+/* A card with long sentences takes two columns of the grid of General, so its text runs on two lines and not five in a narrow column. */
+.config-grid .wide-card { grid-column: span 2; }
+.config-grid .wide-card .muted, .config-grid .wide-card .eyebrow { max-width: none; }
+@media (max-width: 900px) { .config-grid .wide-card { grid-column: 1 / -1; } }

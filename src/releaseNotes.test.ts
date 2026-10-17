@@ -10,8 +10,8 @@ describe("the notes of a release", () => {
   });
   it("are bounded, and an empty release has no lines", () => {
     expect(parseReleaseNotes("")).toEqual([]);
-    expect(parseReleaseNotes(Array.from({ length: 200 }, (_, i) => `- point ${i}`).join("\n"))).toHaveLength(60);
-    expect(parseReleaseNotes(`- ${"x".repeat(5000)}`)[0]!.text).toHaveLength(600);
+    expect(parseReleaseNotes(Array.from({ length: 400 }, (_, i) => `- point ${i}`).join("\n"))).toHaveLength(300);
+    expect(parseReleaseNotes(`- ${"x".repeat(5000)}`)[0]!.text).toHaveLength(1500);
   });
   it("never keep a link or an html tag as something to follow", () => {
     const [line] = parseReleaseNotes("- <script>alert(1)</script> [site](http://x)");

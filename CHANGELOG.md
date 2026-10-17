@@ -34,6 +34,7 @@ All notable changes to this project are documented here.
 - The risk of a device can go back to its default, the history no longer jumps back to its first page, a firmware job that the server forgot ends instead of spinning, stopping or restarting the broker asks first, and a failed PTZ command is no longer an unhandled error.
 - A snapshot address that carries a login is refused and never stored; a colour such as `toString` in an imported drawing is no longer accepted.
 - The static host knows the picture, sound and font types and lets a Studio served without a configured server reach an https server.
+- **Updates:** the release notes of a new version are shown whole (up to 300 lines), and the General tab gives the server's card two columns so its sentences take two lines instead of five.
 - **Documentation:** the security model is rewritten, and the README (in the eight languages) now describes the session, the weather exception, the environment variables and the container.
 
 ## [0.7.9] - Zones of the picture to ignore
