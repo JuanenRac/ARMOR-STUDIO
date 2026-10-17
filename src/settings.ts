@@ -280,7 +280,8 @@ export function parseStudioSettings(raw: string | null): Partial<StudioSettings>
  * the server keeps passwords, and Studio never receives them.
  */
 export function serializeStudioSettings(settings: StudioSettings): string {
-  return JSON.stringify(settings);
+  // The user name of a camera is the server's to say (it comes with the list of cameras): it is not kept in the browser.
+  return JSON.stringify(Array.isArray(settings.cameras) ? { ...settings, cameras: settings.cameras.map(({ username: _username, ...camera }) => camera) } : settings);
 }
 
 /** The site-export document (no credentials by construction). */

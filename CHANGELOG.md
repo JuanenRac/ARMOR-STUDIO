@@ -23,7 +23,7 @@ All notable changes to this project are documented here.
 - The README is rewritten in the eight languages with screenshots taken at 1920x1080.
 - **Drawings kept per server:** the site, electrical, network and alarm drawings are saved in the browser for each server, with the revision they were made from; an edit made while the connection was down is sent when it returns, and one server's plan is never offered to another. A short break in the session check no longer reads the server's copy over what was being edited, and a save that comes due during a read waits for it instead of being lost. One shared code now keeps the three drawings in step.
 - **One server at a time:** the address in Configuration is applied when it is finished, signing out closes the session on the server that opened it, and the server Studio talks to is always the one the person signed in to.
-- **Nothing left behind after signing out:** the output of the console and the firmware job are forgotten, and no camera password is kept in the page.
+- **Nothing left behind after signing out:** the output of the console and the firmware job are forgotten, and no camera password is kept in the page; the user name of a camera is no longer stored in the browser either.
 - **Hidden menus stop asking:** a menu that stays open but hidden, and a tab in the background, no longer poll the server (the alarms keep arriving); this ends the 429 refusals a viewer got after visiting several menus.
 - **Keys of the three designers** only act in the designer that is on screen: a hidden one moved, deleted and undid things nobody saw.
 - **The sign-in screen speaks the language of the browser** (or the last one used), says what the session is, and works with the browser's storage blocked.
