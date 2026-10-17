@@ -62,7 +62,7 @@ export function ElectricalView({ openDevices, t, origin, readings, unreachable, 
       <MenuLogo kind="electrical" size={68} />
       <div className="solar-title"><p className="eyebrow">{t("navEnergy")}</p><h2>{t("electrical")}</h2><span className="muted">{t("electricalLiveHelp")}</span></div>
       {totals && <div className="solar-totals">
-        <Tile label={t("elLiveGrid")} value={totals.grid_w === null ? "–" : formatPower(totals.grid_w)} />
+        <Tile label={t("elLiveGrid")} value={totals.grid_w === null ? "–" : `${totals.grid_estimated ? "≈ " : ""}${formatPower(totals.grid_w)}`} title={totals.grid_estimated ? t("elEstimatedTip") : undefined} />
         <Tile label={t("elLiveEnergy")} value={totals.grid_kwh === null ? "–" : formatEnergy(totals.grid_kwh)} />
         <Tile label={t("elLiveNodes")} value={`${totals.nodes - totals.stale}/${totals.nodes}`} />
         <Tile label={t("elLiveAlarms")} value={String(totals.alarms)} bad={totals.alarms > 0} />
@@ -78,8 +78,8 @@ export function ElectricalView({ openDevices, t, origin, readings, unreachable, 
   </div>;
 }
 
-function Tile({ label, value, bad = false }: { label: string; value: string; bad?: boolean }) {
-  return <div className="solar-tile" style={{ borderColor: bad ? "#ff6f7988" : "#22d3ee55" }}><small>{label}</small><b style={{ color: bad ? "#ff8e99" : "#5df0c4" }}>{value}</b></div>;
+function Tile({ label, value, bad = false, title }: { label: string; value: string; bad?: boolean; title?: string }) {
+  return <div className="solar-tile" title={title} style={{ borderColor: bad ? "#ff6f7988" : "#22d3ee55" }}><small>{label}</small><b style={{ color: bad ? "#ff8e99" : "#5df0c4" }}>{value}</b></div>;
 }
 
 function NodeCard({ t, origin, node, drawn, now }: { t: Translate; origin: string; node: ElectricalNodeReading; drawn: boolean; now: number }) {
@@ -103,7 +103,7 @@ function NodeCard({ t, origin, node, drawn, now }: { t: Translate; origin: strin
 function Channel({ t, channel }: { t: Translate; channel: ElectricalChannelReading }) {
   return <div className={`el-row ${channel.alarm ? "alarm" : ""}`} role="row">
     <span><b>{channel.label ?? channel.id}</b><small>{channel.domain.toUpperCase()}</small></span>
-    <span>{number(channel.voltage_v, 1, "")}</span><span>{number(channel.current_a, 2, "")}</span><span>{number(channel.power_w, 0, "")}</span>
+    <span>{number(channel.voltage_v, 1, "")}</span><span>{number(channel.current_a, 2, "")}</span><span title={channel.power_estimated ? t("elEstimatedTip") : undefined}>{channel.power_estimated && channel.power_w !== undefined ? "≈ " : ""}{number(channel.power_w, 0, "")}</span>
     <span>{number(channel.energy_kwh, 2, "")}</span><span>{number(channel.frequency_hz, 1, "")}</span><span>{number(channel.power_factor, 2, "")}</span>
     <span className={channel.alarm ? "fail" : channel.state === "open" ? "warn" : "ok"}>{channel.alarm ? (channel.alarm_code ?? t("elLiveAlarm")) : channel.state ? t(`elLive_${channel.state}`) : "–"}</span>
   </div>;

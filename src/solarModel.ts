@@ -12,6 +12,8 @@ export type SolarInverterReading = {
   battery_v: number; battery_a: number; battery_percent: number; pv_v: number; pv_a: number; pv_w: number; heatsink_c: number;
   ac_charging: boolean; pv_charging: boolean; load_on: boolean; warnings: string[];
   /** A second PV input (pv_w is already the sum of both) and, for a parallel system, the totals and the units the node reads. */
+  /** False: this inverter's dialect cannot ask for its warnings, so the empty list means unknown, not none. */
+  warnings_known?: boolean;
   pv2_v?: number; pv2_a?: number; pv2_w?: number;
   /** The DC bus voltage inside the inverter, when it says it. */
   bus_v?: number;

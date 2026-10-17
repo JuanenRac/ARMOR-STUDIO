@@ -40,6 +40,7 @@ const ROWS: Record<string, Row> = {
   apState_normal: ["closed", "cerrada", "geschlossen", "fermée", "chiusa", "正常", "正常"],
   apState_triggered: ["open", "abierta", "offen", "ouverte", "aperta", "作動", "触发"],
   apState_tamper: ["tamper", "sabotaje", "Sabotage", "sabotage", "manomissione", "改ざん", "防拆"],
+  apState_trouble: ["cannot be read", "no se puede leer", "nicht lesbar", "illisible", "non leggibile", "読み取り不可", "无法读取"],
   apBypassed: ["left out", "excluida", "ausgeschlossen", "exclue", "esclusa", "除外中", "已旁路"],
   apOpenNow: ["Open now", "Abiertas ahora", "Jetzt offen", "Ouvertes maintenant", "Aperte ora", "現在開いている区域", "当前打开"],
   apEvents: ["Latest events", "Últimos eventos", "Letzte Ereignisse", "Derniers événements", "Ultimi eventi", "直近のイベント", "最近事件"],
@@ -98,6 +99,7 @@ const ROWS: Record<string, Row> = {
   alarm_duress_disarm: ["The system was disarmed with the duress PIN: somebody may be being forced", "El sistema se desarmó con el PIN de coacción: puede que alguien esté siendo obligado", "Das System wurde mit der Zwangs-PIN entschärft: Jemand wird möglicherweise gezwungen", "Le système a été désarmé avec le code de contrainte : quelqu'un est peut-être forcé", "Il sistema è stato disattivato con il PIN di coercizione: qualcuno potrebbe essere costretto", "脅迫用 PIN でシステムが解除されました。誰かが強要されているかもしれません", "系统是用胁迫 PIN 撤防的：可能有人被迫"],
   alarm_alarm_sounding: ["The alarm is sounding", "La alarma está sonando", "Die Alarmanlage schlägt Alarm", "L'alarme sonne", "L'allarme sta suonando", "警報が鳴っています", "报警正在响"],
   alarm_alarm_tamper: ["A zone of the alarm shows tamper (a cut or shorted wire)", "Una zona de la alarma indica sabotaje (cable cortado o en cortocircuito)", "Eine Zone der Alarmanlage meldet Sabotage (Draht durchtrennt oder kurzgeschlossen)", "Une zone de l'alarme signale un sabotage (fil coupé ou en court-circuit)", "Una zona dell'allarme segnala manomissione (filo tagliato o in cortocircuito)", "警報の区域で改ざんを検出（断線またはショート）", "报警防区显示被拆（线路被剪断或短路）"],
+  alarm_alarm_zone_trouble: ["A zone of the alarm cannot be read: it is not guarding", "Una zona de la alarma no se puede leer: no está vigilando", "Eine Zone der Alarmanlage lässt sich nicht lesen: sie überwacht nicht", "Une zone de l'alarme ne peut pas être lue : elle ne surveille pas", "Una zona dell'allarme non si può leggere: non sta sorvegliando", "警報のゾーンを読み取れません。監視していません", "报警的一个防区无法读取：它没有在守护"],
   alarm_alarm_locked_out: ["The alarm panel is locked out after wrong PINs", "La central de alarma está bloqueada tras PIN erróneos", "Die Alarmzentrale ist nach falschen PINs gesperrt", "La centrale d'alarme est verrouillée après de mauvais PIN", "La centrale d'allarme è bloccata dopo PIN errati", "警報盤が誤った PIN によりロックされています", "报警主机因 PIN 错误被锁定"],
   alarm_alarm_offline: ["An alarm node stopped reporting", "Un nodo de alarma ha dejado de informar", "Ein Alarmknoten meldet sich nicht mehr", "Un nœud d'alarme a cessé de rapporter", "Un nodo d'allarme ha smesso di riferire", "警報ノードが報告しなくなりました", "报警节点停止上报"],
 };

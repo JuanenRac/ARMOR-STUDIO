@@ -105,7 +105,7 @@ function InverterPanel({ t, inverter, now, history, minutes, setMinutes }: { t: 
       </div>
       <div className="solar-warnings">
         <small>{t("solarWarnings")}</small>
-        {r.warnings.length === 0 ? <span className="solar-chip ok">{t("solarNoWarnings")}</span> : r.warnings.map(name => <span key={name} className="solar-chip bad">{humanize(name)}</span>)}
+        {r.warnings.length === 0 ? (r.warnings_known === false ? <span className="solar-chip" title={t("solarWarningsUnknownTip")}>{t("solarWarningsUnknown")}</span> : <span className="solar-chip ok">{t("solarNoWarnings")}</span>) : r.warnings.map(name => <span key={name} className="solar-chip bad">{humanize(name)}</span>)}
       </div>
     </section>
     <UnitInfoCard t={t} reading={r} />

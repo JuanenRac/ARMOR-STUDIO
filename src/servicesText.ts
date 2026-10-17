@@ -63,6 +63,7 @@ const ROWS: Record<string, Row> = {
   svcDesc_electrical: ["Electrical node", "Nodo eléctrico", "Elektrischer Knoten", "Nœud électrique", "Nodo elettrico", "電気ノード", "电气节点"],
   svcDesc_alarm: ["Alarm panel node", "Nodo central de alarma", "Alarmzentrale", "Nœud centrale d'alarme", "Nodo centrale d'allarme", "警報盤ノード", "报警主机节点"],
   svcDesc_solar: ["Solar gateway node", "Nodo pasarela solar", "Solar-Gateway-Knoten", "Nœud passerelle solaire", "Nodo gateway solare", "太陽光ゲートウェイノード", "光伏网关节点"],
+  svcDesc_hmi: ["Wall panel (screen)", "Panel de pared (pantalla)", "Wandpanel (Bildschirm)", "Panneau mural (écran)", "Pannello a parete (schermo)", "壁掛けパネル（画面）", "壁挂面板（屏幕）"],
   svcUnit: ["Unit", "Unidad", "Einheit", "Unité", "Unità", "ユニット", "单元"],
   svcPid: ["PID", "PID", "PID", "PID", "PID", "PID", "PID"],
   svcMemory: ["Memory", "Memoria", "Speicher", "Mémoire", "Memoria", "メモリ", "内存"],

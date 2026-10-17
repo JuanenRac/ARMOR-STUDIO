@@ -511,7 +511,7 @@ export async function saveElectrical(origin: string, revision: number, electrica
 
 // ---- what the ARMOR-ELECTRICAL nodes measure -------------------------------------------------------------------------------------------
 export type ElectricalChannelReading = {
-  id: string; domain: "ac" | "dc"; label?: string; voltage_v?: number; current_a?: number; power_w?: number; energy_kwh?: number; frequency_hz?: number; power_factor?: number;
+  id: string; domain: "ac" | "dc"; label?: string; voltage_v?: number; current_a?: number; power_w?: number; energy_kwh?: number; power_estimated?: boolean; frequency_hz?: number; power_factor?: number;
   state?: "closed" | "open" | "unknown"; alarm?: boolean; alarm_code?: string;
 };
 /** A switch of a node (a source transfer): what its auxiliary contacts show, never what was asked. Studio only reads it: nothing here sends a command. */
@@ -520,7 +520,7 @@ export type ElectricalSwitchReading = {
   selected: "none" | "a" | "b"; wanted: "none" | "a" | "b"; closing: boolean; armed: boolean; fault: "none" | "did_not_close" | "did_not_open" | "both_closed" | "disabled";
 };
 export type ElectricalNodeReading = { node_id: string; reading: { kind: "electrical"; node_id: string; timestamp_ms: number; switching_enabled?: boolean; channels: ElectricalChannelReading[]; switches?: ElectricalSwitchReading[] }; received_at: string; stale: boolean };
-export type ElectricalReadings = { nodes: ElectricalNodeReading[]; totals: { nodes: number; channels: number; stale: number; grid_w: number | null; grid_kwh: number | null; alarms: number } };
+export type ElectricalReadings = { nodes: ElectricalNodeReading[]; totals: { nodes: number; channels: number; stale: number; grid_w: number | null; grid_estimated?: boolean; grid_kwh: number | null; alarms: number } };
 export async function listElectricalReadings(origin: string): Promise<ElectricalReadings> {
   const response = await timedFetch(endpoint(origin, "/api/v1/electrical/readings"), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`Electrical readings returned ${response.status}`);
@@ -537,7 +537,7 @@ export async function listElectricalEnergy(origin: string, days = 7): Promise<El
 
 // ---- the alarm nodes (ARMOR-ALARM) -------------------------------------------------------------------------------------------------------
 export type AlarmPhase = "disarmed" | "exit_delay" | "armed" | "entry_delay" | "alarm";
-export type AlarmZoneReading = { id: string; name?: string; kind: "instant" | "entry" | "interior" | "always"; state: "normal" | "triggered" | "tamper"; bypassed: boolean };
+export type AlarmZoneReading = { id: string; name?: string; kind: "instant" | "entry" | "interior" | "always"; state: "normal" | "triggered" | "tamper" | "trouble"; bypassed: boolean };
 export type AlarmEventReading = { ago_s: number; kind: "armed" | "exit_delay_started" | "entry_delay_started" | "alarm" | "siren_timed_out" | "disarmed" | "bad_pin" | "locked_out" | "zone_bypassed"; zone?: string };
 export type AlarmState = {
   kind: "alarm"; node_id: string; timestamp_ms: number; phase: AlarmPhase; mode: "disarmed" | "away" | "stay"; siren: boolean; locked_out: boolean; commands_enabled: boolean;
