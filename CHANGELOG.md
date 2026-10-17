@@ -9,6 +9,10 @@ All notable changes to this project are documented here.
 
 - **The assistant's voice stops when it should:** the mouth no longer goes on moving after the voice has finished, and pressing "tell me more" (or changing menu) several times no longer makes the voice read the previous text before the new one. Each reading has its own number, so what a cut-off reading reports late cannot end the new one; a browser that never says it has finished is noticed within half a second; long texts are read sentence by sentence (a browser stops a long one halfway); and the voice waits a moment before starting, so only the last text is read. Tests with a speech engine that reproduces the late events.
 - **The step-by-step tours have their own mascot and voice:** each step card shows a small guide that moves its mouth while the step is read aloud; the voice and the guide are switched on or off with two buttons in the card itself (and in Preferences > Help), the voice stops when the step changes or the tour is closed, and it uses the voice chosen in Alarm sounds. The guide is on and the voice off by default.
+- **An inverter whose warnings cannot be asked says so:** a REVO inverter has no warning query, so Solar shows its warnings as "unknown" (with an explanation on hover) and not as "none".
+- **Estimated power is marked:** a channel whose power is an estimate (a current input with a nominal voltage) and the grid figure that includes one show "≈" and explain on hover that it is an estimate and can be higher than the real consumption.
+- **A zone the alarm node cannot read is shown:** the zone state "cannot be read" appears in the alarm panels in its own colour, and the warning that the server raises for it has its text in the eight languages.
+- **Wall panels are listed as such:** the services list shows the HMI screens as "Wall panel" and no longer as a radar node.
 
 ## [0.8.0.2] - The way in from outside the house, set up with choices: the VPN, the name that follows the house and the panels of the nodes
 
