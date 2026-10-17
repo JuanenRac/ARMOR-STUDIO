@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here.
 
+## [0.8.0.1] - Security: second factor, open sessions and the settings for using the server from outside the house
+
+- **A Security tab in Configuration** for everybody who signs in, with the account's second factor, the open sessions, a check of how the server sees you and, for an administrator, the settings of outside access.
+- **Second factor (authenticator app):** set it up with your password, add the key to the app (a link opens it on the phone), confirm it with the first code and keep the ten recovery codes, shown only once; turn it off with the password.
+- **Two-step sign-in:** when the account has the second factor on, the sign-in asks for the six-digit code (or a recovery code) as a second step, in the language of the browser, and says why when the server asks for it from outside the house and it has not been set up.
+- **Open sessions:** every browser or phone that is signed in, with where it came from (the house or outside), its address and when it was last used; end one, or all the others.
+- **How the server sees you:** one button shows the address the server sees, whether it counts as the house or outside, the Secure cookie, the trusted proxy and the policy of the second factor, and warns when a phone on mobile data is taken for the house.
+- **Settings of outside access in a form, not a file:** trusted proxy, networks that count as the house, VPN networks, whether the second factor is required from outside, what a session from outside may do (everything, operate the alarm only, only look), how long it lasts and how long it may sit unused; saved in the server's settings file with a restart.
+- **A new proof for critical actions from outside:** when the server asks for it (managing users, starting a firmware update) a dialog asks for the password or a code of the app and the action that was refused is tried again by itself.
+- **The server's refusals are explained:** a firmware release without a valid signature, a policy that only allows something from the house or the VPN, a wrong or locked code, an expired sign-in; each in the eight languages.
+- **Help and hints:** the Configuration page of the Help describes the Security tab and the access from outside, and pointing at the tab says what it is, in the eight languages.
+- **Tests:** the edit of the settings file in place, the dialog and the cards of the tab, and that every phrase of the new screens exists in the eight languages.
+
 ## [0.8.0.0] - A speaking assistant, the overview redesigned and drawings kept per server
 
 - **Connection announcements:** the alarm voice now says aloud when a node, a device or a camera connects, as it already did when one was lost.

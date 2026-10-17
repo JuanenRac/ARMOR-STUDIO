@@ -173,6 +173,7 @@ export const hintsPt: Record<string, string> = {
  "tabDiscovery": "Procurar câmaras na rede local.",
  "tabVideo": "Qualidade do vídeo e opções PTZ.",
  "tabUsers": "Quem pode iniciar sessão no Studio e com que direitos.",
+ "tabSecurity": "Segundo fator, sessões abertas e acesso de fora de casa.",
  "savePreferences": "Guarda o endereço do servidor e as preferências neste navegador.",
  "saveUi": "Guarda o aspeto e o idioma da interface.",
  "serverOrigin": "O endereço que o Studio usa para falar com o servidor ARMOR, por exemplo http://192.168.0.10:18080.",
