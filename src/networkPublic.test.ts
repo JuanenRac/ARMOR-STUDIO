@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { flagOf, publicFacts } from "./networkPublic";
 
-const info = { ip: "203.0.113.9", city: "Exampletown", region: "Murcia", country: "ES", org: "AS12430 VODAFONE ESPANA S.A.U.", timezone: "Europe/Madrid", checked_ms: 0 };
+const info = { ip: "203.0.113.9", city: "Exampleville", region: "Examplestate", country: "ES", org: "AS64500 EXAMPLE NETWORK", timezone: "Europe/Madrid", checked_ms: 0 };
 
 describe("the public connection", () => {
   it("splits the network number from the provider's name", () => {
     const facts = publicFacts(info, "en", Date.UTC(2026, 9, 16, 12, 0));
-    expect(facts.asn).toBe("AS12430");
-    expect(facts.isp).toBe("VODAFONE ESPANA S.A.U.");
+    expect(facts.asn).toBe("AS64500");
+    expect(facts.isp).toBe("EXAMPLE NETWORK");
     expect(facts.version).toBe(4);
   });
   it("keeps an organisation that has no network number as the provider", () => {
