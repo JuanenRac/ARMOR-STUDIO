@@ -1,7 +1,7 @@
 /**
  * The Alarm panels menu: what the ARMOR-ALARM nodes say about the house's alarm, live. The totals (panels, guarding, sounding), one card per node with its phase and mode,
- * its zones and its last events, and - for an administrator, only when the server, the node and the broker all allow it - the buttons that arm and disarm it.
- * A disarm from here asks for the PIN of the signed-in user (the server checks it; the node never sees it); an accepted command is not an armed alarm, and the card shows what the node says next.
+ * its zones and its last events, and - for an administrator, only when the server, the node and the broker all allow it - the buttons that arm and disarm it and, while its siren sounds, silence it.
+ * A disarm (or a silence) from here asks for the PIN of the signed-in user (the server checks it; the node never sees it); an accepted command is not an armed alarm, and the card shows what the node says next.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useEffect, useState } from "react";
@@ -101,7 +101,7 @@ function Tile({ label, value, bad = false }: { label: string; value: string; bad
 
 type Recent = { command_id: string; action: string; mode?: string; accepted: boolean; refusal: string; at: string };
 
-function PanelCard({ t, origin, node, now, canCommand, recent, reload }: { t: Translate; origin: string; node: AlarmNodeView; now: number; canCommand: boolean; recent: Recent[]; reload: () => void }) {
+export function PanelCard({ t, origin, node, now, canCommand, recent, reload }: { t: Translate; origin: string; node: AlarmNodeView; now: number; canCommand: boolean; recent: Recent[]; reload: () => void }) {
   const state = node.state;
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ text: string; bad: boolean } | null>(null);
@@ -110,8 +110,9 @@ function PanelCard({ t, origin, node, now, canCommand, recent, reload }: { t: Tr
   const guarding = state.phase === "armed" || state.phase === "exit_delay" || state.phase === "entry_delay";
   const allowed = canCommand && !node.stale && state.commands_enabled;
   const [askingPin, setAskingPin] = useState(false);
-  const send = async (action: "arm" | "disarm", mode?: "away" | "stay", pin?: string) => {
-    setAskingPin(false);
+  const [askingSilence, setAskingSilence] = useState(false);
+  const send = async (action: "arm" | "disarm" | "silence", mode?: "away" | "stay", pin?: string) => {
+    setAskingPin(false); setAskingSilence(false);
     setBusy(true); setMessage(null);
     try { await sendAlarmCommand(origin, node.node_id, action, mode, force, pin); setMessage({ text: t("apSent"), bad: false }); setForce(false); reload(); }
     catch (error) {
@@ -155,6 +156,8 @@ function PanelCard({ t, origin, node, now, canCommand, recent, reload }: { t: Tr
       <button type="button" disabled={busy || !allowed || state.phase !== "disarmed"} onClick={() => void send("arm", "stay")}>{t("apArmStay")}</button>
       <button type="button" className="danger" disabled={busy || !allowed || state.phase === "disarmed"} onClick={() => setAskingPin(true)}>{t("apDisarm")}</button>
       {askingPin && <PinDialog title={t("apDisarm")} text={fill(t("apConfirmDisarm"), node.node_id)} confirmLabel={t("apDisarm")} confirm={pin => void send("disarm", undefined, pin)} cancel={() => setAskingPin(false)} t={t} />}
+      {state.siren && <button type="button" data-tour="ap-silence" disabled={busy || !allowed} onClick={() => setAskingSilence(true)}>{t("apSilence")}</button>}
+      {askingSilence && <PinDialog title={t("apSilence")} text={fill(t("apConfirmSilence"), node.node_id)} confirmLabel={t("apSilence")} confirm={pin => void send("silence", undefined, pin)} cancel={() => setAskingSilence(false)} t={t} />}
       {openZones.length > 0 && state.phase === "disarmed" && <label className="ap-force"><input type="checkbox" checked={force} onChange={event => setForce(event.target.checked)} /> {t("apForce")}</label>}
     </div>}
     {message && <p className={`solar-notice ${message.bad ? "bad" : ""}`} role={message.bad ? "alert" : "status"}>{message.text}</p>}

@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { text } from "../i18n";
 import type { AlarmNodes } from "../api";
-import { AlarmPanelsView } from "./AlarmPanelsView";
+import { AlarmPanelsView, PanelCard } from "./AlarmPanelsView";
 
 const nodes: AlarmNodes = {
   nodes: [
@@ -43,5 +43,22 @@ describe("the Alarm panels menu", () => {
     const html = renderToStaticMarkup(createElement(AlarmPanelsView, { t: (key: string) => text("en", key), origin: "http://x", nodes, unreachable: false, isAdmin: true, now: Date.now() }));
     expect(html).not.toContain("Arm: away");
     expect(html).not.toContain("Disarm");
+  });
+  it("offers Silence siren only while a siren sounds and the server allows commands, with its phrases in the eight languages", () => {
+    const card = (node: (typeof nodes.nodes)[number], canCommand: boolean, language: Parameters<typeof text>[0] = "en") =>
+      renderToStaticMarkup(createElement(PanelCard, { t: (key: string) => text(language, key), origin: "http://x", node, now: Date.now(), canCommand, recent: [], reload: () => undefined }));
+    const ringing = nodes.nodes[0];
+    expect(card(ringing, true)).toContain("Silence siren");
+    expect(card(ringing, false)).not.toContain("Silence siren");
+    const quiet = { ...ringing, state: { ...ringing.state, siren: false, events: [{ ago_s: 2, kind: "siren_silenced" as const }] } };
+    const quietHtml = card(quiet, true);
+    expect(quietHtml).not.toContain("Silence siren");
+    expect(quietHtml).toContain("siren silenced with the PIN");
+    for (const language of ["en", "es", "de", "fr", "it", "ja", "zh", "pt"] as const) {
+      for (const key of ["apSilence", "apConfirmSilence", "apEvent_siren_silenced"]) expect(text(language, key), `${language}: ${key}`).not.toBe(key);
+      if (language !== "en") expect(text(language, "apSilence"), language).not.toBe(text("en", "apSilence"));
+      expect(text(language, "apConfirmSilence")).toContain("{0}");
+      expect(card(quiet, true, language)).not.toContain("apEvent_");
+    }
   });
 });

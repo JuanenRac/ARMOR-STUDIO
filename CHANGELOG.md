@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+- **Silence a siren without disarming:** in Alarm panels, while a panel's siren sounds, an administrator gets a "Silence siren" button that asks for the PIN of the signed-in user (the server checks it, a wrong one counts toward the same lockout as a wrong disarm PIN). The system stays armed and the alarm stays recorded; the card lists the new "siren silenced with the PIN" event, and the help and the assistant explain it in the eight languages.
+
 ## [0.8.0.3] - Guides control by control, a tidier Security menu, the way in from outside explained, and a voice that stops on time
 
 - **Step-by-step tours that go control by control:** each menu's tour has now four to fourteen steps instead of three generic ones, and every step lights up one part of the page (the arming button, the tiles, the toolbox, the filters, the node cards, each tab of Configuration...) and says what each control does, what to expect and the usual mistakes. The welcome, security and administration tours gained steps for the mute button, the assistant, the recordings, users, security, notifications, node firmware and installation, and the card is a little wider so a long step reads comfortably. Written in the eight languages; the parts of the page are marked in the views, and a test checks that every menu has its detailed steps and that everything a step lights up exists.
