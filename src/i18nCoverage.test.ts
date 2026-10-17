@@ -4,7 +4,7 @@ import { locales, requiredUiKeys, text } from "./i18n";
 /** Names, protocols and loanwords that are written the same in every language. */
 const SAME_EVERYWHERE = new Set([
   "preset_zigbee2mqtt", "preset_shelly", "protocol_thread", "nt_homeassistant", "ndk_modem", "ndk_hub", "sensorOptional", "serverOffline", "ndp_down_mbps", "ndp_up_mbps", "ad_zone_normal",
-  "elWireSection", "nd_medium_eth", "nd_medium_wifi",
+  "elWireSection", "nd_medium_eth", "nd_medium_wifi", "rem_vpn_title",
 ]);
 
 describe("the translations", () => {

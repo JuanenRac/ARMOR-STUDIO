@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { adminFile, adminSaveFile, adminStatus, ApiError, endMySession, endOtherSessions, listMySessions, remoteCheck, totpDisable, totpEnable, totpSetup, totpState,
   type RemoteCheck, type SessionRow, type TotpState } from "./api";
 import { askConfirm } from "./askConfirm";
+import { RemoteAccessSetup } from "./RemoteAccessSetup";
 
 type Props = { t: (key: string) => string; origin: string; isAdmin: boolean };
 type Say = (text: string, bad?: boolean) => void;
@@ -197,6 +198,7 @@ export function SecurityPanel({ t, origin, isAdmin }: Props) {
     <Sessions t={t} origin={origin} />
     <RemoteCheckCard t={t} origin={origin} />
     {isAdmin && <RemoteSettings t={t} origin={origin} />}
+    {isAdmin && <RemoteAccessSetup t={t} origin={origin} />}
   </div>;
 }
 

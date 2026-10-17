@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here.
 
+## [0.8.0.2] - The way in from outside the house, set up with choices: the VPN, the name that follows the house and the panels of the nodes
+
+- **VPN in Configuration > Security:** for an administrator, a form with the name or address the phone will use, the port, the network of the house and, if wanted, routing to the nodes; Studio asks the machine to set up WireGuard and says what is missing (the tool, the helper) in plain words, and tells you which UDP port to forward on the router.
+- **Add a phone or a laptop to the VPN:** type a name, press Create and the configuration appears with a QR code to scan with the WireGuard app (or the text, to copy); it holds a private key, so it is shown with a warning and closed afterwards. Show it again later, or remove the device to cut its access.
+- **A name that follows your house:** DuckDNS, Cloudflare or any address to call, with the token kept on the machine and never shown again; the card says what is being kept up to date and the last address told, and updates it now or stops it with a button.
+- **Node panels through the server:** register a node by its id and its address in the house, and Open panel shows its own web panel from outside the house without publishing the node.
+- **Certificates of the nodes you can check:** for a node with HTTPS, Studio shows the fingerprint it presents so that you compare it with the one in the node's own panel before you trust it, says when the certificate is not trusted yet (and does not open the panel) and when it changed.
+- **The new proof of identity is asked by itself:** every change here, from outside the house, opens the dialog for the password or the code and then goes on.
+- **Refusals in plain words:** a helper that is not installed, an address that is not of the house, a node that does not answer, a wrong password; each in the eight languages.
+- **Help:** the Configuration page of the Help explains the VPN, the name and the node panels step by step in the eight languages, and the assistant answers how to add a phone to the VPN, keep a dynamic DNS name or open a node panel (and, from the previous version, the second factor and outside access).
+- **63 new phrases in the eight languages**, all checked by the coverage test, with the cards drawn only for administrators.
+- **Tests:** the screen draws the new cards for an administrator and not for anybody else, every phrase exists in the eight languages, and the assistant finds each new topic by its keywords.
+
 ## [0.8.0.1] - Security: second factor, open sessions and the settings for using the server from outside the house
 
 - **A Security tab in Configuration** for everybody who signs in, with the account's second factor, the open sessions, a check of how the server sees you and, for an administrator, the settings of outside access.
