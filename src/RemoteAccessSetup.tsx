@@ -173,6 +173,33 @@ function NodePanels({ t, origin }: Props) {
   </article>;
 }
 
+/** The steps to reach the server from outside the house, each with its real state: what Studio can see is checked, what it cannot (the router) is said plainly. */
+function Guide({ t, origin, state }: Props & { state: RemoteSetupState }) {
+  const vpn = state.wireguard;
+  const name = state.ddns.configured && state.ddns.name ? state.ddns.name : vpn.endpoint || "";
+  const address = origin.replace(/\/$/, "");
+  const steps: { title: string; ok: boolean; text: string }[] = [
+    { title: t("rem_guide_s1"), ok: vpn.tool && vpn.script, text: vpn.tool && vpn.script ? t("rem_guide_s1_ok") : t("rem_guide_s1_bad") },
+    { title: t("rem_guide_s2"), ok: vpn.configured && vpn.running, text: !vpn.configured ? t("rem_guide_s2_bad") : vpn.running ? t("rem_guide_s2_ok") : t("rem_guide_s2_stopped") },
+    { title: t("rem_guide_s3"), ok: name !== "", text: name ? fill(t("rem_guide_s3_ok"), name) : t("rem_guide_s3_bad") },
+    { title: t("rem_guide_s4"), ok: false, text: fill(t("rem_guide_s4_text"), vpn.port || "51820") },
+    { title: t("rem_guide_s5"), ok: vpn.peers.length > 0, text: vpn.peers.length > 0 ? fill(t("rem_guide_s5_ok"), String(vpn.peers.length)) : t("rem_guide_s5_bad") },
+    { title: t("rem_guide_s6"), ok: false, text: fill(t("rem_guide_s6_text"), address) },
+  ];
+  return <article className="stack-card" data-testid="remote-guide">
+    <h4>{t("rem_guide_title")}</h4>
+    <p className="muted">{t("rem_guide_help")}</p>
+    <ol className="remote-steps">
+      {steps.map((step, index) => <li key={index} className={step.ok ? "ok" : ""}>
+        <strong>{step.ok ? "✓" : index === 3 || index === 5 ? "→" : "✗"} {step.title}</strong>
+        {index !== 3 && index !== 5 && <span className="muted"> ({step.ok ? t("rem_guide_done") : t("rem_guide_todo")})</span>}
+        <p className="muted">{step.text}</p>
+      </li>)}
+    </ol>
+    <p className="muted">{t("rem_guide_note")}</p>
+  </article>;
+}
+
 export function RemoteAccessSetup({ t, origin }: Props) {
   const [state, setState] = useState<RemoteSetupState | null | "unavailable">(null);
   const load = useCallback(async () => { try { setState(await remoteSetupState(origin)); } catch { setState("unavailable"); } }, [origin]);
@@ -180,6 +207,7 @@ export function RemoteAccessSetup({ t, origin }: Props) {
   return <>
     <div className="panel-heading wide-card"><h3>{t("rem_title")}</h3><p className="muted">{t("rem_help")}</p></div>
     {state === "unavailable" ? <article className="stack-card"><p className="muted">{t("rem_unavailable")}</p></article> : state && <>
+      <Guide t={t} origin={origin} state={state} />
       <Vpn t={t} origin={origin} state={state} reload={load} />
       <Ddns t={t} origin={origin} state={state} reload={load} />
     </>}
