@@ -3345,6 +3345,8 @@ export const PT_CATALOGUE: Record<string, string> = {
  "fw_err_node_not_firmware": "O nó diz que esse ficheiro não é uma imagem de firmware.",
  "fw_err_checksum_mismatch": "A imagem da versão não corresponde ao hash que publica: não foi usada.",
  "fw_err_no_checksum": "A versão não traz ficheiro de hash (.sha256), por isso não se usa.",
+ "fw_err_no_signature": "A versão não traz a assinatura do seu manifesto (.sig2), por isso não se usa.",
+ "fw_err_bad_signature": "A assinatura da versão não coincide com a chave das versões do A.R.M.O.R.: não se usou.",
  "fw_err_no_release": "Este tipo de nó ainda não tem versão no GitHub.",
  "fw_err_no_image_in_release": "A versão mais recente não tem imagem de firmware anexada.",
  "fw_err_github_unreachable": "Não foi possível chegar ao GitHub a partir do servidor.",

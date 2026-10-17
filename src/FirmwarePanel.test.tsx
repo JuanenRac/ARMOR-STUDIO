@@ -64,7 +64,7 @@ describe("the node firmware screen", () => {
     const wanted = requiredUiKeys.filter(key => key.startsWith("fw_") || key === "tabFirmware");
     expect(wanted.length).toBeGreaterThan(60);
     for (const locale of locales) for (const key of wanted) expect(text(locale, key).trim().length, `${locale} ${key}`).toBeGreaterThan(0);
-    const reasons = ["node_not_reachable", "panel_login_refused", "panel_login_failed", "upload_failed", "hash_mismatch", "did_not_come_back", "checksum_mismatch", "no_checksum", "no_release", "no_image_in_release", "github_unreachable", "download_failed", "bad_size", "not_firmware", "job_running", "no_panel_login", "invalid_address", "node_wrong_firmware", "node_not_firmware"];
+    const reasons = ["node_not_reachable", "panel_login_refused", "panel_login_failed", "upload_failed", "hash_mismatch", "did_not_come_back", "checksum_mismatch", "no_checksum", "no_signature", "bad_signature", "no_release", "no_image_in_release", "github_unreachable", "download_failed", "bad_size", "not_firmware", "job_running", "no_panel_login", "invalid_address", "node_wrong_firmware", "node_not_firmware"];
     for (const reason of reasons) expect(requiredUiKeys, reason).toContain(`fw_err_${reason}`);
     for (const state of ["waiting", "checking", "signing_in", "uploading", "restarting", "done", "failed"]) expect(requiredUiKeys).toContain(`fw_state_${state}`);
   });
