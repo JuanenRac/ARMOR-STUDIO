@@ -5,7 +5,11 @@
  */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { View } from "../domain";
-import { getPrefs, setPrefs } from "../prefs";
+import { getPrefs, setPrefs, usePrefs } from "../prefs";
+import type { Locale } from "../i18n";
+import { Mascot } from "../assistant/Assistant";
+import { getAlerts, useAlerts } from "../alerts/settings";
+import { speakAssistant, stopAssistantSpeech } from "../alerts/sounds";
 import { stepTour, stopTour, useActiveTour } from "./tourStore";
 import { placeCard, stepKey, tourById } from "./tours";
 import { TourArt } from "./TourArt";
@@ -45,8 +49,11 @@ function useTarget(selector: string | undefined, key: string): { box: Box | null
   return state;
 }
 
-export function TourHost({ t, view, setView }: { t: (key: string) => string; view: View; setView: (view: View) => void }) {
+export function TourHost({ t, language, view, setView }: { t: (key: string) => string; language: Locale; view: View; setView: (view: View) => void }) {
   const active = useActiveTour();
+  const prefs = usePrefs();
+  const alerts = useAlerts();
+  const [speaking, setSpeaking] = useState(false);   // the voice is reading the step: the mascot moves its mouth
   const tour = active ? tourById(active.id) : undefined;
   const step = tour && active ? tour.steps[active.index] : undefined;
   const key = active ? `${active.id}:${active.index}` : "";
@@ -73,6 +80,14 @@ export function TourHost({ t, view, setView }: { t: (key: string) => string; vie
   }, [active !== null]);   // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (active) next.current?.focus({ preventScroll: true }); }, [key]);   // eslint-disable-line react-hooks/exhaustive-deps
 
+  // the step is read aloud when the voice is on: a short wait so that going quickly through the steps reads only the one that stays; closing the tour or turning the voice off cuts it at once
+  const spoken = active && tour && step && prefs.tourSpeak && !alerts.muted ? `${t(stepKey(tour.id, active.index, "t"))}. ${t(stepKey(tour.id, active.index, "b"))}` : "";
+  useEffect(() => {
+    if (!spoken) { stopAssistantSpeech(); setSpeaking(false); return undefined; }
+    const wait = setTimeout(() => { speakAssistant(spoken, getAlerts(), language, { onStart: () => setSpeaking(true), onEnd: () => setSpeaking(false) }); }, 180);
+    return () => { clearTimeout(wait); stopAssistantSpeech(); setSpeaking(false); };
+  }, [spoken, language]);   // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!active || !tour || !step) return null;
   const last = active.index === tour.steps.length - 1;
   const placed = box ? placeCard(box, size, screen, step.placement ?? "right") : { left: 0, top: 0, side: "center" };
@@ -84,7 +99,11 @@ export function TourHost({ t, view, setView }: { t: (key: string) => string; vie
     {!box && <div className="tour-dim" />}
     <section ref={card} className={`tour-card ${centred ? "centred" : `side-${placed.side}`}`} style={centred ? undefined : { left: placed.left, top: placed.top }} role="dialog" aria-modal="true" aria-labelledby="tour-title" aria-describedby="tour-body" tabIndex={-1}>
       <button className="tour-close" onClick={() => stopTour(true)} aria-label={t("tourClose")} title={t("tourClose")}>×</button>
-      <div className="tour-art-box"><TourArt art={step.art} size={150} /></div>
+      <div className="tour-art-box"><TourArt art={step.art} size={150} />{prefs.tourMascot && <div className="tour-guide" data-testid="tour-guide"><Mascot talking={false} speaking={speaking} scale={1.15} /></div>}</div>
+      <div className="tour-voice-row" role="group">
+        <button type="button" className={`tour-toggle ${prefs.tourSpeak ? "on" : ""}`} aria-pressed={prefs.tourSpeak} onClick={() => setPrefs({ tourSpeak: !prefs.tourSpeak })} title={t("tourVoiceTip")} data-testid="tour-voice">{prefs.tourSpeak ? "🔊" : "🔇"} {prefs.tourSpeak ? t("tourVoiceOn") : t("tourVoiceOff")}</button>
+        <button type="button" className={`tour-toggle ${prefs.tourMascot ? "on" : ""}`} aria-pressed={prefs.tourMascot} onClick={() => setPrefs({ tourMascot: !prefs.tourMascot })} title={t("tourGuideTip")} data-testid="tour-guide-toggle">{prefs.tourMascot ? "🤖" : "▫️"} {prefs.tourMascot ? t("tourGuideOn") : t("tourGuideOff")}</button>
+      </div>
       <p className="eyebrow">{t(`tour_${tour.id}`)} · {format(t("tourStep"), [active.index + 1, tour.steps.length])}</p>
       <h3 id="tour-title">{t(stepKey(tour.id, active.index, "t"))}</h3>
       <p id="tour-body">{t(stepKey(tour.id, active.index, "b"))}</p>

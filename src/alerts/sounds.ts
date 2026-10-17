@@ -186,32 +186,68 @@ export function assistantVoice(settings: AlertSettings, interfaceLanguage: strin
 }
 
 let assistantSpeaking = false;
+let speechToken = 0;                       // each reading has its own number: what an older reading reports late (a cancelled one still fires its end) is ignored
+let speechWatch: ReturnType<typeof setInterval> | undefined;
+const clearSpeechWatch = (): void => { if (speechWatch !== undefined) { clearInterval(speechWatch); speechWatch = undefined; } };
 
-/** Stop the assistant's own speech (and nothing else when it is not talking). */
+/** A text cut in sentences of at most `limit` characters: a browser stops reading a long utterance halfway (Chrome after about fifteen seconds) and never says it ended. */
+export function speechSentences(text: string, limit = 220): string[] {
+  const out: string[] = [];
+  for (const sentence of text.replace(/\s+/g, " ").trim().match(/[^.!?。！？]+[.!?。！？]*\s*/g) ?? []) {
+    let rest = sentence.trim();
+    while (rest.length > limit) {
+      const cut = Math.max(rest.lastIndexOf(",", limit), rest.lastIndexOf(" ", limit), limit > 40 ? 40 : 1);
+      out.push(rest.slice(0, cut).trim()); rest = rest.slice(cut).trim();
+    }
+    if (rest) out.push(rest);
+  }
+  return out;
+}
+
+/** Stop the assistant's own speech (and nothing else when it is not talking). Whatever the stopped reading reports afterwards is ignored. */
 export function stopAssistantSpeech(): void {
+  speechToken += 1;
+  clearSpeechWatch();
   if (!assistantSpeaking) return;
   assistantSpeaking = false;
   try { window.speechSynthesis?.cancel(); } catch { /* no speech */ }
 }
 
-/** The assistant reads a text aloud. A new text takes the place of the one being read. The mute button silences it; whether the alarms' voice is on does not matter (the assistant has its own switch). */
+/** The assistant reads a text aloud. A new text takes the place of the one being read (the old one is cut at once and cannot end the new one). The mute button silences it; whether the alarms' voice is on does not matter (the assistant has its own switch). */
 export function speakAssistant(text: string, settings: AlertSettings, interfaceLanguage: string, handlers: { onStart?: () => void; onEnd?: () => void } = {}): boolean {
   if (!speechAvailable() || settings.muted || !text.trim()) return false;
   try {
+    clearSpeechWatch();
     if (assistantSpeaking) window.speechSynthesis.cancel();
+    const token = (speechToken += 1);
     const spec = assistantVoice(settings, interfaceLanguage, text);
-    const utterance = new SpeechSynthesisUtterance(spec.text);
-    utterance.lang = spec.lang;
+    const parts = speechSentences(spec.text);
+    if (parts.length === 0) { assistantSpeaking = false; return false; }
     const voice = pickVoice(listVoices(), spec.lang, settings.voice.gender);
-    if (voice) utterance.voice = voice;
-    utterance.pitch = spec.pitch; utterance.rate = spec.rate; utterance.volume = spec.volume;
-    const done = () => { if (assistantSpeaking) { assistantSpeaking = false; handlers.onEnd?.(); } };
-    utterance.onstart = () => handlers.onStart?.();
-    utterance.onend = done; utterance.onerror = done;
+    let remaining = parts.length, started = false, finished = false;
+    const finish = (): void => {
+      if (finished || token !== speechToken) return;
+      finished = true; assistantSpeaking = false; clearSpeechWatch(); handlers.onEnd?.();
+    };
     assistantSpeaking = true;
-    window.speechSynthesis.speak(utterance);
+    for (const part of parts) {
+      const utterance = new SpeechSynthesisUtterance(part);
+      utterance.lang = spec.lang;
+      if (voice) utterance.voice = voice;
+      utterance.pitch = spec.pitch; utterance.rate = spec.rate; utterance.volume = spec.volume;
+      utterance.onstart = () => { if (token === speechToken && !started) { started = true; handlers.onStart?.(); } };
+      const ended = (): void => { if (token !== speechToken) return; remaining -= 1; if (remaining <= 0) finish(); };
+      utterance.onend = ended; utterance.onerror = ended;
+      window.speechSynthesis.speak(utterance);
+    }
+    // a browser sometimes never says that it has finished: if it is not speaking and nothing waits, the reading is over
+    speechWatch = setInterval(() => {
+      if (token !== speechToken) { clearSpeechWatch(); return; }
+      const synth = window.speechSynthesis;
+      if (started && !synth.speaking && !synth.pending) finish();
+    }, 400);
     return true;
-  } catch { assistantSpeaking = false; return false; }
+  } catch { assistantSpeaking = false; clearSpeechWatch(); return false; }
 }
 
 export function speak(message: string, settings: AlertSettings, interfaceLanguage: string): boolean {

@@ -145,8 +145,9 @@ export function Assistant({ view, t, language, go, openHelp }: { view: View; t: 
   const speakOn = prefs.assistantSpeak && !alerts.muted && !hidden && !tour;
   useEffect(() => {
     if (!speakOn || !sayNow) { stopAssistantSpeech(); setSpeaking(false); return; }
-    speakAssistant(sayNow, getAlerts(), language, { onStart: () => setSpeaking(true), onEnd: () => setSpeaking(false) });
-    return () => { stopAssistantSpeech(); setSpeaking(false); };
+    // a short wait before reading: pressing "tell me more" several times in a row reads only the last text, and the browser has time to cut the previous one
+    const wait = setTimeout(() => { speakAssistant(sayNow, getAlerts(), language, { onStart: () => setSpeaking(true), onEnd: () => setSpeaking(false) }); }, 180);
+    return () => { clearTimeout(wait); stopAssistantSpeech(); setSpeaking(false); };
   }, [speakOn, sayNow, language]);   // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!prefs.assistant || tour) return null;

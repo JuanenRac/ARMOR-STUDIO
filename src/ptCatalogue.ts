@@ -3377,5 +3377,15 @@ export const PT_CATALOGUE: Record<string, string> = {
  "nt_telegram_steps": "1. No Telegram fale com @BotFather, envie /newbot e guarde o token. 2. Abra uma conversa com o seu bot (ou adicione-o a um grupo) e envie-lhe qualquer mensagem. 3. Abra https://api.telegram.org/bot<TOKEN>/getUpdates num navegador e leia \"chat\":{\"id\": ...}. 4. Ponha ARMOR_TELEGRAM_BOT_TOKEN=<token> e ARMOR_TELEGRAM_CHAT_IDS=<id>[,<id>...] no armor.env.",
  "nt_ha_steps": "1. No Home Assistant crie uma automatização cujo disparador seja Webhook e copie o seu id de webhook. 2. Faça da sua ação o que quiser (uma notificação ao telemóvel, uma sirene, uma luz): trigger.json.text é a frase, trigger.json.title é A.R.M.O.R., e trigger.json.event, node_id, severity, code dizem o que aconteceu. 3. Ponha ARMOR_HOMEASSISTANT_URL=http://<endereço>:8123 e ARMOR_HOMEASSISTANT_WEBHOOK_ID=<id> no armor.env. O id é um segredo.",
  "nt_err_generic": "Não foi possível fazê-lo.",
- "nt_err_nothing_configured": "Ainda não há nada configurado."
+ "nt_err_nothing_configured": "Ainda não há nada configurado.",
+ "tourVoiceOn": "Voz ativada",
+ "tourVoiceOff": "Voz desativada",
+ "tourVoiceTip": "Lê cada passo em voz alta, com a voz escolhida em Sons de alarme",
+ "tourGuideOn": "Guia visível",
+ "tourGuideOff": "Guia oculto",
+ "tourGuideTip": "Mostra ou oculta a mascote que acompanha os passos",
+ "pf_tour_mascot": "A mascote acompanha os guias passo a passo",
+ "pf_tour_mascot_h": "Uma pequena mascote aparece no cartão de cada passo e mexe a boca enquanto é lido. Também pode ser ocultada no próprio guia.",
+ "pf_tour_speak": "Os guias passo a passo leem cada passo em voz alta",
+ "pf_tour_speak_h": "Usa a voz escolhida em Sons de alarme e voz, e corta ao passar a outro passo ou fechar o guia. O guia tem o seu próprio botão para a ativar ou desativar.",
 };

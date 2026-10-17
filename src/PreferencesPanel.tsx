@@ -30,6 +30,8 @@ export function PreferencesPanel({ t, language = "en" }: { t: (key: string) => s
       <article className="stack-card pf-card">
         <h3>{t("pf_section_help")}</h3>
         {toggle("pf_tutorial", "pf_tutorial_h", prefs.tutorial, tutorial => setPrefs({ tutorial }))}
+        {toggle("pf_tour_mascot", "pf_tour_mascot_h", prefs.tourMascot, tourMascot => setPrefs({ tourMascot }), !prefs.tutorial)}
+        {toggle("pf_tour_speak", "pf_tour_speak_h", prefs.tourSpeak, tourSpeak => setPrefs({ tourSpeak }), !prefs.tutorial)}
         {toggle("pf_assistant", "pf_assistant_h", prefs.assistant, assistant => setPrefs({ assistant }))}
         {toggle("pf_asst_autoopen", "pf_asst_autoopen_h", prefs.assistantAutoOpen, assistantAutoOpen => setPrefs({ assistantAutoOpen }), !prefs.assistant)}
         {toggle("pf_asst_speak", "pf_asst_speak_h", prefs.assistantSpeak, assistantSpeak => setPrefs({ assistantSpeak }), !prefs.assistant)}

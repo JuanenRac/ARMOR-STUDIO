@@ -30,7 +30,7 @@ describe("the guided tours", () => {
   });
 
   it("do not keep a sentence nobody uses", () => {
-    const used = new Set<string>(["tourNext", "tourBack", "tourSkip", "tourFinish", "tourStep", "tourNever", "tourClose", "tourKeys", "tourNotShown", "tourHelpButton", "tourDoneBadge", "tourStart", "tourReplay", "tourMinutes", "tourStepsCount"]);
+    const used = new Set<string>(["tourNext", "tourVoiceOn", "tourVoiceOff", "tourVoiceTip", "tourGuideOn", "tourGuideOff", "tourGuideTip", "tourBack", "tourSkip", "tourFinish", "tourStep", "tourNever", "tourClose", "tourKeys", "tourNotShown", "tourHelpButton", "tourDoneBadge", "tourStart", "tourReplay", "tourMinutes", "tourStepsCount"]);
     for (const tour of TOURS) { used.add(`tour_${tour.id}`); used.add(`tour_${tour.id}_s`); tour.steps.forEach((_step, index) => { used.add(stepKey(tour.id, index, "t")); used.add(stepKey(tour.id, index, "b")); }); }
     expect(TOUR_KEYS.filter(key => !used.has(key))).toEqual([]);
   });

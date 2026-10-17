@@ -388,7 +388,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
       })}
     </section>
     {expandedCamera && <CameraFullscreen camera={expandedCamera} cameras={cameras} origin={origin} recording={recordingCameraIds.includes(expandedCamera.id)} t={t} close={() => setExpandedCameraId("")} fullScreen={fullScreen} step={stepExpanded} snapshot={() => void saveSnapshot(expandedCamera)} toggleRecording={() => void toggleRecording(expandedCamera)} invokePtz={command => commandPtz(expandedCamera, command)} />}
-    <TourHost t={t} view={view} setView={setView} />
+    <TourHost t={t} language={language} view={view} setView={setView} />
     <RichTooltips t={t} />
     {helpOpen && <HelpDialog initial={view} close={() => setHelpOpen(false)} t={t} language={language} />}
     <Assistant view={view} t={t} language={language} go={setView} openHelp={() => setHelpOpen(true)} />

@@ -97,3 +97,11 @@ html[data-density="compact"] .stack-card { padding: .65rem .8rem; }
 html[data-density="compact"] .config-grid { gap: .6rem; }
 html[data-density="compact"] .sidebar nav .nav-items button { padding-block: .22rem; }
 html[data-density="compact"] .panel-heading { margin-bottom: .5rem; }
+
+/* the guide that goes with the steps: a mascot at the corner of the picture, and the two switches (voice and guide) in a row of their own */
+.tour-art-box { position: relative; }
+.tour-guide { position: absolute; right: .2rem; bottom: .1rem; filter: drop-shadow(0 0 8px rgba(0, 229, 255, .35)); pointer-events: none; }
+.tour-voice-row { display: flex; flex-wrap: wrap; gap: .4rem; margin: .3rem 0 .15rem; }
+.tour-toggle { display: inline-flex; align-items: center; gap: .35rem; padding: .28rem .6rem; border-radius: 999px; font-size: .76rem; border: 1px solid #315e6b; background: rgba(8, 24, 31, .6); color: #b6d6de; cursor: pointer; }
+.tour-toggle.on { border-color: #00b5cc; color: #e9ffff; background: rgba(0, 150, 170, .22); }
+.tour-toggle:focus-visible { outline: 2px solid #00e5ff; outline-offset: 2px; }
