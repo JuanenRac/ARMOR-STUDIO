@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+- **Reaching the house from outside, step by step:** a guide at the top of Configuration > Security > Reaching the house from outside shows six steps (the machine can do it, the VPN exists, the house has a name, the port on the router, the phone is added, try it from outside) and whether each one is done, in the eight languages.
+- **Configuration > Security is tidy:** three titled sections (your account, how the server sees you, reaching the house from outside); the cards of a section sit side by side and aligned at the top, the forms are laid out in a grid with their labels above the fields, and the guide's steps are cards of their own instead of a long list.
+
 ## [0.8.0.2] - The way in from outside the house, set up with choices: the VPN, the name that follows the house and the panels of the nodes
 
 - **VPN in Configuration > Security:** for an administrator, a form with the name or address the phone will use, the port, the network of the house and, if wanted, routing to the nodes; Studio asks the machine to set up WireGuard and says what is missing (the tool, the helper) in plain words, and tells you which UDP port to forward on the router.

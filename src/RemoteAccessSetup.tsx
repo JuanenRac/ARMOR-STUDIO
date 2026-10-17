@@ -64,7 +64,7 @@ function Vpn({ t, origin, state, reload }: Props & { state: RemoteSetupState; re
     void run(async () => { await vpnRemovePeer(origin, peer); setView(current => (current?.name === peer ? null : current)); });
   };
 
-  return <article className="stack-card camera-form" data-testid="remote-vpn">
+  return <article className="stack-card sec-card" data-testid="remote-vpn">
     <h3>{t("rem_vpn_title")}</h3>
     {!vpn.script ? <p className="muted">{t("rem_unavailable")}</p> : !vpn.tool ? <p className="notice bad">{t("rem_vpn_missing_tool")}</p> : !vpn.configured ? <form onSubmit={setup}>
       <label>{t("rem_vpn_endpoint")}<input value={form.endpoint} onChange={event => setForm({ ...form, endpoint: event.target.value })} placeholder="home.duckdns.org" /></label>
@@ -109,7 +109,7 @@ function Ddns({ t, origin, state, reload }: Props & { state: RemoteSetupState; r
     void run(async () => { await ddnsSetup(origin, input); setForm({ domain: "", token: "", zone: "", record: "", url: "" }); });
   };
   const ready = provider === "duckdns" ? form.domain.trim() !== "" && form.token.trim() !== "" : provider === "cloudflare" ? form.zone.trim() !== "" && form.record.trim() !== "" && form.token.trim() !== "" : form.url.trim() !== "";
-  return <article className="stack-card camera-form" data-testid="remote-ddns">
+  return <article className="stack-card sec-card" data-testid="remote-ddns">
     <h3>{t("rem_ddns_title")}</h3>
     <p className="muted">{t("rem_ddns_help")}</p>
     {!dyn.script ? <p className="muted">{t("rem_unavailable")}</p> : dyn.configured ? <>
@@ -146,7 +146,7 @@ function NodePanels({ t, origin }: Props) {
     event.preventDefault();
     void run(async () => { await saveNodePanel(origin, { id: form.id.trim().toLowerCase(), address: form.address.trim(), scheme: form.https ? "https" : "http" }); setForm({ id: "", address: "", https: false }); });
   };
-  return <article className="stack-card camera-form" data-testid="remote-node-panels">
+  return <article className="stack-card sec-card" data-testid="remote-node-panels">
     <h3>{t("rem_np_title")}</h3>
     <p className="muted">{t("rem_np_help")}</p>
     {panels.length === 0 ? <p className="muted">{t("rem_np_none")}</p> : <ul className="plain-list">
@@ -186,7 +186,7 @@ function Guide({ t, origin, state }: Props & { state: RemoteSetupState }) {
     { title: t("rem_guide_s5"), ok: vpn.peers.length > 0, text: vpn.peers.length > 0 ? fill(t("rem_guide_s5_ok"), String(vpn.peers.length)) : t("rem_guide_s5_bad") },
     { title: t("rem_guide_s6"), ok: false, text: fill(t("rem_guide_s6_text"), address) },
   ];
-  return <article className="stack-card" data-testid="remote-guide">
+  return <article className="stack-card sec-card" data-testid="remote-guide">
     <h4>{t("rem_guide_title")}</h4>
     <p className="muted">{t("rem_guide_help")}</p>
     <ol className="remote-steps">
@@ -204,13 +204,13 @@ export function RemoteAccessSetup({ t, origin }: Props) {
   const [state, setState] = useState<RemoteSetupState | null | "unavailable">(null);
   const load = useCallback(async () => { try { setState(await remoteSetupState(origin)); } catch { setState("unavailable"); } }, [origin]);
   useEffect(() => { void load(); }, [load]);
-  return <>
-    <div className="panel-heading wide-card"><h3>{t("rem_title")}</h3><p className="muted">{t("rem_help")}</p></div>
-    {state === "unavailable" ? <article className="stack-card"><p className="muted">{t("rem_unavailable")}</p></article> : state && <>
+  return <section className="sec-section" data-testid="security-group-outside">
+    <h4 className="sec-section-title">{t("rem_title")}</h4>
+    <p className="muted sec-section-note">{t("rem_help")}</p>
+    {state === "unavailable" ? <article className="stack-card sec-card"><p className="muted">{t("rem_unavailable")}</p></article> : state && <>
       <Guide t={t} origin={origin} state={state} />
-      <Vpn t={t} origin={origin} state={state} reload={load} />
-      <Ddns t={t} origin={origin} state={state} reload={load} />
+      <div className="sec-row"><Vpn t={t} origin={origin} state={state} reload={load} /><Ddns t={t} origin={origin} state={state} reload={load} /></div>
     </>}
     <NodePanels t={t} origin={origin} />
-  </>;
+  </section>;
 }

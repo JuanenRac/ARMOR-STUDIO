@@ -8,6 +8,7 @@ import { adminFile, adminSaveFile, adminStatus, ApiError, endMySession, endOther
   type RemoteCheck, type SessionRow, type TotpState } from "./api";
 import { askConfirm } from "./askConfirm";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
+import "./security.css";
 
 type Props = { t: (key: string) => string; origin: string; isAdmin: boolean };
 type Say = (text: string, bad?: boolean) => void;
@@ -44,7 +45,7 @@ function SecondFactor({ t, origin }: { t: (key: string) => string; origin: strin
     event.preventDefault(); say("");
     try { await totpDisable(origin, password); setPassword(""); setCodes(null); say(t("sec_2fa_off_done")); await load(); } catch (error) { say(explain(t, error), true); }
   };
-  return <article className="stack-card" data-testid="security-2fa">
+  return <article className="stack-card sec-card" data-testid="security-2fa">
     <h3>{t("sec_2fa_title")}</h3>
     <p className="muted">{t("sec_2fa_help")}</p>
     {state && <p className="notice"><b>{state.enabled ? t("sec_2fa_state_on") : t("sec_2fa_state_off")}</b>{state.enabled && <> {state.recovery_left} {t("sec_2fa_left")}</>}</p>}
@@ -83,7 +84,7 @@ function Sessions({ t, origin }: { t: (key: string) => string; origin: string })
     if (!(await askConfirm(t("sec_ses_end_others") + "?", t))) return;
     try { await endOtherSessions(origin); setMessage({ text: t("sec_ses_ended"), bad: false }); await load(); } catch (error) { setMessage({ text: explain(t, error), bad: true }); }
   };
-  return <article className="stack-card" data-testid="security-sessions">
+  return <article className="stack-card sec-card" data-testid="security-sessions">
     <h3>{t("sec_ses_title")}</h3>
     <p className="muted">{t("sec_ses_help")}</p>
     {rows && rows.length === 0 && <p className="muted">{t("sec_ses_none")}</p>}
@@ -101,7 +102,7 @@ function RemoteCheckCard({ t, origin }: { t: (key: string) => string; origin: st
   const [message, setMessage] = useState({ text: "", bad: false });
   const check = async () => { try { setResult(await remoteCheck(origin)); setMessage({ text: "", bad: false }); } catch (error) { setMessage({ text: explain(t, error), bad: true }); } };
   const yes = (value: boolean) => (value ? t("sec_rem_yes") : t("sec_rem_no"));
-  return <article className="stack-card" data-testid="security-remote">
+  return <article className="stack-card sec-card" data-testid="security-remote">
     <h3>{t("sec_rem_title")}</h3>
     <p className="muted">{t("sec_rem_help")}</p>
     <button onClick={() => void check()}>{t("sec_rem_check")}</button>
@@ -172,7 +173,7 @@ function RemoteSettings({ t, origin }: { t: (key: string) => string; origin: str
     } catch (error) { setMessage({ text: explain(t, error), bad: true }); } finally { setBusy(false); }
   };
   const set = (key: keyof typeof form, value: string) => setForm(current => ({ ...current, [key]: value }));
-  return <article className="stack-card camera-form" data-testid="security-settings">
+  return <article className="stack-card sec-card" data-testid="security-settings">
     <h3>{t("sec_cfg_title")}</h3>
     <p className="muted">{t("sec_cfg_help")}</p>
     <form onSubmit={event => void save(event)}>
@@ -192,12 +193,16 @@ function RemoteSettings({ t, origin }: { t: (key: string) => string; origin: str
 }
 
 export function SecurityPanel({ t, origin, isAdmin }: Props) {
-  return <div className="config-grid" data-testid="security-panel">
-    <div className="panel-heading wide-card"><h3>{t("sec_title")}</h3><p className="muted">{t("sec_help")}</p></div>
-    <SecondFactor t={t} origin={origin} />
-    <Sessions t={t} origin={origin} />
-    <RemoteCheckCard t={t} origin={origin} />
-    {isAdmin && <RemoteSettings t={t} origin={origin} />}
+  return <div className="sec-page" data-testid="security-panel">
+    <div className="panel-heading"><h3>{t("sec_title")}</h3><p className="muted">{t("sec_help")}</p></div>
+    <section className="sec-section" data-testid="security-group-account">
+      <h4 className="sec-section-title">{t("sec_group_account")}</h4>
+      <div className="sec-row"><SecondFactor t={t} origin={origin} /><Sessions t={t} origin={origin} /></div>
+    </section>
+    <section className="sec-section" data-testid="security-group-server">
+      <h4 className="sec-section-title">{t("sec_group_server")}</h4>
+      <div className="sec-row"><RemoteCheckCard t={t} origin={origin} />{isAdmin && <RemoteSettings t={t} origin={origin} />}</div>
+    </section>
     {isAdmin && <RemoteAccessSetup t={t} origin={origin} />}
   </div>;
 }
