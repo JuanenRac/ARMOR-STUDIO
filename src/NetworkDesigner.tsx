@@ -481,12 +481,12 @@ export function NetworkDesigner({ t, design, setDesign, status, overview, camera
     onClick={() => { setPlace(current => current === kind ? null : kind); setTool("select"); setWireFrom(null); say(t("elPlaceHint")); }} title={label(kind)}><KindSwatch kind={kind} size={30} /><span>{label(kind)}</span></button>;
 
   return <section className="electrical-designer network-designer">
-    <header className="ed-head">
+    <header className="ed-head" data-tour="nd-head">
       <div><p className="eyebrow">{t("networkDesigner")}</p><h2>{t("nd_title")}</h2><p className="muted">{t("nd_help")}</p></div>
       <span className={`ed-status ${status}`}>{status === "saved" ? t("elSaved") : status === "saving" ? t("elSaving") : status === "offline" ? t("elOffline") : ""}</span>
     </header>
     <div className="ed-layout">
-      <aside className="ed-palette" aria-label={t("elPalette")}>
+      <aside data-tour="nd-palette" className="ed-palette" aria-label={t("elPalette")}>
         <h3>{t("elPalette")}</h3>
         {CATEGORY_ORDER.map(category => <details key={category} open>
           <summary style={{ borderColor: CATEGORY_COLOUR[category] }}><span style={{ background: CATEGORY_COLOUR[category] }} />{t(`ndc_${category}`)}</summary>
@@ -494,7 +494,7 @@ export function NetworkDesigner({ t, design, setDesign, status, overview, camera
         </details>)}
       </aside>
       <div className="ed-main">
-        <div className="ed-toolbar" role="toolbar">
+        <div className="ed-toolbar" role="toolbar" data-tour="nd-toolbar">
           <div className="ed-group" role="group" aria-label={t("nd_group_edit")}>
             <button className={tool === "select" && !place ? "on" : ""} onClick={() => { setTool("select"); setPlace(null); setWireFrom(null); }} title={`${t("elToolSelect")} (V)`} aria-label={t("elToolSelect")}>↖</button>
             <button className={tool === "wire" ? "on" : ""} onClick={() => { setTool("wire"); setPlace(null); say(t("elWiringHint")); }} title={`${t("nd_tool_link")} (W)`} aria-label={t("nd_tool_link")}>⌁</button>
@@ -517,7 +517,7 @@ export function NetworkDesigner({ t, design, setDesign, status, overview, camera
           <span className="grow" />
           <button className={`ed-badge ${errors ? "bad" : warnings ? "warn" : "ok"}`} onClick={() => setPanel("checks")}>{errors} {t("elIssueErrors")} · {warnings} {t("elIssueWarnings")}</button>
         </div>
-        <div ref={canvas} className="ed-canvas" onDragOver={event => { if (event.dataTransfer.types.includes("text/armor-kind")) { event.preventDefault(); event.dataTransfer.dropEffect = "copy"; } }}
+        <div data-tour="nd-canvas" ref={canvas} className="ed-canvas" onDragOver={event => { if (event.dataTransfer.types.includes("text/armor-kind")) { event.preventDefault(); event.dataTransfer.dropEffect = "copy"; } }}
           onDrop={event => { const kind = event.dataTransfer.getData("text/armor-kind"); if (kind) { event.preventDefault(); placeAt(kind, toWorld(event), false); } }} onContextMenu={event => event.preventDefault()}>
           <svg ref={svgRef} width="100%" height="100%" className={`ed-svg ${place ? "placing" : ""} ${tool === "wire" || wireFrom ? "wiring" : ""}`} onPointerDown={onBackgroundDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
             <defs>
@@ -541,7 +541,7 @@ export function NetworkDesigner({ t, design, setDesign, status, overview, camera
           <p className="ed-keys">{t("elKeys")}</p>
         </div>
       </div>
-      <aside className="ed-side">
+      <aside className="ed-side" data-tour="nd-side">
         <div className="ed-tabs" role="tablist">
           <button role="tab" aria-selected={panel === "properties"} className={panel === "properties" ? "on" : ""} onClick={() => setPanel("properties")}>{t("elInspector")}</button>
           <button role="tab" aria-selected={panel === "checks"} className={panel === "checks" ? "on" : ""} onClick={() => setPanel("checks")}>{t("elChecks")} <b className={errors ? "bad" : warnings ? "warn" : ""}>{analysis.issues.length}</b></button>

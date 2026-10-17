@@ -145,7 +145,7 @@ function DeviceDetail({ t, origin, node, device, isAdmin, reload, now, close, st
 function PublicCard({ t, info, language, now }: { t: Translate; info: NonNullable<NetworkNode["public"]>; language: string; now: number }) {
   const facts = publicFacts(info, language, now);
   const [copied, setCopied] = useState(false);
-  return <section className="net-public stack-card" aria-label={t("no_public_title")}>
+  return <section data-tour="net-public" className="net-public stack-card" aria-label={t("no_public_title")}>
     <div className="net-public-main">
       <small>{t("no_public_ip")}</small>
       <strong className="mono">{info.ip}</strong>
@@ -187,13 +187,13 @@ export function NetworkView({ openDesigner, t, origin, isAdmin, overview, reload
   const withPorts = useMemo(() => devices.filter(device => (device.ports?.length ?? 0) > 0), [devices]);
 
   return <section className="network-view">
-    <header className="devices-head"><MenuTitle kind="network"><p className="eyebrow">{t("net_title")}</p><h2>{t("network")}</h2><p className="muted">{t("net_help")}</p></MenuTitle></header>
+    <header className="devices-head" data-tour="net-head"><MenuTitle kind="network"><p className="eyebrow">{t("net_title")}</p><h2>{t("network")}</h2><p className="muted">{t("net_help")}</p></MenuTitle></header>
     {openDesigner && <DesignerLink title={t("dlNetworkTitle")} text={t("dlNetworkText")} button={t("dlNetworkButton")} open={openDesigner} />}
     {!node && <p className="muted net-empty">{t("net_no_nodes")}</p>}
     {node && internet && <>
       {node.stale && <p className="net-warning" role="alert">{t("net_node_stale")}</p>}
       <div className={`net-hero ${internetTone(internet.state)}`}>
-        <div className="net-state-card">
+        <div className="net-state-card" data-tour="net-hero">
           <small>{t("net_internet")}</small>
           <strong>{t(`netstate_${internet.state}`)}</strong>
           {(internet.state === "down" || internet.state === "lan_down") && <p>{t(`netstate_hint_${internet.state}`)}</p>}
@@ -210,7 +210,7 @@ export function NetworkView({ openDesigner, t, origin, isAdmin, overview, reload
         <h3>{t("net_outages_last24")}</h3>
         {lastDay.length === 0 ? <p className="muted">{t("net_no_outages")}</p> : <ul>{lastDay.map(outage => <li key={`${outage.started_ms}${outage.kind}`}><b>{formatDateTimeSeconds(outage.started_ms)}</b> → <b>{formatDateTimeSeconds(outage.ended_ms)}</b><span>{formatDuration(outage.duration_s)}</span><em>{t(`net_outage_${outage.kind}`)}</em></li>)}</ul>}
       </section>}
-      <div className="net-toolbar">
+      <div className="net-toolbar" data-tour="net-toolbar">
         <p className="muted net-meta">{t("net_interface")}: <b>{node.interface.name}</b> · {node.interface.ip} · {t("net_network")} {node.interface.cidr} · {t("net_router")} {node.interface.gateway ?? "—"}
           {node.public ? <> · {t("no_public_ip")} <b>{node.public.ip}</b></> : null}
           {node.scan ? ` · ${t("net_last_scan")}: ${formatTime(node.scan.last_ms)} (${node.scan.hosts} ${t("net_scan_hosts")})` : ""}</p>
@@ -222,14 +222,14 @@ export function NetworkView({ openDesigner, t, origin, isAdmin, overview, reload
 
       {tab === "devices" && <div className={`net-devices ${selectedDevice ? "with-detail" : ""}`}>
         <div>
-          <div className="devices-filters">
+          <div className="devices-filters" data-tour="net-filters">
             <input type="search" value={query} placeholder={t("net_search")} onChange={event => setQuery(event.target.value)} />
             <select value={kind} onChange={event => setKind(event.target.value)}><option value="">{t("net_all_kinds")}</option>{NETWORK_KINDS.map(item => <option key={item} value={item}>{t(`netkind_${item}`)}</option>)}</select>
             <button className={onlyUnknown ? "on" : ""} onClick={() => setOnlyUnknown(value => !value)}>{t("net_only_unknown")}</button>
             <button className={onlyOffline ? "on" : ""} onClick={() => setOnlyOffline(value => !value)}>{t("net_only_offline")}</button>
             {((node.hidden ?? 0) > 0 || showHidden) && <button className={showHidden ? "on" : ""} onClick={() => setShowHidden(value => !value)}>{t("no_hidden_show")} ({node.hidden ?? 0})</button>}
           </div>
-          <div className="net-table" role="table">
+          <div className="net-table" role="table" data-tour="net-table">
             <div className="net-row head" role="row"><span>{t("net_col_status")}</span><span>{t("net_col_name")}</span><span>{t("net_col_address")}</span><span>{t("net_col_kind")}</span><span>{t("net_col_maker")}</span><span>{t("net_col_ports")}</span><span>{t("net_col_seen")}</span></div>
             {shown.map(device => <button key={device.id} className={`net-row ${device.online ? "" : "off"} ${selected === device.id ? "active" : ""} ${isKnown(device) ? "" : "new"}`} role="row" onClick={() => setSelected(device.id === selected ? null : device.id)}>
               <span className="st"><i className={`state-dot ${device.online ? "normal" : "off"}`} title={device.online ? t("net_online") : t("net_offline")} /></span>

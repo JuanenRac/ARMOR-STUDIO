@@ -100,7 +100,7 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
   for (const target of placed) targetsBySensor[target.sensorId] = (targetsBySensor[target.sensorId] ?? 0) + 1;
 
   return <section className="radar-view">
-    <article className="radar-map-card">
+    <article className="radar-map-card" data-tour="radar-map">
       <header>
         <MenuTitle kind="radar"><p className="eyebrow">{t("radarFusion")}</p><h2>{t("radarMap")}</h2></MenuTitle>
         <div className="radar-map-stats"><span><b>{placed.length}</b> {t("targetsLive")}</span><span><b>{counted}</b> {t("legendCounted").toLowerCase()}</span></div>
@@ -154,7 +154,7 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
             </g>;
           })}
         </svg>
-        <div className="radar-map-controls">
+        <div className="radar-map-controls" data-tour="radar-controls">
           <button onClick={() => zoom(1.25)} aria-label="+">+</button><button onClick={() => zoom(1 / 1.25)} aria-label="−">−</button><button onClick={() => setView(null)} title={t("fitView")}>⤢</button>
         </div>
         <ul className="radar-legend">
@@ -164,7 +164,7 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
       <p className="muted small">{t("radarAxisNote")}</p>
     </article>
 
-    <div className="radar-side">
+    <div className="radar-side" data-tour="radar-side">
       <p className="muted small radar-role">{t("radarNodeRole")}</p>
       <ViewTabs tabs={[["radars", t("radarsOfDesign")], ["nodes", t("activeRadarNodes")]]} active={side} onChange={setSide} />
       {side === "radars" && <RadarSensors t={t} sensors={model.sensors} dimensions={dimensions} nodes={nodes} rules={rules} targetsBySensor={targetsBySensor} setSensors={setSensors} openZones={openZones} openDesigner={openDesigner} />}

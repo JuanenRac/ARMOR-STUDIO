@@ -1,6 +1,6 @@
 /**
  * The guided tours of Studio: each one is a list of steps, and a step says which menu to open, which part of the page to light up and which picture to show. The words of a step are in
- * tourText.ts under `tour_<id>_<n>_t` (title) and `tour_<id>_<n>_b` (body), so a step cannot exist without its sentences in the seven languages.
+ * tourText.ts under `tour_<id>_<n>_t` (title) and `tour_<id>_<n>_b` (body), so a step cannot exist without its sentences in the eight languages.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import type { View } from "../domain";
@@ -20,7 +20,7 @@ export type Tour = { id: string; /** The minutes it takes, about. */ minutes: nu
 const nav = (view: View): string => `nav-${view}`;
 
 const BASE_TOURS: readonly Tour[] = [
-  { id: "welcome", minutes: 2, art: "welcome", steps: [
+  { id: "welcome", minutes: 3, art: "welcome", steps: [
     { art: "welcome" },
     { target: "brand", art: "menu", placement: "right" },
     { view: "overview", target: nav("overview"), art: "monitor", placement: "right" },
@@ -29,14 +29,17 @@ const BASE_TOURS: readonly Tour[] = [
     { target: nav("siteDesigner"), art: "design", placement: "right" },
     { target: nav("configuration"), art: "settings", placement: "right" },
     { target: "arm", art: "shield", placement: "bottom" },
+    { target: "mute", art: "tips", placement: "bottom" },
+    { art: "tips" },
     { target: "help", art: "tips", placement: "bottom" },
     { target: "statusbar", art: "welcome", placement: "top" },
   ] },
-  { id: "security", minutes: 2, art: "alarm", steps: [
+  { id: "security", minutes: 3, art: "alarm", steps: [
     { view: "alarms", target: nav("alarms"), art: "bell", placement: "right" },
     { view: "alarmPanels", target: nav("alarmPanels"), art: "alarm", placement: "right" },
     { view: "cameras", target: nav("cameras"), art: "camera", placement: "right" },
     { view: "radar", target: nav("radar"), art: "radar", placement: "right" },
+    { view: "record", target: nav("record"), art: "camera", placement: "right" },
     { view: "history", target: nav("history"), art: "monitor", placement: "right" },
   ] },
   { id: "designers", minutes: 2, art: "design", steps: [
@@ -56,8 +59,13 @@ const BASE_TOURS: readonly Tour[] = [
     { view: "automations", target: nav("automations"), art: "settings", placement: "right" },
     { view: "network", target: nav("network"), art: "network", placement: "right" },
   ] },
-  { id: "admin", minutes: 2, art: "admin", steps: [
+  { id: "admin", minutes: 4, art: "admin", steps: [
     { view: "configuration", target: "config-tabs", art: "settings", placement: "bottom" },
+    { view: "configuration", target: "tab-users", art: "admin", placement: "bottom" },
+    { view: "configuration", target: "tab-security", art: "shield", placement: "bottom" },
+    { view: "configuration", target: "tab-notifications", art: "bell", placement: "bottom" },
+    { view: "configuration", target: "tab-firmware", art: "update", placement: "bottom" },
+    { view: "configuration", target: "tab-installation", art: "admin", placement: "bottom" },
     { view: "configuration", target: "tab-updates", art: "update", placement: "bottom" },
     { view: "configuration", target: "tab-console", art: "terminal", placement: "bottom" },
     { view: "configuration", target: "tab-preferences", art: "tips", placement: "bottom" },

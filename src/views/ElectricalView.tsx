@@ -42,7 +42,7 @@ function ElectricalEnergyCard({ t, origin }: { t: Props["t"]; origin: string }) 
   const rows = (energy?.channels ?? []).filter(item => item.days.some(day => day.kwh > 0));
   if (rows.length === 0) return null;
   const days = [...new Set(rows.flatMap(item => item.days.map(day => day.day)))].sort().slice(-7);
-  return <article className="solar-card el-energy">
+  return <article className="solar-card el-energy" data-tour="el-energy">
     <div className="solar-card-head"><h3>{t("elEnergyTitle")}</h3></div>
     <p className="muted">{t("elEnergyHelp")}</p>
     <div className="el-energy-table" role="table">
@@ -58,10 +58,10 @@ export function ElectricalView({ openDevices, t, origin, readings, unreachable, 
   const drawn = useMemo(() => drawnNodeIds(design), [design]);
   const totals = readings?.totals;
   return <div className="solar-view electrical-live">
-    <header className="solar-head">
+    <header className="solar-head" data-tour="el-head">
       <MenuLogo kind="electrical" size={68} />
       <div className="solar-title"><p className="eyebrow">{t("navEnergy")}</p><h2>{t("electrical")}</h2><span className="muted">{t("electricalLiveHelp")}</span></div>
-      {totals && <div className="solar-totals">
+      {totals && <div className="solar-totals" data-tour="el-totals">
         <Tile label={t("elLiveGrid")} value={totals.grid_w === null ? "–" : `${totals.grid_estimated ? "≈ " : ""}${formatPower(totals.grid_w)}`} title={totals.grid_estimated ? t("elEstimatedTip") : undefined} />
         <Tile label={t("elLiveEnergy")} value={totals.grid_kwh === null ? "–" : formatEnergy(totals.grid_kwh)} />
         <Tile label={t("elLiveNodes")} value={`${totals.nodes - totals.stale}/${totals.nodes}`} />
@@ -91,7 +91,7 @@ function NodeCard({ t, origin, node, drawn, now }: { t: Translate; origin: strin
       <span className={`el-pill ${drawn ? "good" : "warn"}`}>{drawn ? t("elLiveDrawn") : t("elLiveNotDrawn")}</span>
       {switching === false && <span className="el-pill warn">{t("elLiveSwitchingOff")}</span>}
     </header>
-    <div className="el-channels" role="table">
+    <div className="el-channels" role="table" data-tour="el-channels">
       <div className="el-row head" role="row"><span>{t("elLiveChannel")}</span><span>V</span><span>A</span><span>W</span><span>kWh</span><span>Hz</span><span>PF</span><span>{t("elLiveState")}</span></div>
       {channels.map(channel => <Channel key={channel.id} t={t} channel={channel} />)}
     </div>
@@ -154,7 +154,7 @@ function ElectricalDevices({ t, origin, openDevices, now }: { t: Translate; orig
     try { await commandDevice(origin, element.id, command, element.risk !== "low"); poll.reload(); } catch (error) { setProblem(error instanceof Error ? error.message : "error"); }
     setBusy("");
   };
-  return <section className="solar-nodes el-devices">
+  return <section className="solar-nodes el-devices" data-tour="el-devices">
     <div className="solar-card-head"><h3>{t("elDevicesTitle")}</h3>
       {data && data.totals.elements > 0 && <span className="muted">{data.totals.online}/{data.totals.elements} · {formatPower(data.totals.power_w)} · {formatEnergy(data.totals.energy_kwh)}</span>}
       {openDevices && <button type="button" onClick={openDevices}>{t("elDevicesOpen")}</button>}

@@ -24,7 +24,7 @@ type PendingDelete = { kind: "all" } | { kind: "older-than"; days: number };
 function SummaryStrip({ summary, t }: { summary: HistorySummary | null; t: Translate }) {
   const card = (label: string, value: number | string, tone = "") => <article className={`history-stat ${tone}`}><span>{label}</span><strong>{value}</strong></article>;
   const day = summary?.last_24h;
-  return <section className="history-stats" aria-label={t("historySummary")}>
+  return <section data-tour="his-stats" className="history-stats" aria-label={t("historySummary")}>
     {card(t("statTotal"), summary?.total ?? "-")}
     {card(t("stat24h"), day?.events ?? "-")}
     {card(t("statHigh"), day?.high_alerts ?? "-", day && day.high_alerts > 0 ? "danger" : "")}
@@ -118,7 +118,7 @@ function EventPanel({ origin, t }: { origin: string; t: Translate }) {
   return <div className="history-card history-events">
     <header className="history-head">
       <MenuTitle kind="history"><p className="eyebrow">EVENT LOG</p><h2>{t("history")}</h2><p className="muted">{t("historyHelp")}</p></MenuTitle>
-      <div className="history-actions">
+      <div className="history-actions" data-tour="his-actions">
         <button className={live ? "active" : ""} aria-pressed={live} onClick={() => setLive(value => !value)} title={t("liveHelp")}>{live ? t("liveOn") : t("livePaused")}</button>
         <button disabled={busy || events.length === 0} onClick={() => void exportAs("csv")}>CSV</button>
         <button disabled={busy || events.length === 0} onClick={() => void exportAs("json")}>JSON</button>
@@ -134,7 +134,7 @@ function EventPanel({ origin, t }: { origin: string; t: Translate }) {
 
     <SummaryStrip summary={summary} t={t} />
 
-    <div className="history-filters">
+    <div className="history-filters" data-tour="his-filters">
       <div className="media-filters" role="tablist" aria-label={t("history")}>
         {FILTERS.map(value => <button key={value} className={filters.type === value && filters.level === "any" ? "active" : ""} onClick={() => set({ type: value, level: "any" })}>{value === "all" ? t("allEvents") : t(`event_${value}`)}</button>)}
       </div>

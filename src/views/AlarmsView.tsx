@@ -111,14 +111,14 @@ export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mo
         <h2>{pending === 0 ? t("allClear") : `${pending} ${t("alarmsActive")}`}</h2>
         <p className="muted">{pending === 0 ? t("allClearHelp") : t("alarmsHelp")}</p>
       </div>
-      <div className="alarm-hero-actions">
+      <div className="alarm-hero-actions" data-tour="al-actions">
         <button className={`mode-big ${mode}`} onClick={toggleMode} disabled={readOnly}>{mode === "armed" ? t("disarmSystem") : t("armSystem")}<small>{mode === "armed" ? t("armed") : t("disarmed")}</small></button>
         {pending > 0 && <button className="primary" disabled={readOnly} onClick={() => void act(() => acknowledgeAllAlarms(origin))}>{t("acknowledgeAll")}</button>}
       </div>
     </header>
     {message.text && <p className={`notice ${message.bad ? "bad" : ""}`} role="status">{message.text}</p>}
 
-    <div className="alarm-toolbar">
+    <div className="alarm-toolbar" data-tour="al-toolbar">
       <label>{t("alarmFilterSeverity")}<select value={severity} onChange={event => setSeverity(event.target.value)}>
         <option value="all">{t("alarmFilterAll")}</option>{(["critical", "high", "warning"] as const).map(level => <option key={level} value={level}>{t(`severity_${level}`)}</option>)}</select></label>
       <label>{t("alarmFilterSource")}<select value={source} onChange={event => setSource(event.target.value)}>
@@ -127,7 +127,7 @@ export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mo
       <span className="muted small">{t("alarmShowing")} {shownActive.length + shownRecent.length}/{active.length + recent.length}</span>
     </div>
 
-    <div className="alarm-list">
+    <div className="alarm-list" data-tour="al-list">
       {shownActive.map(alarm => <article key={alarm.id} className={`alarm-card ${alarm.severity} ${stateOf(alarm)}`}>
         <span className={`severity-chip ${alarm.severity}`}>{t(`severity_${alarm.severity}`)}</span>
         <div className="alarm-body">
@@ -141,7 +141,7 @@ export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mo
       </article>)}
     </div>
 
-    <article className="stack-card alarm-record">
+    <article className="stack-card alarm-record" data-tour="al-record">
       <h3>{t("alarmRecord")} <small className="user-chip">{shownRecent.length}</small></h3>
       {shownRecent.length === 0 ? <p className="muted">{t("noRecord")}</p> : <ul>
         {shownRecent.map(alarm => <li key={alarm.id} className="alarm-record-row">

@@ -34,13 +34,13 @@ export function SystemView({ t, origin, isAdmin }: { t: Translate; origin: strin
     <header className="devices-head"><MenuTitle kind="system"><p className="eyebrow">{t("systemTitle")}</p><h2>{t("system")}</h2><p className="muted">{t("systemHelp")}</p></MenuTitle></header>
     <MachineMonitor t={t} origin={origin} />
     {system && counts && <>
-      <div className="sys-hero">
+      <div className="sys-hero" data-tour="sys-hero">
         <div><small>{t("sysVersion")}</small><strong>v{system.version}</strong></div>
         <div><small>{t("sysUptime")}</small><strong>{uptimeText(system.uptime_s, t)}</strong></div>
         <div><small>{t("sysMode")}</small><strong className={system.mode}>{system.mode === "armed" ? t("armed") : t("disarmed")}</strong></div>
         <div><small>{t("sysRevision")}</small><strong>{system.revision}</strong></div>
       </div>
-      <div className="sys-grid">
+      <div className="sys-grid" data-tour="sys-grid">
         <article className="stack-card"><h3>{t("sysHolds")}</h3>
           <div className="sys-counts">
             {([["sysNodes", `${counts.nodes_online}/${counts.nodes}`], ["sysCameras", counts.cameras], ["sysDevices", `${counts.devices_online}/${counts.devices}`], ["sysAlarms", counts.alarms_active], ["sysAutomations", counts.automations], ["sysUsers", counts.users], ["sysEvents", counts.events]] as const).map(([key, value]) => <div key={key}><strong>{value}</strong><small>{t(key)}</small></div>)}
@@ -54,7 +54,7 @@ export function SystemView({ t, origin, isAdmin }: { t: Translate; origin: strin
       </div>
     </>}
     <NodeMessages t={t} origin={origin} />
-    <article className="stack-card audit-card">
+    <article className="stack-card audit-card" data-tour="sys-audit">
       <div className="log-head"><h3>{t("auditTitle")}</h3>{isAdmin && <CopyButton t={t} text={() => entries.map(entry => [entry.at, entry.outcome, entry.action, entry.actor ?? "", entry.target ?? "", entry.detail ?? ""].join(" | ")).join("\n")} />}</div>
       {!isAdmin ? <p className="muted">{t("auditOnlyAdmin")}</p> : <>
         <p className="muted">{t("auditHelp")}</p>

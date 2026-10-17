@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-484%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-495%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.0.2-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 484 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary, every menu rendered in the eight languages, the static host) and by browser tests. It runs in daily use against the CM5 test bench with the real server, real IP cameras and a radar node on its board; the pictures of the Help are made with example data. What has **not** been proven is live video and PTZ against every possible camera, the solar, electrical, alarm-panel and touch-panel menus with real equipment (only the radar node exists) and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
+**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 495 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary, every menu rendered in the eight languages, the static host) and by browser tests. It runs in daily use against the CM5 test bench with the real server, real IP cameras and a radar node on its board; the pictures of the Help are made with example data. What has **not** been proven is live video and PTZ against every possible camera, the solar, electrical, alarm-panel and touch-panel menus with real equipment (only the radar node exists) and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
 
 ---
 
@@ -39,7 +39,7 @@
 |---|---|
 | Version | `0.8.0.2` |
 | Maturity | Established |
-| Tests | 484 (`npm test`) |
+| Tests | 495 (`npm test`) |
 | Stack | React 19 / TypeScript / Vite |
 | On real hardware | Used daily against the CM5 test bench (real server, real IP cameras, a real radar node); the solar, electrical, alarm-panel and touch-panel menus wait for real nodes |
 
@@ -61,7 +61,7 @@
 * **Node firmware and updates:** *Node firmware* updates the field nodes one by one, with a bar for the whole job and for every node, and keeps its state if an alarm takes you to another menu; *Updates* installs Studio's and the server's own new versions from GitHub (showing the release notes of the new version), the operating system's updates and an optional maintenance console.
 * **Configuration in groups:** General and Preferences; Users, Notifications and Automatic capture; Node firmware and Updates; Server, Services, MQTT broker, Settings files, Installation and Console; each menu of the sidebar is also in foldable groups (Monitor, Security, Energy, House and network, Design, Administration).
 * **Eight languages** (English, Spanish, German, French, Italian, Japanese, Chinese and Portuguese) and eleven themes, the default one called *Armor*; language, theme and the weather place follow the account, not the browser. Roles: an administrator, an operator and a **viewer** who only looks.
-* **A Help that knows the whole system:** a book with four levels of detail and a picture with example data of each main menu, a guided tour for every menu, tooltips on everything, and an **assistant** (a mascot you can drag anywhere, pin where you want and ask in writing) with a dictionary in eight languages and a bubble that opens on the side that has room. The menus where you are working stay open while you visit another one.
+* **A Help that knows the whole system:** a book with four levels of detail and a picture with example data of each main menu, a step-by-step tour for every menu that goes control by control (what each button does, what to expect and the usual mistakes) with its own guide mascot and voice, a Help that explains the field nodes in depth (set-up Wi-Fi, access point and station, Bluetooth PIN, firmware slots with rollback, signed updates, the panel from outside), tooltips on everything, and an **assistant** (a mascot you can drag anywhere, pin where you want and ask in writing) with a dictionary in eight languages and a bubble that opens on the side that has room. The menus where you are working stay open while you visit another one.
 * **Outside access with choices, not files:** in Security an administrator sets up the WireGuard VPN, adds a phone by scanning a QR code, keeps a name that follows the house (DuckDNS, Cloudflare or any address to call) and registers the nodes whose own panel can be opened from outside through the server, comparing the certificate fingerprint before trusting it; every step explains itself in the eight languages and asks for the password again when it is done from outside.
 
 ## 🖼️ Screenshots
@@ -126,7 +126,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 484 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
+npm test            # 495 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```

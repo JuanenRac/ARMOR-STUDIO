@@ -28,7 +28,7 @@
   .studio-frame .devices-head, .studio-frame .alarm-hero, .studio-frame .sys-head { gap: .6rem; }
   .studio-frame .devices-head h2, .studio-frame .devices-head .eyebrow { display: none; }
   .studio-frame .devices-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 0; padding: 0; }
-  .studio-frame .devices-head .muted { margin: 0; font-size: .74rem; max-width: 60%; }
+  .studio-frame .devices-head .muted { margin: 0; font-size: .74rem; max-width: none; }
   .studio-frame .devices-stats span { padding: .25rem .6rem; } .studio-frame .devices-stats b { font-size: 1rem; }
   .studio-frame .devices-view, .studio-frame .alarms-view, .studio-frame .automations-view, .studio-frame .system-view, .studio-frame .radar-view, .studio-frame .overview { margin-top: 0; gap: 4px; }
 
@@ -56,7 +56,7 @@
   /* ---- overview: everything on one screen ---- */
   .studio-frame .overview { flex: 1 1 0; min-height: 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 4px; }
   .ov-hero { padding: .5rem 1rem; border-radius: 16px; flex-wrap: nowrap; gap: 1rem; }
-  .ov-hero .eyebrow { display: none; } .ov-hero h2 { font-size: 1.3rem; margin: 0; } .ov-hero .muted { margin: 0; font-size: .7rem; max-width: 60ch; }
+  .ov-hero .eyebrow { display: none; } .ov-hero h2 { font-size: 1.3rem; margin: 0; } .ov-hero .muted { margin: 0; font-size: .7rem; max-width: none; }
   .ov-hero-state { padding: .35rem .8rem; gap: .8rem; } .ov-hero-state strong { font-size: 1.05rem; } .ov-hero-state small { font-size: .5rem; }
   .ov-tiles { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; }
   .ov-tile { padding: .45rem .65rem; border-radius: 14px; grid-template-columns: auto minmax(0, 1fr); column-gap: .5rem; align-items: center; }

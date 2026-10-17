@@ -28,7 +28,7 @@ export function AlarmPanelsView({ t, origin, nodes, unreachable, network = null,
   const status = usePolled(() => alarmCommandsStatus(origin), 4000, origin);
   const enabled = status.data?.enabled ?? false;
   return <div className="solar-view electrical-live alarm-panels">
-    <header className="solar-head">
+    <header className="solar-head" data-tour="ap-head">
       <MenuLogo kind="alarmPanels" size={68} />
       <div className="solar-title"><p className="eyebrow">{t("navMonitor")}</p><h2>{t("alarmPanels")}</h2><span className="muted">{t("alarmPanelsHelp")}</span></div>
       {totals && <div className="solar-totals">
@@ -66,7 +66,7 @@ function ZoneLinks({ t, origin, nodes, isAdmin }: { t: Translate; origin: string
     try { setLinks((await saveZoneLinks(origin, links)).links); setMessage({ text: t("zlSaved"), bad: false }); }
     catch { setMessage({ text: t("zlError"), bad: true }); }
   };
-  return <section className="solar-notice zl-card" aria-label={t("zlTitle")}>
+  return <section className="solar-notice zl-card" data-tour="ap-zigbee" aria-label={t("zlTitle")}>
     <h4>{t("zlTitle")}</h4>
     <p className="muted small">{t("zlHelp")}</p>
     {links.length === 0 && <p className="muted">{t("zlNone")}</p>}
@@ -121,7 +121,7 @@ function PanelCard({ t, origin, node, now, canCommand, recent, reload }: { t: Tr
     setBusy(false);
   };
   const openZones = state.open_zones;
-  return <article className={`el-node-card ap-card ${node.stale ? "stale" : ""} ${sounding ? "sounding" : ""}`}>
+  return <article data-tour="ap-card" className={`el-node-card ap-card ${node.stale ? "stale" : ""} ${sounding ? "sounding" : ""}`}>
     <header>
       <strong>{node.node_id}</strong>
       <span className={`el-pill ${node.stale ? "bad" : "good"}`}>{node.stale ? t("solarNodeState_stale") : t("solarNodeState_reporting")} · {sinceIso(node.received_at, now)}</span>
@@ -131,7 +131,7 @@ function PanelCard({ t, origin, node, now, canCommand, recent, reload }: { t: Tr
       {state.locked_out && <span className="el-pill warn">{t("apLockedOut")}</span>}
       <span className={`el-pill ${state.commands_enabled ? "good" : "warn"}`}>{state.commands_enabled ? t("apCommandsEnabled") : t("apCommandsDisabled")}</span>
     </header>
-    <section className="ap-zones" aria-label={t("apZones")}>
+    <section data-tour="ap-zones" className="ap-zones" aria-label={t("apZones")}>
       <h4>{t("apZones")}</h4>
       {state.zones.length === 0 ? <p className="muted">{t("apNoZones")}</p> : <div className="ap-zone-list">
         {state.zones.map(zone => <div key={zone.id} className={`ap-zone ${zone.state}`}>
@@ -150,7 +150,7 @@ function PanelCard({ t, origin, node, now, canCommand, recent, reload }: { t: Tr
       </ul>}
     </section>
     {canCommand && !state.commands_enabled && <p className="muted small">{t("apNodeCommandsOff")}</p>}
-    {canCommand && <div className="ap-actions">
+    {canCommand && <div className="ap-actions" data-tour="ap-actions">
       <button type="button" disabled={busy || !allowed || state.phase !== "disarmed"} onClick={() => void send("arm", "away")}>{t("apArmAway")}</button>
       <button type="button" disabled={busy || !allowed || state.phase !== "disarmed"} onClick={() => void send("arm", "stay")}>{t("apArmStay")}</button>
       <button type="button" className="danger" disabled={busy || !allowed || state.phase === "disarmed"} onClick={() => setAskingPin(true)}>{t("apDisarm")}</button>

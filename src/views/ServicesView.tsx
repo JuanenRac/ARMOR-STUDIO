@@ -100,7 +100,7 @@ export function ServicesView({ t, origin }: { t: Translate; origin: string }) {
   const ask = (service: ServiceInfo, id: string, action: ServiceAction) => (action === "start" || action === "resume") ? void run(service, id, action) : setPending({ service, id, action });
 
   return <section className="services-view">
-    <header className="devices-head">
+    <header className="devices-head" data-tour="svc-head">
       <MenuTitle kind="services"><p className="eyebrow">{t("servicesTitle")}</p><h2>{t("services")}</h2><p className="muted">{t("servicesHelp")}</p></MenuTitle>
       <button onClick={poll.reload}>↻ {t("svcRefresh")}</button>
     </header>
@@ -109,7 +109,7 @@ export function ServicesView({ t, origin }: { t: Translate; origin: string }) {
     {isAdmin && agent === null && poll.data?.systemd && <p className="svc-banner warn">{t("svcNoAgent")}</p>}
     {poll.data && !poll.data.systemd && <p className="svc-banner warn">{t("svcNoSystemd")}</p>}
 
-    <div className="svc-stats">
+    <div className="svc-stats" data-tour="svc-stats">
       <div><small>{t("svcTotal")}</small><strong>{summary.total}</strong></div>
       <div className="green"><small>{t("svcActive")}</small><strong>{summary.active}</strong></div>
       <div className="red"><small>{t("svcInactive")}</small><strong>{summary.inactive}</strong></div>
@@ -118,7 +118,7 @@ export function ServicesView({ t, origin }: { t: Translate; origin: string }) {
       <div><small>{t("svcFamilies")}</small><strong>{families.length}</strong></div>
     </div>
 
-    <div className="svc-filters">
+    <div className="svc-filters" data-tour="svc-filters">
       <input value={search} onChange={event => setSearch(event.target.value)} placeholder={t("svcSearch")} aria-label={t("svcSearch")} />
       <div className="svc-chips" role="group">
         {(["all", "active", "inactive"] as const).map(kind => <button key={kind} className={show === kind ? "active" : ""} onClick={() => setShow(kind)}>{kind === "all" ? t("svcShowAll") : kind === "active" ? t("svcActive") : t("svcInactive")}</button>)}
@@ -131,7 +131,7 @@ export function ServicesView({ t, origin }: { t: Translate; origin: string }) {
 
     {grouped.map(([name, items]) => <div key={name} className="svc-family">
       <h3>{t(familyKey(name)) === familyKey(name) ? name : t(familyKey(name))} <span>({items.length})</span></h3>
-      <div className="svc-grid">
+      <div className="svc-grid" data-tour="svc-grid">
         {items.map(service => <article key={service.id} className={`svc-card ${toneOf(service.state)}`}>
           <header>
             <div><strong>{service.name}</strong><small>{describe(service, t)}</small></div>

@@ -7,3 +7,26 @@
 .main-stage .video-integration { max-width: none; }
 .main-stage :is(.stack-card, .config-panel, .devices-head, .alarm-hero, .sys-head, .ed-head) > p,
 .main-stage :is(.stack-card, .config-panel) > .muted { max-width: none; }
+
+/* The introduction under the title of a menu (and of a Configuration tab) takes the whole width left beside its logo and its buttons: no column of its own, no
+   fixed height, and the line height in rem, so the number of lines follows the language, the text size and the window by itself.
+   `:not(#ui)` makes these rules win over the narrower ones of the menus that load later. */
+.main-stage :is(.menu-title-text, .solar-title, .alarm-hero-text, .ov-hero-text, .ed-head > div, .unified-designer-heading > div, .mt-head > div, .pf-head > div, .devices-head, .sys-head, .fw-head, .stack-card, .config-panel) > .muted:not(#ui) {
+  max-width: none; width: auto; min-width: 0; line-height: 1.5rem; overflow-wrap: anywhere; text-wrap: pretty;
+}
+.main-stage :is(.menu-title, .ed-head > div:first-child, .unified-designer-heading > div:first-child, .mt-head > div:first-child, .pf-head > div:first-child):not(#ui) { flex: 1 1 18rem; min-width: 0; }
+.main-stage .menu-title-text:not(#ui) { flex: 1 1 0; }
+
+/* The head of the solar menus: the logo, the name and the totals on the first rows, and the introduction under all of them across the whole width. */
+.main-stage .solar-head:not(#ui) { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; column-gap: 1.1rem; row-gap: .25rem; align-items: center; }
+.main-stage .solar-head:not(#ui) > :first-child { grid-column: 1; grid-row: 1 / span 2; }
+.main-stage .solar-head:not(#ui) > .solar-title { display: contents; }
+.main-stage .solar-head:not(#ui) .solar-title > .eyebrow { grid-column: 2; grid-row: 1; }
+.main-stage .solar-head:not(#ui) .solar-title > h2 { grid-column: 2; grid-row: 2; }
+.main-stage .solar-head:not(#ui) .solar-title > .muted { grid-column: 1 / -1; grid-row: 3; margin-top: .3rem; }
+.main-stage .solar-head:not(#ui) > .solar-totals { grid-column: 3; grid-row: 1 / span 2; }
+@media (max-width: 760px) {
+  .main-stage .solar-head:not(#ui) { grid-template-columns: auto minmax(0, 1fr); }
+  .main-stage .solar-head:not(#ui) > .solar-totals { grid-column: 1 / -1; grid-row: auto; }
+  .main-stage .solar-head:not(#ui) .solar-title > .muted { grid-row: auto; }
+}

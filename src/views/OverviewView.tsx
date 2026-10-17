@@ -62,14 +62,14 @@ export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras
         <h2>{t("overviewTitle")}</h2>
         <p className="muted">{t("overviewHelp")}</p>
       </div>
-      <div className="ov-hero-state">
+      <div className="ov-hero-state" data-tour="ov-mode">
         <span className={`ov-pulse ${mode}`} />
         <div><small>{t("sysMode")}</small><strong>{mode === "armed" ? t("armed") : t("disarmed")}</strong></div>
         <button className={`mode-big ${mode}`} onClick={toggleMode} disabled={demo || readOnly}>{mode === "armed" ? t("disarmSystem") : t("armSystem")}</button>
       </div>
     </header>
 
-    <div className="ov-tiles">
+    <div className="ov-tiles" data-tour="ov-tiles">
       <Tile colour={active.length ? (critical ? "#ff4d5e" : "#ffb020") : "#34d399"} alert={active.length > 0} icon="!" label={t("tileAlarms")} value={active.length} sub={active.length ? t("alarmsActive") : t("allClear")} onClick={() => setView("alarms")} />
       <Tile colour="#f472b6" icon="▣" label={t("tilePanels")} value={panels ? `${panels.totals.armed}/${panels.totals.nodes}` : "—"} sub={panels && panels.totals.sounding > 0 ? `${panels.totals.sounding} ${t("tileSounding")}` : t("tileGuarding")} alert={(panels?.totals.sounding ?? 0) > 0} onClick={() => setView("alarmPanels")} />
       <Tile colour="#38bdf8" icon="◌" label={t("tileRadar")} value={`${nodesOnline}/${nodes.length}`} sub={`${tracks} ${t("tileTracks")}`} onClick={() => setView("radar")} />
@@ -81,11 +81,11 @@ export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras
     </div>
 
     <div className="ov-main">
-      <article className="ov-card ov-map">
+      <article className="ov-card ov-map" data-tour="ov-map">
         <header><h3>{t("liveMap")}</h3><button className="link-button" onClick={() => setView("siteDesigner")}>{t("qaDesigner")} ▸</button></header>
         <SiteMap model={model} dimensions={dimensions} devices={devices} nodes={nodes} alarms={alarms?.active ?? []} onDevice={onDevice} empty={t("liveMapEmpty")} />
       </article>
-      <div className="ov-side">
+      <div className="ov-side" data-tour="ov-side">
         <article className="ov-card">
           <header><h3>{t("alarms")}</h3><button className="link-button" title={t("alarms")} aria-label={t("alarms")} onClick={() => setView("alarms")}>▸</button></header>
           {active.length === 0 ? <p className="ov-ok">✓ {t("allClearHelp")}</p> : <ul className="ov-list">{active.slice(0, 5).map(alarm => <li key={alarm.id} className={alarm.severity}><span className={`severity-dot ${alarm.severity}`} /><div><strong>{t(`alarm_${alarm.code}`)}</strong><small className="alarm-source"><AlarmSource alarm={alarm} devices={devices} cameraNames={Object.fromEntries(cameras.map(camera => [camera.id, camera.name]))} t={t} /> · {ago(alarm.raised_at, now, t)}</small></div></li>)}</ul>}
@@ -106,7 +106,7 @@ export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras
       </div>
     </div>
 
-    <article className="ov-card ov-feed">
+    <article className="ov-card ov-feed" data-tour="ov-feed">
       <header><h3>{t("recentActivity")}</h3><button className="link-button" onClick={() => setView("history")}>{t("openHistory")} ▸</button></header>
       {feed.length === 0 ? <p className="muted">{t("noActivity")}</p> : <ul>{feed.map(event => <li key={event.id} className={`ev-${event.type}`}><span className="ov-event-icon">{EVENT_ICON[event.type]}</span><span className="ov-event-text">{describeEvent(event, t)}</span><small>{ago(event.at, now, t)}</small></li>)}</ul>}
     </article>

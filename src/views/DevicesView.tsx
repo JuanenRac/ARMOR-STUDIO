@@ -89,20 +89,20 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
   const commandLabels = (kind: DeviceKind) => kind === "lock" ? ["cmdLock", "cmdUnlock"] : isOpeningKind(kind) ? ["cmdOpen", "cmdClose"] : ["cmdOn", "cmdOff"];
 
   return <section className="devices-view">
-    <header className="devices-head">
+    <header className="devices-head" data-tour="dev-head">
       <MenuTitle kind="devices"><p className="eyebrow">{t("devicesTitle")}</p><h2>{t("devices")}</h2><p className="muted">{t("devicesHelp")}</p></MenuTitle>
       <div className="devices-stats">
         <span><b>{devices.length}</b>{t("devices")}</span><span className="ok"><b>{online}</b>{t("deviceOnline")}</span><span className={problems ? "bad" : ""}><b>{problems}</b>{t("filterProblems")}</span>
         <button className="primary" onClick={() => open()}>{t("addDevice")}</button>
       </div>
     </header>
-    <div className="devices-filters">
+    <div className="devices-filters" data-tour="dev-filters">
       {(["all", "sensor", "actuator", "problem"] as const).map(item => <button key={item} className={filter === item ? "on" : ""} onClick={() => setFilter(item)}>{t(item === "all" ? "filterAll" : item === "sensor" ? "filterSensors" : item === "actuator" ? "filterActuators" : "filterProblems")}</button>)}
       <input type="search" value={search} placeholder={t("searchDevices")} onChange={event => setSearch(event.target.value)} aria-label={t("searchDevices")} />
     </div>
     {message.text && <p className={`notice devices-notice ${message.bad ? "bad" : ""}`} role="status">{message.text}</p>}
 
-    {form && <form className="device-form stack-card" onSubmit={event => void save(event)}>
+    {form && <form data-tour="dev-form" className="device-form stack-card" onSubmit={event => void save(event)}>
       <h3>{form.id ? t("editDevice") : t("addDevice")}</h3>
       <div className="device-form-grid">
         <label>{t("deviceName")}<input value={form.name} maxLength={80} required onChange={event => edit({ name: event.target.value })} /></label>
@@ -145,7 +145,7 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
 
     {devices.length === 0 && !form && <div className="devices-empty"><KindIcon kind="smart_plug" size={42} /><h3>{t("noDevices")}</h3><p className="muted">{t("noDevicesHelp")}</p><button className="primary" onClick={() => open()}>{t("addDevice")}</button></div>}
 
-    <div className="device-grid">
+    <div className="device-grid" data-tour="dev-grid">
       {shown.map(device => {
         const problem = deviceProblem(device), colour = KIND_COLOUR[device.kind], state = describeState(device.kind, device.state, t);
         const [onLabel, offLabel] = commandLabels(device.kind), main = MAIN_FIELD[device.kind];

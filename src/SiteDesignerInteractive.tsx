@@ -390,11 +390,11 @@ export function SiteDesignerInteractive(props: Props) {
   </div>;
 
   return <section className="layout-workspace advanced-designer unified-site-designer">
-    <div className="panel-heading unified-designer-heading">
+    <div className="panel-heading unified-designer-heading" data-tour="sd-head">
       <div><p className="eyebrow">{t("siteDesigner")}</p><h2>{t("siteDesignerTitle")}</h2><p className="muted">{view === "2d" ? t("site2dProfessionalHelp") : t("site3dProfessionalHelp")}</p></div>
       <div className="designer-heading-actions">
-        <div className="designer-view-actions">
-          <div className="designer-view-toggle" role="tablist"><button className={view === "2d" ? "active" : ""} onClick={() => switchView("2d")}>{t("view2d")}</button><button className={view === "3d" ? "active" : ""} onClick={() => switchView("3d")}>{t("view3d")}</button></div>
+        <div className="designer-view-actions" data-tour="sd-actions">
+          <div className="designer-view-toggle" role="tablist" data-tour="sd-view"><button className={view === "2d" ? "active" : ""} onClick={() => switchView("2d")}>{t("view2d")}</button><button className={view === "3d" ? "active" : ""} onClick={() => switchView("3d")}>{t("view3d")}</button></div>
           <button className="designer-icon-button" onClick={undo} disabled={past.current.length === 0} title={`${t("undo")} (Ctrl+Z)`} aria-label={t("undo")}>{ICON.undo}</button>
           <button className="designer-icon-button" onClick={redo} disabled={future.current.length === 0} title={`${t("redo")} (Ctrl+Y)`} aria-label={t("redo")}>{ICON.redo}</button>
           <button onClick={props.openVersions} title={t("versionsTitle")}>{t("versionsButton")}</button>
@@ -404,7 +404,7 @@ export function SiteDesignerInteractive(props: Props) {
       </div>
     </div>
     <div className="site-designer-grid">
-      <div className="designer-canvas pro-canvas" ref={canvas}>
+      <div className="designer-canvas pro-canvas" ref={canvas} data-tour="sd-canvas">
         {view === "2d"
           ? <>
               <Plan2D t={t} devices={props.devices} dimensions={dimensions} model={model} selection={selection} tool={tool} activeFloor={floorsChosen} floorCount={floorCount} fitSignal={fitSignal}

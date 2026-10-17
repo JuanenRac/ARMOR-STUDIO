@@ -46,7 +46,7 @@ export function RadarSensors({ t, sensors, dimensions, nodes, rules, targetsBySe
   const zonesOf = (sensor: Sensor) => (rules?.zones ?? []).filter(zone => zone.node_id === sensor.node && (zone.sensor_id === undefined || zone.sensor_id === (sensor.channel ?? 0))).length;
 
   return <article className="stack-card radar-sensors">
-    <header className="rs-head"><div><p className="eyebrow">LD2450 · LD2461</p><h3>{t("radarsOfDesign")}</h3></div><div className="rs-head-actions"><button onClick={() => setWizard(wizard ? null : { name: "", node: nodes[0]?.node_id ?? "", heading: 90, kind: "LD2450" })}>{t("addNode270")}</button><button className="primary" onClick={add}>{t("addRadar")}</button></div></header>
+    <header className="rs-head" data-tour="radar-sensors"><div><p className="eyebrow">LD2450 · LD2461</p><h3>{t("radarsOfDesign")}</h3></div><div className="rs-head-actions"><button onClick={() => setWizard(wizard ? null : { name: "", node: nodes[0]?.node_id ?? "", heading: 90, kind: "LD2450" })}>{t("addNode270")}</button><button className="primary" onClick={add}>{t("addRadar")}</button></div></header>
     {wizard && <section className="rs-card open"><div className="rs-body">
       <p className="muted small">{t("node270Help")}</p>
       <div className="rs-grid">

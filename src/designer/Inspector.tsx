@@ -144,7 +144,7 @@ export function Inspector(p: InspectorProps) {
     return <button key={`${selected.kind}-${"id" in selected ? selected.id : ""}`} className={active ? "selected" : ""} onClick={() => p.onSelect(selected)}><span className="list-icon">{toolIcon(tool)}</span><span className="list-name">{label}</span><small>{sub}</small></button>;
   };
 
-  return <aside className="building-inspector">
+  return <aside className="building-inspector" data-tour="sd-inspector">
     <div className="inspector-tabs" role="tablist">
       <button role="tab" aria-selected={tab === "objects"} className={tab === "objects" ? "active" : ""} onClick={() => setTab("objects")}>{t("siteObjects")}</button>
       <button role="tab" aria-selected={tab === "properties"} className={tab === "properties" ? "active" : ""} onClick={() => setTab("properties")}>{t("properties")}</button>

@@ -32,10 +32,10 @@ export function BatteriesView({ t, origin, devices, totals, now, unreachable, wa
   const history = usePolled(() => (current ? solarHistory(origin, current.node_id, current.device, minutes) : Promise.resolve(null)), 15_000, `${current?.node_id}/${current?.device}/${minutes}/${origin}`);
   const capacity = totals ? capacityPercent(totals.capacity_ah ?? undefined, totals.full_capacity_ah ?? undefined) : null;
   return <div className="solar-view">
-    <header className="solar-head">
+    <header className="solar-head" data-tour="bat-head">
       <BatteryLogo size={68} percent={totals?.soc_percent ?? 70} />
       <div className="solar-title"><p className="eyebrow">{t("navEnergy")}</p><h2>{t("batteries")}</h2><span className="muted">{t("solarHelp")}</span></div>
-      {totals && <div className="solar-totals">
+      {totals && <div className="solar-totals" data-tour="bat-totals">
         <Tile colour={totals.soc_percent === null ? SOLAR_COLOURS.muted : TONE[levelTone(totals.soc_percent)]} label={t("solarSoc")} value={totals.soc_percent === null ? "–" : `${totals.soc_percent} %`} />
         <Tile colour={SOLAR_COLOURS.battery} label="kWh" value={totals.energy_kwh === null ? "–" : formatEnergy(totals.energy_kwh)} />
         <Tile colour={SOLAR_COLOURS.load} label="Ah" value={totals.capacity_ah === null ? "–" : `${totals.capacity_ah.toFixed(0)}${totals.full_capacity_ah === null ? "" : ` / ${totals.full_capacity_ah.toFixed(0)}`}${capacity === null ? "" : ` (${capacity} %)`}`} />
@@ -82,7 +82,7 @@ function StackPanel({ t, stack, now, history, minutes, setMinutes }: { t: Transl
         <span className={`solar-pill ${r.state === "charging" ? "ok" : r.state === "discharging" ? "warn" : ""}`}>{stateText}</span>
         <span className="muted">{stack.stale ? t("solarStale") : `${t("solarUpdated")} ${age} s`}</span>
       </div>
-      {r.modules === 0 ? <p className="solar-notice">{t("solarNoModules")}</p> : <div className="solar-stack-top">
+      {r.modules === 0 ? <p className="solar-notice">{t("solarNoModules")}</p> : <div className="solar-stack-top" data-tour="bat-stack">
         <BatteryGraphic percent={r.soc_percent} state={r.state} alarm={r.alarm === true} />
         <dl className="solar-facts">
           {r.voltage_v !== undefined && <Fact label={t("solarVoltage")} value={formatVolts(r.voltage_v, 2)} />}
@@ -101,7 +101,7 @@ function StackPanel({ t, stack, now, history, minutes, setMinutes }: { t: Transl
           <Fact label={t("solarModules")} value={`${r.stack.filter(module => module.present).length} / ${r.stack.length}`} />
         </dl>
       </div>}
-      {r.capacity_ah !== undefined && r.full_capacity_ah !== undefined && <div className="solar-capacity">
+      {r.capacity_ah !== undefined && r.full_capacity_ah !== undefined && <div className="solar-capacity" data-tour="bat-capacity">
         <div className="solar-capacity-head"><span>{t("solarCapacity")}</span><b>{r.capacity_ah.toFixed(1)} / {r.full_capacity_ah.toFixed(1)} Ah{remaining === null ? "" : ` · ${remaining} %`}</b></div>
         <div className="solar-bar"><i style={{ width: `${remaining ?? 0}%`, background: TONE[levelTone(remaining ?? 0)] }} /></div>
       </div>}
@@ -109,7 +109,7 @@ function StackPanel({ t, stack, now, history, minutes, setMinutes }: { t: Transl
     {r.stack.map(module => <ModuleCard key={module.n} t={t} module={module} />)}
     <section className="solar-card">
       <div className="solar-card-head"><h3>{t("solarHistory")}</h3>
-        <div className="solar-ranges">{RANGES.map(range => <button key={range.minutes} className={minutes === range.minutes ? "active" : ""} onClick={() => setMinutes(range.minutes)}>{t(range.key)}</button>)}</div>
+        <div className="solar-ranges" data-tour="bat-history">{RANGES.map(range => <button key={range.minutes} className={minutes === range.minutes ? "active" : ""} onClick={() => setMinutes(range.minutes)}>{t(range.key)}</button>)}</div>
       </div>
       <LineChart t={t} samples={history} from={from} to={now} series={[{ key: "soc_percent", label: t("solarChargeLevel"), color: SOLAR_COLOURS.battery, unit: "%" }]} />
       <LineChart t={t} samples={history} from={from} to={now} decimals={2} series={[{ key: "voltage_v", label: t("solarVoltage"), color: SOLAR_COLOURS.load, unit: "V" }]} />

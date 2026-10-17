@@ -105,7 +105,7 @@ export function WeatherView({ t, locale, origin }: { t: Translate; locale: strin
 
   if (!saved.enabled) {
     return <section className="weather-view">{title}
-      <div className="wx-consent">
+      <div className="wx-consent" data-tour="wx-consent">
         <h3>{t("wxConsentTitle")}</h3>
         <p>{t("wxConsentBody")}</p>
         <PlaceSearch t={t} query={query} setQuery={setQuery} search={search} searching={searching} results={results} onPick={place => { update({ enabled: true, place }); setResults(null); setQuery(""); }} />
@@ -127,7 +127,7 @@ export function WeatherView({ t, locale, origin }: { t: Translate; locale: strin
   const dayName = (iso: string, index: number) => index === 0 ? t("wxToday") : new Date(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10))).toLocaleDateString(locale, { weekday: "short", day: "numeric" });
 
   return <section className="weather-view">{title}
-    <div className="wx-bar">
+    <div className="wx-bar" data-tour="wx-bar">
       <div className="wx-place"><strong>📍 {placeTitle(place)}</strong>{forecast && <small>{place.latitude.toFixed(2)}, {place.longitude.toFixed(2)} · {t("wxElevation")} {fixed(forecast.elevation)} m</small>}</div>
       <div className="wx-actions">
         {weather.updated > 0 && <small>{t("wxUpdated")} {new Date(weather.updated).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}</small>}
@@ -141,7 +141,7 @@ export function WeatherView({ t, locale, origin }: { t: Translate; locale: strin
     {!forecast && !weather.failed && <p className="wx-note">{t("wxLoading")}</p>}
 
     {forecast && c && code && model && h && d && <>
-      <div className="wx-hero">
+      <div className="wx-hero" data-tour="wx-hero">
         <div className="wx-now">
           <span className="wx-icon" aria-hidden="true">{code.icon}</span>
           <div><div className="wx-temp">{fixed(c.temperature, 1)}<span>°C</span></div><div className="wx-desc">{t(`wx_${code.key}`)}</div><small>{t("wxFeelsLike")} {fixed(c.apparent, 1)}°</small></div>
@@ -173,7 +173,7 @@ export function WeatherView({ t, locale, origin }: { t: Translate; locale: strin
         <small className="wx-sources">{t("wxWarningsNote")}</small>
       </div>
 
-      <div className="wx-card"><h3>🛰 {t("wxRadar")}</h3><RadarMap place={place} t={t} locale={locale} /></div>
+      <div className="wx-card" data-tour="wx-radar"><h3>🛰 {t("wxRadar")}</h3><RadarMap place={place} t={t} locale={locale} /></div>
 
       <div className="wx-card">
         <h3>{t("wxHours")}</h3>
@@ -202,7 +202,7 @@ export function WeatherView({ t, locale, origin }: { t: Translate; locale: strin
       </div>
     </>}
 
-    {air && <div className="wx-card">
+    {air && <div className="wx-card" data-tour="wx-air">
       <h3>🌿 {t("wxAir")}</h3>
       <div className="wx-air">
         <div className="wx-aqi" style={{ borderColor: aqi ? AQI_COLOURS[aqi.level] : undefined }}><small>{t("wxAqi")}</small><strong style={{ color: aqi ? AQI_COLOURS[aqi.level] : undefined }}>{fixed(air.europeanAqi)}</strong><span>{aqi ? t(`aqi_${aqi.key}`) : ""}</span></div>

@@ -5,7 +5,7 @@
 .solar-title { flex: 1 1 14rem; min-width: 0; }
 .solar-title h2 { margin: 0; font-size: 1.6rem; letter-spacing: .02em; }
 .solar-title .eyebrow { margin: 0 0 .1rem; font-size: .68rem; letter-spacing: .18em; text-transform: uppercase; color: #79a3b0; }
-.solar-title .muted { display: block; margin-top: .3rem; font-size: .8rem; color: #8ea7b2; max-width: 44rem; }
+.solar-title .muted { display: block; margin-top: .3rem; font-size: .8rem; color: #8ea7b2; max-width: none; }
 .solar-totals { display: flex; flex-wrap: wrap; gap: .6rem; }
 .solar-tile { min-width: 8.2rem; padding: .55rem .8rem; border: 1px solid #193341; border-radius: 12px; background: #0a1a23; }
 .solar-tile small { display: block; font-size: .68rem; color: #8ea7b2; text-transform: uppercase; letter-spacing: .08em; }

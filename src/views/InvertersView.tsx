@@ -27,10 +27,10 @@ export function InvertersView({ t, origin, devices, totals, now, unreachable, wa
   const current = inverters.find(item => `${item.node_id}/${item.device}` === chosen) ?? inverters[0];
   const history = usePolled(() => (current ? solarHistory(origin, current.node_id, current.device, minutes) : Promise.resolve(null)), 15_000, `${current?.node_id}/${current?.device}/${minutes}/${origin}`);
   return <div className="solar-view">
-    <header className="solar-head">
+    <header className="solar-head" data-tour="inv-head">
       <InverterLogo size={68} />
       <div className="solar-title"><p className="eyebrow">{t("navEnergy")}</p><h2>{t("inverters")}</h2><span className="muted">{t("solarHelp")}</span></div>
-      {totals && <div className="solar-totals">
+      {totals && <div className="solar-totals" data-tour="inv-totals">
         <Tile colour={SOLAR_COLOURS.pv} label={t("solarPv")} value={formatPower(totals.pv_w)} />
         <Tile colour={SOLAR_COLOURS.load} label={t("solarLoad")} value={formatPower(totals.load_w)} />
         <Tile colour={SOLAR_COLOURS.battery} label={t("solarBatteryPower")} value={totals.battery_w === null ? "–" : formatPower(totals.battery_w)} />
@@ -63,7 +63,7 @@ function InverterPanel({ t, inverter, now, history, minutes, setMinutes }: { t: 
   const from = now - minutes * 60_000;
   const age = Math.max(0, Math.round((now - Date.parse(inverter.received_at)) / 1000));
   return <>
-    <section className={`solar-card flow-card ${inverter.stale ? "is-stale" : ""} ${r.mode === "fault" ? "is-fault" : ""}`}>
+    <section data-tour="inv-flow" className={`solar-card flow-card ${inverter.stale ? "is-stale" : ""} ${r.mode === "fault" ? "is-fault" : ""}`}>
       <div className="solar-card-head">
         <h3>{displayName(inverter)} <small>{inverter.node_id}</small></h3>
         {inverter.example && <span className="solar-pill warn">{t("solarExampleBadge")}</span>}
@@ -73,7 +73,7 @@ function InverterPanel({ t, inverter, now, history, minutes, setMinutes }: { t: 
       <FlowDiagram inverter={r} t={t} />
     </section>
     <section className="solar-card">
-      <div className="solar-gauges">
+      <div className="solar-gauges" data-tour="inv-gauges">
         <Gauge value={r.pv_w} max={niceScale([0, seen]).high || 1000} label={t("solarPv")} display={formatPower(r.pv_w)} colour={SOLAR_COLOURS.pv} />
         <Gauge value={r.load_percent} max={100} label={t("solarLoad")} display={`${Math.round(r.load_percent)} %`} colour={r.load_percent > 85 ? SOLAR_COLOURS.bad : SOLAR_COLOURS.load} />
         <Gauge value={r.battery_percent} max={100} label={t("solarBattery")} display={`${Math.round(r.battery_percent)} %`} colour={TONE[levelTone(r.battery_percent)]} />
@@ -103,7 +103,7 @@ function InverterPanel({ t, inverter, now, history, minutes, setMinutes }: { t: 
         <span className={r.ac_charging ? "on" : ""}><i />{t("solarGrid")} ▸ {t("solarBattery")}</span>
         <span className={r.load_on ? "on" : ""}><i />{t("solarLoad")}</span>
       </div>
-      <div className="solar-warnings">
+      <div className="solar-warnings" data-tour="inv-warnings">
         <small>{t("solarWarnings")}</small>
         {r.warnings.length === 0 ? (r.warnings_known === false ? <span className="solar-chip" title={t("solarWarningsUnknownTip")}>{t("solarWarningsUnknown")}</span> : <span className="solar-chip ok">{t("solarNoWarnings")}</span>) : r.warnings.map(name => <span key={name} className="solar-chip bad">{humanize(name)}</span>)}
       </div>
@@ -111,7 +111,7 @@ function InverterPanel({ t, inverter, now, history, minutes, setMinutes }: { t: 
     <UnitInfoCard t={t} reading={r} />
     <section className="solar-card">
       <div className="solar-card-head"><h3>{t("solarHistory")}</h3>
-        <div className="solar-ranges">{RANGES.map(range => <button key={range.minutes} className={minutes === range.minutes ? "active" : ""} onClick={() => setMinutes(range.minutes)}>{t(range.key)}</button>)}</div>
+        <div className="solar-ranges" data-tour="inv-history">{RANGES.map(range => <button key={range.minutes} className={minutes === range.minutes ? "active" : ""} onClick={() => setMinutes(range.minutes)}>{t(range.key)}</button>)}</div>
       </div>
       <LineChart t={t} samples={history} from={from} to={now} series={[{ key: "pv_w", label: t("solarPvPower"), color: SOLAR_COLOURS.pv, unit: "W" }, { key: "out_w", label: t("solarLoadPower"), color: SOLAR_COLOURS.load, unit: "W" }]} />
       <LineChart t={t} samples={history} from={from} to={now} series={[{ key: "battery_percent", label: t("solarChargeLevel"), color: SOLAR_COLOURS.battery, unit: "%" }]} />
@@ -170,7 +170,7 @@ export function EnergyAlarmsCard({ t, origin }: { t: Translate; origin: string }
   const save = async (settings: Partial<EnergyAlarmSettings>) => {
     try { const answer = await saveEnergyAlarms(origin, settings); setDraft(answer.settings); setState("saved"); } catch { setState("failed"); }
   };
-  return <section className="solar-card energy-alarms">
+  return <section className="solar-card energy-alarms" data-tour="inv-alarms">
     <div className="solar-card-head"><h3>{t("eaTitle")}</h3></div>
     <p className="muted small">{t("eaHelp")}</p>
     <div className="inspector-grid">

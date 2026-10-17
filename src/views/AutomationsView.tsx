@@ -75,13 +75,13 @@ export function AutomationsView({ t, origin, automations, reload, devices, now }
   const trigger = form?.trigger;
 
   return <section className="automations-view">
-    <header className="devices-head">
+    <header className="devices-head" data-tour="auto-head">
       <MenuTitle kind="automations"><p className="eyebrow">{t("automationsTitle")}</p><h2>{t("automations")}</h2><p className="muted">{t("automationsHelp")}</p></MenuTitle>
       <div className="devices-stats"><button className="primary" onClick={() => setForm(blank())}>{t("newAutomation")}</button></div>
     </header>
     {message.text && <p className={`notice devices-notice ${message.bad ? "bad" : ""}`} role="status">{message.text}</p>}
 
-    {form && <form className="automation-form stack-card" onSubmit={event => void save(event)}>
+    {form && <form data-tour="auto-form" className="automation-form stack-card" onSubmit={event => void save(event)}>
       <h3>{form.id ? t("editAutomation") : t("newAutomation")}</h3>
       {!form.id && <div className="template-row"><small className="muted">{t("templates")}:</small>{(["smoke", "intrusion", "door"] as const).map(item => <button type="button" key={item} onClick={() => template(item)}>{t(`template_${item}`)}</button>)}</div>}
       <label>{t("automationName")}<input value={form.name ?? ""} maxLength={80} required onChange={event => setForm({ ...form, name: event.target.value })} /></label>
@@ -129,7 +129,7 @@ export function AutomationsView({ t, origin, automations, reload, devices, now }
     </form>}
 
     {automations.length === 0 && !form && <div className="devices-empty"><h3>{t("noAutomations")}</h3><div className="template-row">{(["smoke", "intrusion", "door"] as const).map(item => <button type="button" key={item} onClick={() => template(item)}>{t(`template_${item}`)}</button>)}</div></div>}
-    <div className="automation-list">
+    <div className="automation-list" data-tour="auto-list">
       {automations.map(automation => <article key={automation.id} className={`automation-card ${automation.enabled ? "" : "off"}`}>
         <h3><button className={`switch ${automation.enabled ? "on" : ""}`} role="switch" aria-checked={automation.enabled} aria-label={automation.enabled ? t("automationEnabled") : t("automationDisabled")} onClick={() => void act(() => updateAutomation(origin, automation.id, { enabled: !automation.enabled }))} />{automation.name}</h3>
         <div className="automation-sentence">

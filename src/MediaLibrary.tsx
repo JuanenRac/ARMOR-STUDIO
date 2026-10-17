@@ -63,18 +63,18 @@ export function MediaLibrary({ origin, cameras, t }: { origin: string; cameras: 
   return <section className="media-workspace">
     <header className="media-heading">
       <MenuTitle kind="record"><p className="eyebrow">EVIDENCE ARCHIVE</p><h2>{t("mediaLibrary")}</h2><p className="muted">{t("mediaLibraryHelp")}</p></MenuTitle>
-      <div className="media-toolbar"><div className="media-filters" role="tablist" aria-label={t("mediaLibrary")}>{(["all", "snapshot", "recording"] as Filter[]).map(value => <button key={value} className={filter === value ? "active" : ""} onClick={() => setFilter(value)}>{value === "all" ? t("allMedia") : value === "snapshot" ? t("snapshots") : t("recordings")}</button>)}</div><button className="danger-button" disabled={!visible.length} onClick={() => void clearVisible()}>{t("deleteAllMedia")}</button></div>
+      <div className="media-toolbar" data-tour="rec-filters"><div className="media-filters" role="tablist" aria-label={t("mediaLibrary")}>{(["all", "snapshot", "recording"] as Filter[]).map(value => <button key={value} className={filter === value ? "active" : ""} onClick={() => setFilter(value)}>{value === "all" ? t("allMedia") : value === "snapshot" ? t("snapshots") : t("recordings")}</button>)}</div><button className="danger-button" disabled={!visible.length} onClick={() => void clearVisible()}>{t("deleteAllMedia")}</button></div>
     </header>
-    <div className="media-status">{activeCameraIds.length ? <><span className="record-dot" /> {t("recording")}: {activeCameraIds.map(cameraName).join(", ")}</> : <>{items.length} {t("allMedia").toLowerCase()}</>} {message && <strong>{message}</strong>}</div>
+    <div className="media-status" data-tour="rec-status">{activeCameraIds.length ? <><span className="record-dot" /> {t("recording")}: {activeCameraIds.map(cameraName).join(", ")}</> : <>{items.length} {t("allMedia").toLowerCase()}</>} {message && <strong>{message}</strong>}</div>
     <div className="media-library">
-      <aside className="media-list" aria-label={t("mediaLibrary")}>
+      <aside data-tour="rec-list" className="media-list" aria-label={t("mediaLibrary")}>
         {loading && <p className="muted">…</p>}
         {!loading && !visible.length && <p className="media-empty">{t("noMedia")}</p>}
         {visible.map(item => <button key={item.id} className={`media-item ${selected?.id === item.id ? "selected" : ""}`} onClick={() => setSelectedId(item.id)}>
           <span className={`media-kind ${item.kind}`}>{item.kind === "snapshot" ? t("media_photo") : t("media_video")}</span><span className="media-item-copy"><strong>{cameraName(item.cameraId)}</strong><small>{new Date(item.createdAt).toLocaleString()}</small></span><small>{size(item.bytes)}</small>
         </button>)}
       </aside>
-      <article className="media-preview">
+      <article className="media-preview" data-tour="rec-preview">
         {selected ? <><div className="preview-stage">{selected.kind === "snapshot" ? <img src={mediaUrl(origin, selected)} alt={`${t("snapshot")}: ${cameraName(selected.cameraId)}`} /> : <video key={selected.id} src={mediaUrl(origin, selected)} controls preload="metadata" />}</div><footer className="preview-footer"><div><span className={`media-kind ${selected.kind}`}>{selected.kind === "snapshot" ? t("media_photo") : t("media_video")}</span><h3>{cameraName(selected.cameraId)}</h3><p>{t("createdAt")}: {new Date(selected.createdAt).toLocaleString()} · {t("fileSize")}: {size(selected.bytes)}</p></div><button onClick={() => void toggleProtection()} title={t("mediaProtectedNote")}>{selected.protected ? t("mediaUnprotect") : t("mediaProtect")}</button><button onClick={() => void downloadProof()} title={t("mediaProofNote")}>{t("mediaProof")}</button><button className="danger-button" onClick={() => void removeSelected()}>{t("deleteMedia")}</button></footer></> : <div className="media-empty preview-empty"><span>◉</span><p>{t("selectMedia")}</p></div>}
       </article>
     </div>

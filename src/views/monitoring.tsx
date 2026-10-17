@@ -115,15 +115,15 @@ export function CameraMonitorView(props: CameraViewProps) {
   const placed = resolveSlots(cameras.map(camera => camera.id), props.slots, gridSize);
   const shown = placed.flatMap(id => { const camera = cameras.find(item => item.id === id); return camera ? [camera] : []; });
   const shownIndex = (id: string) => placed.indexOf(id);
-  return <section className="camera-workspace">
+  return <section className="camera-workspace" data-tour="cam-workspace">
     {wall && <CameraWall {...props} shown={shown} exit={leaveWall} />}
     <div className="panel-heading">
       <MenuTitle kind="cameras"><p className="eyebrow">{t("videoOperations")}</p><h2>{t("cameraMonitor")}</h2><p className="muted">{t("cameraHelp")}</p></MenuTitle>
-      <div className="grid-picker">{!configuring && GRID_SIZES.map(size => <button key={size} className={gridSize === size ? "active" : ""} onClick={() => props.setGridSize(size)}>{size} {size > 1 ? t("views") : t("view")}</button>)}{!configuring && gridSize >= 2 && shown.length >= 2 && <button title={t("cam_wall_help")} onClick={() => setWall(true)}>⛶ {t("cam_wall")}</button>}<button className={configuring ? "active" : ""} onClick={() => setConfiguring(value => !value)}>{configuring ? `‹ ${t("cam_back")}` : `⚙ ${t("cam_configure")}`}</button></div>
+      <div className="grid-picker" data-tour="cam-grid">{!configuring && GRID_SIZES.map(size => <button key={size} className={gridSize === size ? "active" : ""} onClick={() => props.setGridSize(size)}>{size} {size > 1 ? t("views") : t("view")}</button>)}{!configuring && gridSize >= 2 && shown.length >= 2 && <button title={t("cam_wall_help")} onClick={() => setWall(true)}>⛶ {t("cam_wall")}</button>}<button className={configuring ? "active" : ""} onClick={() => setConfiguring(value => !value)}>{configuring ? `‹ ${t("cam_back")}` : `⚙ ${t("cam_configure")}`}</button></div>
     </div>
     {props.openDesigner && <DesignerLink title={t("dlCamerasTitle")} text={t("dlCamerasText")} button={t("dlSiteButton")} open={props.openDesigner} />}
     {configuring ? <div className="camera-config-frame">{props.settings}</div> : <>
-    <div ref={frame.ref} className={`camera-frame ${layout.scrolls ? "scrolls" : ""}`}>
+    <div data-tour="cam-frame" ref={frame.ref} className={`camera-frame ${layout.scrolls ? "scrolls" : ""}`}>
       <div className={`camera-grid grid-${gridSize}`} style={layout.tileWidth > 0 ? { gridTemplateColumns: `repeat(${layout.columns}, ${layout.tileWidth}px)`, gridAutoRows: `${layout.tileHeight}px`, gap: GRID_GAP } : undefined}>
         {shown.map(camera => <CameraTile key={camera.id} choices={cameras} pick={id => props.setSlot(shownIndex(camera.id), id)} camera={camera} selected={camera.id === selectedId} select={() => props.select(camera.id)} toggle={() => props.toggle(camera)} snapshot={() => props.snapshot(camera)} record={() => props.record(camera)} expand={() => props.expand(camera.id)} recording={recordingIds.includes(camera.id)} streamUrl={streamUrls[camera.id]} reachability={reachability[camera.id]} invokePtz={command => props.ptz(camera, command)} t={t} />)}
       </div>

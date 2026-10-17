@@ -42,7 +42,7 @@ export function MachineMonitor({ t, origin }: { t: Translate; origin: string }) 
   const memoryPercent = metrics.memory.total ? (metrics.memory.used / metrics.memory.total) * 100 : 0;
   const rx = metrics.network.reduce((sum, item) => sum + (item.rx_bps ?? 0), 0), tx = metrics.network.reduce((sum, item) => sum + (item.tx_bps ?? 0), 0);
   const empty = t("sm_collecting");
-  return <article className="stack-card machine-card">
+  return <article className="stack-card machine-card" data-tour="sys-machine">
     <h3>{t("sm_title")}</h3>
     <p className="hint">{t("sm_help")}</p>
     <div className="machine-tiles">
