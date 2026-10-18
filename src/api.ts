@@ -542,19 +542,52 @@ export type AlarmEventReading = { ago_s: number; kind: "armed" | "exit_delay_sta
 export type AlarmState = {
   kind: "alarm"; node_id: string; timestamp_ms: number; phase: AlarmPhase; mode: "disarmed" | "away" | "stay"; siren: boolean; locked_out: boolean; commands_enabled: boolean;
   zones: AlarmZoneReading[]; open_zones: string[]; events: AlarmEventReading[];
+  /** The node understands the arming profiles of the arm command (an older firmware does not say so). */
+  arm_profiles?: boolean;
+  /** The id of the arming profile the panel is armed (or arming) with. */
+  profile?: string;
 };
 export type AlarmNodeView = { node_id: string; state: AlarmState; received_at: string; stale: boolean };
 export type AlarmNodes = { nodes: AlarmNodeView[]; totals: { nodes: number; stale: number; armed: number; sounding: number } };
 export const listAlarmNodes = (origin: string) => userCall<AlarmNodes>(origin, "GET", "/api/v1/alarm/nodes");
-export type AlarmCommandRecord = { command_id: string; node_id: string; action: "arm" | "disarm" | "silence"; mode?: "away" | "stay"; accepted: boolean; refusal: string; phase?: AlarmPhase; actor: string; at: string };
+export type AlarmCommandRecord = { command_id: string; node_id: string; action: "arm" | "disarm" | "silence"; mode?: "away" | "stay"; profile?: string; accepted: boolean; refusal: string; phase?: AlarmPhase; actor: string; at: string };
 /** A Zigbee device of the registry tied to a zone of an alarm panel: the server tells the panel how that zone is while it holds the radio. */
 export type ZoneLink = { device_id: string; node_id: string; zone_id: string };
 export const listZoneLinks = (origin: string) => userCall<{ links: ZoneLink[] }>(origin, "GET", "/api/v1/alarm/zone-links");
 export const saveZoneLinks = (origin: string, links: ZoneLink[]) => userCall<{ links: ZoneLink[] }>(origin, "PUT", "/api/v1/alarm/zone-links", { links });
 export const alarmCommandsStatus = (origin: string) => userCall<{ enabled: boolean; pending: unknown[]; recent: AlarmCommandRecord[] }>(origin, "GET", "/api/v1/alarm/commands");
 /** Arm (away or stay, optionally leaving out the zones that are open), disarm a panel or silence its siren (the system stays armed). Arming needs no PIN, but the server, the node and the broker must all have allowed it; disarming and silencing send the PIN of the person when the panel asks for one. */
-export const sendAlarmCommand = (origin: string, node: string, action: "arm" | "disarm" | "silence", mode?: "away" | "stay", force = false, pin?: string) =>
-  userCall<{ accepted: boolean; command_id: string }>(origin, "POST", "/api/v1/alarm/command", action === "arm" ? { node, action, mode, ...(force ? { force: true } : {}) } : { node, action, ...(pin ? { pin } : {}) });
+export const sendAlarmCommand = (origin: string, node: string, action: "arm" | "disarm" | "silence", mode?: "away" | "stay", force = false, pin?: string, profile?: string) =>
+  userCall<{ accepted: boolean; command_id: string }>(origin, "POST", "/api/v1/alarm/command", action === "arm" ? { node, action, ...(profile ? { profile } : { mode }), ...(force ? { force: true } : {}) } : { node, action, ...(pin ? { pin } : {}) });
+
+// ---- the arming profiles: the named ways of arming a panel (Away, Home, Night, the owner's own) -------------------------------------------------
+export type ArmProfileZone = { id: string; armed?: boolean; delay?: "instant" | "entry" };
+export type ArmProfile = { id: string; name: string; base: "away" | "stay"; exit_delay_s?: number; entry_delay_s?: number; siren?: boolean; notify?: "urgent" | "normal"; zones?: ArmProfileZone[] };
+export type ArmProfiles = { revision: number; updated_at: string; updated_by: string; profiles: ArmProfile[]; max: number };
+export const listArmProfiles = (origin: string) => userCall<ArmProfiles>(origin, "GET", "/api/v1/alarm/profiles");
+/** Replaces the whole list; `revision` is the one that was read, and a change made meanwhile is a 409 (code `conflict`). */
+export const saveArmProfiles = (origin: string, profiles: ArmProfile[], revision: number) => userCall<ArmProfiles>(origin, "PUT", "/api/v1/alarm/profiles", { profiles, revision });
+
+// ---- the health of the nodes: the same report for every family ------------------------------------------------------------------------------------
+export type HealthFamily = "radar" | "solar" | "electrical" | "alarm" | "hmi";
+export type NodeHealthReport = {
+  kind: "node_health"; node_id: string; timestamp_ms: number; family: HealthFamily; firmware: string; board?: string; uptime_s: number; reset_reason: string; heap_free: number; heap_min: number;
+  link: "wifi" | "ethernet" | "none"; link_up: boolean; rssi_dbm?: number; broker_reconnects: number; low_stack_tasks?: number; last_error?: string;
+};
+export type HealthWarningCode = "node_low_memory" | "node_frequent_resets" | "node_link_flapping" | "node_weak_signal";
+export type HealthWarning = { code: HealthWarningCode; detail: Record<string, string | number | boolean> };
+export type HealthRestart = { at: string; reason: string; abnormal: boolean; uptime_before_s?: number };
+export type NodeHealthItem = {
+  node_id: string; family: HealthFamily; firmware: string; board?: string; report: NodeHealthReport; received_at: string; stale: boolean; status: "ok" | "warning" | "stale";
+  warnings: HealthWarning[]; restarts_24h: number; last_restart?: HealthRestart;
+};
+export type HealthSample = { at: number; heap_free: number; heap_min: number; rssi_dbm?: number; link_up: boolean; uptime_s: number; broker_reconnects: number };
+export type NodeHealthDetail = NodeHealthItem & { samples: HealthSample[]; restarts: HealthRestart[] };
+export type NodeHealthLevels = { low_heap_b: number; low_heap_clear_b: number; restarts_per_day: number; abnormal_window_min: number; flap_reconnects: number; flap_window_min: number; weak_signal_dbm: number; weak_signal_reports: number; silent_after_s: number };
+export type NodeHealthList = { nodes: NodeHealthItem[]; waiting: Array<{ node_id: string; family: HealthFamily }>; totals: { nodes: number; stale: number; with_warnings: number }; levels: NodeHealthLevels };
+export const readNodeHealth = (origin: string) => userCall<NodeHealthList>(origin, "GET", "/api/v1/node-health");
+export const readNodeHealthDetail = (origin: string, node: string) => userCall<NodeHealthDetail>(origin, "GET", `/api/v1/node-health/${encodeURIComponent(node)}`);
+export const forgetNodeHealth = (origin: string, node: string) => userCall<void>(origin, "DELETE", `/api/v1/node-health/${encodeURIComponent(node)}`);
 
 /** The PIN that disarms the system: yours (after confirming the password), or anybody's for an administrator. The duress PIN disarms as well, and warns in silence. */
 export const setMyPin = (origin: string, change: { currentPassword: string; pin?: string; duress_pin?: string; clear?: boolean }) => userCall<StudioUser>(origin, "PUT", "/api/v1/account/pin", change);

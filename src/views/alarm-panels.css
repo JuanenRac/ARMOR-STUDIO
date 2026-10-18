@@ -21,3 +21,22 @@
 .zl-row label { display: grid; gap: 2px; font-size: 12px; }
 .zl-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 @media (max-width: 720px) { .zl-row { grid-template-columns: 1fr; } }
+
+/* The arming modes: the picker on a panel's card and the editor of the modes. */
+.ap-mode { display: inline-flex; align-items: center; gap: .4rem; font-size: .8rem; color: #a9d0d6; }
+.apm-card { display: grid; gap: .5rem; }
+.apm-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; }
+.apm-head h4 { margin: 0; }
+.apm-summary { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: .3rem .9rem; font-size: .82rem; }
+.apm-editor { display: grid; gap: .8rem; }
+.apm-profile { display: grid; gap: .5rem; padding: .6rem .8rem; border: 1px solid #1f4452; border-radius: 12px; }
+.apm-profile legend { padding: 0 .4rem; font-weight: 600; }
+.apm-profile h5 { margin: .2rem 0 0; font-size: .8rem; color: #86a8b3; }
+.apm-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .6rem .9rem; }
+.apm-fields label { display: grid; gap: .15rem; font-size: .78rem; }
+.apm-fields .apm-check { display: block; }
+.apm-fields .apm-check small { display: block; }
+.apm-zone-row { display: grid; grid-template-columns: minmax(8rem, 1.2fr) repeat(2, minmax(8rem, 1fr)) auto; gap: .5rem; align-items: end; }
+.apm-zone-row label { display: grid; gap: .1rem; font-size: .72rem; }
+.apm-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+@media (max-width: 760px) { .apm-zone-row { grid-template-columns: 1fr; } }

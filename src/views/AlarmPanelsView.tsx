@@ -5,7 +5,9 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useEffect, useState } from "react";
-import { alarmCommandsStatus, listDevices, listZoneLinks, saveZoneLinks, sendAlarmCommand, ApiError, type AlarmNodeView, type AlarmNodes, type StudioDevice, type ZoneLink } from "../api";
+import { alarmCommandsStatus, listArmProfiles, listDevices, listZoneLinks, saveZoneLinks, sendAlarmCommand, ApiError, type AlarmNodeView, type AlarmNodes, type ArmProfile, type StudioDevice, type ZoneLink } from "../api";
+import { ArmProfilesEditor } from "./ArmProfilesEditor";
+import { knownZones, profileName } from "../armProfilesModel";
 import { MenuLogo } from "../menuLogos";
 import { PinDialog } from "../components/chrome";
 import { usePolled } from "../hooks";
@@ -27,6 +29,7 @@ export function AlarmPanelsView({ t, origin, nodes, unreachable, network = null,
   const totals = nodes?.totals;
   const status = usePolled(() => alarmCommandsStatus(origin), 4000, origin);
   const enabled = status.data?.enabled ?? false;
+  const modes = usePolled(() => listArmProfiles(origin), 30000, origin);
   return <div className="solar-view electrical-live alarm-panels">
     <header className="solar-head" data-tour="ap-head">
       <MenuLogo kind="alarmPanels" size={68} />
@@ -40,10 +43,11 @@ export function AlarmPanelsView({ t, origin, nodes, unreachable, network = null,
     {unreachable && <p className="solar-notice bad">{t("apUnreachable")}</p>}
     {openDesigner && <p className="solar-notice ap-designer"><span>{t("apDesignerHelp")}</span> <button onClick={openDesigner}>{t("apOpenDesigner")}</button></p>}
     {isAdmin && status.data && !enabled && <p className="solar-notice">{t("apCommandsOff")}</p>}
+    {list.length > 0 && isAdmin && modes.data && <ArmProfilesEditor t={t} origin={origin} current={modes.data} zones={knownZones(list)} onSaved={() => modes.reload()} onConflict={() => modes.reload()} />}
     {list.length > 0 && <ZoneLinks t={t} origin={origin} nodes={list} isAdmin={isAdmin} />}
     <NodeFinder t={t} origin={origin} network={network} wantKind="alarm" knownIds={list.map(node => node.node_id)} />
     {list.length === 0 ? <div className="solar-empty"><MenuLogo kind="alarmPanels" size={92} /><h3>{t("apNone")}</h3><p>{t("apNoneHelp")}</p></div>
-      : list.map(node => <PanelCard key={node.node_id} t={t} origin={origin} node={node} now={now} canCommand={isAdmin && enabled} recent={(status.data?.recent ?? []).filter(item => item.node_id === node.node_id).slice(0, 3)} reload={status.reload} />)}
+      : list.map(node => <PanelCard key={node.node_id} t={t} origin={origin} node={node} now={now} canCommand={isAdmin && enabled} profiles={modes.data?.profiles} recent={(status.data?.recent ?? []).filter(item => item.node_id === node.node_id).slice(0, 3)} reload={status.reload} />)}
   </div>;
 }
 
@@ -99,9 +103,9 @@ function Tile({ label, value, bad = false }: { label: string; value: string; bad
   return <div className="solar-tile" style={{ borderColor: bad ? "#ff6f7988" : "#22d3ee55" }}><small>{label}</small><b style={{ color: bad ? "#ff8e99" : "#5df0c4" }}>{value}</b></div>;
 }
 
-type Recent = { command_id: string; action: string; mode?: string; accepted: boolean; refusal: string; at: string };
+type Recent = { command_id: string; action: string; mode?: string; profile?: string; accepted: boolean; refusal: string; at: string };
 
-export function PanelCard({ t, origin, node, now, canCommand, recent, reload }: { t: Translate; origin: string; node: AlarmNodeView; now: number; canCommand: boolean; recent: Recent[]; reload: () => void }) {
+export function PanelCard({ t, origin, node, now, canCommand, recent, reload, profiles }: { t: Translate; origin: string; node: AlarmNodeView; now: number; canCommand: boolean; recent: Recent[]; reload: () => void; profiles?: ArmProfile[] }) {
   const state = node.state;
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ text: string; bad: boolean } | null>(null);
@@ -111,10 +115,15 @@ export function PanelCard({ t, origin, node, now, canCommand, recent, reload }: 
   const allowed = canCommand && !node.stale && state.commands_enabled;
   const [askingPin, setAskingPin] = useState(false);
   const [askingSilence, setAskingSilence] = useState(false);
-  const send = async (action: "arm" | "disarm" | "silence", mode?: "away" | "stay", pin?: string) => {
+  // The arming modes (Away, Home, Night, the owner's own) are offered only for a panel whose firmware says it understands them; an older one is armed away or at home, as always.
+  const modes = state.arm_profiles === true && profiles && profiles.length > 0 ? profiles : null;
+  const [chosen, setChosen] = useState("");
+  const chosenMode = modes ? (modes.find(item => item.id === chosen) ?? modes[0]) : null;
+  const activeMode = state.profile ? profiles?.find(item => item.id === state.profile) : undefined;
+  const send = async (action: "arm" | "disarm" | "silence", mode?: "away" | "stay", pin?: string, profile?: string) => {
     setAskingPin(false); setAskingSilence(false);
     setBusy(true); setMessage(null);
-    try { await sendAlarmCommand(origin, node.node_id, action, mode, force, pin); setMessage({ text: t("apSent"), bad: false }); setForce(false); reload(); }
+    try { await sendAlarmCommand(origin, node.node_id, action, mode, force, pin, profile); setMessage({ text: t("apSent"), bad: false }); setForce(false); reload(); }
     catch (error) {
       const code = error instanceof ApiError ? error.code : "other";
       setMessage({ text: t(`apErr_${code}`) !== `apErr_${code}` ? t(`apErr_${code}`) : t("apErr_other"), bad: true });
@@ -128,6 +137,7 @@ export function PanelCard({ t, origin, node, now, canCommand, recent, reload }: 
       <span className={`el-pill ${node.stale ? "bad" : "good"}`}>{node.stale ? t("solarNodeState_stale") : t("solarNodeState_reporting")} · {sinceIso(node.received_at, now)}</span>
       <span className={`el-pill ${sounding ? "bad" : guarding ? "good" : "warn"}`}>{t(`apPhase_${state.phase}`)}</span>
       {state.mode !== "disarmed" && <span className="el-pill">{t(`apMode_${state.mode}`)}</span>}
+      {state.profile && state.mode !== "disarmed" && <span className="el-pill good" data-testid="ap-active-mode">{t("apm_current").replace("{0}", activeMode ? profileName(activeMode, t) : state.profile)}</span>}
       {state.siren && <span className="el-pill bad">{t("apSiren")}</span>}
       {state.locked_out && <span className="el-pill warn">{t("apLockedOut")}</span>}
       <span className={`el-pill ${state.commands_enabled ? "good" : "warn"}`}>{state.commands_enabled ? t("apCommandsEnabled") : t("apCommandsDisabled")}</span>
@@ -152,8 +162,17 @@ export function PanelCard({ t, origin, node, now, canCommand, recent, reload }: 
     </section>
     {canCommand && !state.commands_enabled && <p className="muted small">{t("apNodeCommandsOff")}</p>}
     {canCommand && <div className="ap-actions" data-tour="ap-actions">
-      <button type="button" disabled={busy || !allowed || state.phase !== "disarmed"} onClick={() => void send("arm", "away")}>{t("apArmAway")}</button>
-      <button type="button" disabled={busy || !allowed || state.phase !== "disarmed"} onClick={() => void send("arm", "stay")}>{t("apArmStay")}</button>
+      {modes && chosenMode ? <>
+        <label className="ap-mode" data-tour="ap-mode-picker">{t("apm_mode")}
+          <select value={chosenMode.id} disabled={busy || !allowed || state.phase !== "disarmed"} onChange={event => setChosen(event.target.value)}>
+            {modes.map(item => <option key={item.id} value={item.id}>{profileName(item, t)}</option>)}
+          </select></label>
+        <button type="button" disabled={busy || !allowed || state.phase !== "disarmed"} onClick={() => void send("arm", chosenMode.base, undefined, chosenMode.id)}>{t("apm_arm")}</button>
+      </> : <>
+        <button type="button" disabled={busy || !allowed || state.phase !== "disarmed"} onClick={() => void send("arm", "away")}>{t("apArmAway")}</button>
+        <button type="button" disabled={busy || !allowed || state.phase !== "disarmed"} onClick={() => void send("arm", "stay")}>{t("apArmStay")}</button>
+        {profiles && profiles.length > 0 && state.arm_profiles !== true && <small className="muted" role="note">{t("apm_unsupported")}</small>}
+      </>}
       <button type="button" className="danger" disabled={busy || !allowed || state.phase === "disarmed"} onClick={() => setAskingPin(true)}>{t("apDisarm")}</button>
       {askingPin && <PinDialog title={t("apDisarm")} text={fill(t("apConfirmDisarm"), node.node_id)} confirmLabel={t("apDisarm")} confirm={pin => void send("disarm", undefined, pin)} cancel={() => setAskingPin(false)} t={t} />}
       {state.siren && <button type="button" data-tour="ap-silence" disabled={busy || !allowed} onClick={() => setAskingSilence(true)}>{t("apSilence")}</button>}
@@ -162,7 +181,7 @@ export function PanelCard({ t, origin, node, now, canCommand, recent, reload }: 
     </div>}
     {message && <p className={`solar-notice ${message.bad ? "bad" : ""}`} role={message.bad ? "alert" : "status"}>{message.text}</p>}
     {recent.length > 0 && <div className="ap-recent"><h4>{t("apRecent")}</h4><ul>
-      {recent.map(item => <li key={item.command_id}>{item.action}{item.mode ? ` ${t(`apMode_${item.mode}`)}` : ""} · {item.accepted ? t("apAccepted") : (t(`apRefusal_${item.refusal}`) !== `apRefusal_${item.refusal}` ? t(`apRefusal_${item.refusal}`) : item.refusal)}</li>)}
+      {recent.map(item => <li key={item.command_id}>{item.action}{item.mode ? ` ${t(`apMode_${item.mode}`)}` : ""}{item.profile ? ` (${profileName(profiles?.find(mode => mode.id === item.profile) ?? { id: item.profile, name: item.profile }, t)})` : ""} · {item.accepted ? t("apAccepted") : (t(`apRefusal_${item.refusal}`) !== `apRefusal_${item.refusal}` ? t(`apRefusal_${item.refusal}`) : item.refusal)}</li>)}
     </ul></div>}
   </article>;
 }

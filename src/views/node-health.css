@@ -1,0 +1,37 @@
+/* The health of the nodes (System menu): one card per node, a bar for the memory, a small line for each history. */
+.node-health .nh-totals { display: flex; flex-wrap: wrap; gap: .4rem; }
+.node-health .nh-filter { display: block; margin: .3rem 0 .6rem; }
+.node-health .nh-filter select { max-width: 18rem; }
+.node-health .nh-empty { padding: 1rem; border: 1px dashed #276272; border-radius: 12px; text-align: center; }
+.node-health .nh-empty h4 { margin: 0 0 .3rem; }
+.node-health .nh-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); gap: .8rem; }
+.node-health .nh-card { display: grid; gap: .55rem; align-content: start; padding: .8rem 1rem; border: 1px solid #193341; border-radius: 14px; background: #09161e; }
+.node-health .nh-card.warning { border-color: #8a6a1c; }
+.node-health .nh-card.stale { opacity: .7; border-style: dashed; }
+.node-health .nh-card header { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.node-health .nh-card header strong { flex: 1 1 auto; overflow-wrap: anywhere; }
+.node-health .nh-warnings { margin: 0; padding: .4rem .7rem .4rem 1.4rem; border-radius: 10px; background: #261e0a; color: #ffc85a; font-size: .82rem; }
+.node-health .nh-facts { display: grid; grid-template-columns: 1fr 1fr; gap: .45rem .9rem; margin: 0; }
+.node-health .nh-facts > div { min-width: 0; }
+.node-health .nh-facts > div.wide { grid-column: 1 / -1; }
+.node-health .nh-facts dt { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: #8ea7b2; }
+.node-health .nh-facts dd { margin: .1rem 0 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.node-health .nh-facts dd.bad, .node-health .nh-restarts li.bad { color: #ff8d98; }
+.node-health .nh-facts dd.mono { font-family: ui-monospace, Consolas, monospace; font-size: .76rem; }
+.node-health .nh-meter { display: block; height: 6px; margin-bottom: .2rem; border-radius: 3px; background: #123240; overflow: hidden; }
+.node-health .nh-meter i { display: block; height: 100%; background: #5df0c4; }
+.node-health .nh-meter i.low { background: #ff8d98; }
+.node-health .nh-signal { padding: 0 .4rem; border-radius: 999px; font-size: .72rem; border: 1px solid #285a66; }
+.node-health .nh-signal.good { color: #5df0c4; border-color: #1f7a5c; }
+.node-health .nh-signal.fair { color: #a9d0d6; }
+.node-health .nh-signal.weak { color: #ffc85a; border-color: #8a6a1c; }
+.node-health .nh-signal.bad { color: #ff8d98; border-color: #8a3540; }
+.node-health .nh-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
+.node-health .nh-detail { display: grid; gap: .6rem; padding-top: .5rem; border-top: 1px solid #193341; }
+.node-health .nh-detail h4 { margin: .2rem 0 0; font-size: .85rem; }
+.node-health .nh-line { margin: 0; }
+.node-health .nh-line figcaption { font-size: .72rem; color: #8ea7b2; }
+.node-health .nh-line svg { display: block; width: 100%; height: 3rem; color: #4be2e9; }
+.node-health .nh-restarts { margin: 0; padding-left: 1.1rem; font-size: .8rem; }
+.node-health .nh-waiting { margin-top: .6rem; }
+@media (max-width: 30rem) { .node-health .nh-facts { grid-template-columns: 1fr; } }

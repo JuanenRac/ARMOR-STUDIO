@@ -53,7 +53,9 @@ O desenho pode ligar-se à realidade: «Desenhar o que foi encontrado» põe na 
 
 O registo de auditoria lista as ações realizadas no sistema - quem o armou, quem mudou uma definição, o que foi negado ou falhou - com o utilizador e o alvo. Filtre-o por ação, utilizador ou alvo, ou mostre só o que foi negado ou falhou. É onde se olha quando se quer saber quem fez algo.
 
-Se um cartão está vermelho, aquilo que descreve tem um problema: siga-o em Serviços ou nos registos do servidor.`],
+Se um cartão está vermelho, aquilo que descreve tem um problema: siga-o em Serviços ou nos registos do servidor.
+
+Saúde dos nós: por baixo da máquina, um cartão dá o mesmo relatório de cada nó de radar, solar, elétrico, de alarme e de painel de parede - há quanto tempo está ligado, porque reiniciou da última vez (uma falha ou um cão de guarda fica marcado como inesperado), a memória livre, a ligação (Wi-Fi com o sinal, ou o cabo), quantas vezes se ligou ao broker e o último erro que registou. O servidor avisa, em Alarmes, quando a um nó falta memória, reinicia demasiadas vezes, perde o broker repetidamente ou tem um sinal Wi-Fi fraco. Detalhes mostra o histórico da memória e do sinal e os reinícios; um administrador pode esquecer um nó que foi retirado. Um nó que ainda não enviou relatório (firmware antigo) aparece como em espera.`],
   services: ["Serviços", `Os serviços do A.R.M.O.R. que correm no servidor - o próprio servidor, o broker MQTT, o nó de rede, os serviços de alarme e observação, a porta de voz e os outros - com se cada um está ativo e a sua versão.
 
 Os filtros mostram todos, só os ativos ou só os que não estão a funcionar, por família, e a caixa de pesquisa encontra um serviço pelo nome. Atualizar lê o estado de novo.
