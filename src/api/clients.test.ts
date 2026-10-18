@@ -263,6 +263,15 @@ describe("cameras and evidence", () => {
     await expect(createCameraStreamUrl(O, "c1")).rejects.toThrow("ticket returned 403");
   });
 
+  it("a stream ticket path cannot climb out of the cameras route or name another host", async () => {
+    for (const path of ["/api/v1/cameras/../admin", "/api/v1/cameras/%2e%2e/admin", "/api/v1/cameras/c1/%2E%2E/%2E%2E/admin", "/api/v1/cameras//evil.example/x", "/api/v1/cameras/c1\\..\\x", "/api/v1/cameras/%zz"]) {
+      answers.push(json(200, { path }));
+      await expect(createCameraStreamUrl(O, "c1")).rejects.toThrow("invalid");
+    }
+    answers.push(json(200, { path: "/api/v1/cameras/c1/stream.mjpeg?ticket=ab12&quality=low" }));
+    expect(await createCameraStreamUrl(O, "c1")).toBe("http://armor.local:8080/api/v1/cameras/c1/stream.mjpeg?ticket=ab12&quality=low");
+  });
+
   it("a PTZ refusal shows the reason the server gave, in its own words", async () => {
     answers.push(json(200, {}), json(502, { error: "the camera refused the login" }), json(502, {}), text(500, "<html>"));
     await sendPtz(O, "c1", "left");

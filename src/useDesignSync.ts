@@ -3,10 +3,10 @@
  * change a moment after it is made, and picks up what another browser saved. A save made from an out-of-date copy is refused by the server and the newer version is taken here with a
  * notice, so two people editing never overwrite each other silently.
  *
- * The three drawings used to have three copies of this code. What they have in common is here once:
- *  - the drawing is read again only when the SERVER changes, not each time the session check flickers (a minute without answer used to read the server's copy over what had been edited meanwhile);
+ * What the three drawings have in common is here once:
+ *  - the drawing is read again only when the SERVER changes, not each time the session check flickers (a minute without answer must not read the server's copy over what has been edited meanwhile);
  *  - the copy kept in this browser belongs to one server and remembers the revision it was made from, so changes that never arrived are put back and sent, and never reach another installation;
- *  - a save that comes due while a read is under way waits for it instead of being dropped (the status stayed on "saving" until the next edit).
+ *  - a save that comes due while a read is under way waits for it instead of being dropped (the status would stay on "saving" until the next edit).
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useEffect, useRef, useState } from "react";

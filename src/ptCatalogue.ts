@@ -1101,6 +1101,7 @@ export const PT_CATALOGUE: Record<string, string> = {
  "in_part_users": "Utilizadores (para registo: nunca se importam)",
  "in_count": "{0} itens",
  "in_err_invalid_bundle": "O servidor não aceitou o ficheiro como ficheiro de instalação.",
+ "in_err_too_large": "O ficheiro é demasiado grande para o servidor (9 MB no máximo).",
  "in_err_generic": "Não foi possível fazê-lo.",
  "radarMap": "Mapa de radar em direto",
  "radarMapHelp": "Desenhado a partir do desenho do seu local: terreno, edifícios, câmaras e cada radar com a zona que cobre, e os alvos que os radares reportam neste momento.",

@@ -23,4 +23,4 @@ Studio is a browser console for ARMOR-SERVER. This is what it holds, what it sen
 
 ## In the container
 
-The browser talks only to Studio's own origin; nginx proxies `/api/` to the server and passes the real address of the client (`X-Forwarded-For`) and the host with its port, so the server's sign-in limits and audit trail see the person and not the proxy. The server must trust that proxy (`ARMOR_TRUST_PROXY`).
+The browser talks only to Studio's own origin; nginx proxies `/api/` to the server and passes the real address of the client (`X-Forwarded-For`), the protocol the person used (`X-Forwarded-Proto`: the one a proxy in front already announced, else the scheme of the connection) and the host with its port, so the server's sign-in limits and audit trail see the person and not the proxy. The server must trust that proxy (`ARMOR_TRUST_PROXY`).

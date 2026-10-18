@@ -8,7 +8,6 @@ type Props = { origin: string; onAuthenticated: (origin: string) => void };
 
 /**
  * The language of the screens that show before anybody is signed in: the one this browser remembers from the last session, else the one the browser itself asks for, else English.
- * (They used to be in Spanish whatever the language of the person was.)
  */
 export function loginLanguage(): LanguageCode {
   try {

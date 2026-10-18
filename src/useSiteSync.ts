@@ -54,7 +54,7 @@ export function useSiteSync({ origin, enabled, design, apply, onConflict, onNoti
 
   // First load, and again whenever the server changes.
   useEffect(() => {
-    // Only a different server starts it again: the session check flickering (a minute without an answer) used to read the server's copy over what had been edited meanwhile.
+    // Only a different server starts it again: the session check flickering (a minute without an answer) must not read the server's copy over what has been edited meanwhile.
     if (seenOrigin.current !== origin) { seenOrigin.current = origin; revision.current = null; synced.current = ""; startKey.current = keyRef.current; }
     if (!enabled || revision.current !== null) return;
     let cancelled = false;
@@ -118,7 +118,7 @@ export function useSiteSync({ origin, enabled, design, apply, onConflict, onNoti
     setStatus("saving");
     let timer = 0;
     let cancelled = false;
-    // A save that comes due during a read or another save waits for it (it used to be dropped, and the status stayed on "saving" until the next edit).
+    // A save that comes due during a read or another save waits for it (dropped, the status would stay on "saving" until the next edit).
     const run = async () => {
       if (cancelled || revision.current === null) return;
       if (busy.current) { timer = window.setTimeout(() => void run(), 400); return; }

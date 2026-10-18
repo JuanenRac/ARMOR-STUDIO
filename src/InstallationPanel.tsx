@@ -5,7 +5,8 @@
  */
 import { useRef, useState } from "react";
 import { downloadText } from "./download";
-import { ApiError, installationExport, installationImport, type InstallationReport } from "./api";
+import { installationExport, installationImport, type InstallationReport } from "./api";
+import { errorText } from "./apiErrorText";
 
 type Translate = (key: string, ...args: Array<string | number>) => string;
 type Props = { t: Translate; origin: string; isAdmin: boolean };
@@ -27,11 +28,7 @@ export function partsOf(bundle: unknown): Array<{ part: InstallationPart; count:
   return out;
 }
 
-const explain = (t: Translate, error: unknown): string => {
-  const code = error instanceof ApiError ? error.code : "generic";
-  const text = t(`in_err_${code}`);
-  return text === `in_err_${code}` ? t("in_err_generic") : text;
-};
+const explain = (t: Translate, error: unknown): string => errorText(t, error, "in_err_");
 
 export function ReportView({ t, report }: { t: Translate; report: InstallationReport }) {
   const group = (title: string, items: Partial<Record<string, string>>) => {

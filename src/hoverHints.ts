@@ -112,7 +112,7 @@ export function installHoverHints(): () => void {
     everything = false; pending.clear();
   };
   const later = () => { if (!scheduled) scheduled = window.setTimeout(scan, 120); };
-  // Only what changed is looked at: the clock of the status bar and every other second-by-second redraw used to make a pass over the whole page (every menu kept open, every drawing) each time.
+  // Only what changed is looked at: the clock of the status bar and every other second-by-second redraw must not make a pass over the whole page (every menu kept open, every drawing) each time.
   const watch = (records: MutationRecord[]) => {
     for (const record of records) {
       const target = record.target.nodeType === Node.ELEMENT_NODE ? record.target as Element : record.target.parentElement;

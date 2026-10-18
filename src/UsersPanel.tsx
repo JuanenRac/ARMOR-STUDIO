@@ -5,8 +5,9 @@
  */
 import { askConfirm } from "./askConfirm";
 import { useCallback, useContext, useEffect, useState, type FormEvent } from "react";
-import { ApiError, changeAccount, clearUserPin, createUser, deleteUser, listUsers, setMyPin, setUserPin, updateUser, type ListedUser, type Role } from "./api";
+import { changeAccount, clearUserPin, createUser, deleteUser, listUsers, setMyPin, setUserPin, updateUser, type ListedUser, type Role } from "./api";
 import { SessionUserContext } from "./sessionContext";
+import { errorText } from "./apiErrorText";
 
 type Props = { t: (key: string) => string; origin: string };
 const ROLES: readonly Role[] = ["admin", "operator", "viewer", "panel"];
@@ -20,11 +21,7 @@ export function UsersPanel({ t, origin }: Props) {
   const [message, setMessage] = useState<{ text: string; bad: boolean }>({ text: "", bad: false });
   const [editing, setEditing] = useState("");
   const say = (text: string, bad = false) => setMessage({ text, bad });
-  const explain = (error: unknown) => {
-    const code = error instanceof ApiError ? error.code : "generic";
-    const key = `userErr_${code}`, text = t(key);
-    say(text === key ? t("userErr_generic") : text, true);
-  };
+  const explain = (error: unknown) => say(errorText(t, error, "userErr_"), true);
 
   const isAdmin = me?.role === "admin";
   const reload = useCallback(async () => {

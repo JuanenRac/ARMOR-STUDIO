@@ -146,8 +146,8 @@ export function useClock(): Date {
 /**
  * Something read from the server again and again while it is shown; `reload` asks for it right now (after a change).
  *
- * A menu that stays open but hidden (see viewSlots) and a tab that is in the background do not ask: the console used to make about a hundred requests a minute more for every menu
- * visited, which the server's limit counts against a viewer. `always` is for what the whole console needs even when nobody is looking at it (the alarms are announced from a background tab).
+ * A menu that stays open but hidden (see viewSlots) and a tab that is in the background do not ask: every menu visited would add about a hundred requests a minute, which the server's limit counts
+ * against a viewer. `always` is for what the whole console needs even when nobody is looking at it (the alarms are announced from a background tab).
  * Asking starts again at once - with an immediate read - when the menu is shown or the tab comes back.
  */
 export function usePolled<T>(load: () => Promise<T>, everyMs: number, key: unknown, options: { always?: boolean } = {}): { data: T | null; reload: () => void; failed: boolean } {
@@ -183,7 +183,7 @@ export function usePolled<T>(load: () => Promise<T>, everyMs: number, key: unkno
 /**
  * Who is signed in, kept up to date: asked again every minute, when the window comes back into view and a few seconds after an answer that
  * could not be had. Only the server saying "nobody" clears the user: a failed or slow answer keeps the last one, so a hiccup of the network
- * never takes the administrator role away (the Users tab used to say "only an administrator" until the page was reloaded).
+ * never takes the administrator role away (the Users tab would say "only an administrator" until the page was reloaded).
  */
 export type SessionUser = { user: StudioUser | null; known: boolean; /** Why the last attempt to ask could not be answered (empty when it could). */ reason: string; refresh: () => void };
 export function useSessionUser(origin: string): SessionUser {

@@ -37,6 +37,7 @@ const rows: Record<string, Row> = {
   in_part_users: ["Users (for the record: never imported)", "Usuarios (solo como referencia: nunca se importan)", "Benutzer (nur zur Information: nie importiert)", "Utilisateurs (pour mémoire : jamais importés)", "Utenti (solo per memoria: mai importati)", "ユーザー（参考のみ：インポートされません）", "用户（仅作记录：从不导入）"],
   in_count: ["{0} items", "{0} elementos", "{0} Einträge", "{0} éléments", "{0} elementi", "{0} 件", "{0} 项"],
   in_err_invalid_bundle: ["The server did not take the file as an installation file.", "El servidor no tomó el archivo como un archivo de instalación.", "Der Server hat die Datei nicht als Installationsdatei angenommen.", "Le serveur n'a pas pris le fichier pour un fichier d'installation.", "Il server non ha riconosciuto il file come file di installazione.", "サーバーはこのファイルをインストール環境ファイルとして受け付けませんでした。", "服务器未将该文件识别为安装配置文件。"],
+  in_err_too_large: ["The file is too large for the server (9 MB at most).", "El archivo es demasiado grande para el servidor (9 MB como máximo).", "Die Datei ist zu groß für den Server (höchstens 9 MB).", "Le fichier est trop grand pour le serveur (9 Mo au maximum).", "Il file è troppo grande per il server (9 MB al massimo).", "ファイルがサーバーにとって大きすぎます（最大 9 MB）。", "文件对服务器来说太大（最多 9 MB）。"],
   in_err_generic: ["It could not be done.", "No se pudo hacer.", "Es ging nicht.", "Impossible à faire.", "Non è stato possibile.", "実行できませんでした。", "无法完成。"],
 };
 

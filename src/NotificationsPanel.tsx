@@ -4,18 +4,15 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useCallback, useEffect, useState } from "react";
-import { ApiError, notificationsStatus, notificationsTest, type NotificationsStatus, type NotificationTestResult } from "./api";
+import { notificationsStatus, notificationsTest, type NotificationsStatus, type NotificationTestResult } from "./api";
+import { errorText } from "./apiErrorText";
 
 type Translate = (key: string) => string;
 type Props = { t: Translate; origin: string; isAdmin: boolean };
 
 const PLACES = ["webhook", "mqtt", "telegram", "ntfy", "homeassistant"] as const;
 
-const explain = (t: Translate, error: unknown): string => {
-  const code = error instanceof ApiError ? error.code : "generic";
-  const text = t(`nt_err_${code}`);
-  return text === `nt_err_${code}` ? t("nt_err_generic") : text;
-};
+const explain = (t: Translate, error: unknown): string => errorText(t, error, "nt_err_");
 
 export function NotificationsPanel({ t, origin, isAdmin }: Props) {
   const [status, setStatus] = useState<NotificationsStatus | null>(null);

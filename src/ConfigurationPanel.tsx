@@ -87,7 +87,7 @@ function ServerSettings({ t, origin, isAdmin }: { t: (key: string) => string; or
 export function ConfigurationPanel(props: Props) {
   const { t } = props;
   const [tab, setTab] = useState<Tab>("general");
-  // The address is applied when the person finishes (leaves the box or presses Enter), not on every key: each key used to be "a new server" for the whole console.
+  // The address is applied when the person finishes (leaves the box or presses Enter), not on every key: each key would otherwise be "a new server" for the whole console.
   const [draftOrigin, setDraftOrigin] = useState(props.origin);
   useEffect(() => { setDraftOrigin(props.origin); }, [props.origin]);
   const applyOrigin = (value: string) => {

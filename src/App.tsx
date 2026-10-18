@@ -88,8 +88,8 @@ import "./wide-text.css";
 
 const studioVersion = manifest.version;
 
-// The menus that bring the most code (the four designers and the weather map with its own library) are fetched the first time they are opened: the page used to carry all of them, and the
-// language tables, before the sign-in could even be shown.
+// The menus that bring the most code (the four designers and the weather map with its own library) are fetched the first time they are opened, so the sign-in is not held back by their code or by
+// the language tables.
 const SiteDesignerInteractive = lazy(() => import("./SiteDesignerInteractive").then(module => ({ default: module.SiteDesignerInteractive })));
 const ElectricalDesigner = lazy(() => import("./ElectricalDesigner").then(module => ({ default: module.ElectricalDesigner })));
 const NetworkDesigner = lazy(() => import("./NetworkDesigner").then(module => ({ default: module.NetworkDesigner })));
@@ -151,7 +151,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const selected = cameras.find(camera => camera.id === selectedCamera) ?? cameras[0];
   const devicePoll = usePolled(() => listDevices(origin), 2500, origin, { always: true });
   const alarmPoll = usePolled(() => listAlarms(origin), 2000, origin, { always: true });
-  // Which cameras are recording is the server's to say: after a reload the console used to think none was.
+  // Which cameras are recording is the server's to say: after a reload the console has to ask.
   const recordingPoll = usePolled(() => listMedia(origin).then(result => result.activeCameraIds), 15_000, origin, { always: true });
   useEffect(() => { if (recordingPoll.data) setRecordingCameraIds(recordingPoll.data); }, [recordingPoll.data]);
   const automationPoll = usePolled(() => listAutomations(origin), 5000, origin, { always: true });
@@ -202,7 +202,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     let raw: string | null = null;
     try { raw = window.localStorage.getItem(SETTINGS_KEY); } catch { /* Storage may be blocked. */ }
     const saved = parseStudioSettings(raw);
-    // The address saved with the settings is NOT applied: the server this person signed in to is the one they are using (it used to be replaced by whichever the browser remembered).
+    // The address saved with the settings is NOT applied: the server this person signed in to is the one they are using, not whichever the browser remembers.
     if (saved.theme) setTheme(saved.theme);
     if (saved.language) setLanguage(saved.language);
     if (saved.sidebarOpen !== undefined) setSidebarOpen(saved.sidebarOpen);

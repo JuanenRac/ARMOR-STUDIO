@@ -12,6 +12,12 @@ map $http_upgrade $connection_upgrade {
     ""      close;
 }
 
+# The protocol the person really used: when a proxy in front (Caddy, a router) already ended the HTTPS, it says so and nginx passes that on; reached directly, it is the scheme of this connection.
+map $http_x_forwarded_proto $forwarded_proto {
+    default $http_x_forwarded_proto;
+    ""      $scheme;
+}
+
 server {
     listen 80;
     server_name _;
@@ -39,7 +45,7 @@ server {
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Proto $forwarded_proto;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
         # Live video and recordings are long-lived streams.

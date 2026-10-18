@@ -42,13 +42,20 @@ export async function discoverCameraStreams(origin: string, id: string): Promise
   if (!response.ok) throw new Error("RTSP discovery returned " + response.status);
   return response.json() as Promise<{ paths: string[]; camera: PublicCameraConnection }>;
 }
+/** A path the server may hand out for a camera stream: under the cameras route, with no way back up the tree ("..", also encoded) and no second slash that would make it another host. */
+export function isCameraPath(path: unknown): path is string {
+  if (typeof path !== "string" || !path.startsWith("/api/v1/cameras/") || path.includes("//") || path.includes("\\")) return false;
+  let decoded: string;
+  try { decoded = decodeURIComponent(path); } catch { return false; }
+  return !decoded.split(/[/?#]/).some(part => part === ".." || part === ".") && !decoded.includes("//");
+}
 export async function createCameraStreamUrl(origin: string, id: string): Promise<string> {
   const response = await timedFetch(endpoint(origin, `/api/v1/cameras/${encodeURIComponent(id)}/stream-ticket`), {
     method: "POST", headers: { Accept: "application/json" }, ...localSession,
   });
   if (!response.ok) throw new Error(`Camera stream ticket returned ${response.status}`);
   const body = await response.json() as { path?: string };
-  if (!body.path || !body.path.startsWith("/api/v1/cameras/")) throw new Error("Camera stream ticket response is invalid");
+  if (!isCameraPath(body.path)) throw new Error("Camera stream ticket response is invalid");
   return endpoint(origin, body.path);
 }
 export async function sendPtz(origin: string, id: string, command: string): Promise<void> {

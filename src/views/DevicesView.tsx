@@ -5,13 +5,14 @@
  */
 import { askConfirm } from "../askConfirm";
 import { useMemo, useState, type FormEvent } from "react";
-import { ApiError, commandDevice, createDevice, deleteDevice, setDeviceState, updateDevice, type DeviceKind, type DeviceProtocol, type DeviceRisk, type StudioDevice } from "../api";
+import { commandDevice, createDevice, deleteDevice, setDeviceState, updateDevice, type DeviceKind, type DeviceProtocol, type DeviceRisk, type StudioDevice } from "../api";
 import {
   ACTUATOR_KINDS, isOpeningKind, ago, ALARM_KIND, applyPreset, describeState, deviceProblem, KIND_COLOUR, KindIcon, MAIN_FIELD, mapToText, PRESETS, PROTOCOLS, slug, textToMap, SENSOR_KINDS, type PresetId, type PresetResult,
 } from "../deviceKinds";
 import type { Translate } from "../components/camera";
 import "./devices.css";
 import { MenuTitle } from "../menuLogos";
+import { errorText } from "../apiErrorText";
 
 type Props = { t: Translate; origin: string; devices: StudioDevice[]; reload: () => void; placedIds: ReadonlySet<string>; onPlace: (id: string) => void; now: number };
 type Filter = "all" | "sensor" | "actuator" | "problem";
@@ -28,10 +29,7 @@ export function DevicesView({ t, origin, devices, reload, placedIds, onPlace, no
   const [message, setMessage] = useState<{ text: string; bad: boolean }>({ text: "", bad: false });
   const [form, setForm] = useState<Form | null>(null);
   const say = (text: string, bad = false) => setMessage({ text, bad });
-  const explain = (error: unknown) => {
-    const code = error instanceof ApiError ? error.code : "generic", key = `deviceErr_${code}`, text = t(key);
-    say(text === key ? t("deviceErr_generic") : text, true);
-  };
+  const explain = (error: unknown) => say(errorText(t, error, "deviceErr_"), true);
 
   const shown = useMemo(() => devices.filter(device => {
     if (filter === "sensor" && device.category !== "sensor") return false;

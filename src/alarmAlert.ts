@@ -1,6 +1,6 @@
 /**
- * A critical alarm that comes in is heard and, when the browser allows it, shown as a notification: the console used to say nothing outside its own tab, so an alarm raised while it was
- * on another tab or another view went unnoticed. Alarms already on the list when the console opens are not announced again.
+ * A critical alarm that comes in is heard and, when the browser allows it, shown as a notification, so that an alarm raised while the console is
+ * on another tab or another view is not missed. Alarms already on the list when the console opens are not announced again.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useEffect, useRef } from "react";

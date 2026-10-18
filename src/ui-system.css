@@ -1,6 +1,6 @@
 /*
  * The look of every control of Studio, in one place: buttons, tabs, fields, dropdown lists, scroll bars and the small texts of the menus.
- * Each menu used to bring its own (grey buttons, white fields, six different corner radii, type from 9 to 16 px); this sheet is loaded last and says what the
+ * No menu brings its own buttons, fields, corner radii or type sizes; this sheet is loaded last and says what the
  * "game menu" look is once, in the colours of the theme (--t-*; the default "Armor" look when there is no theme).
  *
  *   tokens ........ the colours, the corners and the type every rule below draws from

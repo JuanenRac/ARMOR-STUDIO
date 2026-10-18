@@ -4,19 +4,17 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { adminFile, adminSaveFile, adminStatus, ApiError, endMySession, endOtherSessions, listMySessions, remoteCheck, totpDisable, totpEnable, totpSetup, totpState,
+import { adminFile, adminSaveFile, adminStatus, endMySession, endOtherSessions, listMySessions, remoteCheck, totpDisable, totpEnable, totpSetup, totpState,
   type RemoteCheck, type SessionRow, type TotpState } from "./api";
 import { askConfirm } from "./askConfirm";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
 import "./security.css";
+import { errorText } from "./apiErrorText";
 
 type Props = { t: (key: string) => string; origin: string; isAdmin: boolean };
 type Say = (text: string, bad?: boolean) => void;
 
-const explain = (t: (key: string) => string, error: unknown): string => {
-  const key = `sec_err_${error instanceof ApiError ? error.code : "generic"}`;
-  return t(key) === key ? t("sec_err_generic") : t(key);
-};
+const explain = (t: (key: string) => string, error: unknown): string => errorText(t, error, "sec_err_");
 
 function Message({ message }: { message: { text: string; bad: boolean } }) {
   return message.text ? <p className={`notice ${message.bad ? "bad" : ""}`} role="status">{message.text}</p> : null;

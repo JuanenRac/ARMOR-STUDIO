@@ -1,6 +1,6 @@
 /**
- * A menu keeps what the person was doing in it. Going to another menu (by hand, or because an alarm took the person there) used to close the one being left and everything
- * unsaved in it was gone from the screen: a form half filled, a tab, a selection, a filter, a message. The menus where that matters stay open once they have been visited, hidden
+ * A menu keeps what the person was doing in it. Going to another menu (by hand, or because an alarm took the person there) must not close the one being left and lose
+ * what is unsaved in it: a form half filled, a tab, a selection, a filter, a message. The menus where that matters stay open once they have been visited, hidden
  * while another one is shown, and they come back exactly as they were. Their own refreshing pauses while they are hidden (see useViewActive) and the heavy ones - live video, the
  * 3D plan, the weather map - are not kept: they are rebuilt when opened, as they always were.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.

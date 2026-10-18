@@ -5,11 +5,12 @@
  */
 import { askConfirm } from "../askConfirm";
 import { useState, type FormEvent } from "react";
-import { ApiError, createAutomation, deleteAutomation, runAutomation, updateAutomation, type Automation, type AutomationAction, type AlarmSourceType, type AutomationInput, type StudioDevice, type Trigger } from "../api";
+import { createAutomation, deleteAutomation, runAutomation, updateAutomation, type Automation, type AutomationAction, type AlarmSourceType, type AutomationInput, type StudioDevice, type Trigger } from "../api";
 import { ACTUATOR_KINDS, MAIN_FIELD, OPENING_KINDS, ago, isOpeningKind } from "../deviceKinds";
 import type { Translate } from "../components/camera";
 import "./alarms.css";
 import { MenuTitle } from "../menuLogos";
+import { errorText } from "../apiErrorText";
 
 type Props = { t: Translate; origin: string; automations: Automation[]; reload: () => void; devices: StudioDevice[]; now: number };
 
@@ -25,7 +26,7 @@ export function AutomationsView({ t, origin, automations, reload, devices, now }
   const [form, setForm] = useState<(AutomationInput & { id?: string }) | null>(null);
   const [message, setMessage] = useState<{ text: string; bad: boolean }>({ text: "", bad: false });
   const say = (text: string, bad = false) => setMessage({ text, bad });
-  const explain = (error: unknown) => { const key = `autoErr_${error instanceof ApiError ? error.code : "generic"}`, text = t(key); say(text === key ? t("autoErr_generic") : text, true); };
+  const explain = (error: unknown) => say(errorText(t, error, "autoErr_"), true);
   const byId = (id: string) => devices.find(device => device.id === id);
   const binary = devices.filter(device => MAIN_FIELD[device.kind]);
   const actuators = devices.filter(device => ACTUATOR_KINDS.includes(device.kind));

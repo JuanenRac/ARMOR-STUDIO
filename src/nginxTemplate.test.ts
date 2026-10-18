@@ -34,7 +34,8 @@ describe("the nginx of the container", () => {
   it("tells the real address of the client and the port of the host to the server", () => {
     const api = blocks.get("/api/") ?? "";
     expect(api).toContain("proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;");
-    expect(api).toContain("proxy_set_header X-Forwarded-Proto $scheme;");
+    expect(api).toContain("proxy_set_header X-Forwarded-Proto $forwarded_proto;");
+    expect((template as string).replace(/\r\n/g, "\n")).toMatch(/map \$http_x_forwarded_proto \$forwarded_proto \{\s+default \$http_x_forwarded_proto;\s+"" +\$scheme;/);
     expect(api).toContain("proxy_set_header Host $http_host;");
     expect(api).toContain("$connection_upgrade");
   });

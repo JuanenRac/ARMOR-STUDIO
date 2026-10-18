@@ -5,18 +5,16 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { ApiError, ddnsRemove, ddnsSetup, ddnsUpdate, listNodePanels, nodePanelFingerprint, nodePanelUrl, remoteSetupState, removeNodePanel, saveNodePanel, vpnAddPeer, vpnRemovePeer,
+import { ddnsRemove, ddnsSetup, ddnsUpdate, listNodePanels, nodePanelFingerprint, nodePanelUrl, remoteSetupState, removeNodePanel, saveNodePanel, vpnAddPeer, vpnRemovePeer,
   vpnSetup, vpnShowPeer, type DdnsInput, type NodePanel, type RemoteSetupState, type VpnPeerConfig } from "./api";
 import { askConfirm } from "./askConfirm";
+import { errorText } from "./apiErrorText";
 
 type T = (key: string) => string;
 type Props = { t: T; origin: string };
 type Say = (text: string, bad?: boolean) => void;
 
-const explain = (t: T, error: unknown): string => {
-  const key = `sec_err_${error instanceof ApiError ? error.code : "generic"}`;
-  return t(key) === key ? t("sec_err_generic") : t(key);
-};
+const explain = (t: T, error: unknown): string => errorText(t, error, "sec_err_");
 const fill = (text: string, ...values: string[]) => text.replace(/\{(\d+)\}/g, (_match, index: string) => values[Number(index)] ?? "");
 
 function useMessage(): [{ text: string; bad: boolean }, Say] {
