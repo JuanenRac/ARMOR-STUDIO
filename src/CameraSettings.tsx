@@ -70,7 +70,7 @@ export function CameraSettings(props: Props) {
       setMessage(`${t("rtspFound")}: ${result.paths.join(", ")}`);
     } catch { setMessage(t("rtspDiscoverFailed")); }
   };
-  const useDiscovery = (device: DiscoveredCamera) => {
+  const pickDiscovered = (device: DiscoveredCamera) => {
     setSelectedId("");
     setForm({ ...emptyConnection(), host: device.host });
   };
@@ -83,7 +83,7 @@ export function CameraSettings(props: Props) {
   return <div className="camera-settings">
     <aside className="camera-picker"><button className="primary" onClick={newCamera}>{t("newCamera")}</button>{props.cameras.map(camera => <button key={camera.id} className={camera.id === selectedId ? "active" : ""} onClick={() => selectCamera(camera.id)}><b>{camera.name}</b><small>{camera.host}</small></button>)}
       <div className="camera-discovery"><button onClick={props.discover}>{t("networkDiscovery")}</button><small>{t("discoveryHelp")}</small>
-        {props.discovered.length > 0 && <><small>{t("selectCandidate")}</small>{props.discovered.map(camera => <button key={camera.host} onClick={() => useDiscovery(camera)}>{camera.host} · {camera.ports.join(", ")}</button>)}</>}</div>
+        {props.discovered.length > 0 && <><small>{t("selectCandidate")}</small>{props.discovered.map(camera => <button key={camera.host} onClick={() => pickDiscovered(camera)}>{camera.host} · {camera.ports.join(", ")}</button>)}</>}</div>
     </aside>
     <article className="stack-card camera-form"><h3>{form.id ? t("editCamera") : t("newCamera")}</h3>
       <div className="camera-field"><label><span>{t("cameraName")}</span><input value={form.name} onChange={event => update("name", event.target.value)} /></label></div>

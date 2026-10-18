@@ -72,3 +72,4 @@ html[data-armor-theme="Midnight"] body{background:#020611}html[data-armor-theme=
 .view-slot[hidden] { display: none; }
 
 .studio-login-card .login-remember{display:flex;align-items:center;gap:.5rem;font-weight:600}.studio-login-card .login-remember input{min-height:0;width:auto;margin:0}
+.remote-badge{padding:.22rem .6rem;border:1px solid #5ec8e8;border-radius:999px;background:rgba(94,200,232,.12);color:#8fdcf2;font:600 .68rem "DM Mono","Cascadia Mono",ui-monospace,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase}

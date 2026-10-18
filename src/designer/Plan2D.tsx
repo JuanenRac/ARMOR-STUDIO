@@ -312,8 +312,8 @@ export function Plan2D(props: PlanProps) {
   const gridPath = useMemo(() => {
     const box = contentBox, parts = { minor: "", major: "" };
     const x0 = Math.floor(box.minX), x1 = Math.ceil(box.maxX), y0 = Math.floor(box.minY), y1 = Math.ceil(box.maxY);
-    for (let x = x0; x <= x1; x += 1) (x % 5 === 0 ? (parts.major += `M${x} ${Y(y0)}V${Y(y1)}`) : (parts.minor += `M${x} ${Y(y0)}V${Y(y1)}`));
-    for (let y = y0; y <= y1; y += 1) (y % 5 === 0 ? (parts.major += `M${x0} ${Y(y)}H${x1}`) : (parts.minor += `M${x0} ${Y(y)}H${x1}`));
+    for (let x = x0; x <= x1; x += 1) parts[x % 5 === 0 ? "major" : "minor"] += `M${x} ${Y(y0)}V${Y(y1)}`;
+    for (let y = y0; y <= y1; y += 1) parts[y % 5 === 0 ? "major" : "minor"] += `M${x0} ${Y(y)}H${x1}`;
     return parts;
   }, [contentBox]);
 

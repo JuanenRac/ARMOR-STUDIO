@@ -42,7 +42,7 @@ import { NAV } from "./domain";
 
 const VIEW_ORDER = NAV.map(([key]) => key);
 import type { SiteModel } from "./designer/ops";
-import { usePolled, useFullscreen, useCameraReachability, useServerCameras, useServerInfo, useServerStatus, useSessionUser, useStreamUrls } from "./hooks";
+import { usePolled, useFullscreen, useCameraReachability, useServerCameras, useServerInfo, useRemoteConnection, useServerStatus, useSessionUser, useStreamUrls } from "./hooks";
 import { text } from "./i18n";
 import { HistoryView } from "./HistoryView";
 import { MediaLibrary } from "./MediaLibrary";
@@ -142,6 +142,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const [notice, setNotice] = useState(t("configuration"));
 
   const { state, connection: connectionState, latencyMs, apply: applyState } = useServerStatus(origin);
+  const remoteConnection = useRemoteConnection(origin, connectionState !== "demo" && sessionUser.user !== null);
   const serverInfo = useServerInfo(origin);
   const { urls: streamUrls, renew: renewStream } = useStreamUrls(origin, cameras);
   const reachability = useCameraReachability(origin);
@@ -380,7 +381,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   return <SessionUserContext.Provider value={sessionUser}><KnownNodesContext.Provider value={knownNodes}><StreamRenewContext.Provider value={renewStream}><div className="studio-frame"><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
     <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} alarmBadge={alarmsPending} t={t} />
     <section className="main-stage" data-tour="stage">
-      <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={isViewer} checkPerimeter={() => setCheckOpen(true)} t={t} />
+      <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={isViewer} checkPerimeter={() => setCheckOpen(true)} remote={remoteConnection} t={t} />
       {viewsToDraw(VIEW_ORDER, view, visitedViews.current).map(shown => {
         // a hidden menu keeps the last thing it was given (the same element: React does not draw it again every second); it is refreshed when it is shown
         if (shown === view) shownPanels.current.set(shown, panels[shown]);

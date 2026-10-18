@@ -32,6 +32,8 @@ All notable changes to this project are documented here.
 - **A file too large for the server is told as such:** importing an installation file larger than the server accepts (9 MB) shows a sentence of its own in the eight languages and not "it could not be done"; the refusals of the other screens use the same helper, which asks for the text of a "too large" answer only where the screen has it.
 - **One way to turn a refusal into words:** the seven screens that each had their own copy of the lookup (installation, notifications, security, outside access, users, devices, automations) share one function, tested with the codes the server gives, an unknown one and a failure of the network.
 - **Comments that say why, not what went wrong before:** the explanations in the code of the console that told the story of an old fault now say only the reason for the way it is done.
+- **"Remote connection" in the top bar:** when the server counts the session as coming from outside the house, a small badge says so, and its hint explains that critical actions may ask for the password again and which second-factor policy applies (off, asked from outside, always). Nothing is shown from inside the house. In the eight languages, with tests.
+- **A linter for the source:** `npm run lint` runs ESLint with the rules of hooks as errors and the unused variables and dependency lists of effects as warnings; the first pass fixed a hook called inside a callback (a camera discovery button), statements used as expressions in the grid of the 2D plan and a few leftovers.
 
 ## [0.8.0.3] - Guides control by control, a tidier Security menu, the way in from outside explained, and a voice that stops on time
 

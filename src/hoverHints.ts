@@ -73,9 +73,8 @@ function apply(element: Element, locale: Locale): void {
   const html = element as HTMLElement;
   if (html.dataset.noHint !== undefined || html.dataset.tip !== undefined) return;   // a control whose hint is on show (the rich hints take its title off for a moment)
   const owned = html.dataset.hintKey !== undefined;   // a title this file wrote earlier (the element may now say something else)
-  let key: string | undefined;
   const words = wordsOf(element);
-  key = keyFor(words, locale, element.closest("aside.sidebar nav") !== null);
+  const key = keyFor(words, locale, element.closest("aside.sidebar nav") !== null);
   if (!key) {
     // no row in the catalogue: a control that can be used still says what it is and what it does (hintFallback.ts); a heading or a label does not need to
     const current = html.getAttribute("title");

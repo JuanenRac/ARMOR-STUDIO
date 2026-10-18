@@ -5,6 +5,11 @@
 import { cataloguesFromRows, type Row } from "./catalogueRows";
 
 const ROWS: Record<string, Row> = {
+  remoteConn: ["Remote connection", "Conexión remota", "Fernverbindung", "Connexion à distance", "Connessione remota", "リモート接続", "远程连接"],
+  remoteConnHint: ["This session counts as coming from outside the house: critical actions may ask for the password again.", "Esta sesión cuenta como venida de fuera de casa: las acciones críticas pueden pedir la contraseña de nuevo.", "Diese Sitzung gilt als von außerhalb des Hauses: Kritische Aktionen können das Passwort erneut abfragen.", "Cette session compte comme venant de l'extérieur de la maison : les actions critiques peuvent redemander le mot de passe.", "Questa sessione conta come proveniente da fuori casa: le azioni critiche possono richiedere di nuovo la password.", "このセッションは家の外からのものとして扱われます。重要な操作ではパスワードを再度求められることがあります。", "此会话视为来自房屋外部：关键操作可能需要再次输入密码。"],
+  remoteConn_off: ["Second factor: off", "Segundo factor: desactivado", "Zweiter Faktor: aus", "Second facteur : désactivé", "Secondo fattore: disattivato", "2 段階認証：オフ", "第二重验证：关闭"],
+  remoteConn_remote: ["Second factor: asked from outside", "Segundo factor: se pide desde fuera", "Zweiter Faktor: von außerhalb verlangt", "Second facteur : demandé depuis l'extérieur", "Secondo fattore: richiesto da fuori", "2 段階認証：外部からの接続で要求", "第二重验证：来自外部时要求"],
+  remoteConn_always: ["Second factor: always", "Segundo factor: siempre", "Zweiter Faktor: immer", "Second facteur : toujours", "Secondo fattore: sempre", "2 段階認証：常に", "第二重验证：始终"],
   armSystem: ["Arm the system", "Armar el sistema", "System scharfschalten", "Armer le système", "Attiva il sistema", "システムを警戒開始", "布防系统"],
   disarmSystem: ["Disarm the system", "Desarmar el sistema", "System unscharf schalten", "Désarmer le système", "Disattiva il sistema", "システムの警戒を解除", "撤防系统"],
   confirmArm: ["Arm the system? Intrusion sensors will raise alarms.", "¿Armar el sistema? Los sensores de intrusión activarán alarmas.", "System scharfschalten? Einbruchsensoren lösen Alarme aus.", "Armer le système ? Les capteurs d'intrusion déclencheront des alarmes.", "Attivare il sistema? I sensori di intrusione genereranno allarmi.", "システムを警戒状態にしますか？侵入センサーが警報を発します。", "布防系统？入侵传感器将触发警报。"],

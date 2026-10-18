@@ -3,7 +3,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
-import { createCameraStreamUrl, listCameraStatus, listCameraViews, listConfiguredCameras, readInfo, readStatus, sessionUserState, type Reachability, type ServerInfo, type StudioUser } from "./api";
+import { createCameraStreamUrl, listCameraStatus, listCameraViews, listConfiguredCameras, readInfo, remoteCheck, readStatus, sessionUserState, type Reachability, type ServerInfo, type StudioUser } from "./api";
 import { mergeServerCameras } from "./cameras";
 import { DEMO_STATE, type Camera } from "./domain";
 import type { SystemState } from "./types";
@@ -186,6 +186,18 @@ export function usePolled<T>(load: () => Promise<T>, everyMs: number, key: unkno
  * never takes the administrator role away (the Users tab would say "only an administrator" until the page was reloaded).
  */
 export type SessionUser = { user: StudioUser | null; known: boolean; /** Why the last attempt to ask could not be answered (empty when it could). */ reason: string; refresh: () => void };
+/** Whether the server counts this session as coming from outside the house, and the second-factor policy it applies there; asked once per server, null while unknown or from inside. */
+export function useRemoteConnection(origin: string, enabled: boolean): { policy: string } | null {
+  const [state, setState] = useState<{ policy: string } | null>(null);
+  useEffect(() => {
+    if (!enabled) { setState(null); return; }
+    let cancelled = false;
+    remoteCheck(origin).then(check => { if (!cancelled) setState(check.origin === "remote" || check.session_origin === "remote" ? { policy: ["off", "remote", "always"].includes(check.totp_policy) ? check.totp_policy : "off" } : null); }, () => { if (!cancelled) setState(null); });
+    return () => { cancelled = true; };
+  }, [origin, enabled]);
+  return state;
+}
+
 export function useSessionUser(origin: string): SessionUser {
   const [answer, setAnswer] = useState<{ user: StudioUser | null; known: boolean; reason: string }>({ user: null, known: false, reason: "" });
   const [tick, setTick] = useState(0);
