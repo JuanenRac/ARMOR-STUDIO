@@ -72,8 +72,8 @@ describe("zone canvas", () => {
 describe("history filters", () => {
   const now = Date.parse("2026-03-10T12:00:00Z");
   it("turns filters into the server query", () => {
-    expect(historyQuery(DEFAULT_FILTERS, now)).toEqual({ order: "desc" });
-    expect(historyQuery({ ...DEFAULT_FILTERS, type: "camera", q: "  cam-01 ", range: "7d", order: "asc" }, now)).toEqual({ order: "asc", q: "cam-01", type: "camera", since: "2026-03-03T12:00:00.000Z" });
+    expect(historyQuery(DEFAULT_FILTERS, now)).toEqual({ order: "desc", all: true });
+    expect(historyQuery({ ...DEFAULT_FILTERS, type: "camera", q: "  cam-01 ", range: "7d", order: "asc" }, now)).toEqual({ order: "asc", q: "cam-01", type: "camera", all: true, since: "2026-03-03T12:00:00.000Z" });
     expect(historyQuery({ ...DEFAULT_FILTERS, type: "node", level: "high" }, now).type).toBe("alert");   // a level only exists for alerts
     expect(historyQuery({ ...DEFAULT_FILTERS, q: "x".repeat(200) }, now).q).toHaveLength(80);
   });
@@ -87,6 +87,43 @@ describe("history filters", () => {
     const query = historyQuery({ ...DEFAULT_FILTERS, range: "custom", from: "2026-03-01", to: "2026-03-05" }, now);
     expect(Date.parse(query.since!)).toBeLessThan(Date.parse(query.until!));
     expect(historyQuery({ ...DEFAULT_FILTERS, range: "custom", from: "nope", to: "" }, now).since).toBeUndefined();
+  });
+});
+
+describe("the tabs of the history", () => {
+  const now = Date.parse("2026-03-10T12:00:00Z");
+  it("asks the server for the kind of event each tab is about", () => {
+    expect(historyQuery({ ...DEFAULT_FILTERS, tab: "alarms" }, now)).toEqual({ order: "desc", type: "alarm" });
+    expect(historyQuery({ ...DEFAULT_FILTERS, tab: "devices" }, now)).toEqual({ order: "desc", type: "device" });
+    expect(historyQuery({ ...DEFAULT_FILTERS, tab: "connections" }, now)).toEqual({ order: "desc", type: "connection" });
+    expect(historyQuery({ ...DEFAULT_FILTERS, tab: "connections", sub: "android" }, now)).toEqual({ order: "desc", type: "connection", kind: "android" });
+    expect(historyQuery({ ...DEFAULT_FILTERS, tab: "system", sub: "broker" }, now)).toEqual({ order: "desc", type: "system", category: "broker" });
+    expect(historyQuery({ ...DEFAULT_FILTERS, tab: "settings" }, now)).toEqual({ order: "desc", type: "system", category: "settings" });
+  });
+
+  it("reads a connection and a system event in every language", () => {
+    const at = "2026-01-01T00:00:00.000Z";
+    const connection = { id: 1, at, type: "connection", action: "login", client_kind: "android", client_id: "0123456789abcdef", user: "ana", app_version: "0.6.6", two_factor: true, origin: "remote" } as ArmorEvent;
+    const system = { id: 2, at, type: "system", category: "alarm", action: "arm_requested", subject: "alarm-1", profile: "night", by: "ana" } as ArmorEvent;
+    const firmware = { id: 3, at, type: "system", category: "node", action: "firmware_changed", subject: "radar-1", version: "0.7.1", previous_version: "0.7.0" } as ArmorEvent;
+    expect(describeEvent(connection, key => text("en", key))).toBe("Android app · ana · signed in · v0.6.6 · with second factor · from outside");
+    expect(describeEvent(system, key => text("en", key))).toBe("Alarm · alarm-1 · arming requested · profile night · by ana");
+    expect(describeEvent(firmware, key => text("en", key))).toBe("Node · radar-1 · firmware changed · 0.7.0 → 0.7.1");
+    for (const locale of locales) {
+      for (const event of [connection, system, firmware]) expect(describeEvent(event, key => text(locale, key)), locale).not.toMatch(/(ck|conn|sc|sa)_[a-z_]+/);
+      for (const key of ["his_tab_alarms", "his_tab_connections", "his_tab_devices", "his_tab_system", "his_tab_settings", "cl_title", "cl_help", "cl_empty", "event_connection", "event_system", "sa_backup_made"]) expect(text(locale, key), `${locale}:${key}`).not.toBe(key);
+    }
+  });
+
+  it("writes the new events in the export without their address or agent", () => {
+    const at = "2026-01-01T00:00:00.000Z";
+    const csv = eventsToCsv([
+      { id: 2, at, type: "connection", action: "login_failed", client_kind: "studio", client_id: "0123456789abcdef", user: "ana", ip: "10.0.0.5", agent: "Mozilla" },
+      { id: 1, at, type: "system", category: "settings", action: "changed", subject: "rules" },
+    ] as ArmorEvent[]);
+    expect(csv).toContain(`2,${at},connection,ana,,login_failed,`);
+    expect(csv).toContain(`1,${at},system,rules,,changed,`);
+    expect(csv).not.toContain("10.0.0.5");
   });
 });
 

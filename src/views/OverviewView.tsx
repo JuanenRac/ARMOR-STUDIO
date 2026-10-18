@@ -28,7 +28,7 @@ type Props = {
 };
 
 const size = (bytes: number): string => bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1)} GB` : bytes >= 1e6 ? `${(bytes / 1e6).toFixed(0)} MB` : `${Math.round(bytes / 1e3)} kB`;
-const EVENT_ICON: Record<ArmorEvent["type"], string> = { alert: "◌", node: "▣", camera: "◉", mode: "⏻", device: "◈", alarm: "!" };
+const EVENT_ICON: Record<ArmorEvent["type"], string> = { alert: "◌", node: "▣", camera: "◉", mode: "⏻", device: "◈", alarm: "!", connection: "⇄", system: "⚙" };
 
 function Tile({ colour, label, value, sub, onClick, alert, icon }: { colour: string; label: string; value: ReactNode; sub: ReactNode; onClick: () => void; alert?: boolean; icon: string }) {
   return <button className={`ov-tile ${alert ? "alert" : ""}`} style={{ "--accent": colour } as CSSProperties} onClick={onClick}>

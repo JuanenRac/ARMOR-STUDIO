@@ -120,3 +120,4 @@
   .status-bar { position: sticky; bottom: 0; padding: 0 .7rem; gap: .7rem; }
   .sb-date { display: none; } .sb-signout { padding: 0 .55rem; }
 }
+.history-tabs{flex-wrap:wrap}.history-clients{display:grid;gap:.5rem;margin:.5rem 0}.history-clients h3{margin:.4rem 0 .2rem;font-size:.95rem}.history-clients .history-check{display:flex;gap:.4rem;align-items:center;font-size:.8rem}.history-clients-scroll{overflow-x:auto}.history-clients-table{width:100%;border-collapse:collapse;font-size:.78rem}.history-clients-table th,.history-clients-table td{padding:.35rem .5rem;text-align:left;border-bottom:1px solid rgba(120,160,170,.25);white-space:nowrap}.history-clients-table td.on{color:#7cf5a7;font-weight:700}.history-clients-table tr.has-failures td:nth-child(8){color:#ffb4b4;font-weight:700}.history-clients-table td.agent{max-width:22rem;overflow:hidden;text-overflow:ellipsis}

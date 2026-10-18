@@ -3,7 +3,7 @@
  * becomes a validated zone. Kept apart from React so they are unit-tested.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import type { AlertLevel, ArmorEvent, EventType, HistoryQuery, Zone } from "./api";
+import type { AlertLevel, ArmorEvent, ClientKind, EventType, HistoryQuery, SystemCategory, Zone } from "./api";
 
 export type ZoneDraft = { name: string; node_id: string; sensor_id: string; x_min_mm: string; x_max_mm: string; y_min_mm: string; y_max_mm: string };
 export const emptyZoneDraft = (): ZoneDraft => ({ name: "", node_id: "", sensor_id: "", x_min_mm: "", x_max_mm: "", y_min_mm: "", y_max_mm: "" });
@@ -39,6 +39,24 @@ export function describeEvent(event: ArmorEvent, t: (key: string) => string): st
   if (event.type === "device") return `${event.device_id}: ${event.field} ${event.from === null ? "" : `${String(event.from)} → `}${String(event.to)}`;
   if (event.type === "alarm") return `${t(`alarm_${event.code}`)} · ${event.source} · ${t(event.state === "raised" ? "alarmRaised" : event.state === "acknowledged" ? "alarmAcknowledged" : "alarmCleared")}`;
   if (event.type === "alert") return `${event.node_id}: ${t(`level_${event.from}`)} → ${t(`level_${event.to}`)} (${event.targets} ${t("targetsShort")})`;
+  if (event.type === "connection") {
+    const parts = [t(`ck_${event.client_kind}`), event.user, t(`conn_${event.action}`)];
+    if (event.subject) parts.push(event.subject);
+    if (event.app_version) parts.push(`v${event.app_version}`);
+    if (event.two_factor) parts.push(t("conn_2fa"));
+    if (event.origin) parts.push(t(event.origin === "remote" ? "conn_remote" : "conn_local"));
+    return parts.filter(Boolean).join(" · ");
+  }
+  if (event.type === "system") {
+    const parts = [t(`sc_${event.category}`), event.subject, t(`sa_${event.action}`)];
+    if (event.previous_version && event.version) parts.push(`${event.previous_version} → ${event.version}`);
+    else if (event.version) parts.push(`${t("sa_firmware")} ${event.version}`);
+    if (event.profile) parts.push(`${t("sa_profile")} ${event.profile}`);
+    if (event.by) parts.push(`${t("sa_by")} ${event.by}`);
+    if (event.outcome === "denied") parts.push(t("sa_refused"));
+    if (event.outcome === "failed") parts.push(t("sa_failed"));
+    return parts.filter(Boolean).join(" · ");
+  }
   return `${event.node_id}: ${event.from ? `${t(`status_${event.from}`)} → ` : ""}${t(`status_${event.to}`)}`;
 }
 
@@ -67,8 +85,14 @@ export function rectFromDrag(a: { x: number; y: number }, b: { x: number; y: num
 // ---- filters, export and durations for the history view ------------------------------------------------------------------
 
 export type HistoryRange = "24h" | "7d" | "30d" | "all" | "custom";
-export type HistoryFilters = { type: EventType | "all"; q: string; range: HistoryRange; from: string; to: string; level: AlertLevel | "any"; order: "desc" | "asc" };
-export const DEFAULT_FILTERS: HistoryFilters = { type: "all", q: "", range: "all", from: "", to: "", level: "any", order: "desc" };
+/** The tabs of the history: everything, the alarms, the connections of the clients, the devices, the events of the system, and the changes of settings. */
+export type HistoryTab = "all" | "alarms" | "connections" | "devices" | "system" | "settings";
+export const HISTORY_TABS: readonly HistoryTab[] = ["all", "alarms", "connections", "devices", "system", "settings"];
+export const CLIENT_KINDS: readonly ClientKind[] = ["studio", "android", "node", "voice", "other"];
+export const SYSTEM_CATEGORIES: readonly SystemCategory[] = ["node", "broker", "service", "update", "alarm", "backup"];
+/** `type` is the kind chosen on the "all" tab; `sub` is a kind of client on the connections tab or a category on the system tab ("" for all of them). */
+export type HistoryFilters = { tab: HistoryTab; type: EventType | "all"; sub: ClientKind | SystemCategory | ""; q: string; range: HistoryRange; from: string; to: string; level: AlertLevel | "any"; order: "desc" | "asc" };
+export const DEFAULT_FILTERS: HistoryFilters = { tab: "all", type: "all", sub: "", q: "", range: "all", from: "", to: "", level: "any", order: "desc" };
 
 const RANGE_MS: Record<"24h" | "7d" | "30d", number> = { "24h": 86_400_000, "7d": 7 * 86_400_000, "30d": 30 * 86_400_000 };
 
@@ -91,8 +115,17 @@ export function historyQuery(filters: HistoryFilters, now: number = Date.now()):
   else if (filters.range !== "all") since = now - RANGE_MS[filters.range];
   if (since !== undefined) query.since = new Date(since).toISOString();
   if (until !== undefined) query.until = new Date(until).toISOString();
-  if (filters.level !== "any") { query.level = filters.level; query.type = "alert"; }
-  else if (filters.type !== "all") query.type = filters.type;
+  switch (filters.tab) {
+    case "alarms": query.type = "alarm"; break;
+    case "devices": query.type = "device"; break;
+    case "connections": query.type = "connection"; if (filters.sub) query.kind = filters.sub as ClientKind; break;
+    case "system": query.type = "system"; if (filters.sub) query.category = filters.sub as SystemCategory; break;
+    case "settings": query.type = "system"; query.category = "settings"; break;
+    default:
+      query.all = true;
+      if (filters.level !== "any") { query.level = filters.level; query.type = "alert"; }
+      else if (filters.type !== "all") query.type = filters.type;
+  }
   return query;
 }
 
@@ -106,8 +139,10 @@ export function csvCell(value: string | number | boolean | null | undefined): st
 export function eventsToCsv(events: readonly ArmorEvent[]): string {
   const rows = events.map(event => [
     event.id, event.at, event.type,
-    event.type === "mode" ? "" : event.type === "camera" ? event.camera_id : event.type === "device" ? event.device_id : event.type === "alarm" ? event.source : event.node_id,
-    event.type === "mode" || event.type === "alarm" ? "" : event.from ?? "", event.type === "mode" ? event.mode : event.type === "alarm" ? `${event.code}:${event.state}` : event.to,
+    event.type === "mode" ? "" : event.type === "camera" ? event.camera_id : event.type === "device" ? event.device_id : event.type === "alarm" ? event.source
+      : event.type === "connection" ? event.user ?? event.client_kind : event.type === "system" ? event.subject ?? event.category : event.node_id,
+    event.type === "mode" || event.type === "alarm" || event.type === "connection" || event.type === "system" ? "" : event.from ?? "",
+    event.type === "mode" ? event.mode : event.type === "alarm" ? `${event.code}:${event.state}` : event.type === "connection" || event.type === "system" ? event.action : event.to,
     event.type === "alert" ? event.targets : "",
   ].map(csvCell).join(","));
   return ["id,time,type,subject,from,to,targets", ...rows].join("\r\n") + "\r\n";

@@ -7,14 +7,14 @@ import { downloadText } from "./download";
 import { ViewTabs } from "./components/ViewTabs";
 import { useViewActive } from "./viewSlots";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { deleteHistory, listHistory, readHistorySummary, readRules, saveRules, type ArmorEvent, type EventType, type HistorySummary, type Rules, type Zone } from "./api";
-import { DEFAULT_FILTERS, DEFAULT_ZONE_VIEW, describeEvent, emptyZoneDraft, eventsToCsv, historyQuery, pixelToMm, rectFromDrag, zoneFromDraft, type HistoryFilters, type ZoneDraft } from "./history";
+import { deleteHistory, listConnections, listHistory, readHistorySummary, readRules, saveRules, type ArmorEvent, type ConnectionClient, type EventType, type HistorySummary, type Rules, type Zone } from "./api";
+import { CLIENT_KINDS, DEFAULT_FILTERS, DEFAULT_ZONE_VIEW, describeEvent, emptyZoneDraft, eventsToCsv, HISTORY_TABS, historyQuery, pixelToMm, rectFromDrag, SYSTEM_CATEGORIES, zoneFromDraft, type HistoryFilters, type ZoneDraft } from "./history";
 import "./history.css";
 import { MenuTitle } from "./menuLogos";
 
 type Translate = (key: string) => string;
 
-const FILTERS: Array<EventType | "all"> = ["all", "alarm", "alert", "device", "node", "camera", "mode"];
+const FILTERS: Array<EventType | "all"> = ["all", "alarm", "alert", "device", "node", "camera", "mode", "connection", "system"];
 
 type Notice = { kind: "info" | "error"; text: string } | null;
 const PAGE = 100;
@@ -31,6 +31,41 @@ function SummaryStrip({ summary, t }: { summary: HistorySummary | null; t: Trans
     {card(t("statNodes"), day?.node_incidents ?? "-", day && day.node_incidents > 0 ? "warn" : "")}
     {card(t("statCameras"), day?.camera_incidents ?? "-", day && day.camera_incidents > 0 ? "warn" : "")}
     <article className="history-stat span"><span>{t("statSpan")}</span><strong>{summary?.oldest_at ? `${new Date(summary.oldest_at).toLocaleDateString()} → ${new Date(summary.newest_at ?? summary.oldest_at).toLocaleDateString()}` : "-"}</strong></article>
+  </section>;
+}
+
+/** Every device or app the server has seen, with when it was last seen and how many sessions it has open. The address and the user agent come only to an administrator, and the columns appear only then. */
+function ConnectionsList({ origin, t, kind }: { origin: string; t: Translate; kind: ConnectionClient["kind"] | "" }) {
+  const [clients, setClients] = useState<ConnectionClient[] | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [activeOnly, setActiveOnly] = useState(false);
+  const active = useViewActive();
+  useEffect(() => {
+    let alive = true;
+    const load = () => { listConnections(origin, { ...(kind ? { kind } : {}), ...(activeOnly ? { active: true } : {}) }).then(list => { if (alive) { setClients(list); setFailed(false); } }).catch(() => { if (alive) setFailed(true); }); };
+    load();
+    if (!active) return () => { alive = false; };
+    const timer = window.setInterval(load, 10_000);
+    return () => { alive = false; window.clearInterval(timer); };
+  }, [origin, kind, activeOnly, active]);
+  const when = (iso: string | undefined): string => (iso ? new Date(iso).toLocaleString() : "-");
+  const showAddress = (clients ?? []).some(client => client.ip !== undefined || client.agent !== undefined);
+  return <section data-tour="his-clients" className="history-clients" aria-label={t("cl_title")}>
+    <header><h3>{t("cl_title")}</h3><p className="muted">{t("cl_help")}</p>
+      <label className="history-check"><input type="checkbox" checked={activeOnly} onChange={event => setActiveOnly(event.target.checked)} /> {t("cl_active_only")}</label></header>
+    {failed && <p className="history-error" role="alert">{t("cl_load_failed")}</p>}
+    {clients !== null && clients.length === 0 && !failed && <p className="media-empty">{t("cl_empty")}</p>}
+    {clients !== null && clients.length > 0 && <div className="history-clients-scroll"><table className="history-clients-table">
+      <thead><tr><th>{t("cl_kind")}</th><th>{t("cl_user")}</th><th>{t("cl_version")}</th><th>{t("cl_first")}</th><th>{t("cl_last")}</th><th>{t("cl_sessions")}</th><th>{t("cl_ok")}</th><th>{t("cl_failed")}</th>{showAddress && <><th>{t("cl_ip")}</th><th>{t("cl_agent")}</th></>}</tr></thead>
+      <tbody>{clients.map(client => <tr key={client.id} className={client.logins_failed > 0 ? "has-failures" : ""}>
+        <td>{t(`ck_${client.kind}`)}{client.label ? ` · ${client.label}` : ""}</td><td>{client.user ?? "-"}</td><td>{client.app_version ?? "-"}</td>
+        <td><time dateTime={client.first_seen}>{when(client.first_seen)}</time></td><td><time dateTime={client.last_seen}>{when(client.last_seen)}</time></td>
+        <td className={client.active_sessions > 0 ? "on" : ""}>{client.active_sessions}</td><td>{client.logins_ok}</td>
+        <td title={client.last_failure ? `${t("cl_last_failure")}: ${when(client.last_failure)}` : undefined}>{client.logins_failed}</td>
+        {showAddress && <><td>{client.ip ?? "-"}</td><td className="agent">{client.agent ?? "-"}</td></>}
+      </tr>)}</tbody></table></div>}
+    {!showAddress && clients !== null && clients.length > 0 && <p className="muted small">{t("cl_admin_note")}</p>}
+    <h3>{t("cl_events")}</h3>
   </section>;
 }
 
@@ -77,7 +112,9 @@ function EventPanel({ origin, t }: { origin: string; t: Translate }) {
   };
 
   const set = (patch: Partial<HistoryFilters>) => setFilters(current => ({ ...current, ...patch }));
-  const anyFilter = filters.type !== "all" || filters.q !== "" || filters.range !== "all" || filters.level !== "any";
+  const anyFilter = filters.type !== "all" || filters.sub !== "" || filters.q !== "" || filters.range !== "all" || filters.level !== "any";
+  /** The kind of event the tab narrows the list to (undefined on the tab of everything): clearing the history can be limited to it. */
+  const scopedType = filters.level === "any" ? historyQuery(filters).type : undefined;
 
   /** Every event that matches the current filters, page by page (at most 5000), for the export. */
   const collect = async (): Promise<ArmorEvent[]> => {
@@ -106,7 +143,7 @@ function EventPanel({ origin, t }: { origin: string; t: Translate }) {
     if (!pending) return;
     setBusy(true);
     try {
-      const result = await deleteHistory(origin, pending, filters.type !== "all" && filters.level === "any" ? filters.type : undefined);
+      const result = await deleteHistory(origin, pending, scopedType);
       setNotice({ kind: "info", text: `${t("deleted")} ${result.deleted}` });
       setPending(null); setOpenId(null);
       await refresh();
@@ -135,14 +172,25 @@ function EventPanel({ origin, t }: { origin: string; t: Translate }) {
     <SummaryStrip summary={summary} t={t} />
 
     <div className="history-filters" data-tour="his-filters">
-      <div className="media-filters" role="tablist" aria-label={t("history")}>
-        {FILTERS.map(value => <button key={value} className={filters.type === value && filters.level === "any" ? "active" : ""} onClick={() => set({ type: value, level: "any" })}>{value === "all" ? t("allEvents") : t(`event_${value}`)}</button>)}
+      <div className="media-filters history-tabs" role="tablist" aria-label={t("history")} data-tour="his-tabs">
+        {HISTORY_TABS.map(tab => <button key={tab} role="tab" aria-selected={filters.tab === tab} className={filters.tab === tab ? "active" : ""} onClick={() => set({ tab, type: "all", sub: "", level: "any" })}>{tab === "all" ? t("allEvents") : t(`his_tab_${tab}`)}</button>)}
       </div>
+      {filters.tab === "all" && <div className="media-filters" aria-label={t("history")}>
+        {FILTERS.map(value => <button key={value} className={filters.type === value && filters.level === "any" ? "active" : ""} onClick={() => set({ type: value, level: "any" })}>{value === "all" ? t("allEvents") : t(`event_${value}`)}</button>)}
+      </div>}
+      {filters.tab === "connections" && <div className="media-filters" aria-label={t("his_tab_connections")}>
+        <button className={filters.sub === "" ? "active" : ""} onClick={() => set({ sub: "" })}>{t("ck_all")}</button>
+        {CLIENT_KINDS.map(kind => <button key={kind} className={filters.sub === kind ? "active" : ""} onClick={() => set({ sub: kind })}>{t(`ck_${kind}`)}</button>)}
+      </div>}
+      {filters.tab === "system" && <div className="media-filters" aria-label={t("his_tab_system")}>
+        <button className={filters.sub === "" ? "active" : ""} onClick={() => set({ sub: "" })}>{t("sc_all")}</button>
+        {SYSTEM_CATEGORIES.map(category => <button key={category} className={filters.sub === category ? "active" : ""} onClick={() => set({ sub: category })}>{t(`sc_${category}`)}</button>)}
+      </div>}
       <input className="history-search" type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={t("searchPlaceholder")} aria-label={t("searchPlaceholder")} maxLength={80} />
-      <select value={filters.level} onChange={event => set({ level: event.target.value as HistoryFilters["level"] })} aria-label={t("levelFilter")}>
+      {filters.tab === "all" && <select value={filters.level} onChange={event => set({ level: event.target.value as HistoryFilters["level"] })} aria-label={t("levelFilter")}>
         <option value="any">{t("anyLevel")}</option>
         {(["high", "review", "normal"] as const).map(level => <option key={level} value={level}>{t(`level_${level}`)}</option>)}
-      </select>
+      </select>}
       <select value={filters.range} onChange={event => set({ range: event.target.value as HistoryFilters["range"] })} aria-label={t("rangeFilter")}>
         {RANGES.map(range => <option key={range} value={range}>{t(`range_${range}`)}</option>)}
       </select>
@@ -151,11 +199,11 @@ function EventPanel({ origin, t }: { origin: string; t: Translate }) {
         <input type="date" value={filters.to} min={filters.from || undefined} onChange={event => set({ to: event.target.value })} aria-label={t("rangeTo")} />
       </>}
       <button onClick={() => set({ order: filters.order === "desc" ? "asc" : "desc" })} title={t("orderHelp")}>{filters.order === "desc" ? t("newestFirst") : t("oldestFirst")}</button>
-      {anyFilter && <button onClick={() => { setFilters(DEFAULT_FILTERS); setQuery(""); }}>{t("clearFilters")}</button>}
+      {anyFilter && <button onClick={() => { setFilters({ ...DEFAULT_FILTERS, tab: filters.tab }); setQuery(""); }}>{t("clearFilters")}</button>}
     </div>
 
     {pending && <div className="history-confirm" role="alertdialog" aria-label={t("clearHistory")}>
-      <p><strong>{t("confirmDeleteTitle")}</strong> {scopeText(pending)}{filters.type !== "all" && filters.level === "any" ? ` · ${t(`event_${filters.type}`)}` : ""}. {t("confirmDeleteBody")}</p>
+      <p><strong>{t("confirmDeleteTitle")}</strong> {scopeText(pending)}{scopedType ? ` · ${t(`event_${scopedType}`)}` : ""}. {t("confirmDeleteBody")}</p>
       <div>
         <button disabled={busy} onClick={() => void exportAs("json")}>{t("exportFirst")}</button>
         <button className="danger-button" disabled={busy} onClick={() => void confirmDelete()}>{t("deleteNow")}</button>
@@ -166,6 +214,7 @@ function EventPanel({ origin, t }: { origin: string; t: Translate }) {
     {error && <p className="history-error" role="alert">{t("historyFailed")}</p>}
     {!loading && !error && events.length === 0 && <p className="media-empty">{anyFilter ? t("noEventsFiltered") : t("noEvents")}</p>}
 
+    {filters.tab === "connections" && <ConnectionsList origin={origin} t={t} kind={filters.sub as ConnectionClient["kind"] | ""} />}
     <ol className="history-list">
       {events.map(event => {
         const open = openId === event.id;

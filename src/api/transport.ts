@@ -1,3 +1,4 @@
+import manifest from "../../package.json";
 export const endpoint = (origin: string, suffix: string) => origin.replace(/\/$/, "") + suffix;
 export const localSession = { credentials: "include" as const };
 /**
@@ -5,7 +6,13 @@ export const localSession = { credentials: "include" as const };
  * answered would wait for ever behind them - the buttons would seem dead until the page is reloaded.
  */
 export const CALL_TIMEOUT_MS = 30_000;
-export const timedFetch = (url: string, init: RequestInit = {}): Promise<Response> => fetch(url, { ...init, signal: init.signal ?? AbortSignal.timeout(CALL_TIMEOUT_MS) });
+/** What Studio says it is on every call (`X-Armor-Client`), so that the server's history of connections can tell it from the phone and from the other clients. Only informative. */
+export const CLIENT_NAME = `studio/${manifest.version}`;
+export const timedFetch = (url: string, init: RequestInit = {}): Promise<Response> => {
+  const headers = new Headers(init.headers);
+  if (!headers.has("X-Armor-Client")) headers.set("X-Armor-Client", CLIENT_NAME);
+  return fetch(url, { ...init, headers, signal: init.signal ?? AbortSignal.timeout(CALL_TIMEOUT_MS) });
+};
 /** An answer the server refused, with the stable `code` that says why. */
 export class ApiError extends Error {
   constructor(readonly status: number, readonly code: string) { super(`${status} ${code}`); }

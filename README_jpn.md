@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-495%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-535%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.0.3-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**正直さのチェック - 今日動いているもの:** Studio は [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) と通信し、495 件のユニットテスト（設定の解析、カメラの統合、ソーラーグラフの計算、設計ツールの幾何と検査、警報アナウンサー、アシスタントの辞書、8 言語での全メニューの描画、静的ホスト）とブラウザテストでカバーされています。CM5 テストベンチで、実際のサーバー、実際の IP カメラ、基板上のレーダーノードと組み合わせて日常的に動作しており、ヘルプの画像は例示データで作られています。**まだ**証明されていないもの：あらゆるカメラでのライブ映像と PTZ、実機でのソーラー・電気・警報盤・タッチパネルのメニュー（存在するのはレーダーノードのみ）、正式なアクセシビリティ・ユーザビリティ評価。サーバーに接続できない間、Studio はデモデータを表示し、上部バーでそれを示します。
+**正直さのチェック - 今日動いているもの:** Studio は [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) と通信し、535 件のユニットテスト（設定の解析、カメラの統合、ソーラーグラフの計算、設計ツールの幾何と検査、警報アナウンサー、アシスタントの辞書、8 言語での全メニューの描画、静的ホスト）とブラウザテストでカバーされています。CM5 テストベンチで、実際のサーバー、実際の IP カメラ、基板上のレーダーノードと組み合わせて日常的に動作しており、ヘルプの画像は例示データで作られています。**まだ**証明されていないもの：あらゆるカメラでのライブ映像と PTZ、実機でのソーラー・電気・警報盤・タッチパネルのメニュー（存在するのはレーダーノードのみ）、正式なアクセシビリティ・ユーザビリティ評価。サーバーに接続できない間、Studio はデモデータを表示し、上部バーでそれを示します。
 
 ---
 
@@ -39,7 +39,7 @@
 |---|---|
 | バージョン | `0.8.0.3` |
 | 成熟度 | 確立 |
-| テスト | 495 (`npm test`) |
+| テスト | 535 (`npm test`) |
 | 技術 | React 19 / TypeScript / Vite |
 | 実機での確認 | CM5 テストベンチ（実サーバー、実際の IP カメラ、実際のレーダーノード）で毎日使用。ソーラー・電気・警報盤・タッチパネルのメニューは実ノードを待っています |
 
@@ -65,6 +65,7 @@
 * **ファイルではなく選択肢で設定する外部アクセス：**セキュリティで管理者が WireGuard VPN を設定し、QR コードでスマホを追加し、家に付いてくる名前（DuckDNS、Cloudflare、または呼び出せる任意のアドレス）を維持し、サーバー経由で外から開けるノードを登録します（信頼する前に証明書のフィンガープリントを比較）。各ステップは 8 言語で説明され、外からの操作ではパスワードを再度求めます。**外から家に届く方法を一歩ずつ：** 設定 > セキュリティの6ステップのガイドが、マシンが対応しているか、VPNがあるか、家に名前があるか、ルーターでポートが開いているか、スマホが追加済みかを示し、モバイルデータでの試し方を説明します。セキュリティタブは見出し付きの3つのセクションに整理されています。
 * **ブローカー暗号化カード:** 設定 > ブローカー に、サーバーとブローカーの接続が暗号化されているかと、信頼している設備独自の認証局のフィンガープリントが表示されます。接続が暗号化なしの場合は、それが初期状態なので警告は表示されません。
 * **ノードの状態と警戒モード:** 「システム」には各ノードの状態報告（稼働時間、再起動の理由、メモリ、回線と信号、ブローカー接続、最後のエラー、履歴と再起動）のカードがあり、「警報盤」にはモード選択（外出、在宅、夜間、独自）とモードの編集があります。すべて 8 言語で、ヘルプ、ツアーの手順、アシスタントの回答付きです。
+* **パスワードマネージャー対応のサインインとタブ付きの履歴:** サインインは本物のフォームで、ブラウザーや OS のパスワードマネージャーが保存・入力できます。任意の「ユーザー名を記憶」はユーザー名だけを保存し（パスワードは決して保存しません）、その旨の注記があります。履歴には「すべて」「アラーム」「接続」「デバイス」「システム」「設定」のタブがあり、サーバーに接続するすべてのデバイスとアプリの一覧（最終確認、開いているセッション、サインインと拒否）と、ノード・ブローカー・サービス・更新・警戒操作のイベントが見られます。アドレスは管理者にだけ表示されます。
 
 ## 🖼️ スクリーンショット
 
@@ -128,7 +129,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 495 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
+npm test            # 535 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```
