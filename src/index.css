@@ -70,3 +70,5 @@ html[data-armor-theme="Midnight"] body{background:#020611}html[data-armor-theme=
 /* a menu in its place: the wrapper takes no part in the layout, and a hidden one takes no room */
 .view-slot { display: contents; }
 .view-slot[hidden] { display: none; }
+
+.studio-login-card .login-remember{display:flex;align-items:center;gap:.5rem;font-weight:600}.studio-login-card .login-remember input{min-height:0;width:auto;margin:0}

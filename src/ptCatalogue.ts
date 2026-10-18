@@ -11,6 +11,8 @@ export const PT_CATALOGUE: Record<string, string> = {
  "login_enter": "Entrar no Studio",
  "login_busy": "A verificar…",
  "login_failed": "Não foi possível iniciar sessão. Verifique o servidor, o utilizador e a palavra-passe.",
+ "login_remember": "Lembrar-me (só o nome de utilizador)",
+ "login_pm_note": "O Studio só se lembra do nome de utilizador, e apenas se marcar a caixa. A palavra-passe é guardada, se quiser, unicamente pelo gestor de palavras-passe do seu navegador ou sistema; o Studio nunca a armazena.",
  "login_note": "A palavra-passe só é enviada ao servidor para abrir uma sessão (um cookie HttpOnly que dura o que o servidor disser); o Studio não a guarda, e as funções das câmaras ficam ativas durante essa sessão sem nenhum token adicional.",
  "default": "predefinido",
  "bk_confirm_stop": "Parar o broker deixa todos os nós cegos até ele voltar a arrancar. Parar?",
