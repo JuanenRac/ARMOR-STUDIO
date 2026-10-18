@@ -101,10 +101,10 @@ flowchart LR
 ```text
 ARMOR-STUDIO/
 ├── src/
-│   ├── App.tsx, domain.ts, settings.ts, prefs.ts, cameras.ts, hooks.ts, api.ts, config.ts, i18n.ts, viewSlots.tsx
+│   ├── App.tsx, domain.ts, settings.ts, prefs.ts, cameras.ts, hooks.ts, api.ts (+ api/ by area), config.ts, i18n.ts, viewSlots.tsx
 │   ├── components/   camera, chrome (top bar, sidebar, Help), SiteMap
 │   ├── views/        overview, monitoring, RadarView, AlarmsView, AlarmPanelsView, DevicesView, AutomationsView, InvertersView, BatteriesView, ElectricalView, NetworkView, WeatherView, SystemView, ServicesView
-│   ├── designer/     the Site Designer: geometry, ops, model, Plan2D, Viewport3D, Toolbox, Inspector
+│   ├── designer/     the Site Designer: geometry, ops (+ ops/), model, Plan2D, Viewport3D, Toolbox, Inspector
 │   ├── electrical/   the Electrical Designer: model, ops, analysis (the checks), presets, symbols, sync
 │   ├── alarm/        the Alarm Designer and the alarm panels' Zigbee links
 │   ├── network/      the Network Designer and the network model
