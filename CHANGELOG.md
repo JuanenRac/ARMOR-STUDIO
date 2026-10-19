@@ -14,6 +14,7 @@ All notable changes to this project are documented here.
 - **Follow an order node by node:** each node shows its steps (sent, acknowledged, offline, back, or sent and done), the times, the new firmware after a restart, the state it was left in, the snapshot a diagnostics order returns and, when it did not work, the reason in words for each refusal (busy installing a firmware, receiving an upload, copying a slot or running a battery operation, restarted a moment ago, already in that state, no answer, did not come back).
 - **Help, tour and assistant:** the System help, a new step of the System tour and a new assistant topic explain the orders, rolling against now, standby and the warnings, in the eight languages.
 - **Eight languages and tests:** every text is written in English, Spanish, German, French, Italian, Japanese, Chinese and Portuguese; the confirmation, the lengths, the warnings, the steps of an order, the refusals, the errors and the screens are tested.
+- **Internal memory of the nodes:** the health card of a node shows its internal memory on its own (free now, least since start, biggest block) and the external RAM, when the node tells them, with the bar judged by the internal level, and the history draws the internal memory; the details of the memory warning name the three figures. Texts in the eight languages.
 
 ## [0.8.0.5] - Battery maintenance, richer battery data and alerts, and the remote connection badge
 

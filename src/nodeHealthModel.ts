@@ -61,7 +61,7 @@ export function sparkline(values: readonly number[], width: number, height: numb
   return values.map((value, index) => `${index === 0 ? "M" : "L"}${x(index).toFixed(1)} ${y(value).toFixed(1)}`).join(" ");
 }
 
-export const heapSeries = (samples: readonly HealthSample[]): number[] => samples.map(sample => sample.heap_free);
+export const heapSeries = (samples: readonly HealthSample[]): number[] => samples.map(sample => sample.heap_internal_free ?? sample.heap_free);   // the internal memory when the node tells it: the total adds the external RAM and never looks short
 export const signalSeries = (samples: readonly HealthSample[]): number[] => samples.filter(sample => sample.rssi_dbm !== undefined).map(sample => sample.rssi_dbm as number);
 
 /** The nodes of one family (or all), those that need a look first, then the silent ones, then the healthy, each in order of name. */

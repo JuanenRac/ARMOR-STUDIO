@@ -82,6 +82,7 @@ export function NodeHealth({ t, origin, isAdmin, now = Date.now() }: { t: Transl
 export function NodeCard({ t, node, levels, now, opened, toggle, origin, isAdmin, forget, control }: { t: Translate; node: NodeHealthItem; levels: NodeHealthLevels; now: number; opened: boolean; toggle: () => void; origin: string; isAdmin: boolean; forget: () => void; control?: (action: NodeAction) => void }) {
   const report = node.report;
   const memory = heapMeter(report.heap_free, levels.low_heap_b);
+  const internal = heapMeter(report.heap_internal_free ?? 0, levels.low_internal_b ?? 40_960);
   const abnormal = isAbnormalReset(report.reset_reason);
   const chips = stateChips(node, now, t);
   return <section className={`nh-card ${node.status}`} data-testid={`nh-${node.node_id}`}>
@@ -100,6 +101,10 @@ export function NodeCard({ t, node, levels, now, opened, toggle, origin, isAdmin
         <span className="nh-meter" role="img" aria-label={formatBytes(report.heap_free)}><i className={memory.level} style={{ width: `${memory.percent}%` }} /></span>
         {formatBytes(report.heap_free)} <small className="muted">{fillAll(t("nh_heap_min"), formatBytes(report.heap_min))}</small>
       </dd></div>
+      {report.heap_internal_free !== undefined && <div><dt>{t("nh_internal")}</dt><dd data-testid="nh-internal">
+        <span className="nh-meter" role="img" aria-label={formatBytes(report.heap_internal_free)}><i className={internal.level} style={{ width: `${internal.percent}%` }} /></span>
+        {formatBytes(report.heap_internal_free)} <small className="muted">{fillAll(t("nh_internal_detail"), formatBytes(report.heap_internal_min ?? 0), formatBytes(report.heap_internal_largest ?? 0))}{report.psram_free !== undefined ? ` · ${fillAll(t("nh_psram"), formatBytes(report.psram_free))}` : ""}</small>
+      </dd></div>}
       <div><dt>{t("nh_link")}</dt><dd>{t(`nh_link_${report.link}`)} · {t(report.link_up ? "nh_link_up" : "nh_link_down")}{report.rssi_dbm !== undefined && <> · {t("nh_signal")}: {report.rssi_dbm} dBm <span className={`nh-signal ${signalLevel(report.rssi_dbm)}`}>{t(`nh_signal_${signalLevel(report.rssi_dbm)}`)}</span></>}</dd></div>
       <div><dt>{t("nh_reconnects")}</dt><dd title={t("nh_reconnects_hint")}>{report.broker_reconnects}</dd></div>
       <div><dt>{t("nh_restarts")}</dt><dd>{node.restarts_24h}</dd></div>

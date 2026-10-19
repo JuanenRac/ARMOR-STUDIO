@@ -53,6 +53,18 @@ describe("the health of the nodes, in the System menu", () => {
     expect(html).toContain("139 KB");
   });
 
+  it("shows the internal memory on its own when the node tells it, in every language, and nothing when it does not", () => {
+    const told: NodeHealthItem = { ...cable, report: { ...cable.report, heap_internal_free: 52_000, heap_internal_min: 40_000, heap_internal_largest: 30_000, psram_free: 7_900_000 } };
+    for (const language of locales) {
+      const html = card(told, language);
+      expect(html, language).toContain("nh-internal");
+      expect(html, language).toContain("51 KB");
+      for (const marker of ["nh_", "fact_"]) expect(html, `${language}: ${marker}`).not.toContain(marker);
+    }
+    expect(card(told)).toContain("Internal memory");
+    expect(card(cable)).not.toContain("nh-internal");
+  });
+
   it("offers Forget only to an administrator", () => {
     expect(card(cable, "en", true)).toContain(">Forget<");
     expect(card(cable, "en", false)).not.toContain(">Forget<");
