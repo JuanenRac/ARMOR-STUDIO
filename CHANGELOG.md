@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.0.5] - Battery maintenance, richer battery data and alerts, and the remote connection badge
+
 - **The model and the versions of every battery module:** each module card shows the model the module reports (a stack may mix models) and the versions of its board and software, as its console says them.
 - **Cells, allowed current and console speed per module:** the number of cells, the charge and discharge current the module says it allows and the speed of its console (an old unit says 19200) appear on the card.
 - **The state of health of each cell:** a new fold-out lists the count of every cell as the battery's console reports it and marks the cell the console calls abnormal, opening by itself when there is one.
@@ -23,6 +25,8 @@ All notable changes to this project are documented here.
 - **The operations are listed and kept:** who ordered what to which battery, when and how it ended, with the reads before and after. An output switched by mistake can be put back as it was.
 - **History:** a new Batteries category in the System tab says who ordered an operation on which battery and how it ended.
 - **Eight languages:** the screen, every refusal of the server and of the node, the operations and their warnings are written in English, Spanish, German, French, Italian, Japanese, Chinese and Portuguese.
+
+
 
 ## [0.8.0.4] - History of connections, node health, arming modes, daily cell extremes and a safer sign-in
 
