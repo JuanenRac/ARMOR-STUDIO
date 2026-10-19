@@ -13,14 +13,23 @@ export type NodeHealthReport = {
 export type HealthWarningCode = "node_low_memory" | "node_frequent_resets" | "node_link_flapping" | "node_weak_signal";
 export type HealthWarning = { code: HealthWarningCode; detail: Record<string, string | number | boolean> };
 export type HealthRestart = { at: string; reason: string; abnormal: boolean; uptime_before_s?: number };
+export type MaintenanceReason = "restart" | "pause" | "standby" | "update" | "upload" | "operator";
+/** The planned-maintenance window the server holds for a node: one window, opened by the node's own announcement, by an operator or both. `at_ms` is when this list was read (the time left counts from there). */
+export type MaintenanceWindow = { source: "node" | "operator" | "both"; reason: MaintenanceReason; remaining_s: number; requested_by?: string; at_ms?: number };
+/** What the server knows of the control state of a node (its own report, or what the orders left it in) and its maintenance window. */
+export type NodeControlView = { state: ControlState; maintenance: boolean; since_ms?: number; by?: string; until_s?: number; maintenance_until_s?: number; window?: MaintenanceWindow; source: "node" | "server" };
 export type NodeHealthItem = {
   node_id: string; family: HealthFamily; firmware: string; board?: string; report: NodeHealthReport; received_at: string; stale: boolean; status: "ok" | "warning" | "stale";
-  warnings: HealthWarning[]; restarts_24h: number; last_restart?: HealthRestart;
+  warnings: HealthWarning[]; restarts_24h: number; last_restart?: HealthRestart; control?: NodeControlView;
 };
 export type HealthSample = { at: number; heap_free: number; heap_min: number; heap_internal_free?: number; heap_internal_largest?: number; rssi_dbm?: number; link_up: boolean; uptime_s: number; broker_reconnects: number };
 export type NodeHealthDetail = NodeHealthItem & { samples: HealthSample[]; restarts: HealthRestart[] };
 export type NodeHealthLevels = { low_heap_b: number; low_heap_clear_b: number; low_internal_b?: number; low_internal_clear_b?: number; low_block_b?: number; restarts_per_day: number; abnormal_window_min: number; flap_reconnects: number; flap_window_min: number; weak_signal_dbm: number; weak_signal_reports: number; silent_after_s: number };
 export type NodeHealthList = { nodes: NodeHealthItem[]; waiting: Array<{ node_id: string; family: HealthFamily }>; totals: { nodes: number; stale: number; with_warnings: number }; levels: NodeHealthLevels };
-export const readNodeHealth = (origin: string) => userCall<NodeHealthList>(origin, "GET", "/api/v1/node-health");
+/** The window's time left counts from the moment the list was read, so every window is stamped with it. */
+export const stampWindows = (list: NodeHealthList, at: number): NodeHealthList => ({
+  ...list, nodes: list.nodes.map(node => (node.control?.window ? { ...node, control: { ...node.control, window: { ...node.control.window, at_ms: at } } } : node)),
+});
+export const readNodeHealth = (origin: string) => userCall<NodeHealthList>(origin, "GET", "/api/v1/node-health").then(list => stampWindows(list, Date.now()));
 export const readNodeHealthDetail = (origin: string, node: string) => userCall<NodeHealthDetail>(origin, "GET", `/api/v1/node-health/${encodeURIComponent(node)}`);
 export const forgetNodeHealth = (origin: string, node: string) => userCall<void>(origin, "DELETE", `/api/v1/node-health/${encodeURIComponent(node)}`);

@@ -51,7 +51,8 @@ export function describeEvent(event: ArmorEvent, t: (key: string) => string): st
     const parts = [t(`sc_${event.category}`), event.subject, t(`sa_${event.action}`)];
     if (event.previous_version && event.version) parts.push(`${event.previous_version} → ${event.version}`);
     else if (event.version) parts.push(`${t("sa_firmware")} ${event.version}`);
-    if (event.profile) parts.push(`${t("sa_profile")} ${event.profile}`);
+    if (event.profile && event.action.startsWith("maintenance_")) parts.push(t(`mr_${event.profile}`));
+    else if (event.profile) parts.push(`${t("sa_profile")} ${event.profile}`);
     if (event.by) parts.push(`${t("sa_by")} ${event.by}`);
     if (event.outcome === "denied") parts.push(t("sa_refused"));
     if (event.outcome === "failed") parts.push(t("sa_failed"));

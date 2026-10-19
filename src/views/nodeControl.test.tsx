@@ -148,3 +148,16 @@ describe("the progress of an order", () => {
     }
   });
 });
+
+describe("the maintenance window on the card", () => {
+  const withWindow = (window: NonNullable<NonNullable<NodeHealthItem["control"]>["window"]>): NodeHealthItem => ({ ...base("radar", "north-1"), control: { state: "running", maintenance: true, maintenance_until_s: window.remaining_s, window, source: "server" } });
+  it("shows one Maintenance chip with the reason and the time left to everybody", () => {
+    const html = card(withWindow({ source: "node", reason: "restart", remaining_s: 120, at_ms: Date.now() }), "en", false);
+    expect(html).toContain("nc-chips-north-1");
+    expect(html).toContain("Maintenance · restarting · announced by the node");
+    expect(html).toContain("left");
+  });
+  it("is told in every language", () => {
+    for (const language of locales) expect(card(withWindow({ source: "operator", reason: "operator", remaining_s: 600, at_ms: Date.now() }), language, false)).not.toMatch(/mw_|nc_state_maint/);
+  });
+});

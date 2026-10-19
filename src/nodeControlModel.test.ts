@@ -229,3 +229,36 @@ describe("the sentences the screens build by name", () => {
 });
 const ROW_PROBE: Record<string, true> = Object.fromEntries(["nc_actions_for", "nc_title_node", "nc_title_all", "nc_reach", "nc_duration_bad", "nc_confirm_name", "nc_confirm_word", "nc_state_paused_left", "nc_state_standby_since",
   "nc_state_maint_until", "nc_by", "nc_progress_line", "nc_progress_done", "nc_back_after", "nc_firmware_change", "nc_until"].map(key => [key, true]));
+
+describe("the maintenance chip of one window, whoever opened it", () => {
+  const now = 1_000_000 + 60_000;
+  const withWindow = (window: NonNullable<NonNullable<NodeHealthItem["control"]>["window"]>): NodeHealthItem =>
+    ({ ...node(), control: { state: "running", maintenance: true, maintenance_until_s: window.remaining_s, window, source: "server" } });
+  it("tells a window the node announced with its reason and the time left, counted from the moment it was read", () => {
+    const chips = stateChips(withWindow({ source: "node", reason: "update", remaining_s: 300, at_ms: 1_000_000, requested_by: "maria" }), now, t("en"));
+    expect(chips.map(chip => chip.id)).toEqual(["maintenance"]);
+    expect(chips[0].text).toBe("Maintenance · updating the firmware · announced by the node · 4 min left · by maria");
+  });
+  it("tells an operator window and a merged one", () => {
+    expect(stateChips(withWindow({ source: "operator", reason: "operator", remaining_s: 1800, at_ms: now }), now, t("en"))[0].text).toBe("Maintenance · planned work · set by an operator · 30 min left");
+    expect(stateChips(withWindow({ source: "both", reason: "restart", remaining_s: 100, at_ms: 1_000_000 }), now, t("en"))[0].text).toContain("node and operator · 40 s left");
+    expect(stateChips(withWindow({ source: "node", reason: "restart", remaining_s: 10, at_ms: 1_000_000 }), now, t("en"))[0].text).toContain("0 s left");
+  });
+  it("keeps the chip of a state besides it, and the old one when the server gives no window", () => {
+    const item = { ...withWindow({ source: "node", reason: "pause", remaining_s: 600, at_ms: now }), report: { ...node().report, control_state: "paused" as const, control_until_s: 600 } };
+    expect(stateChips(item, now, t("en")).map(chip => chip.id)).toEqual(["paused", "maintenance"]);
+    expect(stateChips(node({ maintenance: true, maintenance_until_s: 600 }), now, t("en"))[0].text).toContain("Maintenance until");
+  });
+  it("is told in every language, with no key left bare", () => {
+    for (const language of locales) for (const source of ["node", "operator", "both"] as const) for (const reason of ["restart", "pause", "standby", "update", "upload", "operator"] as const) {
+      const chip = stateChips(withWindow({ source, reason, remaining_s: 90, at_ms: now }), now, t(language))[0].text;
+      expect(chip, `${language} ${source} ${reason}`).not.toMatch(/mw_|nc_state|\{\d\}/);
+      if (language !== "en") expect(chip).not.toBe(stateChips(withWindow({ source, reason, remaining_s: 90, at_ms: now }), now, t("en"))[0].text);
+    }
+  });
+  it("offers Maintenance off only for an operator window, since the node's own ends by itself", () => {
+    expect(actionsFor(withWindow({ source: "node", reason: "restart", remaining_s: 60, at_ms: now })).map(item => item.operation)).toContain("maintenance_on");
+    expect(actionsFor(withWindow({ source: "operator", reason: "operator", remaining_s: 600, at_ms: now })).map(item => item.operation)).toContain("maintenance_off");
+    expect(actionsFor(withWindow({ source: "both", reason: "update", remaining_s: 600, at_ms: now })).map(item => item.operation)).toContain("maintenance_off");
+  });
+});

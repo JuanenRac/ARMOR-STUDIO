@@ -60,7 +60,9 @@ export const durationRange = (operation: ControlOperationName): [number, number]
 
 /** The state a node is in: what it reports about itself (a node of an older firmware does not say, so it is running). */
 export const stateOf = (node: Pick<NodeHealthItem, "report">): ControlState => node.report.control_state ?? "running";
-export const inMaintenance = (node: Pick<NodeHealthItem, "report">): boolean => node.report.maintenance === true;
+/** Whether an OPERATOR window is on (the one maintenance_off ends): the node's own announcement is not, it ends by itself. */
+export const inMaintenance = (node: Pick<NodeHealthItem, "report"> & { control?: NodeHealthItem["control"] }): boolean =>
+  node.control?.window ? node.control.window.source !== "node" : node.report.maintenance === true;
 
 export type NodeAction = { operation: ControlOperationName; label: string };
 /**
@@ -136,7 +138,7 @@ export const secondsLeft = (until: number, receivedAt: string, now: number): num
 
 export type StateChip = { id: "paused" | "standby" | "maintenance"; text: string };
 /** The chips on a node's card: Paused with the time left, Standby since when and by whom, Maintenance until when. A running node outside maintenance has none. */
-export function stateChips(node: Pick<NodeHealthItem, "report" | "received_at">, now: number, t: Translate): StateChip[] {
+export function stateChips(node: Pick<NodeHealthItem, "report" | "received_at"> & { control?: NodeHealthItem["control"] }, now: number, t: Translate): StateChip[] {
   const report = node.report, chips: StateChip[] = [];
   const fill = (text: string, ...values: string[]) => values.reduce((out, value, index) => out.split(`{${index}}`).join(value), text);
   if (report.control_state === "paused") {
@@ -146,7 +148,13 @@ export function stateChips(node: Pick<NodeHealthItem, "report" | "received_at">,
     const since = report.control_since_ms && report.control_since_ms > 0 ? fill(t("nc_state_standby_since"), clock(report.control_since_ms)) : t("nc_state_standby");
     chips.push({ id: "standby", text: report.control_by ? `${since} · ${fill(t("nc_by"), report.control_by)}` : since });
   }
-  if (report.maintenance) {
+  const window = node.control?.window;
+  if (window) {
+    // One window, from the node's announcement, the operator or both: the reason, who opened it and the time left, counted from the moment the server was asked.
+    const left = Math.max(0, Math.round(window.remaining_s - (window.at_ms === undefined ? 0 : (now - window.at_ms) / 1000)));
+    const text = fill(t("nc_state_maint_window"), t(`mw_reason_${window.reason}`), t(`mw_source_${window.source}`), leftText(left, t));
+    chips.push({ id: "maintenance", text: window.requested_by ? `${text} · ${fill(t("nc_by"), window.requested_by)}` : text });
+  } else if (report.maintenance) {
     const until = report.maintenance_until_s !== undefined ? secondsLeft(report.maintenance_until_s, node.received_at, now) : null;
     chips.push({ id: "maintenance", text: until === null ? t("nc_state_maint") : fill(t("nc_state_maint_until"), clock(now + until * 1000)) });
   }

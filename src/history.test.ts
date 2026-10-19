@@ -157,3 +157,22 @@ describe("uptime", () => {
     expect(formatUptime(Number.NaN)).toBe("-");
   });
 });
+
+describe("the maintenance and node-order events of the system", () => {
+  const event = (action: string, profile?: string, outcome?: string) => ({ id: 1, at: "2026-01-01T00:00:00.000Z", type: "system", category: "node", action, subject: "radar-1", ...(profile ? { profile } : {}), ...(outcome ? { outcome } : {}) }) as unknown as ArmorEvent;
+  it("says that a maintenance expired without the node returning, with the reason, in every language", () => {
+    for (const language of locales) {
+      const t = (key: string) => text(language, key);
+      const line = describeEvent(event("maintenance_expired", "update", "failed"), t);
+      expect(line, language).not.toMatch(/sa_|mr_/);
+      expect(line).toContain("radar-1");
+      if (language === "en") expect(line).toBe("Node · radar-1 · maintenance expired without the node returning · firmware update · failed");
+    }
+  });
+  it("words the start and the end of an announced window and every node order", () => {
+    for (const language of locales) {
+      const t = (key: string) => text(language, key);
+      for (const action of ["maintenance_started", "maintenance_ended", "control_requested", "control_acknowledged", "control_refused", "control_applied", "control_back", "control_lost"]) expect(describeEvent(event(action, "restart"), t), `${language} ${action}`).not.toMatch(/sa_/);
+    }
+  });
+});
