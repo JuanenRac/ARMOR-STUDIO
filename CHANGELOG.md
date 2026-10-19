@@ -36,6 +36,7 @@ All notable changes to this project are documented here.
 - **Comments that say why, not what went wrong before:** the explanations in the code of the console that told the story of an old fault now say only the reason for the way it is done.
 - **"Remote connection" in the top bar:** when the server counts the session as coming from outside the house, a small badge says so, and its hint explains that critical actions may ask for the password again and which second-factor policy applies (off, asked from outside, always). Nothing is shown from inside the house. In the eight languages, with tests.
 - **A linter for the source:** `npm run lint` runs ESLint with the rules of hooks as errors and the unused variables and dependency lists of effects as warnings; the first pass fixed a hook called inside a callback (a camera discovery button), statements used as expressions in the grid of the 2D plan and a few leftovers.
+- **Life counters of a battery module:** each module card in Batteries has a collapsible list of the counters its console prints (bat OV times, COC times, data items ...) with the protection ones first and flagged when above zero, a note that their meaning is not official, and the new alarm for a protection counter that went up in the eight languages.
 
 ## [0.8.0.3] - Guides control by control, a tidier Security menu, the way in from outside explained, and a voice that stops on time
 

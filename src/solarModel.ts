@@ -49,6 +49,8 @@ export type SolarUnitReading = {
 export type SolarModuleReading = {
   n: number; present: boolean; voltage_v?: number; current_a?: number; temperature_c?: number; soc_percent?: number; state?: string;
   cells_v?: number[]; temperatures_c?: number[]; capacity_ah?: number; full_capacity_ah?: number; cycles?: number; health_percent?: number;
+  /** The counters of the module's life that its console prints, by the console's own name (lowercase with underscores); what they mean is not official. */
+  counters?: Record<string, number>;
 };
 export type SolarBatteryReading = {
   kind: "battery"; node_id: string; device: string; timestamp_ms: number; modules: number; stack: SolarModuleReading[];
@@ -94,6 +96,21 @@ export function formatReach(reach: CellReach, cellWord: string, locale?: string)
 
 /** The widest gap of the day in millivolts, rounded. */
 export const deltaMv = (deltaV: number): number => Math.round(deltaV * 1000);
+
+/** The counters of protections and errors: a value above zero here is worth a look (the same list the server tells a rise of). */
+export const SEVERE_COUNTERS: ReadonlySet<string> = new Set([
+  "lifealarm_times", "bat_ov_times", "bat_hv_times", "bat_uv_times", "input_ov_times", "pwr_ov_times", "pwr_hv_times", "pwr_uv_times", "coc_times", "coc2_times", "doc_times", "doc2_times",
+  "sc_times", "cot_times", "dot_times", "bmicerr_times", "system_error_times",
+]);
+
+/** The counters of a module as lines: the name as the battery's console prints it ("bat_ov_times" -> "Bat OV Times") and the value, the severe ones first and flagged when they are above zero. */
+export function counterLines(counters: Record<string, number> | undefined): Array<{ name: string; label: string; value: number; severe: boolean; raised: boolean }> {
+  if (!counters) return [];
+  const acronyms = new Set(["ov", "hv", "lv", "uv", "coc", "coc2", "doc", "doc2", "sc", "coca", "doca", "cot", "cut", "dot", "dut", "cht", "clt", "dht", "dlt", "ht", "lt", "slp", "rv", "bmicerr"]);
+  const label = (name: string) => name.split("_").map(word => (acronyms.has(word) ? word.toUpperCase() : word[0]!.toUpperCase() + word.slice(1))).join(" ");
+  return Object.entries(counters).map(([name, value]) => ({ name, label: label(name), value, severe: SEVERE_COUNTERS.has(name), raised: SEVERE_COUNTERS.has(name) && value > 0 }))
+    .sort((a, b) => Number(b.severe) - Number(a.severe) || a.name.localeCompare(b.name));
+}
 
 export const displayName = (view: Pick<SolarDeviceView, "device" | "registered">): string => view.registered?.name ?? view.device;
 export type SolarTotals = {

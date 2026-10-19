@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  areaOf, capacityPercent, healthTone, modelName, cellFill, cellStats, cellTone, deltaMv, formatReach, flowSeconds, flowsOf, formatEnergy, formatPower, humanize, levelTone, nearestSample, niceScale, pathOf, seriesPoints, spreadTone, timeTicks,
+  areaOf, capacityPercent, healthTone, modelName, cellFill, cellStats, cellTone, deltaMv, formatReach, counterLines, flowSeconds, flowsOf, formatEnergy, formatPower, humanize, levelTone, nearestSample, niceScale, pathOf, seriesPoints, spreadTone, timeTicks,
   type SolarInverterReading, type SolarSample,
 } from "./solarModel";
 
@@ -122,5 +122,16 @@ describe("the cell extremes of the day", () => {
     expect(formatReach({ v: 3.3121, cell: 5, at }, "cell", "en-GB")).toBe("3.312 V (cell 5, 14:02)");
     expect(deltaMv(0.0604)).toBe(60);
     expect(deltaMv(0)).toBe(0);
+  });
+});
+
+describe("the life counters of a module", () => {
+  it("are written with the console's names, the protection ones first and flagged when above zero", () => {
+    const lines = counterLines({ data_items: 2411, bat_ov_times: 755, coc_times: 0, ht_half_c_cnt: 0, dsg_cap: 5 });
+    expect(lines.map(line => line.label)).toEqual(["Bat OV Times", "COC Times", "Data Items", "Dsg Cap", "HT Half C Cnt"]);
+    expect(lines[0]).toMatchObject({ severe: true, raised: true, value: 755 });
+    expect(lines[1]).toMatchObject({ severe: true, raised: false });
+    expect(lines[2]).toMatchObject({ severe: false, raised: false });
+    expect(counterLines(undefined)).toEqual([]);
   });
 });

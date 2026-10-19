@@ -9,7 +9,7 @@ import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
 import { BatteryGraphic, BatteryLogo, CellBars, LineChart, SOLAR_COLOURS } from "../solarGraphics";
 import {
-  capacityPercent, cellStats, deltaMv, formatReach, displayName, formatAmps, formatEnergy, formatPower, formatVolts, healthTone, levelTone, spreadTone,
+  capacityPercent, cellStats, counterLines, deltaMv, formatReach, displayName, formatAmps, formatEnergy, formatPower, formatVolts, healthTone, levelTone, spreadTone,
   type ModuleDayCells, type SolarBatteryReading, type SolarCatalog, type SolarDeviceView, type SolarModuleReading, type SolarRegistration, type SolarTotals,
 } from "../solarModel";
 import { SolarEquipment } from "../SolarEquipment";
@@ -143,5 +143,10 @@ function ModuleCard({ t, module, today }: { t: Translate; module: SolarModuleRea
       {module.temperatures_c && module.temperatures_c.length > 0 && <Fact label={t("solarTemperature")} value={module.temperatures_c.map(v => v.toFixed(1)).join(" · ") + " °C"} />}
     </dl>
     {module.cells_v && module.cells_v.length > 0 && <CellBars cells={module.cells_v} t={t} />}
+    {module.counters && Object.keys(module.counters).length > 0 && <details className="solar-counters">
+      <summary>{t("solarCounters")}</summary>
+      <p className="muted small">{t("solarCountersNote")}</p>
+      <dl className="solar-facts compact">{counterLines(module.counters).map(line => <Fact key={line.name} label={line.label} value={String(line.value)} tone={line.raised ? "warn" : undefined} />)}</dl>
+    </details>}
   </section>;
 }
