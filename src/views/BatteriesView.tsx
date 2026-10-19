@@ -9,8 +9,8 @@ import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
 import { BatteryGraphic, BatteryLogo, CellBars, LineChart, SOLAR_COLOURS } from "../solarGraphics";
 import {
-  capacityPercent, cellStats, counterLines, deltaMv, formatReach, displayName, formatAmps, formatEnergy, formatPower, formatVolts, healthTone, levelTone, spreadTone,
-  type ModuleDayCells, type SolarBatteryReading, type SolarCatalog, type SolarDeviceView, type SolarModuleReading, type SolarRegistration, type SolarTotals,
+  abnormalCells, capacityPercent, cellStats, compositionWarnings, counterLines, repeatedEvents, deltaMv, formatReach, displayName, formatAmps, formatEnergy, formatPower, formatVolts, healthTone, levelTone, spreadTone,
+  type LoggedSolarEvent, type ModuleDayCells, type SolarBatteryReading, type SolarCatalog, type SolarDeviceView, type SolarModuleReading, type SolarRegistration, type SolarTotals,
 } from "../solarModel";
 import { SolarEquipment } from "../SolarEquipment";
 import { EnergyAlarmsCard, EnergyCard } from "./InvertersView";
@@ -107,7 +107,9 @@ function StackPanel({ t, stack, now, history, minutes, setMinutes }: { t: Transl
         <div className="solar-bar"><i style={{ width: `${remaining ?? 0}%`, background: TONE[levelTone(remaining ?? 0)] }} /></div>
       </div>}
     </section>
+    <Composition t={t} stack={r.stack} />
     {r.stack.map(module => <ModuleCard key={module.n} t={t} module={module} today={stack.day_cells?.modules.find(item => item.n === module.n)} />)}
+    {stack.events && stack.events.length > 0 && <EventLog t={t} events={stack.events} />}
     <section className="solar-card">
       <div className="solar-card-head"><h3>{t("solarHistory")}</h3>
         <div className="solar-ranges" data-tour="bat-history">{RANGES.map(range => <button key={range.minutes} className={minutes === range.minutes ? "active" : ""} onClick={() => setMinutes(range.minutes)}>{t(range.key)}</button>)}</div>
@@ -138,15 +140,54 @@ function ModuleCard({ t, module, today }: { t: Translate; module: SolarModuleRea
       {module.temperature_c !== undefined && <Fact label={t("solarTemperature")} value={`${module.temperature_c.toFixed(1)} °C`} />}
       {module.capacity_ah !== undefined && <Fact label={t("solarCapacity")} value={`${module.capacity_ah.toFixed(1)}${module.full_capacity_ah !== undefined ? ` / ${module.full_capacity_ah.toFixed(1)}` : ""} Ah${remaining === null ? "" : ` · ${remaining} %`}`} />}
       {today && <Fact label={t("solarCellsToday")} value={`${formatReach(today.min, t("solarCellWord"))} – ${formatReach(today.max, t("solarCellWord"))} · Δ ${deltaMv(today.delta_v)} mV`} tone={spreadTone(deltaMv(today.delta_v))} />}
+      {module.model && <Fact label={t("solarModuleModel")} value={module.model} />}
+      {(module.board_version || module.main_soft_version || module.soft_version) && <Fact label={t("solarModuleFirmware")} value={[module.board_version, module.main_soft_version, module.soft_version].filter(Boolean).join(" · ")} />}
+      {module.cell_count !== undefined && <Fact label={t("solarCellCount")} value={String(module.cell_count)} />}
+      {(module.max_charge_a !== undefined || module.max_discharge_a !== undefined) && <Fact label={t("solarCurrentLimits")} value={`${module.max_charge_a !== undefined ? module.max_charge_a.toFixed(0) : "–"} / ${module.max_discharge_a !== undefined ? module.max_discharge_a.toFixed(0) : "–"} A`} />}
+      {module.console_baud !== undefined && <Fact label={t("solarConsoleSpeed")} value={String(module.console_baud)} />}
       {module.cycles !== undefined && <Fact label={t("solarCycles")} value={String(module.cycles)} />}
       {module.health_percent !== undefined && <Fact label={t("solarHealth")} value={`${module.health_percent} %`} tone={healthTone(module.health_percent)} />}
       {module.temperatures_c && module.temperatures_c.length > 0 && <Fact label={t("solarTemperature")} value={module.temperatures_c.map(v => v.toFixed(1)).join(" · ") + " °C"} />}
     </dl>
     {module.cells_v && module.cells_v.length > 0 && <CellBars cells={module.cells_v} t={t} />}
+    {module.soh_counts && module.soh_counts.length > 0 && <details className="solar-counters" open={abnormalCells(module).length > 0}>
+      <summary>{t("solarSoh")}{abnormalCells(module).length > 0 && <span className="solar-pill bad">{t("solarSohAbnormal")}: {abnormalCells(module).join(", ")}</span>}</summary>
+      <p className="muted small">{t("solarSohNote")}</p>
+      <dl className="solar-facts compact">{module.soh_counts.map((count, cell) => <Fact key={cell} label={`${t("solarCellWord")} ${cell + 1}`} value={String(count)} tone={(module.soh_abnormal ?? []).includes(cell) ? "bad" : undefined} />)}</dl>
+    </details>}
     {module.counters && Object.keys(module.counters).length > 0 && <details className="solar-counters">
       <summary>{t("solarCounters")}</summary>
       <p className="muted small">{t("solarCountersNote")}</p>
       <dl className="solar-facts compact">{counterLines(module.counters).map(line => <Fact key={line.name} label={line.label} value={String(line.value)} tone={line.raised ? "warn" : undefined} />)}</dl>
     </details>}
+  </section>;
+}
+
+/** The warnings about the models a group mixes, from the makers' manuals (a warning, not a block); nothing is drawn when every module is fine or reports no model. */
+function Composition({ t, stack }: { t: Translate; stack: SolarModuleReading[] }) {
+  const warnings = compositionWarnings(stack);
+  if (warnings.length === 0) return null;
+  return <section className="solar-card composition-card" data-testid="composition">
+    <div className="solar-card-head"><h3>{t("solarCompTitle")}</h3><span className="solar-pill warn">{warnings.length}</span></div>
+    {warnings.map(warning => <p key={warning.code} className="solar-notice">{t(warning.code)} {warning.modules.map(n => `${t("solarModule")} ${n} (${stack.find(module => module.n === n)?.model ?? "?"})`).join(", ")}</p>)}
+    <p className="muted small">{t("solarCompNote")}</p>
+  </section>;
+}
+
+/** The entries of the modules' own event logs the node has read, newest first, as the console prints them. Read-only. */
+function EventLog({ t, events }: { t: Translate; events: LoggedSolarEvent[] }) {
+  const repeated = repeatedEvents(events).filter(item => item.count > 1).slice(0, 6);
+  return <section className="solar-card" data-testid="event-log">
+    <div className="solar-card-head"><h3>{t("solarEventLog")}</h3></div>
+    <p className="muted small">{t("solarEventLogNote")}</p>
+    {repeated.length > 0 && <p className="solar-events-repeated">{repeated.map(item => <span key={item.word} className="solar-pill warn">{item.word} × {item.count}</span>)}</p>}
+    <div className="scroll"><table className="solar-events">
+      <thead><tr><th>{t("solarModule")}</th><th>{t("solarEventItem")}</th><th>{t("solarEventClock")}</th><th>{t("solarEventSeen")}</th><th>{t("solarEventStates")}</th><th>{t("solarEventPower")}</th><th>{t("solarEventBattery")}</th><th>{t("solarEventFault")}</th></tr></thead>
+      <tbody>{events.map(item => <tr key={`${item.n}/${item.event.index}/${item.event.time}`}>
+        <td>{item.n}</td><td>{item.event.index}</td><td>{item.event.time}</td><td>{new Date(item.seen_at).toLocaleString()}</td>
+        <td>{[item.event.base_state, item.event.voltage_state, item.event.current_state, item.event.temperature_state].filter(Boolean).join(" · ")}</td>
+        <td className="mono">{item.event.power_events ?? "–"}</td><td className="mono">{item.event.battery_events ?? "–"}</td><td className="mono">{item.event.system_fault ?? "–"}</td>
+      </tr>)}</tbody>
+    </table></div>
   </section>;
 }

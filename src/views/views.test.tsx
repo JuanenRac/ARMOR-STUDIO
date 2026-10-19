@@ -7,7 +7,7 @@ import type { SiteModel } from "../designer/ops";
 import { locales, text, type Locale } from "../i18n";
 import type { NodeState } from "../types";
 import type { SolarDeviceView, SolarInverterReading, SolarTotals } from "../solarModel";
-import { AlarmsView } from "./AlarmsView";
+import { AlarmFacts, AlarmsView } from "./AlarmsView";
 import { BatteriesView } from "./BatteriesView";
 import { InvertersView } from "./InvertersView";
 import { AutomationsView } from "./AutomationsView";
@@ -58,7 +58,7 @@ function render(locale: Locale, build: (t: (key: string) => string) => ReturnTyp
 }
 
 /** Every alarm code the server can raise (ARMOR-SERVER/src/alarms.ts) has a phrase in every language. */
-const SERVER_ALARM_CODES = ["intrusion", "node_down", "camera_down", "camera_motion", "smoke", "co", "gas", "water_leak", "panic", "door_open", "window_open", "motion", "glass_break", "vibration", "triggered", "tamper", "low_battery", "device_offline", "solar_fault", "solar_battery_low", "solar_cells_unbalanced", "solar_battery_hot", "solar_battery_cold", "solar_battery_worn", "solar_inverter_hot", "solar_battery_alarm", "solar_offline", "electrical_alarm", "electrical_voltage", "electrical_grid_lost", "electrical_offline", "electrical_switch_fault", "network_internet_down", "network_lan_down", "network_degraded", "network_new_device", "network_arp_conflict", "network_port_opened", "network_offline", "alarm_sounding", "alarm_tamper", "alarm_locked_out", "alarm_offline"];
+const SERVER_ALARM_CODES = ["intrusion", "node_down", "camera_down", "camera_motion", "smoke", "co", "gas", "water_leak", "panic", "door_open", "window_open", "motion", "glass_break", "vibration", "triggered", "tamper", "low_battery", "device_offline", "solar_fault", "solar_battery_low", "solar_cells_unbalanced", "solar_battery_hot", "solar_battery_cold", "solar_battery_worn", "solar_counter_rose", "solar_battery_overvoltage", "solar_cell_soh_abnormal", "solar_module_overcurrent", "solar_inverter_hot", "solar_battery_alarm", "solar_offline", "electrical_alarm", "electrical_voltage", "electrical_grid_lost", "electrical_offline", "electrical_switch_fault", "network_internet_down", "network_lan_down", "network_degraded", "network_new_device", "network_arp_conflict", "network_port_opened", "network_offline", "alarm_sounding", "alarm_tamper", "alarm_locked_out", "alarm_offline"];
 const cells = (base: number) => Array.from({ length: 15 }, (_, i) => Number((base + (i === 9 ? 0.024 : (i % 4) * 0.002)).toFixed(3)));
 const solarDevices: SolarDeviceView[] = [
   { node_id: "solar-1", device: "axpert-1", kind: "inverter", received_at: new Date(NOW - 5000).toISOString(), stale: false, reading: {
@@ -68,9 +68,17 @@ const solarDevices: SolarDeviceView[] = [
     kind: "battery", node_id: "solar-1", device: "us3000", timestamp_ms: NOW, modules: 2, state: "charging", voltage_v: 51.2, current_a: 12.5, soc_percent: 76, model: "US3000C",
     capacity_ah: 91.2, full_capacity_ah: 148, energy_kwh: 4.67, cycles: 210, temperature_min_c: 21, temperature_max_c: 24, cell_min_v: 3.32, cell_max_v: 3.35,
     stack: [
-      { n: 1, present: true, voltage_v: 51.2, current_a: 6.2, soc_percent: 76, state: "charging", cells_v: cells(3.32), temperatures_c: [21, 22, 22, 23, 21], capacity_ah: 45.6, full_capacity_ah: 74, cycles: 210 },
-      { n: 2, present: false },
-    ] } },
+      { n: 1, present: true, voltage_v: 51.2, current_a: 6.2, soc_percent: 76, state: "charging", cells_v: cells(3.32), temperatures_c: [21, 22, 22, 23, 21], capacity_ah: 45.6, full_capacity_ah: 74, cycles: 210,
+        model: "US2000", board_version: "V10R04", main_soft_version: "B68.2.0.0", soft_version: "V2.6", cell_count: 15, max_charge_a: 53, max_discharge_a: 55, console_baud: 19200,
+        soh_counts: [0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 12, 0, 0, 0, 0], soh_abnormal: [6],
+        last_event: { index: 754, time: "25-03-09 19:01:42", power_events: "0x2 PHV", battery_events: "0x4 BVNOR", system_fault: "0x0" } },
+      { n: 2, present: true, voltage_v: 51.1, current_a: 6.3, model: "US3000C" },
+      { n: 3, present: false },
+    ] },
+    events: [
+      { n: 1, seen_at: NOW - 60_000, event: { index: 754, time: "25-03-09 19:01:42", voltage_state: "OV", power_events: "0x2 PHV", battery_events: "0x4 BVNOR", system_fault: "0x0" } },
+      { n: 1, seen_at: NOW - 120_000, event: { index: 753, time: "25-03-09 18:01:42", voltage_state: "OV", power_events: "0x2 PHV", battery_events: "0x4 BVNOR", system_fault: "0x0" } },
+    ] },
 ];
 const solarDevicesParallel: SolarDeviceView[] = [
   { ...solarDevices[0], device: "axpert-big", reading: { ...(solarDevices[0].reading as SolarInverterReading), device: "axpert-big", pv2_v: 327.3, pv2_a: 3.1, pv2_w: 1026, pv_w: 1626,
@@ -87,6 +95,36 @@ const solarTotals: SolarTotals = { inverters: 1, batteries: 1, stale: 0, pv_w: 6
 describe("alarm phrases", () => {
   it("cover every code the server raises", () => {
     for (const locale of locales) for (const code of SERVER_ALARM_CODES) expect(text(locale, `alarm_${code}`), `${locale}:${code}`).not.toBe(`alarm_${code}`);
+  });
+});
+
+describe("the details of a battery module", () => {
+  it("show the model, the versions, the health of the cells, the event log and the composition warning, in every language", () => {
+    for (const locale of locales) {
+      const { html, untranslated } = render(locale, t => createElement(BatteriesView, { t, origin: "http://x", devices: solarDevices, waiting: [], catalog: solarCatalog, reload: noop, totals: solarTotals, now: NOW, unreachable: false }));
+      expect(untranslated, locale).toEqual([]);
+      expect(html).toContain("V10R04 · B68.2.0.0 · V2.6");
+      expect(html).toContain("53 / 55 A");
+      expect(html).toContain("19200");
+      expect(html).toContain('data-testid="event-log"');
+      expect(html).toContain("0x4 BVNOR");
+      expect(html).toContain('data-testid="composition"');
+      expect(html).toContain("US3000C");
+    }
+  });
+  it("tell what an alert means and what to check, in every language, for the battery alerts", () => {
+    for (const locale of locales) for (const code of ["solar_battery_overvoltage", "solar_battery_low", "solar_battery_alarm", "solar_battery_hot", "solar_battery_cold", "solar_cells_unbalanced", "solar_counter_rose", "solar_cell_soh_abnormal", "solar_module_overcurrent", "solar_offline", "solar_battery_worn"]) {
+      const help = text(locale, `alarmhelp_${code}`);
+      expect(help, `${locale}:${code}`).not.toBe(`alarmhelp_${code}`);
+      expect(help.split("\n")).toHaveLength(2);
+    }
+  });
+  it("are shown under an alert when it is opened", () => {
+    const alarm: Alarm = { id: "s1", key: "solar:x", source: { type: "solar", id: "solar-1/us3000" }, severity: "warning", code: "solar_cell_soh_abnormal", raised_at: new Date(NOW - 5000).toISOString(), detail: { module: 1, cell: 7, cells: 1 } };
+    const { html } = render("en", t => createElement(AlarmFacts, { alarm, t }));
+    expect(html).toContain("Means:");
+    expect(html).toContain("Check:");
+    expect(html).toContain("Module");
   });
 });
 

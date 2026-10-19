@@ -51,7 +51,19 @@ export type SolarModuleReading = {
   cells_v?: number[]; temperatures_c?: number[]; capacity_ah?: number; full_capacity_ah?: number; cycles?: number; health_percent?: number;
   /** The counters of the module's life that its console prints, by the console's own name (lowercase with underscores); what they mean is not official. */
   counters?: Record<string, number>;
+  /** What the module says about itself: its model (a stack may mix models), the versions of its board and software, its cells, the current it allows each way (amperes, positive) and the speed of its console. */
+  model?: string; board_version?: string; main_soft_version?: string; soft_version?: string; cell_count?: number; max_charge_a?: number; max_discharge_a?: number; console_baud?: number;
+  /** The state of health of each cell, in cell order, and the cells (0-based) the console does not call Normal. */
+  soh_counts?: number[]; soh_abnormal?: number[];
+  /** The newest entry of the module's own event log, as the console prints it. */
+  last_event?: SolarEventRecord;
 };
+/** An entry of a battery's event log: the protection fields are the console's own words (a number and a mnemonic), never decoded. */
+export type SolarEventRecord = {
+  index: number; time: string; voltage_v?: number; current_a?: number; temperature_c?: number; percent?: number;
+  base_state?: string; voltage_state?: string; current_state?: string; temperature_state?: string; coulomb_state?: string; power_events?: string; battery_events?: string; system_fault?: string;
+};
+export type LoggedSolarEvent = { n: number; seen_at: number; event: SolarEventRecord };
 export type SolarBatteryReading = {
   kind: "battery"; node_id: string; device: string; timestamp_ms: number; modules: number; stack: SolarModuleReading[];
   state?: "charging" | "discharging" | "idle"; voltage_v?: number; current_a?: number; temperature_min_c?: number; temperature_max_c?: number;
@@ -70,7 +82,7 @@ export type SolarCatalog = { inverter_models: string[]; battery_models: string[]
 export type CellReach = { v: number; cell: number; at: number };
 export type ModuleDayCells = { n: number; min: CellReach; max: CellReach; delta_v: number };
 export type DayCells = { date: string; modules: ModuleDayCells[]; bank_delta_v: number };
-export type SolarDeviceView = { node_id: string; device: string; kind: SolarKind; reading: SolarReading; received_at: string; stale: boolean; example?: boolean; registered?: SolarRegistration; day_cells?: DayCells };
+export type SolarDeviceView = { node_id: string; device: string; kind: SolarKind; reading: SolarReading; received_at: string; stale: boolean; example?: boolean; registered?: SolarRegistration; day_cells?: DayCells; events?: LoggedSolarEvent[] };
 
 /** How the models and connections are written (the brands are the same in every language; "other" is translated where it is shown). */
 export const MODEL_LABEL: Record<string, string> = {
@@ -110,6 +122,43 @@ export function counterLines(counters: Record<string, number> | undefined): Arra
   const label = (name: string) => name.split("_").map(word => (acronyms.has(word) ? word.toUpperCase() : word[0]!.toUpperCase() + word.slice(1))).join(" ");
   return Object.entries(counters).map(([name, value]) => ({ name, label: label(name), value, severe: SEVERE_COUNTERS.has(name), raised: SEVERE_COUNTERS.has(name) && value > 0 }))
     .sort((a, b) => Number(b.severe) - Number(a.severe) || a.name.localeCompare(b.name));
+}
+
+/**
+ * What the makers' manuals say about mixing models in one group, from the model each module reports: the group's master (module 1) is the newest model, from the 9th module on only the
+ * C, UP and US5000 models are accepted, and a 24 V model (UP2500) does not share a group with 48 V ones. A model nobody knows is not judged. The answer is warnings, never a block.
+ */
+export type CompositionWarning = { code: "solarCompBeyond8" | "solarCompMaster" | "solarCompVoltage"; modules: number[] };
+const generationOf = (model: string | undefined): 0 | 1 | 2 => {
+  const name = (model ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (/^(US2000|US2000B|US2000BPLUS|US2000PLUS|US2KBPL|US3000)$/.test(name)) return 1;
+  if (/^(US2000C|US3000C|US5000|US5000B|UP2500|UP5000)$/.test(name)) return 2;
+  return 0;
+};
+const is24Volt = (model: string | undefined): boolean => (model ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "") === "UP2500";
+export function compositionWarnings(stack: SolarModuleReading[]): CompositionWarning[] {
+  const present = stack.filter(module => module.present && module.model);
+  const out: CompositionWarning[] = [];
+  const beyond = present.filter(module => module.n >= 9 && generationOf(module.model) === 1).map(module => module.n);
+  if (beyond.length > 0) out.push({ code: "solarCompBeyond8", modules: beyond });
+  const master = present.find(module => module.n === 1);
+  if (master && generationOf(master.model) > 0) {
+    const newer = present.filter(module => module.n !== 1 && generationOf(module.model) > generationOf(master.model)).map(module => module.n);
+    if (newer.length > 0) out.push({ code: "solarCompMaster", modules: newer });
+  }
+  const small = present.filter(module => is24Volt(module.model)), big = present.filter(module => !is24Volt(module.model) && generationOf(module.model) > 0);
+  if (small.length > 0 && big.length > 0) out.push({ code: "solarCompVoltage", modules: small.map(module => module.n) });
+  return out;
+}
+
+/** The cells (counted from 1, as a person counts them) the battery's console calls abnormal in its state of health. */
+export const abnormalCells = (module: Pick<SolarModuleReading, "soh_abnormal">): number[] => (module.soh_abnormal ?? []).map(cell => cell + 1);
+
+/** "BHV BOV BHV ...": how often each mnemonic of the events appears in a list of entries, most frequent first (the words are the console's, kept as printed). */
+export function repeatedEvents(events: LoggedSolarEvent[]): Array<{ word: string; count: number }> {
+  const counts = new Map<string, number>();
+  for (const item of events) for (const word of `${item.event.power_events ?? ""} ${item.event.battery_events ?? ""}`.split(/\s+/)) if (/^[A-Z][A-Z0-9]{1,7}$/.test(word)) counts.set(word, (counts.get(word) ?? 0) + 1);
+  return [...counts.entries()].map(([word, count]) => ({ word, count })).sort((a, b) => b.count - a.count || a.word.localeCompare(b.word));
 }
 
 export const displayName = (view: Pick<SolarDeviceView, "device" | "registered">): string => view.registered?.name ?? view.device;

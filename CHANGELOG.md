@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The model and the versions of every battery module:** each module card shows the model the module reports (a stack may mix models) and the versions of its board and software, as its console says them.
+- **Cells, allowed current and console speed per module:** the number of cells, the charge and discharge current the module says it allows and the speed of its console (an old unit says 19200) appear on the card.
+- **The state of health of each cell:** a new fold-out lists the count of every cell as the battery's console reports it and marks the cell the console calls abnormal, opening by itself when there is one.
+- **The event log of the modules, read-only:** the entries the gateway node reads from each module's own log are listed newest first with the battery's clock, the states and the protection fields exactly as the console prints them (never translated or decoded), and the mnemonics that repeat are counted.
+- **Warnings about the models a group mixes:** the master of a group should be the newest model, only the C, UP and US5000 models are accepted from the 9th module on and a 24 V model does not share a group with 48 V ones; they are warnings from the makers' manuals, never a block.
+- **Two new alarms:** a cell that the battery itself marks as abnormal and a module that carries more current than it says it allows, with their texts in the eight languages.
+- **What an alert means and what to check:** eleven battery alerts (overvoltage, low charge, alarm, hot, cold, unbalanced cells, a protection counter that went up, an abnormal cell, overcurrent, a device that stopped answering and a worn battery) show two lines when they are opened, based on the makers' manuals and on what can be checked, in the eight languages.
+- **The gap between cells, said honestly:** the help of the unbalanced-cells alert says that about 100 mV near full charge is a usual figure and not an official one, that the level is configurable and that the battery balances its cells while it cycles.
+- **Labels for the details of an alarm:** the module, the cell, the current and the limit an alarm carries now have their own names in the eight languages instead of the raw keys.
+- **Old batteries are understood:** the card and the help take into account that a battery of an old firmware may talk at 19200 on its console and that a silent one may be asleep.
+- **Tests:** the rules of the group composition, the cells counted from 1, the repeated mnemonics, the alert help in the eight languages, and the Batteries menu drawn with the new details in every language.
+
 ## [0.8.0.4] - History of connections, node health, arming modes, daily cell extremes and a safer sign-in
 
 - **Cell extremes of the day, per battery module:** each module card in Batteries shows today's lowest and highest cell with the cell number and the time, and the widest gap of the module; the stack card shows the widest gap of the whole bank today. The numbers come from the server, start again with its day and survive a restart.

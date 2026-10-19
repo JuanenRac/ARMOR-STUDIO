@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  areaOf, capacityPercent, healthTone, modelName, cellFill, cellStats, cellTone, deltaMv, formatReach, counterLines, flowSeconds, flowsOf, formatEnergy, formatPower, humanize, levelTone, nearestSample, niceScale, pathOf, seriesPoints, spreadTone, timeTicks,
+  abnormalCells, compositionWarnings, repeatedEvents, areaOf, capacityPercent, healthTone, modelName, cellFill, cellStats, cellTone, deltaMv, formatReach, counterLines, flowSeconds, flowsOf, formatEnergy, formatPower, humanize, levelTone, nearestSample, niceScale, pathOf, seriesPoints, spreadTone, timeTicks,
   type SolarInverterReading, type SolarSample,
 } from "./solarModel";
 
@@ -133,5 +133,38 @@ describe("the life counters of a module", () => {
     expect(lines[1]).toMatchObject({ severe: true, raised: false });
     expect(lines[2]).toMatchObject({ severe: false, raised: false });
     expect(counterLines(undefined)).toEqual([]);
+  });
+});
+
+describe("the models a group mixes", () => {
+  const module = (n: number, model?: string) => ({ n, present: true, ...(model ? { model } : {}) });
+  it("warns when a group's master is older than a slave, as the manuals say", () => {
+    expect(compositionWarnings([module(1, "US2000"), module(2, "US3000C")])).toEqual([{ code: "solarCompMaster", modules: [2] }]);
+    expect(compositionWarnings([module(1, "US3000C"), module(2, "US2000")])).toEqual([]);
+    expect(compositionWarnings([module(1, "US3000C"), module(2, "US3000C"), module(3, "US5000")])).toEqual([]);
+  });
+  it("warns about an older model from the 9th module on", () => {
+    const eight = Array.from({ length: 8 }, (_, i) => module(i + 1, "US3000C"));
+    expect(compositionWarnings([...eight, module(9, "US2000")])).toEqual([{ code: "solarCompBeyond8", modules: [9] }]);
+    expect(compositionWarnings([...eight, module(9, "US2000C")])).toEqual([]);
+    expect(compositionWarnings([module(1, "US2000"), module(8, "US2000")])).toEqual([]);
+  });
+  it("warns about a 24 V model next to 48 V ones, and judges nothing it does not know", () => {
+    expect(compositionWarnings([module(1, "UP2500"), module(2, "US3000C")]).map(item => item.code)).toContain("solarCompVoltage");
+    expect(compositionWarnings([module(1, "UP2500"), module(2, "UP2500")])).toEqual([]);
+    expect(compositionWarnings([module(1), module(2, "Fidus")])).toEqual([]);
+    expect(compositionWarnings([{ n: 1, present: false, model: "US2000" }, module(2, "US3000C")])).toEqual([]);
+  });
+});
+
+describe("the health of the cells and the event log", () => {
+  it("counts the abnormal cells from 1, as a person does", () => {
+    expect(abnormalCells({ soh_abnormal: [6] })).toEqual([7]);
+    expect(abnormalCells({})).toEqual([]);
+  });
+  it("counts the mnemonics that repeat in the log, as printed", () => {
+    const entry = (power: string, battery: string, index: number) => ({ n: 1, seen_at: index, event: { index, time: "t", power_events: power, battery_events: battery } });
+    expect(repeatedEvents([entry("0x2 PHV", "0x4 BVNOR", 3), entry("0x2 PHV", "0x0", 2), entry("0x0", "0x4 BVNOR", 1)])).toEqual([{ word: "BVNOR", count: 2 }, { word: "PHV", count: 2 }]);
+    expect(repeatedEvents([])).toEqual([]);
   });
 });

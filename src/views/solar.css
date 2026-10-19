@@ -154,3 +154,7 @@
 .node-finder-head { display: flex; justify-content: space-between; align-items: center; gap: .6rem; flex-wrap: wrap; } .node-finder h3 { margin: 0; font-size: .9rem; color: #f2feff; }
 .node-finder-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; } .node-finder-list li { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; padding: .5rem .7rem; border: 1px solid #285a66; border-radius: 10px; background: #0a202a; }
 .node-finder-list li.off { opacity: .6; } .node-finder-list strong { display: block; color: #f2feff; } .node-finder-list small { color: #86a8b3; } .node-finder-list li > div { flex: 1 1 200px; }
+
+.solar-events { width: 100%; border-collapse: collapse; font-size: .78rem; }
+.solar-events th, .solar-events td { text-align: left; padding: .3rem .5rem; border-bottom: 1px solid rgba(120, 190, 200, .18); white-space: nowrap; }
+.solar-events-repeated { display: flex; gap: .4rem; flex-wrap: wrap; margin: .3rem 0; }

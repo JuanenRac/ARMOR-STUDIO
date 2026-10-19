@@ -42,11 +42,13 @@ export function factValue(key: string, value: string | number | boolean, t: Tran
 
 export function AlarmFacts({ alarm, t }: { alarm: Alarm; t: Translate }) {
   const entries = Object.entries(alarm.detail ?? {}).sort(([a], [b]) => (FACT_ORDER.indexOf(a) + 1 || 99) - (FACT_ORDER.indexOf(b) + 1 || 99));
-  if (entries.length === 0) return <p className="muted small">{t("alarmNoDetails")}</p>;
-  return <dl className="alarm-facts">{entries.map(([key, value]) => {
+  const help = t(`alarmhelp_${alarm.code}`);   // what it means and what to check, for the alerts that have such a text (the key itself comes back when there is none)
+  const helpLine = help !== `alarmhelp_${alarm.code}` ? <p className="alarm-help small">{help}</p> : null;
+  if (entries.length === 0) return <>{helpLine}<p className="muted small">{t("alarmNoDetails")}</p></>;
+  return <>{helpLine}<dl className="alarm-facts">{entries.map(([key, value]) => {
     const label = t(`fact_${key}`);
     return <div key={key}><dt>{label === `fact_${key}` ? key : label}</dt><dd className={key.startsWith("mac") || key === "ip" ? "mono" : ""}>{factValue(key, value, t)}</dd></div>;
-  })}</dl>;
+  })}</dl></>;
 }
 
 /** One line that says what it is about, without opening it: the device and its address. */
