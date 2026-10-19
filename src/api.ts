@@ -19,4 +19,5 @@ export * from "./api/security";
 export * from "./api/remoteAccess";
 export * from "./api/network";
 export * from "./api/solar";
+export * from "./api/battery";
 export { ApiError, setElevationAsker } from "./api/transport";

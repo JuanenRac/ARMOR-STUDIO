@@ -46,7 +46,7 @@ afterEach(async () => { await act(async () => { root?.unmount(); }); root = null
 describe("the configuration screen, by who is looking at it", () => {
   it("offers every tab to someone who can change the installation, grouped from the person's own to the system's", async () => {
     await show({ isAdmin: true });
-    expect(tabNames()).toEqual(["general", "preferences", "users", "security", "notifications", "capture", "firmware", "updates", "services", "broker", "files", "installation", "console"]);
+    expect(tabNames()).toEqual(["general", "preferences", "users", "security", "notifications", "capture", "firmware", "batteries", "updates", "services", "broker", "files", "installation", "console"]);
     expect(container.querySelectorAll(".tab-sep")).toHaveLength(3);
   });
 
@@ -54,7 +54,7 @@ describe("the configuration screen, by who is looking at it", () => {
     await show({ isViewer: true });
     expect(tabNames()).toEqual(["general", "preferences", "users", "security"]);
     expect(container.querySelectorAll(".tab-sep")).toHaveLength(1);
-    for (const hidden of ["console", "files", "broker", "installation", "firmware", "updates", "services", "notifications", "capture"]) expect(container.querySelector(`[data-tour=tab-${hidden}]`), hidden).toBeNull();
+    for (const hidden of ["console", "files", "broker", "installation", "firmware", "batteries", "updates", "services", "notifications", "capture"]) expect(container.querySelector(`[data-tour=tab-${hidden}]`), hidden).toBeNull();
   });
 
   it("shows the panel of the tab that is chosen and only that one", async () => {

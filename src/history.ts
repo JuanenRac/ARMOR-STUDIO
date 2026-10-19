@@ -89,7 +89,7 @@ export type HistoryRange = "24h" | "7d" | "30d" | "all" | "custom";
 export type HistoryTab = "all" | "alarms" | "connections" | "devices" | "system" | "settings";
 export const HISTORY_TABS: readonly HistoryTab[] = ["all", "alarms", "connections", "devices", "system", "settings"];
 export const CLIENT_KINDS: readonly ClientKind[] = ["studio", "android", "node", "voice", "other"];
-export const SYSTEM_CATEGORIES: readonly SystemCategory[] = ["node", "broker", "service", "update", "alarm", "backup"];
+export const SYSTEM_CATEGORIES: readonly SystemCategory[] = ["node", "broker", "service", "update", "alarm", "backup", "batteries"];
 /** `type` is the kind chosen on the "all" tab; `sub` is a kind of client on the connections tab or a category on the system tab ("" for all of them). */
 export type HistoryFilters = { tab: HistoryTab; type: EventType | "all"; sub: ClientKind | SystemCategory | ""; q: string; range: HistoryRange; from: string; to: string; level: AlertLevel | "any"; order: "desc" | "asc" };
 export const DEFAULT_FILTERS: HistoryFilters = { tab: "all", type: "all", sub: "", q: "", range: "all", from: "", to: "", level: "any", order: "desc" };

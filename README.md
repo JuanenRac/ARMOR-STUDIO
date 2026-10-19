@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-740%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-765%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.0.4-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 740 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary, every menu rendered in the eight languages, the static host) and by browser tests. It runs in daily use against the CM5 test bench with the real server, real IP cameras and a radar node on its board; the pictures of the Help are made with example data. What has **not** been proven is live video and PTZ against every possible camera, the solar, electrical, alarm-panel and touch-panel menus with real equipment (only the radar node exists) and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
+**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 765 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary, every menu rendered in the eight languages, the static host) and by browser tests. It runs in daily use against the CM5 test bench with the real server, real IP cameras and a radar node on its board; the pictures of the Help are made with example data. What has **not** been proven is live video and PTZ against every possible camera, the solar, electrical, alarm-panel and touch-panel menus with real equipment (only the radar node exists) and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
 
 ---
 
@@ -39,7 +39,7 @@
 |---|---|
 | Version | `0.8.0.4` |
 | Maturity | Established |
-| Tests | 740 (`npm test`) |
+| Tests | 765 (`npm test`) |
 | Stack | React 19 / TypeScript / Vite |
 | On real hardware | Used daily against the CM5 test bench (real server, real IP cameras, a real radar node); the solar, electrical, alarm-panel and touch-panel menus wait for real nodes |
 
@@ -66,6 +66,7 @@
 * **Broker encryption card:** Configuration > Broker shows whether the server's link to the broker is encrypted and the fingerprint of the installation's own authority it trusts; nothing alarming is shown when the link is plain, because that is the default.
 * **Node health and arming modes:** System has a card with the health report of every node (uptime, why it restarted, memory, link and signal, broker connections, last error, history and restarts) and Alarm panels has a mode picker (Away, Home, Night and your own) with an editor for the modes, all in the eight languages with help, tour steps and assistant answers.
 * **Sign-in for password managers and a History with tabs:** the sign-in is a real form that the browser's or system's password manager can save and fill, with an optional "Remember me" that keeps only the user name (never the password) and a note that says so; the History has the tabs All, Alarms, Connections, Devices, System and Settings, with the list of every device and app that connects to the server (last seen, open sessions, sign-ins and refusals) and the events of the nodes, the broker, services, updates and arming. Addresses are shown to administrators only.
+* **Battery maintenance (Configuration, administrators):** a four-step wizard - battery and operation, values, confirmation with the battery's serial number typed, result - to change what a Pylontech battery keeps; limits in volts and degrees a whole group at a time, a firmware file read before it is sent, the battery read before and after with the difference and the transcript, and an output put back as it was.
 
 ## 🖼️ Screenshots
 

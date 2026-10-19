@@ -20,6 +20,8 @@ export class ApiError extends Error {
 /** Set by the app: asks the person for their password (or a code) again and says whether they proved themselves. Critical actions from outside the house ask for it (see ElevationHost). */
 let elevationAsker: ((origin: string) => Promise<boolean>) | null = null;
 export const setElevationAsker = (asker: ((origin: string) => Promise<boolean>) | null): void => { elevationAsker = asker; };
+/** Asks the person to prove themselves again, for a call that is not made through `userCall` (an upload). False when they did not, or when nothing can ask. */
+export const askElevation = (origin: string): Promise<boolean> => (elevationAsker ? elevationAsker(origin) : Promise.resolve(false));
 export async function userCall<T>(origin: string, method: string, route: string, body?: unknown, retried = false): Promise<T> {
   const response = await timedFetch(endpoint(origin, route), {
     method, headers: { Accept: "application/json", ...(body === undefined ? {} : { "Content-Type": "application/json" }) }, ...localSession,

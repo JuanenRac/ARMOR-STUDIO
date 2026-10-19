@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-740%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-765%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.0.4-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**Controllo di onestà - cosa funziona oggi:** Studio dialoga con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) ed è coperto da 740 test unitari (lettura delle impostazioni, fusione delle telecamere, aritmetica dei grafici solari, geometria e controlli dei progettisti, annunciatore degli allarmi, dizionario dell'assistente, ogni menu reso nelle otto lingue, host statico) e da test nel browser. Funziona in uso quotidiano contro il banco di prova CM5 con il vero server, vere telecamere IP e un nodo radar sulla sua scheda; le immagini della Guida sono fatte con dati di esempio. Ciò che **non** è stato provato è il video dal vivo e il PTZ con tutte le telecamere possibili, i menu solare, elettrico, centrali d'allarme e pannello touch con apparecchi reali (esiste solo il nodo radar) e una revisione formale di accessibilità o usabilità. Finché il server non è raggiungibile, Studio mostra dati dimostrativi e lo dice nella barra superiore.
+**Controllo di onestà - cosa funziona oggi:** Studio dialoga con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) ed è coperto da 765 test unitari (lettura delle impostazioni, fusione delle telecamere, aritmetica dei grafici solari, geometria e controlli dei progettisti, annunciatore degli allarmi, dizionario dell'assistente, ogni menu reso nelle otto lingue, host statico) e da test nel browser. Funziona in uso quotidiano contro il banco di prova CM5 con il vero server, vere telecamere IP e un nodo radar sulla sua scheda; le immagini della Guida sono fatte con dati di esempio. Ciò che **non** è stato provato è il video dal vivo e il PTZ con tutte le telecamere possibili, i menu solare, elettrico, centrali d'allarme e pannello touch con apparecchi reali (esiste solo il nodo radar) e una revisione formale di accessibilità o usabilità. Finché il server non è raggiungibile, Studio mostra dati dimostrativi e lo dice nella barra superiore.
 
 ---
 
@@ -39,7 +39,7 @@
 |---|---|
 | Versione | `0.8.0.4` |
 | Maturità | Consolidato |
-| Test | 740 (`npm test`) |
+| Test | 765 (`npm test`) |
 | Tecnologia | React 19 / TypeScript / Vite |
 | Su hardware reale | Usato ogni giorno sul banco di prova CM5 (vero server, vere telecamere IP, un vero nodo radar); i menu solare, elettrico, centrali d'allarme e pannello touch attendono nodi reali |
 
@@ -66,6 +66,7 @@
 * **Scheda della cifratura del broker:** Configurazione > Broker mostra se il collegamento del server con il broker è cifrato e l'impronta dell'autorità propria dell'installazione di cui si fida; non viene mostrato nulla di allarmante quando il collegamento non è cifrato, perché è la condizione predefinita.
 * **Salute dei nodi e modalità di inserimento:** Sistema ha una scheda con il rapporto di salute di ogni nodo (tempo acceso, motivo del riavvio, memoria, collegamento e segnale, connessioni al broker, ultimo errore, cronologia e riavvii) e Centrali d'allarme ha un selettore di modalità (Fuori casa, In casa, Notte e le tue) con un editor delle modalità, tutto in otto lingue con aiuto, passi della guida e risposte dell'assistente.
 * **Accesso per gestori di password e una Cronologia a schede:** l'accesso è un vero modulo che il gestore di password del browser o del sistema può salvare e compilare, con un "Ricordami" facoltativo che conserva solo il nome utente (mai la password) e una nota che lo dice; la Cronologia ha le schede Tutto, Allarmi, Connessioni, Dispositivi, Sistema e Impostazioni, con l'elenco di ogni dispositivo e app che si collega al server (ultima volta visto, sessioni aperte, accessi e rifiuti) e gli eventi di nodi, broker, servizi, aggiornamenti e inserimento. Gli indirizzi li vedono solo gli amministratori.
+* **Manutenzione delle batterie (Configurazione, amministratori):** una procedura guidata in quattro passi - batteria e operazione, valori, conferma digitando il numero di serie della batteria, risultato - per modificare ciò che conserva una batteria Pylontech; limiti in volt e gradi un gruppo intero alla volta, un file firmware letto prima di essere inviato, la batteria letta prima e dopo con la differenza e la trascrizione, e un'uscita che si può rimettere com'era.
 
 ## 🖼️ Schermate
 

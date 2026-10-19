@@ -14,8 +14,9 @@ import { SecurityPanel } from "./SecurityPanel";
 import type { NetworkOverview } from "./networkModel";
 import "./configuration.css";
 import { MenuTitle } from "./menuLogos";
+import { BatteryMaintenance } from "./BatteryMaintenance";
 
-type Tab = "general" | "users" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications" | "capture" | "preferences" | "security";
+type Tab = "general" | "users" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications" | "capture" | "preferences" | "security" | "batteries";
 type Props = {
   t: (key: string) => string;
   origin: string; setOrigin: (value: string) => void;
@@ -29,7 +30,7 @@ type Props = {
 
 const VIEWER_TABS: readonly string[] = ["general", "users", "preferences", "security"];
 /** The tabs in groups, from what is the person's own to what is the system's: the interface; people, alerts and what is recorded; the nodes' firmware and Studio's updates; the server and what it runs on. */
-const tabGroups: Tab[][] = [["general", "preferences"], ["users", "security", "notifications", "capture"], ["firmware", "updates"], ["services", "broker", "files", "installation", "console"]];
+const tabGroups: Tab[][] = [["general", "preferences"], ["users", "security", "notifications", "capture"], ["firmware", "batteries", "updates"], ["services", "broker", "files", "installation", "console"]];
 const tabs: Tab[] = tabGroups.flat();
 
 /** Can the browser reach something at this address at all? (no-cors: only a network failure rejects, which is what a wrong scheme or port gives.) */
@@ -119,6 +120,7 @@ export function ConfigurationPanel(props: Props) {
     {tab === "preferences" && <PreferencesPanel t={t} language={props.language} />}
     {tab === "updates" && <UpdatesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "console" && <ConsolePanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
+    {tab === "batteries" && <BatteryMaintenance t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "firmware" && <FirmwarePanel t={t} origin={props.origin} isAdmin={props.isAdmin} network={props.network ?? null} />}
   </section>;
 }

@@ -3,9 +3,9 @@ import { endpoint, localSession, timedFetch } from "./transport";
 export type EventType = "alert" | "node" | "camera" | "mode" | "device" | "alarm" | "connection" | "system";
 export type ClientKind = "studio" | "android" | "node" | "voice" | "other";
 export type ConnectionAction = "first_seen" | "login" | "login_failed" | "second_factor_failed" | "logout" | "session_ended" | "session_expired" | "panel_opened";
-export type SystemCategory = "node" | "broker" | "settings" | "service" | "update" | "alarm" | "backup";
+export type SystemCategory = "node" | "broker" | "settings" | "service" | "update" | "alarm" | "backup" | "batteries";
 export type SystemAction = "appeared" | "returned" | "disappeared" | "firmware_changed" | "connected" | "disconnected" | "created" | "changed" | "removed" | "started" | "stopped" | "restarted" | "checked" | "installed" | "rolled_back"
-  | "armed" | "disarmed" | "silenced" | "acknowledged" | "arm_requested" | "disarm_requested" | "silence_requested" | "backup_made" | "backup_restored";
+  | "armed" | "disarmed" | "silenced" | "acknowledged" | "arm_requested" | "disarm_requested" | "silence_requested" | "backup_made" | "backup_restored" | "battery_requested" | "battery_operation";
 export type Reachability = "unknown" | "online" | "offline";
 export type AlertLevel = "normal" | "review" | "high";
 export type NodeStatus = "online" | "offline" | "stale";
