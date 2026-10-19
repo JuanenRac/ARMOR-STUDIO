@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.0.6] - Control of the nodes from the health card, the internal memory and the maintenance window of every node
+
 - **Orders for each node, from the health card (administrators only):** every node has an Actions menu with the orders it can take in the state it is in: Restart, Pause or Resume, Standby or Power on, Identify, Diagnostics and Maintenance mode on or off. Nothing here erases a node or resets it to factory settings, and the server and the CM5 are never reached.
 - **Orders for all the nodes:** the card header has Restart all, Pause all, Standby all and Resume all. A restart of all can be Now (every node at once) or Rolling, the recommended one: one after another, thirty seconds apart, the alarm panel last; both are explained where you choose.
 - **Typed confirmation:** Restart, Pause and Standby ask for the name of the node (or the word RESTART, PAUSE or STANDBY for all) exactly as typed; the other orders need none. The server's request for a fresh proof of identity goes through the usual sign-in again.
@@ -18,6 +20,7 @@ All notable changes to this project are documented here.
 - **Help, tour and assistant:** the System help, a new step of the System tour and a new assistant topic explain the orders, rolling against now, standby and the warnings, in the eight languages.
 - **Eight languages and tests:** every text is written in English, Spanish, German, French, Italian, Japanese, Chinese and Portuguese; the confirmation, the lengths, the warnings, the steps of an order, the refusals, the errors and the screens are tested.
 - **Internal memory of the nodes:** the health card of a node shows its internal memory on its own (free now, least since start, biggest block) and the external RAM, when the node tells them, with the bar judged by the internal level, and the history draws the internal memory; the details of the memory warning name the three figures. Texts in the eight languages.
+
 
 ## [0.8.0.5] - Battery maintenance, richer battery data and alerts, and the remote connection badge
 
