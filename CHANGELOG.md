@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Cell extremes of the day, per battery module:** each module card in Batteries shows today's lowest and highest cell with the cell number and the time, and the widest gap of the module; the stack card shows the widest gap of the whole bank today. The numbers come from the server, start again with its day and survive a restart.
+- **Cell gap alarm that waits:** Solar alarm levels has a new field, how many minutes the gap between the cells must last before the alarm is raised (0 keeps the old behaviour, at once); it starts again whenever the gap drops back under its level.
 - **The History has tabs:** All, Alarms, Connections, Devices, System and Settings. Each tab asks the server only for what it is about; Connections and System have their own filters (by kind of client, by category), the level filter belongs to the first tab, and "Clear history" and the export follow the tab you are on.
 - **Who connects to the server:** the Connections tab lists every device and app the server has seen - Studio sessions, the Android app, the panels of the nodes, the voice service and anything else - with its version, when it was first and last seen, how many sessions it has open and how many sign-ins worked or were refused, refreshed while it is open; a client with refusals stands out.
 - **Sign-ins in the history:** a line for every sign-in, refused sign-in, wrong code of the second factor, sign-out, session ended from the list of sessions or session that ran out, saying who, with what, from inside the house or outside, and whether the second factor was used.

@@ -14,7 +14,7 @@ export const solarExample = (origin: string, node: string, device: string) => us
 export type SolarEnergyDay = { date: string; pv_kwh: number; load_kwh: number; battery_in_kwh: number; battery_out_kwh: number };
 export const solarEnergy = (origin: string, days: number) => userCall<{ days: SolarEnergyDay[] }>(origin, "GET", `/api/v1/solar/energy?days=${days}`);
 /** The levels at which batteries and inverters raise alarms, and their defaults. */
-export type EnergyAlarmSettings = { soc_low: number; soc_ok: number; cell_spread_mv: number; battery_temp_high_c: number; battery_temp_low_c: number; heatsink_high_c: number; health_low_percent: number };
+export type EnergyAlarmSettings = { soc_low: number; soc_ok: number; cell_spread_mv: number; cell_spread_minutes: number; battery_temp_high_c: number; battery_temp_low_c: number; heatsink_high_c: number; health_low_percent: number };
 export const readEnergyAlarms = (origin: string) => userCall<{ settings: EnergyAlarmSettings; defaults: EnergyAlarmSettings }>(origin, "GET", "/api/v1/solar/alarms");
 export const saveEnergyAlarms = (origin: string, settings: Partial<EnergyAlarmSettings>) => userCall<{ settings: EnergyAlarmSettings; defaults: EnergyAlarmSettings }>(origin, "PUT", "/api/v1/solar/alarms", settings);
 export async function solarHistory(origin: string, node: string, device: string, minutes: number): Promise<{ samples: SolarSample[] }> {

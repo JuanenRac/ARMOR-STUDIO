@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  areaOf, capacityPercent, healthTone, modelName, cellFill, cellStats, cellTone, flowSeconds, flowsOf, formatEnergy, formatPower, humanize, levelTone, nearestSample, niceScale, pathOf, seriesPoints, spreadTone, timeTicks,
+  areaOf, capacityPercent, healthTone, modelName, cellFill, cellStats, cellTone, deltaMv, formatReach, flowSeconds, flowsOf, formatEnergy, formatPower, humanize, levelTone, nearestSample, niceScale, pathOf, seriesPoints, spreadTone, timeTicks,
   type SolarInverterReading, type SolarSample,
 } from "./solarModel";
 
@@ -113,5 +113,14 @@ describe("the names of the models", () => {
 describe("battery health", () => {
   it("is fine from 80, a warning from 60 and bad below", () => {
     expect([healthTone(100), healthTone(80), healthTone(79), healthTone(60), healthTone(59), healthTone(0)]).toEqual(["ok", "ok", "warn", "warn", "bad", "bad"]);
+  });
+});
+
+describe("the cell extremes of the day", () => {
+  it("writes a reach as voltage, cell number and time, and the gap in whole millivolts", () => {
+    const at = new Date(2026, 0, 5, 14, 2).getTime();
+    expect(formatReach({ v: 3.3121, cell: 5, at }, "cell", "en-GB")).toBe("3.312 V (cell 5, 14:02)");
+    expect(deltaMv(0.0604)).toBe(60);
+    expect(deltaMv(0)).toBe(0);
   });
 });

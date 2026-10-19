@@ -28,6 +28,7 @@ const ROWS: Record<string, Row> = {
   eaSocLow: ["Low charge (%)", "Carga baja (%)", "Niedrige Ladung (%)", "Charge basse (%)", "Carica bassa (%)", "低残量（%）", "低电量（%）"],
   eaSocOk: ["Enough again (%)", "Ya es suficiente (%)", "Wieder ausreichend (%)", "De nouveau suffisante (%)", "Di nuovo sufficiente (%)", "回復とみなす残量（%）", "视为恢复的电量（%）"],
   eaCells: ["Cell spread (mV)", "Diferencia entre celdas (mV)", "Zellspreizung (mV)", "Écart entre cellules (mV)", "Differenza tra celle (mV)", "セル間の差（mV）", "电芯压差（mV）"],
+  eaCellsMinutes: ["Cell spread must last (minutes, 0 = at once)", "La diferencia debe durar (minutos, 0 = al instante)", "Die Abweichung muss andauern (Minuten, 0 = sofort)", "L'écart doit durer (minutes, 0 = tout de suite)", "La differenza deve durare (minuti, 0 = subito)", "差が続く時間（分、0＝即時）", "压差需持续（分钟，0＝立即）"],
   eaHot: ["Battery too hot (°C)", "Batería demasiado caliente (°C)", "Batterie zu heiß (°C)", "Batterie trop chaude (°C)", "Batteria troppo calda (°C)", "バッテリー高温（°C）", "电池过热（°C）"],
   eaCold: ["Too cold to charge (°C)", "Demasiado fría para cargar (°C)", "Zu kalt zum Laden (°C)", "Trop froide pour charger (°C)", "Troppo fredda per caricare (°C)", "低温で充電不可（°C）", "过冷不宜充电（°C）"],
   eaHeatsink: ["Inverter heat sink too hot (°C)", "Disipador del inversor demasiado caliente (°C)", "Kühlkörper des Wechselrichters zu heiß (°C)", "Dissipateur de l'onduleur trop chaud (°C)", "Dissipatore dell'inverter troppo caldo (°C)", "インバーターの放熱器が高温（°C）", "逆变器散热器过热（°C）"],

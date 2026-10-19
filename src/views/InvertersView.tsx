@@ -155,7 +155,7 @@ export function EnergyCard({ t, origin, kind }: { t: Translate; origin: string; 
 }
 
 const ALARM_FIELDS: ReadonlyArray<{ key: keyof EnergyAlarmSettings; label: string; min: number; max: number }> = [
-  { key: "soc_low", label: "eaSocLow", min: 1, max: 90 }, { key: "soc_ok", label: "eaSocOk", min: 2, max: 100 }, { key: "cell_spread_mv", label: "eaCells", min: 10, max: 1000 },
+  { key: "soc_low", label: "eaSocLow", min: 1, max: 90 }, { key: "soc_ok", label: "eaSocOk", min: 2, max: 100 }, { key: "cell_spread_mv", label: "eaCells", min: 10, max: 1000 }, { key: "cell_spread_minutes", label: "eaCellsMinutes", min: 0, max: 240 },
   { key: "battery_temp_high_c", label: "eaHot", min: 30, max: 90 }, { key: "battery_temp_low_c", label: "eaCold", min: -20, max: 15 }, { key: "heatsink_high_c", label: "eaHeatsink", min: 50, max: 120 },
   { key: "health_low_percent", label: "eaWorn", min: 10, max: 95 },
 ];

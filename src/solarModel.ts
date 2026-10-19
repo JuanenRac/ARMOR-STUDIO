@@ -64,7 +64,11 @@ export type SolarKind = "inverter" | "battery";
 export type SolarRegistration = { node_id: string; device: string; kind: SolarKind; name: string; model: string; connection: string; notes: string; created_at: string };
 /** What the server offers when equipment is declared: the models (with their names and, for inverters, the serial dialect each answers in) and the connections. */
 export type SolarCatalog = { inverter_models: string[]; battery_models: string[]; connections: string[]; labels?: Record<string, string>; inverter_dialects?: Record<string, string> };
-export type SolarDeviceView = { node_id: string; device: string; kind: SolarKind; reading: SolarReading; received_at: string; stale: boolean; example?: boolean; registered?: SolarRegistration };
+/** The extremes of the cells of a battery today, per module (the server's day): the lowest and highest cell with its number and the moment, and the widest gap. */
+export type CellReach = { v: number; cell: number; at: number };
+export type ModuleDayCells = { n: number; min: CellReach; max: CellReach; delta_v: number };
+export type DayCells = { date: string; modules: ModuleDayCells[]; bank_delta_v: number };
+export type SolarDeviceView = { node_id: string; device: string; kind: SolarKind; reading: SolarReading; received_at: string; stale: boolean; example?: boolean; registered?: SolarRegistration; day_cells?: DayCells };
 
 /** How the models and connections are written (the brands are the same in every language; "other" is translated where it is shown). */
 export const MODEL_LABEL: Record<string, string> = {
@@ -82,6 +86,15 @@ export function modelName(model: string, catalog?: SolarCatalog | null): string 
 export const healthTone = (percent: number): "ok" | "warn" | "bad" => (percent >= 80 ? "ok" : percent >= 60 ? "warn" : "bad");
 export const CONNECTION_LABEL: Record<string, string> = { rs232: "RS232", rs485: "RS485", usb: "USB", can: "CAN", wifi: "Wi-Fi" };
 /** The name an operator gave a device, or its identifier when nobody declared it. */
+/** "3.312 V (cell 5, 14:02)": a cell extreme of the day as a line; the time is the viewer's own clock. */
+export function formatReach(reach: CellReach, cellWord: string, locale?: string): string {
+  const time = new Date(reach.at).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+  return `${reach.v.toFixed(3)} V (${cellWord} ${reach.cell}, ${time})`;
+}
+
+/** The widest gap of the day in millivolts, rounded. */
+export const deltaMv = (deltaV: number): number => Math.round(deltaV * 1000);
+
 export const displayName = (view: Pick<SolarDeviceView, "device" | "registered">): string => view.registered?.name ?? view.device;
 export type SolarTotals = {
   inverters: number; batteries: number; stale: number; pv_w: number; load_w: number; battery_w: number | null; soc_percent: number | null;

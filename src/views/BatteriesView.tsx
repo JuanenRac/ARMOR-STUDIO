@@ -9,8 +9,8 @@ import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
 import { BatteryGraphic, BatteryLogo, CellBars, LineChart, SOLAR_COLOURS } from "../solarGraphics";
 import {
-  capacityPercent, cellStats, displayName, formatAmps, formatEnergy, formatPower, formatVolts, healthTone, levelTone, spreadTone,
-  type SolarBatteryReading, type SolarCatalog, type SolarDeviceView, type SolarModuleReading, type SolarRegistration, type SolarTotals,
+  capacityPercent, cellStats, deltaMv, formatReach, displayName, formatAmps, formatEnergy, formatPower, formatVolts, healthTone, levelTone, spreadTone,
+  type ModuleDayCells, type SolarBatteryReading, type SolarCatalog, type SolarDeviceView, type SolarModuleReading, type SolarRegistration, type SolarTotals,
 } from "../solarModel";
 import { SolarEquipment } from "../SolarEquipment";
 import { EnergyAlarmsCard, EnergyCard } from "./InvertersView";
@@ -91,6 +91,7 @@ function StackPanel({ t, stack, now, history, minutes, setMinutes }: { t: Transl
           {r.temperature_min_c !== undefined && r.temperature_max_c !== undefined && <Fact label={t("solarTemperature")} value={`${r.temperature_min_c.toFixed(1)} – ${r.temperature_max_c.toFixed(1)} °C`} />}
           {cells && <Fact label={t("solarCells")} value={`${cells.min.toFixed(3)} – ${cells.max.toFixed(3)} V · Δ ${cells.spreadMv} mV`} tone={spreadTone(cells.spreadMv)} />}
           {!cells && r.cell_min_v !== undefined && r.cell_max_v !== undefined && <Fact label={t("solarCells")} value={`${r.cell_min_v.toFixed(3)} – ${r.cell_max_v.toFixed(3)} V · Δ ${Math.round((r.cell_max_v - r.cell_min_v) * 1000)} mV`} tone={spreadTone((r.cell_max_v - r.cell_min_v) * 1000)} />}
+          {stack.day_cells && stack.day_cells.bank_delta_v > 0 && <Fact label={t("solarBankDeltaToday")} value={`Δ ${deltaMv(stack.day_cells.bank_delta_v)} mV`} tone={spreadTone(deltaMv(stack.day_cells.bank_delta_v))} />}
           {r.power_w !== undefined && <Fact label={t("bmsPower")} value={formatPower(r.power_w)} />}
           {r.balancing !== undefined && <Fact label={t("bmsBalancing")} value={String(r.balancing)} tone={r.balancing > 0 ? "warn" : undefined} />}
           {r.protecting === true && <Fact label={t("bmsProtecting")} value={`${r.charge_mos ?? "–"} / ${r.discharge_mos ?? "–"}`} tone="bad" />}
@@ -106,7 +107,7 @@ function StackPanel({ t, stack, now, history, minutes, setMinutes }: { t: Transl
         <div className="solar-bar"><i style={{ width: `${remaining ?? 0}%`, background: TONE[levelTone(remaining ?? 0)] }} /></div>
       </div>}
     </section>
-    {r.stack.map(module => <ModuleCard key={module.n} t={t} module={module} />)}
+    {r.stack.map(module => <ModuleCard key={module.n} t={t} module={module} today={stack.day_cells?.modules.find(item => item.n === module.n)} />)}
     <section className="solar-card">
       <div className="solar-card-head"><h3>{t("solarHistory")}</h3>
         <div className="solar-ranges" data-tour="bat-history">{RANGES.map(range => <button key={range.minutes} className={minutes === range.minutes ? "active" : ""} onClick={() => setMinutes(range.minutes)}>{t(range.key)}</button>)}</div>
@@ -120,7 +121,7 @@ function StackPanel({ t, stack, now, history, minutes, setMinutes }: { t: Transl
   </>;
 }
 
-function ModuleCard({ t, module }: { t: Translate; module: SolarModuleReading }) {
+function ModuleCard({ t, module, today }: { t: Translate; module: SolarModuleReading; today?: ModuleDayCells }) {
   const cells = cellStats(module.cells_v);
   const remaining = capacityPercent(module.capacity_ah, module.full_capacity_ah);
   if (!module.present) return <section className="solar-card module-card absent"><div className="solar-card-head"><h3>{t("solarModule")} {module.n}</h3><span className="solar-pill">{t("solarModuleAbsent")}</span></div></section>;
@@ -136,6 +137,7 @@ function ModuleCard({ t, module }: { t: Translate; module: SolarModuleReading })
       {module.current_a !== undefined && <Fact label={t("solarCurrent")} value={formatAmps(module.current_a)} />}
       {module.temperature_c !== undefined && <Fact label={t("solarTemperature")} value={`${module.temperature_c.toFixed(1)} °C`} />}
       {module.capacity_ah !== undefined && <Fact label={t("solarCapacity")} value={`${module.capacity_ah.toFixed(1)}${module.full_capacity_ah !== undefined ? ` / ${module.full_capacity_ah.toFixed(1)}` : ""} Ah${remaining === null ? "" : ` · ${remaining} %`}`} />}
+      {today && <Fact label={t("solarCellsToday")} value={`${formatReach(today.min, t("solarCellWord"))} – ${formatReach(today.max, t("solarCellWord"))} · Δ ${deltaMv(today.delta_v)} mV`} tone={spreadTone(deltaMv(today.delta_v))} />}
       {module.cycles !== undefined && <Fact label={t("solarCycles")} value={String(module.cycles)} />}
       {module.health_percent !== undefined && <Fact label={t("solarHealth")} value={`${module.health_percent} %`} tone={healthTone(module.health_percent)} />}
       {module.temperatures_c && module.temperatures_c.length > 0 && <Fact label={t("solarTemperature")} value={module.temperatures_c.map(v => v.toFixed(1)).join(" · ") + " °C"} />}
