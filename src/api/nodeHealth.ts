@@ -1,9 +1,12 @@
 import { userCall } from "./transport";
 // ---- the health of the nodes: the same report for every family ------------------------------------------------------------------------------------
+export type ControlState = "running" | "paused" | "standby";
 export type HealthFamily = "radar" | "solar" | "electrical" | "alarm" | "hmi";
 export type NodeHealthReport = {
   kind: "node_health"; node_id: string; timestamp_ms: number; family: HealthFamily; firmware: string; board?: string; uptime_s: number; reset_reason: string; heap_free: number; heap_min: number;
   link: "wifi" | "ethernet" | "none"; link_up: boolean; rssi_dbm?: number; broker_reconnects: number; low_stack_tasks?: number; last_error?: string;
+  /** What the node says about its own control state (the server's node_health contract): running, paused or in standby, since when and by whom, and the maintenance window. */
+  control_state?: ControlState; control_since_ms?: number; control_by?: string; control_until_s?: number; maintenance?: boolean; maintenance_until_s?: number;
 };
 export type HealthWarningCode = "node_low_memory" | "node_frequent_resets" | "node_link_flapping" | "node_weak_signal";
 export type HealthWarning = { code: HealthWarningCode; detail: Record<string, string | number | boolean> };

@@ -24,3 +24,7 @@ Studio is a browser console for ARMOR-SERVER. This is what it holds, what it sen
 ## In the container
 
 The browser talks only to Studio's own origin; nginx proxies `/api/` to the server and passes the real address of the client (`X-Forwarded-For`), the protocol the person used (`X-Forwarded-Proto`: the one a proxy in front already announced, else the scheme of the connection) and the host with its port, so the server's sign-in limits and audit trail see the person and not the proxy. The server must trust that proxy (`ARMOR_TRUST_PROXY`).
+
+## Orders to the nodes
+
+The health card can restart, pause, put in standby, identify, read and put in maintenance one node or all of them. It is shown to administrators only, and the server checks the role again. Restart, pause and standby need the name of the node (or a word for all of them) typed, and every order needs a recent proof of identity: when the server asks for one, Studio asks you to sign in again before repeating the order. Nothing in the console erases a node, resets it to factory settings or powers it off, and the server and the CM5 cannot be reached this way.

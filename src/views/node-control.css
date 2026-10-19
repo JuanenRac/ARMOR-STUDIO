@@ -1,0 +1,29 @@
+/* Orders for the nodes (System menu, administrators): the group buttons, the menu of a node, the state chips, the dialog and the progress of an order. */
+.node-health .nc-group { display: grid; gap: .3rem; margin: .4rem 0 .6rem; padding: .6rem .8rem; border: 1px solid #193341; border-radius: 12px; background: #09161e; }
+.node-health .nc-group-buttons { display: flex; flex-wrap: wrap; gap: .4rem; }
+.node-health .nc-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.node-health .nc-chip.paused, .node-health .nc-chip.maintenance { color: #ffc85a; border-color: #8a6a1c; }
+.node-health .nc-chip.standby { color: #ff8d98; border-color: #8a3540; }
+.node-health .nc-menu { position: relative; }
+.node-health .nc-menu-list { position: absolute; z-index: 5; left: 0; bottom: calc(100% + .25rem); display: grid; min-width: 14rem; margin: 0; padding: .3rem; list-style: none; border: 1px solid #285a66; border-radius: 10px; background: #0b1e28; box-shadow: 0 6px 24px #0008; }
+.node-health .nc-menu-list button { width: 100%; text-align: left; }
+.nc-dialog { display: grid; gap: .7rem; max-width: 34rem; max-height: 90vh; overflow-y: auto; }
+.nc-dialog h2 { margin: 0; overflow-wrap: anywhere; }
+.nc-dialog .nc-field { display: grid; gap: .25rem; }
+.nc-dialog .nc-modes { display: grid; gap: .5rem; margin: 0; padding: .5rem .7rem; border: 1px solid #193341; border-radius: 10px; }
+.nc-dialog .nc-mode { display: flex; gap: .5rem; align-items: flex-start; }
+.nc-dialog .bad { color: #ff8d98; }
+.nc-progress { display: grid; gap: .4rem; margin: .5rem 0; padding: .7rem .9rem; border: 1px solid #285a66; border-radius: 12px; background: #09161e; }
+.nc-progress > header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.nc-progress h4 { margin: 0; }
+.nc-lines { display: grid; gap: .6rem; margin: 0; padding: 0; list-style: none; }
+.nc-line { display: grid; gap: .3rem; padding: .5rem .7rem; border: 1px solid #193341; border-radius: 10px; }
+.nc-line.failed { border-color: #8a3540; }
+.nc-line header { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.nc-steps { display: flex; flex-wrap: wrap; gap: .35rem; margin: 0; padding: 0; list-style: none; }
+.nc-step { padding: .1rem .6rem; border: 1px solid #285a66; border-radius: 999px; font-size: .78rem; color: #8ea7b2; }
+.nc-step.done { color: #5df0c4; border-color: #1f7a5c; }
+.nc-step.current { color: #4be2e9; border-color: #4be2e9; }
+.nc-step.failed { color: #ff8d98; border-color: #8a3540; }
+.nc-failure { margin: 0; color: #ff8d98; }
+.nc-diag h5 { margin: .3rem 0; }

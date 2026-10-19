@@ -4,6 +4,17 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Orders for each node, from the health card (administrators only):** every node has an Actions menu with the orders it can take in the state it is in: Restart, Pause or Resume, Standby or Power on, Identify, Diagnostics and Maintenance mode on or off. Nothing here erases a node or resets it to factory settings, and the server and the CM5 are never reached.
+- **Orders for all the nodes:** the card header has Restart all, Pause all, Standby all and Resume all. A restart of all can be Now (every node at once) or Rolling, the recommended one: one after another, thirty seconds apart, the alarm panel last; both are explained where you choose.
+- **Typed confirmation:** Restart, Pause and Standby ask for the name of the node (or the word RESTART, PAUSE or STANDBY for all) exactly as typed; the other orders need none. The server's request for a fresh proof of identity goes through the usual sign-in again.
+- **Honest warnings:** a restart says the node is unwatched for about a minute and the alarm panel and the radars get their own line; a pause or a standby says the house is NOT protected while it lasts, with a stronger line for the alarm panel and the radars.
+- **Standby means work off, still connected:** the node keeps answering, stays in standby after a restart until you press Power on, and is never described as a power-off.
+- **Lengths with sensible limits:** a pause is 1 to 60 minutes (an hour by default, and it always resumes by itself), a maintenance window 1 minute to 8 hours and an identification 5 to 300 seconds; a value outside the range is refused before anything is sent.
+- **State chips on every node card:** Paused with the time left, Standby since when and by whom, and Maintenance until when, shown to everybody who can see the health card.
+- **Follow an order node by node:** each node shows its steps (sent, acknowledged, offline, back, or sent and done), the times, the new firmware after a restart, the state it was left in, the snapshot a diagnostics order returns and, when it did not work, the reason in words for each refusal (busy installing a firmware, receiving an upload, copying a slot or running a battery operation, restarted a moment ago, already in that state, no answer, did not come back).
+- **Help, tour and assistant:** the System help, a new step of the System tour and a new assistant topic explain the orders, rolling against now, standby and the warnings, in the eight languages.
+- **Eight languages and tests:** every text is written in English, Spanish, German, French, Italian, Japanese, Chinese and Portuguese; the confirmation, the lengths, the warnings, the steps of an order, the refusals, the errors and the screens are tested.
+
 ## [0.8.0.5] - Battery maintenance, richer battery data and alerts, and the remote connection badge
 
 - **The model and the versions of every battery module:** each module card shows the model the module reports (a stack may mix models) and the versions of its board and software, as its console says them.

@@ -4,14 +4,17 @@
  * Reading never moves anything; an administrator can forget a node that was taken away.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import { useEffect, useState } from "react";
-import { ApiError, forgetNodeHealth, readNodeHealth, readNodeHealthDetail, type HealthFamily, type NodeHealthDetail, type NodeHealthItem, type NodeHealthLevels } from "../api";
+import { useEffect, useRef, useState } from "react";
+import { ApiError, forgetNodeHealth, readNodeControlOperation, readNodeHealth, readNodeHealthDetail, type HealthFamily, type NodeControlOperation, type NodeHealthDetail, type NodeHealthItem, type NodeHealthLevels } from "../api";
 import { askConfirm } from "../askConfirm";
 import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
 import { fillAll, formatBytes, formatUptime, heapMeter, heapSeries, HEALTH_FAMILIES, isAbnormalReset, resetText, signalLevel, signalSeries, sparkline, statusClass, visibleNodes } from "../nodeHealthModel";
+import { operationFinished, reachableNodes, stateChips, type NodeAction } from "../nodeControlModel";
+import { ActionMenu, ControlDialog, GroupActions, OperationView, type DialogRequest } from "./NodeControl";
 import "./electrical-live.css";
 import "./node-health.css";
+import "./node-control.css";
 
 const sinceIso = (iso: string, now: number, t: Translate): string => {
   const seconds = Math.max(0, Math.round((now - Date.parse(iso)) / 1000));
@@ -23,7 +26,22 @@ export function NodeHealth({ t, origin, isAdmin, now = Date.now() }: { t: Transl
   const [family, setFamily] = useState<HealthFamily | "all">("all");
   const [open, setOpen] = useState<string | null>(null);
   const [message, setMessage] = useState<{ text: string; bad: boolean } | null>(null);
+  const [dialog, setDialog] = useState<DialogRequest | null>(null);
+  const [order, setOrder] = useState<NodeControlOperation | null>(null);
   const data = poll.data;
+  const orderOpen = order !== null && !operationFinished(order);
+  const orderId = order?.id;
+  const alive = useRef(true);
+  useEffect(() => () => { alive.current = false; }, []);
+  // while an order is under way the server is asked how it stands every couple of seconds; when it is over the health of the nodes is read again
+  useEffect(() => {
+    if (!orderId || !orderOpen) return;
+    const timer = window.setInterval(() => {
+      readNodeControlOperation(origin, orderId).then(next => { if (alive.current) { setOrder(next); if (operationFinished(next)) poll.reload?.(); } }).catch(() => undefined);
+    }, 2000);
+    return () => window.clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderId, orderOpen, origin]);
   const nodes = data ? visibleNodes(data.nodes, family) : [];
   const forget = async (node: NodeHealthItem) => {
     if (!(await askConfirm(fillAll(t("nh_forget_q"), node.node_id), t))) return;
@@ -39,6 +57,8 @@ export function NodeHealth({ t, origin, isAdmin, now = Date.now() }: { t: Transl
         {data.totals.stale > 0 && <span className="el-pill bad">{t("nh_total_silent")}: {data.totals.stale}</span>}
       </div>}
     </div>
+    {isAdmin && data && data.nodes.length > 0 && <GroupActions t={t} nodes={data.nodes} choose={operation => setDialog({ operation, scope: "all", label: `nc_op_${operation}`, count: reachableNodes(data.nodes).length })} />}
+    {isAdmin && order && <OperationView t={t} operation={order} dismiss={() => setOrder(null)} />}
     <p className="muted">{t("nh_help")}</p>
     {poll.failed && !data && <p className="solar-notice bad">{t("nh_unreachable")}</p>}
     {data && <p className="muted small" data-testid="nh-levels">{fillAll(t("nh_levels"), Math.round(data.levels.low_heap_b / 1000), data.levels.restarts_per_day, data.levels.flap_reconnects, data.levels.flap_window_min, data.levels.weak_signal_dbm)}</p>}
@@ -51,23 +71,26 @@ export function NodeHealth({ t, origin, isAdmin, now = Date.now() }: { t: Transl
     {data && data.nodes.length === 0 && <div className="nh-empty"><h4>{t("nh_none")}</h4><p className="muted">{t("nh_none_help")}</p></div>}
     <div className="nh-grid">
       {nodes.map(node => <NodeCard key={node.node_id} t={t} node={node} levels={data!.levels} now={now} opened={open === node.node_id} toggle={() => setOpen(open === node.node_id ? null : node.node_id)}
-        origin={origin} isAdmin={isAdmin} forget={() => void forget(node)} />)}
+        origin={origin} isAdmin={isAdmin} forget={() => void forget(node)} control={action => setDialog({ operation: action.operation, scope: "node", node, label: action.label })} />)}
     </div>
     {data && data.waiting.length > 0 && <p className="muted small nh-waiting">{t("nh_waiting")} {data.waiting.map(item => `${item.node_id} (${t(`nh_family_${item.family}`)})`).join(", ")}</p>}
     {message && <p className={`solar-notice ${message.bad ? "bad" : ""}`} role={message.bad ? "alert" : "status"}>{message.text}</p>}
+    {isAdmin && dialog && <ControlDialog t={t} origin={origin} request={dialog} close={() => setDialog(null)} started={operation => { setDialog(null); setOrder(operation); setMessage({ text: t("nc_sent_ok"), bad: false }); poll.reload?.(); }} />}
   </article>;
 }
 
-export function NodeCard({ t, node, levels, now, opened, toggle, origin, isAdmin, forget }: { t: Translate; node: NodeHealthItem; levels: NodeHealthLevels; now: number; opened: boolean; toggle: () => void; origin: string; isAdmin: boolean; forget: () => void }) {
+export function NodeCard({ t, node, levels, now, opened, toggle, origin, isAdmin, forget, control }: { t: Translate; node: NodeHealthItem; levels: NodeHealthLevels; now: number; opened: boolean; toggle: () => void; origin: string; isAdmin: boolean; forget: () => void; control?: (action: NodeAction) => void }) {
   const report = node.report;
   const memory = heapMeter(report.heap_free, levels.low_heap_b);
   const abnormal = isAbnormalReset(report.reset_reason);
+  const chips = stateChips(node, now, t);
   return <section className={`nh-card ${node.status}`} data-testid={`nh-${node.node_id}`}>
     <header>
       <strong>{node.node_id}</strong>
       <span className="el-pill">{t(`nh_family_${node.family}`)}</span>
       <span className={`el-pill ${statusClass(node)}`}>{t(`nh_status_${node.status}`)} · {sinceIso(node.received_at, now, t)}</span>
     </header>
+    {chips.length > 0 && <div className="nc-chips" data-testid={`nc-chips-${node.node_id}`}>{chips.map(chip => <span key={chip.id} className={`el-pill nc-chip ${chip.id}`}>{chip.text}</span>)}</div>}
     {node.warnings.length > 0 && <ul className="nh-warnings">{node.warnings.map(warning => <li key={warning.code}>{t(`nh_warn_${warning.code}`)}</li>)}</ul>}
     <dl className="nh-facts">
       <div><dt>{t("nh_firmware")}</dt><dd>{node.firmware}{node.board ? ` · ${node.board}` : ""}</dd></div>
@@ -85,6 +108,7 @@ export function NodeCard({ t, node, levels, now, opened, toggle, origin, isAdmin
     </dl>
     <div className="nh-actions">
       <button type="button" onClick={toggle} aria-expanded={opened}>{opened ? t("nh_hide") : t("nh_details")}</button>
+      {isAdmin && control && !node.stale && <ActionMenu t={t} node={node} choose={control} />}
       {isAdmin && <button type="button" className="danger" onClick={forget}>{t("nh_forget")}</button>}
     </div>
     {opened && <Detail t={t} origin={origin} node={node} />}
