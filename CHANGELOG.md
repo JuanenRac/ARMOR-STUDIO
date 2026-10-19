@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.0.4] - History of connections, node health, arming modes, daily cell extremes and a safer sign-in
+
 - **Cell extremes of the day, per battery module:** each module card in Batteries shows today's lowest and highest cell with the cell number and the time, and the widest gap of the module; the stack card shows the widest gap of the whole bank today. The numbers come from the server, start again with its day and survive a restart.
 - **Cell gap alarm that waits:** Solar alarm levels has a new field, how many minutes the gap between the cells must last before the alarm is raised (0 keeps the old behaviour, at once); it starts again whenever the gap drops back under its level.
 - **The History has tabs:** All, Alarms, Connections, Devices, System and Settings. Each tab asks the server only for what it is about; Connections and System have their own filters (by kind of client, by category), the level filter belongs to the first tab, and "Clear history" and the export follow the tab you are on.
@@ -38,6 +40,8 @@ All notable changes to this project are documented here.
 - **A linter for the source:** `npm run lint` runs ESLint with the rules of hooks as errors and the unused variables and dependency lists of effects as warnings; the first pass fixed a hook called inside a callback (a camera discovery button), statements used as expressions in the grid of the 2D plan and a few leftovers.
 - **Life counters of a battery module:** each module card in Batteries has a collapsible list of the counters its console prints (bat OV times, COC times, data items ...) with the protection ones first and flagged when above zero, a note that their meaning is not official, and the new alarm for a protection counter that went up in the eight languages.
 - **Newer batteries in the list:** the Pylontech UP2500 (24 V), the corrected UP5000, the UF5000 and the Fidus FB-L-5.12-EU can be declared, and the alarm for a battery over the voltage its own protection acts at is worded in the eight languages.
+
+
 
 ## [0.8.0.3] - Guides control by control, a tidier Security menu, the way in from outside explained, and a voice that stops on time
 
