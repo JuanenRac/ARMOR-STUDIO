@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- The banner follows the animated style of the ecosystem banners, with the name, the kind and the technologies of the project.
 ## [0.8.0.7] - The status arrives live, lighter menus, wider help cards, four more logos and the keyboard of the designers
 
 - **The status arrives live:** Studio opens the live channel of the server and takes the state it pushes at once, so an alarm, an arming or a node coming back shows in a fraction of a second; while the channel is open the status is asked only every twenty seconds as a safety net (every three without it, as before), and the bottom bar says Live. If the channel cannot be opened or is cut, Studio tries again after a longer wait each time and goes on as it always did.
