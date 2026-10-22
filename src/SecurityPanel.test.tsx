@@ -38,6 +38,15 @@ describe("the security screen", () => {
     expect(isLowering([true, false], false, true)).toBe(false);
   });
 
+  it("offers the option that keeps device logins from nodes that did not come over TLS, in every language, with its warning", () => {
+    for (const locale of locales) for (const id of ["sec_opt_netlogin", "sec_opt_netlogin_help", "sec_opt_netlogin_warn"]) {
+      const words = text(locale, id);
+      expect(words.trim().length, `${locale} ${id}`).toBeGreaterThan(8);
+      expect(words, `${locale} ${id} is not the key`).not.toBe(id);
+    }
+    expect(text("en", "sec_opt_node_pending")).not.toContain("will act on them");
+  });
+
   it("draws the cards of the account, and the dialog that asks for the password again", () => {
     const t = (key: string) => text("en", key);
     const panel = renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }));

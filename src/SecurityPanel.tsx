@@ -202,6 +202,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "server.zone_feed", id: "feed", values: [true, false], node: true },
   { key: "server.zone_feed_signature", id: "sign", values: [true, false], node: true },
   { key: "media.rtsp_proxy", id: "rtsp", values: [true, false] },
+  { key: "network.login_secure_only", id: "netlogin", values: [true, false] },
 ];
 const valueName = (t: (key: string) => string, id: string, value: string | boolean) => typeof value === "boolean" ? t(value ? "sec_opt_on" : "sec_opt_off") : t(`sec_opt_${id}_${value}`);
 /** The options an administrator turns on and off: only where the server announced them. Lowering one asks first; the one the environment fixes cannot be moved from here. */
