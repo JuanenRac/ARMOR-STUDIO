@@ -110,7 +110,7 @@ export function useDesignSync<D>(adapter: DesignAdapter<D>, { origin, enabled, p
     };
     void start();
     return () => { cancelled = true; window.clearTimeout(retry); };
-  }, [origin, enabled]);   // eslint-disable-line react-hooks/exhaustive-deps
+  }, [origin, enabled]);
 
   // Save a moment after the last change; one that comes due during a read or another save waits for it.
   useEffect(() => {
@@ -149,7 +149,7 @@ export function useDesignSync<D>(adapter: DesignAdapter<D>, { origin, enabled, p
       busy.current = false;
     }, POLL_MS);
     return () => window.clearInterval(timer);
-  }, [enabled, origin]);   // eslint-disable-line react-hooks/exhaustive-deps
+  }, [enabled, origin]);
 
   // The copy of this browser, for this server: what the drawing is, which revision of the server it was made from, and whether the server has it yet.
   useEffect(() => {

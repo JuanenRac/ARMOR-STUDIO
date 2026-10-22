@@ -86,7 +86,7 @@ export function TourHost({ t, language, view, setView }: { t: (key: string) => s
     if (!spoken) { stopAssistantSpeech(); setSpeaking(false); return undefined; }
     const wait = setTimeout(() => { speakAssistant(spoken, getAlerts(), language, { onStart: () => setSpeaking(true), onEnd: () => setSpeaking(false) }); }, 180);
     return () => { clearTimeout(wait); stopAssistantSpeech(); setSpeaking(false); };
-  }, [spoken, language]);   // eslint-disable-line react-hooks/exhaustive-deps
+  }, [spoken, language]);
 
   if (!active || !tour || !step) return null;
   const last = active.index === tour.steps.length - 1;

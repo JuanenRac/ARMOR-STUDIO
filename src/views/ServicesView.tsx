@@ -64,7 +64,7 @@ export function ServicesView({ t, origin }: { t: Translate; origin: string }) {
   const [search, setSearch] = useState("");
   const [family, setFamily] = useState<string | null>(null);
   const [show, setShow] = useState<"all" | "active" | "inactive">("all");
-  const services = poll.data?.services ?? [];
+  const services = useMemo(() => poll.data?.services ?? [], [poll.data]);
 
   const summary = useMemo(() => ({
     total: services.length,

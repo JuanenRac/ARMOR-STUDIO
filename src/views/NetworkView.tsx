@@ -177,7 +177,7 @@ export function NetworkView({ openDesigner, t, origin, isAdmin, overview, reload
   const node = data?.nodes[0];
   const history = usePolled(() => node ? readNetworkHistory(origin, node.node_id, 60) : Promise.resolve({ samples: [] as NetworkSample[] }), 15000, `${origin}:${node?.node_id ?? ""}`).data;
   const samples = history?.samples ?? [];
-  const devices = node?.devices ?? [];
+  const devices = useMemo(() => node?.devices ?? [], [node]);
   const shown = useMemo(() => filterDevices(devices, { query, kind, onlyUnknown, onlyOffline }), [devices, query, kind, onlyUnknown, onlyOffline]);
   const selectedDevice = devices.find(device => device.id === selected);
   const events = data?.events ?? [];

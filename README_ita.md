@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-765%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.8.0.6-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Tests-866%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Version-0.8.0.7-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**Controllo di onestà - cosa funziona oggi:** Studio dialoga con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) ed è coperto da 765 test unitari (lettura delle impostazioni, fusione delle telecamere, aritmetica dei grafici solari, geometria e controlli dei progettisti, annunciatore degli allarmi, dizionario dell'assistente, ogni menu reso nelle otto lingue, host statico) e da test nel browser. Funziona in uso quotidiano contro il banco di prova CM5 con il vero server, vere telecamere IP e un nodo radar sulla sua scheda; le immagini della Guida sono fatte con dati di esempio. Ciò che **non** è stato provato è il video dal vivo e il PTZ con tutte le telecamere possibili, i menu solare, elettrico, centrali d'allarme e pannello touch con apparecchi reali (esiste solo il nodo radar) e una revisione formale di accessibilità o usabilità. Finché il server non è raggiungibile, Studio mostra dati dimostrativi e lo dice nella barra superiore.
+**Controllo di onestà - cosa funziona oggi:** Studio dialoga con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) ed è coperto da 866 test unitari (lettura delle impostazioni, fusione delle telecamere, aritmetica dei grafici solari, geometria e controlli dei progettisti, annunciatore degli allarmi, dizionario dell'assistente, ogni menu reso nelle otto lingue, host statico) e da test nel browser. Funziona in uso quotidiano contro il banco di prova CM5 con il vero server, vere telecamere IP e un nodo radar sulla sua scheda; le immagini della Guida sono fatte con dati di esempio. Ciò che **non** è stato provato è il video dal vivo e il PTZ con tutte le telecamere possibili, i menu solare, elettrico, centrali d'allarme e pannello touch con apparecchi reali (esiste solo il nodo radar) e una revisione formale di accessibilità o usabilità. Finché il server non è raggiungibile, Studio mostra dati dimostrativi e lo dice nella barra superiore.
 
 ---
 
@@ -37,9 +37,9 @@
 
 | | |
 |---|---|
-| Versione | `0.8.0.6` |
+| Versione | `0.8.0.7` |
 | Maturità | Consolidato |
-| Test | 765 (`npm test`) |
+| Test | 866 (`npm test`) |
 | Tecnologia | React 19 / TypeScript / Vite |
 | Su hardware reale | Usato ogni giorno sul banco di prova CM5 (vero server, vere telecamere IP, un vero nodo radar); i menu solare, elettrico, centrali d'allarme e pannello touch attendono nodi reali |
 
@@ -68,6 +68,7 @@
 * **Accesso per gestori di password e una Cronologia a schede:** l'accesso è un vero modulo che il gestore di password del browser o del sistema può salvare e compilare, con un "Ricordami" facoltativo che conserva solo il nome utente (mai la password) e una nota che lo dice; la Cronologia ha le schede Tutto, Allarmi, Connessioni, Dispositivi, Sistema e Impostazioni, con l'elenco di ogni dispositivo e app che si collega al server (ultima volta visto, sessioni aperte, accessi e rifiuti) e gli eventi di nodi, broker, servizi, aggiornamenti e inserimento. Gli indirizzi li vedono solo gli amministratori.
 * **Manutenzione delle batterie (Configurazione, amministratori):** una procedura guidata in quattro passi - batteria e operazione, valori, conferma digitando il numero di serie della batteria, risultato - per modificare ciò che conserva una batteria Pylontech; limiti in volt e gradi un gruppo intero alla volta, un file firmware letto prima di essere inviato, la batteria letta prima e dopo con la differenza e la trascrizione, e un'uscita che si può rimettere com'era.
 * **Controllo dei nodi dalla scheda di salute:** ogni nodo ha un menu (Riavvia, Pausa o Riprendi, Standby - lavoro spento, resta connesso - o Accendi, Identifica, Diagnostica, Manutenzione attivata o disattivata) e la scheda ha le azioni di gruppo Riavvia tutti (insieme, o uno dopo l'altro con la centrale d'allarme per ultima), Metti tutti in pausa, Metti tutti in standby e Riprendi tutti. Il nome del nodo (o la parola RESTART, PAUSE o STANDBY per tutti) viene digitato di nuovo e si chiede una nuova prova di identità; delle etichette seguono ogni nodo (inviato, ricevuto, offline, tornato, applicato) e mostrano In pausa, In standby da quando e da chi, e Manutenzione; e gli avvisi dicono quando una centrale d'allarme o un radar in pausa o in standby lascia la casa senza protezione. Non esistono ripristino di fabbrica, cancellazione né sonno profondo.
+* **Stato in diretta:** Studio ascolta il canale in diretta del server (un WebSocket) e mostra subito un allarme, un inserimento o un nodo che torna, e chiede lo stato solo ogni venti secondi come rete di sicurezza finché il canale è aperto; la barra in basso dice *In diretta*. I designer di allarme, elettrico e rete rispondono anche a F (adatta), più e meno (zoom) e Ctrl+D (duplica).
 
 ## 🖼️ Schermate
 
@@ -131,7 +132,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 750 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
+npm test            # 866 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```

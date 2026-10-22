@@ -10,7 +10,7 @@ describe("Studio internationalisation", () => {
     }
     expect(text("es", "cameras")).toBe("Cámaras");
     expect(text("ja", "configuration")).toBe("設定");
-  });
+  }, 30_000);   // the first test of the file pays for loading every catalogue: a slow computer needs more than five seconds
 
   it("offers exactly the languages the catalogue provides", () => {
     expect(LANGUAGES.map(language => language.code).sort()).toEqual([...locales].sort());

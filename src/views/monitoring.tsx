@@ -105,7 +105,7 @@ function CameraWall(props: CameraViewProps & { shown: readonly Camera[]; exit: (
 }
 
 export function CameraMonitorView(props: CameraViewProps) {
-  const { cameras, selected, selectedId, gridSize, recordingIds, streamUrls, reachability, notice, t } = props;
+  const { cameras, selectedId, gridSize, recordingIds, streamUrls, reachability, notice, t } = props;
   const frame = useElementSize<HTMLDivElement>();
   const [configuring, setConfiguring] = useState(false);
   const [wall, setWall] = useState(false);

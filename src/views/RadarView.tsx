@@ -7,7 +7,7 @@ import { askConfirm } from "../askConfirm";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { readRules, readStatus, type Rules } from "../api";
 import { bounds, centroid, offsetPolygon } from "../designer/geometry";
-import { arcPoints, cameraView, fitTransform, formatMetres, headingOf, radarView, sectorPoints, toMetres, type Point } from "../designer/model";
+import { arcPoints, cameraView, fitTransform, headingOf, radarView, sectorPoints, toMetres, type Point } from "../designer/model";
 import type { SiteModel } from "../designer/ops";
 import { placeTargets, updateTrails, zonePolygons, type Trails } from "../designer/radarMap";
 import type { Dimensions, Sensor } from "../domain";

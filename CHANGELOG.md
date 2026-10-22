@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.0.7] - The status arrives live, lighter menus, wider help cards, four more logos and the keyboard of the designers
+
+- **The status arrives live:** Studio opens the live channel of the server and takes the state it pushes at once, so an alarm, an arming or a node coming back shows in a fraction of a second; while the channel is open the status is asked only every twenty seconds as a safety net (every three without it, as before), and the bottom bar says Live. If the channel cannot be opened or is cut, Studio tries again after a longer wait each time and goes on as it always did.
+- **The clock no longer redraws the whole console:** the menus that say how long ago something happened tick by themselves, only while they are shown, instead of making every menu draw anew each second; the console is lighter on a slow computer.
+- **The cards that open a designer from Cameras, Radar, Electrical and Network:** the title and the button share the first row and the explanation runs across the whole card under them, in one line where the window is wide and wrapping by itself in any language, text size or window (1920x1080 and 1366x768).
+- **The Cameras footer** no longer starts with the stray word of the menu before the hint about the double click.
+- **Four more animated logos:** the Site, Alarm, Electrical and Network designers have a logo of their own beside the title, moved by CSS and still under the reduced-motion setting.
+- **Keyboard in the designers:** F fits the drawing, plus and minus zoom around the middle, and Ctrl+D duplicates the selected element, in the Alarm, Electrical and Network designers; the key hint under the drawing lists them in the eight languages.
+- **Tested whole:** the three designers are mounted in a browser-like page and driven by the keyboard: tools, Escape, delete, duplicate, zoom, keys typed in a field and a designer that is open but hidden behind another menu.
+- **Help for Battery maintenance:** the Help of Configuration explains the four steps, what the node reads first, the serial number and the password asked, the switch that keeps writing off and the risk of an operation that cannot be stopped, in the eight languages.
+- **Tour steps:** a new step in the Configuration tour for the Battery maintenance tab and a new step in the Batteries tour for the details of a module, the health of its cells, its event log and what an alert means.
+- **Assistant:** a new task, how to change the clock or the limits of a Pylontech battery, answered with the steps and a link to the tour, in the eight languages.
+- **European Portuguese:** the sign-in confirmation, the assistant's name for the person and the hints no longer use Brazilian forms.
+- **Cleaner code:** unused imports, variables and obsolete lint directives removed and two lists made stable for their hooks; the lint warnings go from twenty-eight to four.
+
 ## [0.8.0.6] - Control of the nodes from the health card, the internal memory and the maintenance window of every node
 
 - **Orders for each node, from the health card (administrators only):** every node has an Actions menu with the orders it can take in the state it is in: Restart, Pause or Resume, Standby or Power on, Identify, Diagnostics and Maintenance mode on or off. Nothing here erases a node or resets it to factory settings, and the server and the CM5 are never reached.

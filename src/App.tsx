@@ -22,10 +22,11 @@ import { clearSessionMemory } from "./sessionMemory";
 import { cameraCoveringNode } from "./alerts/coverage";
 import { useConnectionAnnouncer } from "./alerts/useConnectionAnnouncer";
 import { ViewSlot, viewsToDraw } from "./viewSlots";
-import { AboutDialog, ConfirmDialog, HelpDialog, PinDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
+import { AboutDialog, HelpDialog, PinDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
 import { DesignVersionsDialog } from "./DesignVersionsDialog";
 import { SessionUserContext } from "./sessionContext";
 import { KnownNodesContext } from "./knownNodes";
+import { Ticking } from "./components/Ticking";
 import { StreamRenewContext } from "./streamContext";
 import { CameraFullscreen } from "./components/camera";
 import { ElectricalView } from "./views/ElectricalView";
@@ -126,7 +127,6 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const isViewer = sessionUser.user?.role === "viewer";
   const [pendingMode, setPendingMode] = useState<"armed" | "disarmed" | null>(null);
   const [checkOpen, setCheckOpen] = useState(false);
-  const [now, setNow] = useState(() => Date.now());
   const [restored, setRestored] = useState(false);
   const savedLayout = useMemo(() => loadLayout(), []);
   const [gridSize, setGridSize] = useState<GridSize>(savedLayout?.gridSize ?? 4);
@@ -139,9 +139,9 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   // The same function for as long as the language is the same: effects that list it among their dependencies (the rules of the history, the evidence library) were run again every second,
   // when the clock of the console draws it anew, and replaced what the person was editing with the copy of the server.
   const t = useCallback((key: string, ...args: Array<string | number>) => args.reduce<string>((value, arg, index) => value.split(`{${index}}`).join(String(arg)), text(language, key)), [language]);
-  const [notice, setNotice] = useState(t("configuration"));
+  const [notice, setNotice] = useState("");
 
-  const { state, connection: connectionState, latencyMs, apply: applyState } = useServerStatus(origin);
+  const { state, connection: connectionState, latencyMs, live: liveChannel, apply: applyState } = useServerStatus(origin, { live: true });
   const remoteConnection = useRemoteConnection(origin, connectionState !== "demo" && sessionUser.user !== null);
   const serverInfo = useServerInfo(origin);
   const { urls: streamUrls, renew: renewStream } = useStreamUrls(origin, cameras);
@@ -191,7 +191,6 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   useEffect(() => { if (!shouldAutoStart()) return undefined; const timer = window.setTimeout(() => { if (shouldAutoStart()) startTour("welcome"); }, 1400); return () => window.clearTimeout(timer); }, []);
   const alarmsPending = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at).length;
   const cameraNames = useMemo(() => Object.fromEntries(cameras.map(camera => [camera.id, camera.name])), [cameras]);
-  useEffect(() => { const timer = window.setInterval(() => setNow(Date.now()), 1000); return () => window.clearInterval(timer); }, []);
 
   useEffect(() => {
     document.documentElement.dataset.armorTheme = theme;
@@ -241,7 +240,6 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
       if (prefs.theme) setTheme(prefs.theme as Theme);
     }).catch(() => { /* the local fallback stands when the server cannot be asked */ });
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [origin]);
 
   const site: SiteModel = useMemo(() => ({ terrain, buildings, openings, roofItems, wallLamps, features, cameras, sensors, placements }), [terrain, buildings, openings, roofItems, wallLamps, features, cameras, sensors, placements]);
@@ -342,14 +340,14 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const visitedViews = useRef(new Set<View>());
   const shownPanels = useRef(new Map<View, ReactNode>());
   const panels: Record<View, ReactNode> = {
-    overview: <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} readOnly={isViewer} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} panels={alarmNodesPoll.data ?? null} solar={solarPoll.data ?? null} electrical={electricalPoll.data ?? null} network={networkPoll.data ?? null} />,
-    alarms: <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} readOnly={isViewer} />,
-    alarmPanels: <AlarmPanelsView openDesigner={() => setView("alarmDesigner")} t={t} origin={origin} nodes={alarmNodesPoll.data ?? null} unreachable={alarmNodesPoll.failed} network={networkPoll.data ?? null} isAdmin={isAdmin} now={now} />,
-    electrical: <ElectricalView openDevices={() => setView("devices")} t={t} origin={origin} readings={electricalPoll.data ?? null} unreachable={electricalPoll.failed} design={electrical} openDesigner={() => setView("electricalDesigner")} network={networkPoll.data} now={now} />,
-    inverters: <InvertersView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} network={networkPoll.data} />,
-    batteries: <BatteriesView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} network={networkPoll.data} />,
-    devices: <DevicesView t={t} origin={origin} devices={devices} reload={devicePoll.reload} placedIds={new Set(placements.map(item => item.device_id))} onPlace={id => { setWantsToPlace(id); setView("siteDesigner"); }} now={now} />,
-    automations: <AutomationsView t={t} origin={origin} automations={automationPoll.data?.automations ?? []} reload={automationPoll.reload} devices={devices} now={now} />,
+    overview: <Ticking>{now => <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} readOnly={isViewer} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} panels={alarmNodesPoll.data ?? null} solar={solarPoll.data ?? null} electrical={electricalPoll.data ?? null} network={networkPoll.data ?? null} />}</Ticking>,
+    alarms: <Ticking>{now => <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} readOnly={isViewer} />}</Ticking>,
+    alarmPanels: <Ticking>{now => <AlarmPanelsView openDesigner={() => setView("alarmDesigner")} t={t} origin={origin} nodes={alarmNodesPoll.data ?? null} unreachable={alarmNodesPoll.failed} network={networkPoll.data ?? null} isAdmin={isAdmin} now={now} />}</Ticking>,
+    electrical: <Ticking>{now => <ElectricalView openDevices={() => setView("devices")} t={t} origin={origin} readings={electricalPoll.data ?? null} unreachable={electricalPoll.failed} design={electrical} openDesigner={() => setView("electricalDesigner")} network={networkPoll.data} now={now} />}</Ticking>,
+    inverters: <Ticking>{now => <InvertersView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} network={networkPoll.data} />}</Ticking>,
+    batteries: <Ticking>{now => <BatteriesView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} network={networkPoll.data} />}</Ticking>,
+    devices: <Ticking>{now => <DevicesView t={t} origin={origin} devices={devices} reload={devicePoll.reload} placedIds={new Set(placements.map(item => item.device_id))} onPlace={id => { setWantsToPlace(id); setView("siteDesigner"); }} now={now} />}</Ticking>,
+    automations: <Ticking>{now => <AutomationsView t={t} origin={origin} automations={automationPoll.data?.automations ?? []} reload={automationPoll.reload} devices={devices} now={now} />}</Ticking>,
     system: <SystemView t={t} origin={origin} isAdmin={isAdmin} />,
     services: <ServicesView t={t} origin={origin} />,
     weather: <WeatherView t={t} locale={language} origin={origin} />,
@@ -363,7 +361,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     radar: <RadarView network={networkPoll.data} nodes={nodes} model={site} dimensions={dimensions} origin={origin} openDesigner={() => setView("siteDesigner")} openZones={() => setView("history")} setSensors={setSensors} forget={id => void forgetNode(origin, id).then(() => setNotice(t("nodeForgotten"))).catch(() => setNotice(t("recordingFailed")))} t={t} />,
     siteDesigner: <SiteDesignerInteractive openVersions={() => setVersionsOf("site")} t={t} dimensions={dimensions} setDimensions={setDimensions} model={site} applyModel={applySite} selectedCamera={selectedCamera} setSelectedCamera={setSelectedCamera} notice={notice} setNotice={setNotice} save={saveSettings} nodeIds={nodes.map(node => node.node_id)} devices={devices} wantsToPlace={wantsToPlace} clearWantsToPlace={() => setWantsToPlace("")} openDevices={() => setView("devices")} cameras={cameras} alarmNodes={alarmNodesPoll.data?.nodes ?? []} openCameras={() => setView("cameras")} openAlarmPanels={() => setView("alarmPanels")} />,
     electricalDesigner: <ElectricalDesigner t={t} design={electrical} setDesign={setElectrical} status={electricalStatus} nodeIds={nodes.map(node => node.node_id)} solarDevices={solarPoll.data?.devices ?? []} solarWaiting={solarPoll.data?.waiting ?? []} electricalNodes={electricalPoll.data?.nodes ?? []} site={{ openings, features, roofItems }} />,
-    network: <NetworkView openDesigner={() => setView("networkDesigner")} language={language} t={t} origin={origin} isAdmin={isAdmin} overview={networkPoll.data} reload={networkPoll.reload} now={now} />,
+    network: <Ticking>{now => <NetworkView openDesigner={() => setView("networkDesigner")} language={language} t={t} origin={origin} isAdmin={isAdmin} overview={networkPoll.data} reload={networkPoll.reload} now={now} />}</Ticking>,
     alarmDesigner: <AlarmDesigner t={t} design={alarmDesign} setDesign={setAlarmDesign} status={alarmDesignStatus} panels={alarmNodesPoll.data ?? null} openVersions={() => setVersionsOf("alarm")} openPanels={() => setView("alarmPanels")} />,
     networkDesigner: <NetworkDesigner t={t} design={networkDesign} setDesign={setNetworkDesign} status={networkStatus} overview={networkPoll.data} cameras={cameras} />,
     configuration: <ConfigurationPanel
@@ -406,7 +404,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     nodesOnline={nodes.filter(node => node.online && !node.stale).length} nodesTotal={nodes.length}
     camerasReachable={cameras.filter(camera => reachability[camera.id] === "online").length} camerasTotal={cameras.length}
     highAlerts={nodes.filter(node => node.online && !node.stale && node.alert_level === "high").length}
-    info={serverInfo} latencyMs={latencyMs} revision={state.revision} onSignOut={onSignOut} t={t} />
+    info={serverInfo} latencyMs={latencyMs} live={liveChannel} revision={state.revision} onSignOut={onSignOut} t={t} />
   <ConfirmHost />
   <ElevationHost t={t} />
   </div></StreamRenewContext.Provider></KnownNodesContext.Provider></SessionUserContext.Provider>;

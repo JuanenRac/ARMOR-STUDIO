@@ -41,3 +41,23 @@ describe("the introduction under the title of a menu", () => {
     expect(wideCss).toContain("@media (max-width: 760px)");
   });
 });
+
+describe("the card that opens a designer from a menu", () => {
+  const linkCss = read("./components/designer-link.css");
+  const rule = (selector: string) => rulesOf(linkCss).find(item => item.selector === selector)!;
+
+  it("puts the title and the button on one row and the explanation under them, across the whole card", () => {
+    expect(rule(".designer-link").body).toMatch(/display:\s*grid/);
+    expect(rule(".designer-link").body).toMatch(/grid-template-columns:\s*minmax\(0, 1fr\) auto/);
+    expect(rule(".designer-link-text").body).toContain("display: contents");
+    expect(rule(".designer-link p").body).toContain("grid-column: 1 / -1");
+    expect(maxWidthOf(rule(".designer-link p"))).toBe("none");
+  });
+
+  it("wraps by the language, the text size and the window: a line height in rem, no fixed height and the button below on a phone", () => {
+    expect(rule(".designer-link p").body).toMatch(/line-height:\s*[\d.]+rem/);
+    expect(rule(".designer-link p").body).not.toMatch(/(?:^|[;\s])(?:height|max-height)\s*:/);
+    expect(rule(".designer-link p").body).toContain("overflow-wrap: anywhere");
+    expect(linkCss).toContain("@media (max-width: 520px)");
+  });
+});

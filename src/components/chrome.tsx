@@ -191,12 +191,12 @@ export function PinDialog({ title, text, confirmLabel, confirm, cancel, t }: { t
 export type StatusBarProps = {
   serverName: string; synced: boolean; mode: "armed" | "disarmed";
   nodesOnline: number; nodesTotal: number; camerasReachable: number; camerasTotal: number; highAlerts: number;
-  info: ServerInfo | null; latencyMs: number | null; revision: number; onSignOut: () => void; t: Translate;
+  info: ServerInfo | null; latencyMs: number | null; live?: boolean; revision: number; onSignOut: () => void; t: Translate;
 };
 
 /** The console's bottom bar: which server, whether the perimeter is healthy, and the time. */
 export function StatusBar(props: StatusBarProps) {
-  const { serverName, synced, mode, nodesOnline, nodesTotal, camerasReachable, camerasTotal, highAlerts, info, latencyMs, revision, onSignOut, t } = props;
+  const { serverName, synced, mode, nodesOnline, nodesTotal, camerasReachable, camerasTotal, highAlerts, info, latencyMs, live = false, revision, onSignOut, t } = props;
   const now = useClock();
   const item = (label: string, value: string, tone = "") => <span className={`sb-item ${tone}`}><em>{label}</em><b>{value}</b></span>;
   const nodesTone = nodesTotal > 0 && nodesOnline < nodesTotal ? "warn" : "";
@@ -215,6 +215,7 @@ export function StatusBar(props: StatusBarProps) {
       {info && item(t("sbUptime"), formatUptime(info.uptime_s))}
       {info?.mqtt !== undefined && item("MQTT", info.mqtt ? t("sbOn") : t("sbOff"), info.mqtt ? "" : "dim")}
       {info?.live_video !== undefined && item(t("sbVideo"), info.live_video ? t("sbOn") : t("sbOff"), info.live_video ? "" : "dim")}
+      {live && item(t("sbLive"), t("sbOn"))}
       {latencyMs !== null && item(t("sbLatency"), `${latencyMs} ms`, latencyMs > 500 ? "warn" : "")}
       {item("REV", String(revision))}
     </div>

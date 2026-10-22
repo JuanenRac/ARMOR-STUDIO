@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-765%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.8.0.6-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Tests-866%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Version-0.8.0.7-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**正直さのチェック - 今日動いているもの:** Studio は [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) と通信し、765 件のユニットテスト（設定の解析、カメラの統合、ソーラーグラフの計算、設計ツールの幾何と検査、警報アナウンサー、アシスタントの辞書、8 言語での全メニューの描画、静的ホスト）とブラウザテストでカバーされています。CM5 テストベンチで、実際のサーバー、実際の IP カメラ、基板上のレーダーノードと組み合わせて日常的に動作しており、ヘルプの画像は例示データで作られています。**まだ**証明されていないもの：あらゆるカメラでのライブ映像と PTZ、実機でのソーラー・電気・警報盤・タッチパネルのメニュー（存在するのはレーダーノードのみ）、正式なアクセシビリティ・ユーザビリティ評価。サーバーに接続できない間、Studio はデモデータを表示し、上部バーでそれを示します。
+**正直さのチェック - 今日動いているもの:** Studio は [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) と通信し、866 件のユニットテスト（設定の解析、カメラの統合、ソーラーグラフの計算、設計ツールの幾何と検査、警報アナウンサー、アシスタントの辞書、8 言語での全メニューの描画、静的ホスト）とブラウザテストでカバーされています。CM5 テストベンチで、実際のサーバー、実際の IP カメラ、基板上のレーダーノードと組み合わせて日常的に動作しており、ヘルプの画像は例示データで作られています。**まだ**証明されていないもの：あらゆるカメラでのライブ映像と PTZ、実機でのソーラー・電気・警報盤・タッチパネルのメニュー（存在するのはレーダーノードのみ）、正式なアクセシビリティ・ユーザビリティ評価。サーバーに接続できない間、Studio はデモデータを表示し、上部バーでそれを示します。
 
 ---
 
@@ -37,9 +37,9 @@
 
 | | |
 |---|---|
-| バージョン | `0.8.0.6` |
+| バージョン | `0.8.0.7` |
 | 成熟度 | 確立 |
-| テスト | 765 (`npm test`) |
+| テスト | 866 (`npm test`) |
 | 技術 | React 19 / TypeScript / Vite |
 | 実機での確認 | CM5 テストベンチ（実サーバー、実際の IP カメラ、実際のレーダーノード）で毎日使用。ソーラー・電気・警報盤・タッチパネルのメニューは実ノードを待っています |
 
@@ -68,6 +68,7 @@
 * **パスワードマネージャー対応のサインインとタブ付きの履歴:** サインインは本物のフォームで、ブラウザーや OS のパスワードマネージャーが保存・入力できます。任意の「ユーザー名を記憶」はユーザー名だけを保存し（パスワードは決して保存しません）、その旨の注記があります。履歴には「すべて」「アラーム」「接続」「デバイス」「システム」「設定」のタブがあり、サーバーに接続するすべてのデバイスとアプリの一覧（最終確認、開いているセッション、サインインと拒否）と、ノード・ブローカー・サービス・更新・警戒操作のイベントが見られます。アドレスは管理者にだけ表示されます。
 * **バッテリーのメンテナンス（設定、管理者向け）：** 4段階のウィザード——バッテリーと操作、値、バッテリーのシリアル番号を入力して確認、結果——で、Pylontechバッテリーが保持する内容を変更します。制限値は電圧・温度で入力しグループ単位で送信、ファームウェアファイルは送信前に読み取り、前後のバッテリー状態を差分と記録とともに表示し、出力は元に戻せます。
 * **ノードの健全性カードからの制御：** 各ノードにメニュー（再起動、一時停止または再開、スタンバイ（動作停止、接続は維持）または電源オン、識別、診断、メンテナンスのオン／オフ）があり、カードにはグループ操作として、すべて再起動（同時、または警報パネルを最後にして順番に）、すべて一時停止、すべてスタンバイ、すべて再開があります。ノード名（全ノードの場合は RESTART、PAUSE、STANDBY のいずれかの単語）を再入力し、新たな本人確認も求められます。チップが各ノード（送信済み、受領、オフライン、復帰、適用）を追い、一時停止中、いつから誰によるスタンバイか、メンテナンスを表示し、警報パネルやレーダーが一時停止またはスタンバイのとき家が無防備になることを警告が知らせます。工場出荷時リセット、消去、ディープスリープはありません。
+* **ライブ状態：** Studio はサーバーのライブチャネル（WebSocket）を受け取り、アラーム・警戒・ノードの復帰を即座に表示します。チャネルが開いている間は保険として20秒ごとにだけ状態を問い合わせ、下部バーに「ライブ」と表示します。アラーム・電気・ネットワークの各デザイナーは、既存のキーに加えて F（全体表示）、プラス／マイナス（ズーム）、Ctrl+D（複製）にも反応します。
 
 ## 🖼️ スクリーンショット
 
@@ -131,7 +132,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 750 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
+npm test            # 866 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```

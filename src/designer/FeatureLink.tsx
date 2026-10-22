@@ -5,7 +5,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import type { AlarmNodeView, StudioDevice } from "../api";
-import type { FeatureLink, FeatureLinkKind, SiteFeature, SiteFeatureKind } from "../domain";
+import type { FeatureLink, FeatureLinkKind, SiteFeature } from "../domain";
 
 /** What each kind of object can be tied to. */
 export const LINK_OF_KIND: Partial<Record<string, FeatureLinkKind>> = {

@@ -8,6 +8,7 @@ import { mergeServerCameras } from "./cameras";
 import { DEMO_STATE, type Camera } from "./domain";
 import type { SystemState } from "./types";
 import { useViewActive } from "./viewSlots";
+import { browserSocket, eventsUrl, LIVE_POLL_MS, POLL_MS, retryDelay, stateOf, type LiveSocket, type SocketFactory } from "./liveStatus";
 
 export type Connection = "synced" | "demo";
 
@@ -27,12 +28,17 @@ export function useFullscreen(onFailure: () => void): { active: boolean; toggle:
   return { active, toggle };
 }
 
-export function useServerStatus(origin: string): { state: SystemState; connection: Connection; latencyMs: number | null; apply: (state: SystemState) => void } {
+/** Options of the status hook: `live` opens the live channel of the server (the console does; the tests that only poll leave it off) and `socket` says how to open it. */
+export type StatusOptions = { live?: boolean; socket?: SocketFactory };
+
+export function useServerStatus(origin: string, options: StatusOptions = {}): { state: SystemState; connection: Connection; latencyMs: number | null; live: boolean; apply: (state: SystemState) => void } {
   const [state, setState] = useState<SystemState>(DEMO_STATE);
   const [connection, setConnection] = useState<Connection>("demo");
   const [latencyMs, setLatencyMs] = useState<number | null>(null);
+  const [live, setLive] = useState(false);
+  const wantLive = options.live === true, openSocket = options.socket ?? browserSocket;
   useEffect(() => {
-    let cancelled = false, failures = 0, busy = false;
+    let cancelled = false, failures = 0, busy = false, open = false, attempts = 0, socket: LiveSocket | null = null, retry = 0, timer = 0;
     // One answer that is late or lost is not a lost server (a browser shares a few connections between the camera pictures and these calls): the console says it is offline after three in a row.
     const refresh = async () => {
       if (busy || document.hidden) return;   // a slow server is not asked again while it has not answered, and a tab nobody is looking at does not ask at all
@@ -42,13 +48,40 @@ export function useServerStatus(origin: string): { state: SystemState; connectio
       catch { failures += 1; if (!cancelled && failures >= 3) { setConnection("demo"); setLatencyMs(null); } }
       finally { busy = false; }
     };
+    // The asking goes on while the live channel is open, only far less often: it is the net under a channel that may be cut by a proxy without anybody telling.
+    const schedule = () => { window.clearInterval(timer); timer = window.setInterval(() => void refresh(), open ? LIVE_POLL_MS : POLL_MS); };
+    const connect = () => {
+      const url = wantLive ? eventsUrl(origin) : null;
+      if (cancelled || !url) return;
+      let current: LiveSocket;
+      try { current = openSocket(url); } catch { retry = window.setTimeout(connect, retryDelay(++attempts)); return; }
+      socket = current;
+      current.onopen = () => { if (cancelled) return; attempts = 0; open = true; setLive(true); schedule(); };
+      current.onmessage = event => {
+        const next = stateOf(event.data);
+        if (!next || cancelled) return;
+        failures = 0; setState(next); setConnection("synced");
+      };
+      const lost = () => {
+        if (socket !== current) return;
+        socket = null;
+        if (open) { open = false; if (!cancelled) { setLive(false); schedule(); } }
+        if (!cancelled) retry = window.setTimeout(connect, retryDelay(++attempts));
+      };
+      current.onclose = lost; current.onerror = lost;
+    };
     void refresh();
-    const timer = window.setInterval(() => void refresh(), 3000);
+    schedule();
+    connect();
     const back = () => { if (!document.hidden) void refresh(); };   // the tab is shown again: bring it up to date at once
     document.addEventListener("visibilitychange", back);
-    return () => { cancelled = true; window.clearInterval(timer); document.removeEventListener("visibilitychange", back); };
-  }, [origin]);
-  return { state, connection, latencyMs, apply: setState };
+    return () => {
+      cancelled = true; window.clearInterval(timer); window.clearTimeout(retry); document.removeEventListener("visibilitychange", back);
+      const closing = socket; socket = null;
+      if (closing) { closing.onopen = closing.onmessage = closing.onclose = closing.onerror = null; try { closing.close(); } catch { /* it was already closed */ } }
+    };
+  }, [origin, wantLive, openSocket]);
+  return { state, connection, latencyMs, live, apply: setState };
 }
 
 /**
@@ -134,6 +167,22 @@ export function useServerInfo(origin: string): ServerInfo | null {
     return () => { cancelled = true; window.clearInterval(timer); };
   }, [origin]);
   return info;
+}
+
+/**
+ * The current time in milliseconds, ticking once a second while the menu that asks for it is shown (a menu that is open but hidden does not tick). It lives in the menu that needs
+ * it and not in the console as a whole, so a tick draws that menu and nothing else.
+ */
+export function useNow(intervalMs = 1000): number {
+  const active = useViewActive();
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!active) return;
+    setNow(Date.now());
+    const timer = window.setInterval(() => setNow(Date.now()), intervalMs);
+    return () => window.clearInterval(timer);
+  }, [active, intervalMs]);
+  return now;
 }
 
 /** The current time, ticking once a second. */

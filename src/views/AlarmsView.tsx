@@ -19,7 +19,7 @@ type Props = {
 };
 
 /** Where an alarm came from, in words and (for a device) as its icon. */
-export function AlarmSource({ alarm, devices, cameraNames, t }: { alarm: Alarm; devices: StudioDevice[]; cameraNames: Record<string, string>; t: Translate }) {
+export function AlarmSource({ alarm, devices, cameraNames }: { alarm: Alarm; devices: StudioDevice[]; cameraNames: Record<string, string>; t?: Translate }) {
   if (alarm.source.type === "device") {
     const device = devices.find(item => item.id === alarm.source.id);
     return <><span className="alarm-source-icon">{device ? <KindIcon kind={device.kind} size={20} /> : "◌"}</span><span>{device?.name ?? alarm.source.id}</span></>;

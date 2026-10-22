@@ -29,7 +29,7 @@ describe("the assistant's dictionary", () => {
       }
     }
     expect(wrong).toEqual([]);
-  });
+  }, 30_000);   // ranks every task in every language: a slow machine needs more than the usual five seconds
 
   it("understands questions phrased in other words than the samples", () => {
     const cases: Array<[string, string]> = [

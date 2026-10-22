@@ -1,4 +1,4 @@
-import { endpoint, userCall } from "./transport";
+import { userCall } from "./transport";
 // ---- the way in from outside the house: the VPN, the dynamic DNS name and the panels of the nodes through the server -------------------------------------
 export type VpnPeer = { name: string; address: string; full_tunnel: "yes" | "no" };
 export type RemoteSetupState = {

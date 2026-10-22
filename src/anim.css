@@ -67,5 +67,5 @@ html[data-armor-theme] .brand-mark.armor-mark { background: none; border: 0; box
 
 /* the icon of the open menu breathes; the small headers of the compact layout get a smaller logo */
 nav button.active > span { animation: ml-pulse 2.6s ease-in-out infinite; }
-.studio-frame .devices-head .ml, .studio-frame .history-head .ml { width: 32px; height: 32px; }
+.studio-frame .devices-head .ml, .studio-frame .history-head .ml, .studio-frame .ed-head .ml, .studio-frame .unified-designer-heading .ml { width: 32px; height: 32px; }
 @media (prefers-reduced-motion: reduce) { nav button.active > span { animation: none !important; } }

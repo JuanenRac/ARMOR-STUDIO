@@ -10,7 +10,7 @@ import { KindIcon } from "../deviceKinds";
 import { FEATURE_STYLES, FLOOR_STYLES, MAST_PART_KINDS, type Building, type Camera, type Dimensions, type Opening, type RoofItem, type RoofStyle, type Sensor, type SiteFeature, type WallLamp, BUILDING_USES, BUILDING_MATERIALS, OPENING_STYLES, LAMP_KINDS, type BuildingUse, type BuildingMaterial, type LampKind, CAMERA_LENSES, type CameraLens } from "../domain";
 import { area, bounds, edgeOf, floorBottom, isSimplePolygon, nearestOnOutline, pointInPolygon, roofRise, signedArea, totalHeight } from "./geometry";
 import { floorFinish } from "./floors";
-import { DEFAULT_DOOR_COLOUR, DEFAULT_FEATURE_COLOUR, DEFAULT_LIGHT_COLOUR, DEFAULT_ROOF_COLOUR, DEFAULT_ROOF_ITEM_COLOUR, DEFAULT_TERRAIN_COLOUR, DEFAULT_WALL_COLOUR, DEFAULT_WINDOW_FRAME_COLOUR, featureColourOf } from "./colors";
+import { DEFAULT_DOOR_COLOUR, DEFAULT_LIGHT_COLOUR, DEFAULT_ROOF_COLOUR, DEFAULT_ROOF_ITEM_COLOUR, DEFAULT_TERRAIN_COLOUR, DEFAULT_WALL_COLOUR, DEFAULT_WINDOW_FRAME_COLOUR, featureColourOf } from "./colors";
 import { toolIcon } from "./icons";
 import { clamp, formatMetres, headingOf, radarView, round2, SENSOR_HEIGHT_M, CAMERA_HEIGHT_M, toMetres, toPercent, toolLabelKey, type Selection, type Tool, cameraZoom, cameraTeleDeg, cameraTeleRangeM } from "./model";
 import { mergeBuildings, mergeCandidates, partnersOf, separateBuildings } from "./merge";

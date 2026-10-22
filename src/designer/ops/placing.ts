@@ -1,5 +1,5 @@
 import type { Building, DevicePlacement, Opening, Point, RoofItem, RoofItemKind, SiteFeature, SiteFeatureKind } from "../../domain";
-import { edgeOf, nearestOnOutline, pointInPolygon, rectangle, roofFrame, roofHeight, totalHeight } from "../geometry";
+import { edgeOf, nearestOnOutline, pointInPolygon, roofFrame, roofHeight, totalHeight } from "../geometry";
 import type { Selection } from "../model";
 import { rotateBuilding } from "./reshaping";
 import { EDGE_MARGIN, clamp, nextId, round2 } from "./shared";

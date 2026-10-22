@@ -31,7 +31,6 @@ type Props = {
 const VIEWER_TABS: readonly string[] = ["general", "users", "preferences", "security"];
 /** The tabs in groups, from what is the person's own to what is the system's: the interface; people, alerts and what is recorded; the nodes' firmware and Studio's updates; the server and what it runs on. */
 const tabGroups: Tab[][] = [["general", "preferences"], ["users", "security", "notifications", "capture"], ["firmware", "batteries", "updates"], ["services", "broker", "files", "installation", "console"]];
-const tabs: Tab[] = tabGroups.flat();
 
 /** Can the browser reach something at this address at all? (no-cors: only a network failure rejects, which is what a wrong scheme or port gives.) */
 async function reachable(url: string): Promise<boolean> {

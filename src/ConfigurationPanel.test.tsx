@@ -48,7 +48,7 @@ describe("the configuration screen, by who is looking at it", () => {
     await show({ isAdmin: true });
     expect(tabNames()).toEqual(["general", "preferences", "users", "security", "notifications", "capture", "firmware", "batteries", "updates", "services", "broker", "files", "installation", "console"]);
     expect(container.querySelectorAll(".tab-sep")).toHaveLength(3);
-  });
+  }, 30_000);   // the first test of the file pays for loading the whole screen: a slow computer needs more than five seconds
 
   it("offers a viewer only the tabs that do not change anything, with no separator left over", async () => {
     await show({ isViewer: true });

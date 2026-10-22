@@ -4,7 +4,6 @@
  * still finds its task, and the answer comes in the interface's language), and, when no task fits, against the paragraphs of the Help of every menu. It says plainly when it found nothing.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import type { View } from "../domain";
 import type { Locale } from "../i18n";
 import { TOPICS, type Topic } from "./knowledge";
 

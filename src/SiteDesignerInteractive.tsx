@@ -21,6 +21,7 @@ import {
 import { Plan2D, type DragTarget, type PlaceHit } from "./designer/Plan2D";
 import type { Target3D } from "./designer/Viewport3D";
 import "./designer/designer.css";
+import { MenuTitle } from "./menuLogos";
 
 const Viewport3D = lazy(() => import("./designer/Viewport3D"));
 
@@ -45,7 +46,6 @@ type Snapshot = { model: SiteModel; dimensions: Dimensions };
 const GRID_M = 0.25, HISTORY_LIMIT = 100, COALESCE_MS = 900;
 const FEATURE_TOOLS: ReadonlySet<Tool> = new Set(["pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road", "tree", "kennel", "fence", "fountain", "coop", "gate", "sidewalk", "pool", "planter", "terrace", "bench", "table", "barbecue", "pergola", "shed", "hedge", "mailbox", "bins", "tank", "ac-unit", "electrical-box", "car", "wall", "fireplace", "stairs", "kitchen", "bathroom", "bed", "wardrobe", "sofa", "armchair", "dining", "tv", "floor", "mirror", "lift", "stair-light", "radiator", "washer", "fridge", "desk", "plant", "rug", "water-heater", "hot-tank", "solar-tank", "intercom", "intercom-monitor", "alarm-panel", "alarm-keypad"]);
 const ROOF_ITEM_OF: Partial<Record<Tool, RoofItemKind>> = { chimney: "chimney", "roof-solar": "solar", "roof-heater": "solar-heater", antenna: "antenna", gutter: "gutter", downpipe: "downpipe" };
-const REPEATING: ReadonlySet<Tool> = new Set(["door", "window", "garage", "arch", "wall-lamp", "chimney", "roof-solar", "roof-heater", "antenna", "gutter", "downpipe", "pillar", "lamp", "mast", "solar", "canopy", "entrance", "path", "road"]);
 const NUDGE = 0.25;
 
 export function SiteDesignerInteractive(props: Props) {
@@ -391,7 +391,7 @@ export function SiteDesignerInteractive(props: Props) {
 
   return <section className="layout-workspace advanced-designer unified-site-designer">
     <div className="panel-heading unified-designer-heading" data-tour="sd-head">
-      <div><p className="eyebrow">{t("siteDesigner")}</p><h2>{t("siteDesignerTitle")}</h2><p className="muted">{view === "2d" ? t("site2dProfessionalHelp") : t("site3dProfessionalHelp")}</p></div>
+      <MenuTitle kind="drawSite"><p className="eyebrow">{t("siteDesigner")}</p><h2>{t("siteDesignerTitle")}</h2><p className="muted">{view === "2d" ? t("site2dProfessionalHelp") : t("site3dProfessionalHelp")}</p></MenuTitle>
       <div className="designer-heading-actions">
         <div className="designer-view-actions" data-tour="sd-actions">
           <div className="designer-view-toggle" role="tablist" data-tour="sd-view"><button className={view === "2d" ? "active" : ""} onClick={() => switchView("2d")}>{t("view2d")}</button><button className={view === "3d" ? "active" : ""} onClick={() => switchView("3d")}>{t("view3d")}</button></div>

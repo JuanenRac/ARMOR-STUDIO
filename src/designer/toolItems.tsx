@@ -5,7 +5,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { ICON, toolIcon } from "./icons";
-import { BRANCHES, TOOL_GROUPS, toolKeyOf, toolLabelKey, type Tool, type ToolMode } from "./model";
+import { BRANCHES, TOOL_GROUPS, toolKeyOf, type Tool, type ToolMode } from "./model";
 import type { ToolboxItem } from "./Toolbox";
 
 export type TurnAxis = "yaw" | "pitch" | "roll";

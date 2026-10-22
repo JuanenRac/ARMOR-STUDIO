@@ -22,7 +22,7 @@ O pequeno mapa em direto mostra o local com os alvos dos radares à medida que s
 Alarmes no mapa: um alarme que ninguém reconheceu pulsa no mapa em direto onde está desenhada a sua câmara, o seu dispositivo ou o seu radar (vermelho se crítico, laranja se alto, amarelo para um aviso), para ver onde está sem abrir a lista.`],
   weather: ["Meteorologia", `A previsão do seu local: agora, as próximas 48 horas e os próximos dias, com avisos da previsão e a qualidade do ar.
 
-Da primeira vez, ativa a meteorologia e escolhe o local: procure uma localidade, ou escreva você mesmo a latitude e a longitude. O local fica guardado neste servidor. «Mudar de local» escolhe outro; «Desativar e esquecer o local» remove-o.
+Da primeira vez, ativa a meteorologia e escolhe o local: procure uma localidade, ou escreva à mão a latitude e a longitude. O local fica guardado neste servidor. «Mudar de local» escolhe outro; «Desativar e esquecer o local» remove-o.
 
 O radar de chuva reproduz as últimas imagens de chuva (e, se quiser, de nuvens do satélite) sobre um mapa. Reproduzir e Pausa controlam a animação, o controlo de opacidade deixa ver o mapa por baixo, e «Centrar no meu local» recentra a vista.
 

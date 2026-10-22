@@ -6,7 +6,7 @@
 import { useId } from "react";
 import "./anim.css";
 
-export type LogoKind = "overview" | "weather" | "alarms" | "cameras" | "radar" | "devices" | "automations" | "record" | "history" | "network" | "system" | "services" | "configuration" | "electrical" | "alarmPanels";
+export type LogoKind = "overview" | "weather" | "alarms" | "cameras" | "radar" | "devices" | "automations" | "record" | "history" | "network" | "system" | "services" | "configuration" | "electrical" | "alarmPanels" | "drawSite" | "drawAlarm" | "drawElectrical" | "drawNetwork";
 const CYAN = "#00E5FF", AMBER = "#FFB020", GREEN = "#5DF0C4", RED = "#FF6F79";
 
 /** The shield of the sidebar: a radar sweep turns inside it and a ring of light leaves it now and then. */
@@ -107,11 +107,39 @@ const DRAWINGS: Record<LogoKind, React.ReactNode> = {
     <path d="M22 33 L29 40 L43 24" stroke={GREEN} strokeWidth="3.2" className="ml-draw" />
     <circle className="ml-ping a" cx="32" cy="32" r="6" stroke={AMBER} strokeWidth="2" /><circle className="ml-ping b" cx="32" cy="32" r="6" stroke={AMBER} strokeWidth="2" />
   </>,
+  drawSite: <>
+    <path className="ml-draw" d="M8 54 V26 L32 8 L56 26 V54 Z" />
+    <path d="M8 54 H56 M25 54 V38 H39 V54" opacity=".8" />
+    <path d="M32 22 v6 M26 30 h12" stroke={AMBER} strokeWidth="2.4" opacity=".9" />
+    <circle className="ml-dot a" cx="50" cy="12" r="3" fill={AMBER} stroke="none" /><circle className="ml-dot b" cx="14" cy="14" r="2.4" fill={GREEN} stroke="none" />
+  </>,
+  drawAlarm: <>
+    <path d="M32 6 L52 14 V32 C52 44 43 53 32 58 C21 53 12 44 12 32 V14 Z" opacity=".55" />
+    <circle cx="22" cy="24" r="4" className="ml-pulse" /><circle cx="44" cy="22" r="4" /><circle cx="32" cy="44" r="4" />
+    <path className="ml-beat" d="M26 25 L40 23 M24 28 L30 40 M41 26 L34 40" strokeWidth="2" />
+    <circle className="ml-dot a" cx="44" cy="22" r="2" fill={AMBER} stroke="none" /><circle className="ml-dot b" cx="32" cy="44" r="2" fill={GREEN} stroke="none" />
+  </>,
+  drawElectrical: <>
+    <path d="M6 32 H18 M46 32 H58" /><rect x="18" y="22" width="28" height="20" rx="4" className="ml-pulse" />
+    <path className="ml-beat" d="M26 36 L30 28 L34 36 L38 28" stroke={AMBER} strokeWidth="2.4" />
+    <path d="M12 12 H24 L28 18 M52 12 H40 L36 18 M12 52 H24 L28 46 M52 52 H40 L36 46" opacity=".6" strokeWidth="2" />
+    <circle className="ml-dot a" cx="12" cy="12" r="2.6" fill={GREEN} stroke="none" /><circle className="ml-dot b" cx="52" cy="52" r="2.6" fill={AMBER} stroke="none" />
+  </>,
+  drawNetwork: <>
+    <rect x="22" y="8" width="20" height="12" rx="3" className="ml-pulse" />
+    <rect x="6" y="44" width="16" height="12" rx="3" /><rect x="42" y="44" width="16" height="12" rx="3" />
+    <path className="ml-draw" d="M32 20 V32 M32 32 H14 V44 M32 32 H50 V44" />
+    <circle className="ml-led a" cx="28" cy="14" r="1.8" fill={GREEN} stroke="none" /><circle className="ml-led b" cx="34" cy="14" r="1.8" fill={AMBER} stroke="none" />
+    <circle className="ml-dot a" cx="14" cy="50" r="2.2" fill={GREEN} stroke="none" /><circle className="ml-dot b" cx="50" cy="50" r="2.2" fill={AMBER} stroke="none" />
+  </>,
   configuration: <>
     <g className="ml-gear"><circle cx="32" cy="32" r="9" /><path d="M32 8 v9 M32 47 v9 M8 32 h9 M47 32 h9 M15 15 l6 6 M43 43 l6 6 M49 15 l-6 6 M21 43 l-6 6" strokeWidth="5" /></g>
     <circle cx="32" cy="32" r="3" fill={AMBER} stroke="none" />
   </>,
 };
+
+/** Every kind of logo there is. */
+export const LOGO_KINDS = Object.keys(DRAWINGS) as LogoKind[];
 
 /** A menu's title with its logo beside it. */
 export function MenuTitle({ kind, children }: { kind: LogoKind; children: React.ReactNode }) {

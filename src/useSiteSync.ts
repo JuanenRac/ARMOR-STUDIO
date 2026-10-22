@@ -100,7 +100,7 @@ export function useSiteSync({ origin, enabled, design, apply, onConflict, onNoti
     };
     void start();
     return () => { cancelled = true; window.clearTimeout(retry); };
-  }, [origin, enabled]);   // eslint-disable-line react-hooks/exhaustive-deps
+  }, [origin, enabled]);
 
   // What has not reached the server is kept in this browser too, as soon as there is any.
   useEffect(() => {
@@ -149,7 +149,7 @@ export function useSiteSync({ origin, enabled, design, apply, onConflict, onNoti
       busy.current = false;
     }, POLL_MS);
     return () => window.clearInterval(timer);
-  }, [enabled, origin]);   // eslint-disable-line react-hooks/exhaustive-deps
+  }, [enabled, origin]);
 
   /** Put a stored document in place as an unsaved change: the usual save then makes it the current design. */
   const restoreDocument = (site: Record<string, unknown>) => { latest.current.apply(applySiteDoc(site, latest.current.design)); };

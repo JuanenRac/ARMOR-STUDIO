@@ -1,6 +1,8 @@
-/* The card that opens a designer from a menu: the look of the "nodes and the diagram" card of the Electrical menu, in one row. */
-.designer-link { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: .7rem 1rem; border: 1px solid #1d4b56; border-radius: 14px; background: #08171f; }
-.designer-link-text { display: grid; gap: .15rem; min-width: 0; flex: 1 1 22rem; }
-.designer-link h3 { margin: 0; font-size: .9rem; color: #f2feff; }
-.designer-link p { margin: 0; }
-.designer-link button { flex-shrink: 0; }
+/* The card that opens a designer from a menu: the look of the "nodes and the diagram" card of the Electrical menu. The title and the button share the first row and the
+   explanation runs across the whole card under them, so it takes the width there is, in any language, at any text size and in any window, and wraps by itself. */
+.designer-link { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 1rem; row-gap: .2rem; padding: .7rem 1rem; border: 1px solid #1d4b56; border-radius: 14px; background: #08171f; }
+.designer-link-text { display: contents; }
+.designer-link h3 { grid-column: 1; grid-row: 1; margin: 0; font-size: .9rem; color: #f2feff; min-width: 0; overflow-wrap: anywhere; }
+.designer-link p { grid-column: 1 / -1; grid-row: 2; margin: 0; max-width: none; line-height: 1.45rem; overflow-wrap: anywhere; text-wrap: pretty; }
+.designer-link button { grid-column: 2; grid-row: 1; justify-self: end; }
+@media (max-width: 520px) { .designer-link { grid-template-columns: minmax(0, 1fr); } .designer-link button { grid-column: 1; grid-row: 3; justify-self: stretch; } }

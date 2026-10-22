@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-765%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.8.0.6-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Tests-866%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Version-0.8.0.7-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**诚实性检查 - 今天真正能运行的部分:** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，由 765 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、设计器的几何与检查、报警播报器、助手的词典、八种语言的每个菜单、静态主机），并有浏览器测试。它在 CM5 测试台上日常运行，配有真实的服务器、真实的 IP 摄像头和板上的雷达节点；帮助中的图片使用示例数据制作。**尚未**证明的是：所有可能摄像头的实时视频和 PTZ、使用真实设备的太阳能、电气、报警主机和触摸屏菜单（目前只有雷达节点），以及正式的无障碍或可用性评审。当无法连接服务器时，Studio 会显示演示数据，并在顶部栏说明。
+**诚实性检查 - 今天真正能运行的部分:** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，由 866 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、设计器的几何与检查、报警播报器、助手的词典、八种语言的每个菜单、静态主机），并有浏览器测试。它在 CM5 测试台上日常运行，配有真实的服务器、真实的 IP 摄像头和板上的雷达节点；帮助中的图片使用示例数据制作。**尚未**证明的是：所有可能摄像头的实时视频和 PTZ、使用真实设备的太阳能、电气、报警主机和触摸屏菜单（目前只有雷达节点），以及正式的无障碍或可用性评审。当无法连接服务器时，Studio 会显示演示数据，并在顶部栏说明。
 
 ---
 
@@ -37,9 +37,9 @@
 
 | | |
 |---|---|
-| 版本 | `0.8.0.6` |
+| 版本 | `0.8.0.7` |
 | 成熟度 | 成熟 |
-| 测试 | 765 (`npm test`) |
+| 测试 | 866 (`npm test`) |
 | 技术栈 | React 19 / TypeScript / Vite |
 | 真实硬件 | 每天在 CM5 测试台上使用（真实服务器、真实 IP 摄像头、真实雷达节点）；太阳能、电气、报警主机和触摸屏菜单在等待真实节点 |
 
@@ -68,6 +68,7 @@
 * **适配密码管理器的登录与带标签的历史：** 登录是真正的表单，浏览器或系统的密码管理器可以保存并填充；可选的“记住我”只记住用户名（绝不保存密码），并附有说明。历史有“全部”“报警”“连接”“设备”“系统”“设置”标签，列出所有连接服务器的设备和应用（最后出现、已打开的会话、登录与被拒），以及节点、代理、服务、更新和布防的事件。地址只显示给管理员。
 * **电池维护（配置，管理员）：** 四步向导——电池和操作、数值、输入电池序列号确认、结果——用于修改 Pylontech 电池保存的内容；限值以伏特和摄氏度输入并整组发送，固件文件在发送前先被读取，操作前后读取电池并显示差异和记录，输出可以恢复原状。
 * **在节点健康卡片上控制节点：** 每个节点都有一个菜单（重启、暂停或恢复、待机——停止工作，保持连接——或开机、识别、诊断、开启或关闭维护），卡片上有群组操作：全部重启（同时进行，或逐个进行并把报警主机放在最后）、全部暂停、全部待机和全部恢复。需要再次输入节点名称（对所有节点则输入单词 RESTART、PAUSE 或 STANDBY），并要求新的身份验证；标签跟踪每个节点（已发送、已确认、离线、已恢复、已应用），并显示已暂停、自何时起由谁设为待机以及维护；警告会说明报警主机或雷达处于暂停或待机时，家中将失去保护。没有恢复出厂设置、擦除或深度睡眠。
+* **实时状态：** Studio 监听服务器的实时通道（WebSocket），报警、布防或节点恢复会立即显示；通道打开时，状态仅每二十秒轮询一次作为保底，底栏显示“实时”。报警、电气和网络设计器除原有按键外，还支持 F（适应窗口）、加减号（缩放）和 Ctrl+D（复制）。
 
 ## 🖼️ 屏幕截图
 
@@ -131,7 +132,7 @@ ARMOR-STUDIO/
 npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
-npm test            # 750 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
+npm test            # 866 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```

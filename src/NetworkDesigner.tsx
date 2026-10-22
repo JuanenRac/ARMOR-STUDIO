@@ -25,6 +25,8 @@ import type { SyncStatus } from "./network/useNetworkSync";
 import { deviceName, sortByAddress, type NetworkOverview } from "./networkModel";
 import "./electrical/electrical.css";
 import "./electrical/group.css";
+import { MenuTitle } from "./menuLogos";
+import { isTypingTarget, viewKey, zoomView } from "./designerKeys";
 
 type Props = {
   t: (key: string) => string;
@@ -230,6 +232,8 @@ export function NetworkDesigner({ t, design, setDesign, status, overview, camera
   };
 
   // ---- the keyboard ----
+  const zoomBy = (factor: number) => setView(current => zoomView(current, factor, size.current, MIN_ZOOM, MAX_ZOOM));
+  const duplicateSelected = (id: string) => { const copy = duplicateElement(designRef.current, id); if (copy) { commit(copy.design); setSelection({ kind: "element", id: copy.id }); } };
   // The designers stay open (hidden) after they are visited: a hidden one must not answer the keys pressed in another menu - it moved, deleted and undid things nobody saw, and saved them.
   const viewActive = useViewActive();
   const selectionRef = useRef(selection);
@@ -237,15 +241,18 @@ export function NetworkDesigner({ t, design, setDesign, status, overview, camera
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (!viewActive) return;
-      const target = event.target as HTMLElement | null;
-      if (target && (target.tagName === "INPUT" || target.tagName === "SELECT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
+      if (isTypingTarget(event.target)) return;
       const key = event.key.toLowerCase();
       if ((event.ctrlKey || event.metaKey) && key === "z") { event.preventDefault(); if (event.shiftKey) redo(); else undo(); return; }
       if ((event.ctrlKey || event.metaKey) && key === "y") { event.preventDefault(); redo(); return; }
       if (key === "escape") { cancel(); return; }
       if (key === "v") { setTool("select"); setWireFrom(null); return; }
       if (key === "w") { setTool("wire"); setPlace(null); return; }
+      const move = viewKey(event);
+      if (move === "fit") { fit(); return; }
+      if (move) { zoomBy(move === "zoomIn" ? 1.25 : 0.8); return; }
       const chosen = selectionRef.current;
+      if ((event.ctrlKey || event.metaKey) && key === "d" && chosen?.kind === "element") { event.preventDefault(); duplicateSelected(chosen.id); return; }
       if (!chosen) return;
       if (key === "r" && chosen.kind === "element") { commit(rotateElement(designRef.current, chosen.id)); return; }
       if (key === "delete" || key === "backspace") { event.preventDefault(); removeSelected(); return; }
@@ -482,7 +489,7 @@ export function NetworkDesigner({ t, design, setDesign, status, overview, camera
 
   return <section className="electrical-designer network-designer">
     <header className="ed-head" data-tour="nd-head">
-      <div><p className="eyebrow">{t("networkDesigner")}</p><h2>{t("nd_title")}</h2><p className="muted">{t("nd_help")}</p></div>
+      <MenuTitle kind="drawNetwork"><p className="eyebrow">{t("networkDesigner")}</p><h2>{t("nd_title")}</h2><p className="muted">{t("nd_help")}</p></MenuTitle>
       <span className={`ed-status ${status}`}>{status === "saved" ? t("elSaved") : status === "saving" ? t("elSaving") : status === "offline" ? t("elOffline") : ""}</span>
     </header>
     <div className="ed-layout">
