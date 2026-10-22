@@ -7,7 +7,7 @@ import { text } from "./i18n";
 const api = vi.hoisted(() => ({ readConnection: vi.fn(), saveConnection: vi.fn() }));
 vi.mock("./api", async importOriginal => ({ ...(await importOriginal<typeof import("./api")>()), ...api }));
 // The tabs have their own tests: here only the panel that holds them is looked at.
-for (const [path, name] of [["./UsersPanel", "UsersPanel"], ["./AdminPanel", "BrokerPanel,FilesPanel,ServicesPanel"], ["./FirmwarePanel", "FirmwarePanel"], ["./CapturePanel", "CapturePanel"], ["./NotificationsPanel", "NotificationsPanel"], ["./InstallationPanel", "InstallationPanel"], ["./UpdatesPanel", "UpdatesPanel"], ["./ConsolePanel", "ConsolePanel"], ["./PreferencesPanel", "PreferencesPanel"], ["./SecurityPanel", "SecurityPanel"]] as const) {
+for (const [path, name] of [["./UsersPanel", "UsersPanel"], ["./AdminPanel", "BrokerPanel,FilesPanel,ServicesPanel"], ["./FirmwarePanel", "FirmwarePanel"], ["./CapturePanel", "CapturePanel"], ["./NotificationsPanel", "NotificationsPanel"], ["./InstallationPanel", "InstallationPanel"], ["./UpdatesPanel", "UpdatesPanel"], ["./ConsolePanel", "ConsolePanel"], ["./DiagnosticsPanel", "DiagnosticsPanel"], ["./PreferencesPanel", "PreferencesPanel"], ["./SecurityPanel", "SecurityPanel"]] as const) {
   vi.doMock(path, () => Object.fromEntries(name.split(",").map(item => [item, () => createElement("div", { "data-panel": item })])));
 }
 
@@ -46,7 +46,7 @@ afterEach(async () => { await act(async () => { root?.unmount(); }); root = null
 describe("the configuration screen, by who is looking at it", () => {
   it("offers every tab to someone who can change the installation, grouped from the person's own to the system's", async () => {
     await show({ isAdmin: true });
-    expect(tabNames()).toEqual(["general", "preferences", "users", "security", "notifications", "capture", "firmware", "batteries", "updates", "services", "broker", "files", "installation", "console"]);
+    expect(tabNames()).toEqual(["general", "preferences", "users", "security", "notifications", "capture", "firmware", "batteries", "updates", "services", "broker", "files", "diagnostics", "installation", "console"]);
     expect(container.querySelectorAll(".tab-sep")).toHaveLength(3);
   }, 30_000);   // the first test of the file pays for loading the whole screen: a slow computer needs more than five seconds
 
@@ -54,7 +54,7 @@ describe("the configuration screen, by who is looking at it", () => {
     await show({ isViewer: true });
     expect(tabNames()).toEqual(["general", "preferences", "users", "security"]);
     expect(container.querySelectorAll(".tab-sep")).toHaveLength(1);
-    for (const hidden of ["console", "files", "broker", "installation", "firmware", "batteries", "updates", "services", "notifications", "capture"]) expect(container.querySelector(`[data-tour=tab-${hidden}]`), hidden).toBeNull();
+    for (const hidden of ["console", "diagnostics", "files", "broker", "installation", "firmware", "batteries", "updates", "services", "notifications", "capture"]) expect(container.querySelector(`[data-tour=tab-${hidden}]`), hidden).toBeNull();
   });
 
   it("shows the panel of the tab that is chosen and only that one", async () => {

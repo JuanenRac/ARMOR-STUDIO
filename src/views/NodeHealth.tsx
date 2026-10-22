@@ -9,8 +9,9 @@ import { ApiError, forgetNodeHealth, readNodeControlOperation, readNodeHealth, r
 import { askConfirm } from "../askConfirm";
 import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
-import { fillAll, formatBytes, formatUptime, heapMeter, heapSeries, HEALTH_FAMILIES, isAbnormalReset, resetText, signalLevel, signalSeries, sparkline, statusClass, visibleNodes } from "../nodeHealthModel";
+import { causeText, fillAll, formatBytes, formatUptime, heapMeter, heapSeries, HEALTH_FAMILIES, isAbnormalReset, resetText, signalLevel, signalSeries, sparkline, statusClass, visibleNodes, warningExplanation } from "../nodeHealthModel";
 import { operationFinished, reachableNodes, stateChips, type NodeAction } from "../nodeControlModel";
+import { RadarFactsInfo, SensorTable, StartInfo } from "./NodeHealthExtras";
 import { ActionMenu, ControlDialog, GroupActions, OperationView, type DialogRequest } from "./NodeControl";
 import "./electrical-live.css";
 import "./node-health.css";
@@ -92,7 +93,7 @@ export function NodeCard({ t, node, levels, now, opened, toggle, origin, isAdmin
       <span className={`el-pill ${statusClass(node)}`}>{t(`nh_status_${node.status}`)} · {sinceIso(node.received_at, now, t)}</span>
     </header>
     {chips.length > 0 && <div className="nc-chips" data-testid={`nc-chips-${node.node_id}`}>{chips.map(chip => <span key={chip.id} className={`el-pill nc-chip ${chip.id}`}>{chip.text}</span>)}</div>}
-    {node.warnings.length > 0 && <ul className="nh-warnings">{node.warnings.map(warning => <li key={warning.code}>{t(`nh_warn_${warning.code}`)}</li>)}</ul>}
+    {node.warnings.length > 0 && <ul className="nh-warnings">{node.warnings.map(warning => <li key={warning.code}>{t(`nh_warn_${warning.code}`)}{warningExplanation(warning, t) && <small className="nh-warning-why">{warningExplanation(warning, t)}</small>}</li>)}</ul>}
     <dl className="nh-facts">
       <div><dt>{t("nh_firmware")}</dt><dd>{node.firmware}{node.board ? ` · ${node.board}` : ""}</dd></div>
       <div><dt>{t("nh_uptime")}</dt><dd>{formatUptime(report.uptime_s, t)}</dd></div>
@@ -111,6 +112,9 @@ export function NodeCard({ t, node, levels, now, opened, toggle, origin, isAdmin
       {(report.low_stack_tasks ?? 0) > 0 && <div><dt>{t("nh_stack")}</dt><dd className="bad">{report.low_stack_tasks}</dd></div>}
       <div className="wide"><dt>{t("nh_last_error")}</dt><dd className={report.last_error ? "mono" : "muted"}>{report.last_error ?? t("nh_no_error")}</dd></div>
     </dl>
+    <StartInfo t={t} report={report} />
+    <SensorTable t={t} report={report} isAdmin={isAdmin} />
+    {report.radar && <RadarFactsInfo t={t} radar={report.radar} />}
     <div className="nh-actions">
       <button type="button" onClick={toggle} aria-expanded={opened}>{opened ? t("nh_hide") : t("nh_details")}</button>
       {isAdmin && control && !node.stale && <ActionMenu t={t} node={node} choose={control} />}
@@ -144,7 +148,7 @@ function Detail({ t, origin, node }: { t: Translate; origin: string; node: NodeH
     <h4>{t("nh_restart_log")}</h4>
     {detail.restarts.length === 0 ? <p className="muted small">{t("nh_no_restarts")}</p> : <ul className="nh-restarts">
       {detail.restarts.map(item => <li key={item.at} className={item.abnormal ? "bad" : ""}>
-        <time dateTime={item.at}>{new Date(item.at).toLocaleString()}</time> · {resetText(item.reason, t)}{item.abnormal ? ` · ${t("nh_unexpected")}` : ""}
+        <time dateTime={item.at}>{new Date(item.at).toLocaleString()}</time> · {resetText(item.reason, t)}{item.abnormal ? ` · ${t("nh_unexpected")}` : ""}{item.boot ? ` · ${causeText(item.boot.cause, t)}` : ""}
         {item.uptime_before_s !== undefined && <small className="muted"> · {fillAll(t("nh_up_before"), formatUptime(item.uptime_before_s, t))}</small>}
       </li>)}
     </ul>}

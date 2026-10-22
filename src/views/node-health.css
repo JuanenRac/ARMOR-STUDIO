@@ -35,3 +35,19 @@
 .node-health .nh-restarts { margin: 0; padding-left: 1.1rem; font-size: .8rem; }
 .node-health .nh-waiting { margin-top: .6rem; }
 @media (max-width: 30rem) { .node-health .nh-facts { grid-template-columns: 1fr; } }
+
+/* What the newer firmware adds to the card: the dirty start, the memory gate, the settings check, the sensors and the perimeter engine of a radar node. */
+.node-health .nh-warning-why { display: block; margin-top: .15rem; color: #d9b873; font-size: .76rem; }
+.node-health .nh-start, .node-health .nh-sensors { display: grid; gap: .45rem; }
+.node-health .nh-note { padding: .45rem .7rem; border-radius: 10px; background: #0f2230; font-size: .82rem; }
+.node-health .nh-note.bad { background: #2a1217; color: #ff8d98; }
+.node-health .nh-note h5, .node-health .nh-sensors h5 { margin: 0 0 .2rem; font-size: .8rem; }
+.node-health .nh-note p { margin: .15rem 0; }
+.node-health .nh-note p.bad, .node-health .nh-note-line.bad { color: #ff8d98; }
+.node-health .nh-note-line { margin: 0; font-size: .8rem; }
+.node-health .nh-sensors table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.node-health .nh-sensors th { text-align: left; font-size: .66rem; text-transform: uppercase; letter-spacing: .06em; color: #8ea7b2; padding: .15rem .3rem; }
+.node-health .nh-sensors td { padding: .2rem .3rem; border-top: 1px solid #193341; overflow-wrap: anywhere; }
+.node-health .nh-sensors td.bad { color: #ff8d98; }
+.node-health .nh-bt.open { color: #ff8d98; font-weight: 600; }
+.node-health .nh-bt-alert { margin-left: .3rem; }

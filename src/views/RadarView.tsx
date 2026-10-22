@@ -12,6 +12,8 @@ import type { SiteModel } from "../designer/ops";
 import { placeTargets, updateTrails, zonePolygons, type Trails } from "../designer/radarMap";
 import type { Dimensions, Sensor } from "../domain";
 import { RadarSensors } from "./RadarSensors";
+import { PerimeterCard } from "./PerimeterCard";
+import { panelUrl } from "../panelUrl";
 import { ViewTabs } from "../components/ViewTabs";
 import type { NodeState } from "../types";
 import type { Translate } from "../components/camera";
@@ -49,8 +51,7 @@ function useLiveNodes(origin: string, fallback: NodeState[]): NodeState[] {
   return live ?? fallback;
 }
 
-/** The address of a node's own web panel (port 80 is left out). Only the numbers the server validated as an IPv4 address and a port reach here. */
-export const panelUrl = (panel: { ip: string; port: number }): string => `http://${panel.ip}${panel.port === 80 ? "" : `:${panel.port}`}/`;
+export { panelUrl };
 
 export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forget, openDesigner, openZones, setSensors, t, network = null }: Props) {
   const nodes = useLiveNodes(origin, consoleNodes);
@@ -61,7 +62,7 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
   const [view, setView] = useState<{ scale: number; x: number; y: number } | null>(null);
   const [trails, setTrails] = useState<Trails>(new Map());
   const [hover, setHover] = useState("");
-  const [side, setSide] = useState<"radars" | "nodes">("radars");
+  const [side, setSide] = useState<"radars" | "nodes" | "perimeter">("radars");
   const drag = useRef<{ x: number; y: number; vx: number; vy: number } | null>(null);
 
   useEffect(() => {
@@ -166,7 +167,7 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
 
     <div className="radar-side" data-tour="radar-side">
       <p className="muted small radar-role">{t("radarNodeRole")}</p>
-      <ViewTabs tabs={[["radars", t("radarsOfDesign")], ["nodes", t("activeRadarNodes")]]} active={side} onChange={setSide} />
+      <ViewTabs tabs={[["radars", t("radarsOfDesign")], ["nodes", t("activeRadarNodes")], ["perimeter", t("pm_tab")]]} active={side} onChange={setSide} />
       {side === "radars" && <RadarSensors t={t} sensors={model.sensors} dimensions={dimensions} nodes={nodes} rules={rules} targetsBySensor={targetsBySensor} setSensors={setSensors} openZones={openZones} openDesigner={openDesigner} />}
       {side === "nodes" && <article className="stack-card">
         <p className="eyebrow">{t("radarFusion")}</p><h3>{t("activeRadarNodes")}</h3>
@@ -180,6 +181,7 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
         {unmapped.map(item => <p key={item.node} className="muted small warn-line"><b>{item.node}</b> {t("unmappedNode")}</p>)}
         {!nodes.length && <p className="muted">{t("noRadar")}</p>}
       </article>}
+      {side === "perimeter" && <PerimeterCard t={t} origin={origin} nodes={nodes} />}
       {side === "nodes" && <NodeFinder t={t} origin={origin} network={network} wantKind="radar" knownIds={nodes.map(node => node.node_id)} knownIps={nodes.flatMap(node => (node.panel ? [node.panel.ip] : []))} />}
     </div>
   </section>;

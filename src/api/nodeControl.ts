@@ -8,13 +8,16 @@ export type ControlStage = "pending" | "armed" | "sent" | "acknowledged" | "appl
 export type DiagnosticsSnapshot = { firmware?: string; uptime_s?: number; reset_reason?: string; heap_free?: number; heap_min?: number; psram_free?: number; stack_min_free?: number; rssi?: number; mqtt_connected?: boolean; state?: string; maintenance?: boolean };
 export type NodeControlLine = {
   node_id: string; family: HealthFamily; stage: ControlStage; state?: ControlState; maintenance?: boolean; refusal?: string; slot?: number; restart_in_s?: number; until_s?: number;
+  /** Set when the node handed over the package or the log that was asked for. */ delivered?: DiagnosticDetail;
   firmware_before?: string; firmware_after?: string; acknowledged_at?: string; applied_at?: string; offline_at?: string; back_at?: string; back_after_s?: number; diagnostics?: DiagnosticsSnapshot;
 };
 export type NodeControlOperation = {
   id: string; scope: "node" | "all"; operation: ControlOperationName; mode: ControlMode; duration_s?: number; actor: string; origin?: string; created_at: string; updated_at: string;
   state: "arming" | "running" | "done"; nodes: NodeControlLine[];
 };
-export type NodeControlRequest = { operation: ControlOperationName; confirm?: string; duration_s?: number };
+/** What a diagnostics order asks for besides the plain snapshot: the whole package, or the log alone. */
+export type DiagnosticDetail = "package" | "log";
+export type NodeControlRequest = { operation: ControlOperationName; confirm?: string; duration_s?: number; detail?: DiagnosticDetail };
 export type NodeControlAllRequest = { operation: ControlOperationName; mode: ControlMode; confirm?: string; duration_s?: number };
 
 /** One order for one node. The call asks the person to prove themselves again when the server says so (the usual re-authentication of the console). */

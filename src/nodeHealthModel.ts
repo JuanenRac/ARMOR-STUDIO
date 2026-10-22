@@ -3,7 +3,7 @@
  * with. Pure functions of the report, so they are tested without a screen.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import type { HealthFamily, HealthSample, NodeHealthItem } from "./api";
+import type { BootReport, ConfigCheck, HealthFamily, HealthSample, HealthWarning, NodeHealthItem, SensorHealth } from "./api";
 
 type Translate = (key: string) => string;
 
@@ -68,4 +68,57 @@ export const signalSeries = (samples: readonly HealthSample[]): number[] => samp
 export function visibleNodes(nodes: readonly NodeHealthItem[], family: HealthFamily | "all"): NodeHealthItem[] {
   const rank = { warning: 0, stale: 1, ok: 2 } as const;
   return nodes.filter(node => family === "all" || node.family === family).sort((a, b) => rank[a.status] - rank[b.status] || a.node_id.localeCompare(b.node_id));
+}
+
+// ---- how a node last started, its memory gate, its settings check, and the sensors of a radar node ---------------------------------------------------------------
+
+/** The cause of a dirty start in words (an unknown one is written as the node gave it). */
+export function causeText(cause: string, t: Translate): string {
+  const key = `nh_cause_${cause}`;
+  const word = t(key);
+  return word === key ? cause : word;
+}
+
+/** What to tell about a dirty start: the cause and how long the node had been up, the internal memory at that moment, whether a core dump was kept and whether the node itself decided the restart. */
+export function bootLines(boot: BootReport, t: Translate): string[] {
+  const lines: string[] = [];
+  const cause = causeText(boot.cause, t);
+  lines.push(boot.uptime_before_s !== undefined ? fillAll(t("nh_boot_line"), cause, formatUptime(boot.uptime_before_s, t)) : fillAll(t("nh_boot_line_short"), cause));
+  if (boot.heap_internal_free !== undefined && boot.heap_internal_largest !== undefined) lines.push(fillAll(t("nh_boot_memory"), formatBytes(boot.heap_internal_free), formatBytes(boot.heap_internal_largest)));
+  if (boot.coredump) lines.push(t("nh_boot_coredump"));
+  if (boot.guard) lines.push(t("nh_boot_guard"));
+  else if (boot.deliberate) lines.push(t("nh_boot_deliberate"));
+  return lines;
+}
+
+/** The lines of the settings check of a node (a copy restored after the start, a change that was undone); nothing when it did not check anything. */
+export function configCheckLines(check: ConfigCheck | undefined, t: Translate): Array<{ text: string; bad: boolean }> {
+  const lines: Array<{ text: string; bad: boolean }> = [];
+  if (check?.snapshot) lines.push({ text: t(`nh_cfg_snapshot_${check.snapshot}`), bad: check.snapshot === "failed" });
+  if (check?.reverted) lines.push({ text: t(`nh_cfg_reverted_${check.reverted}`), bad: check.reverted === "failed" });
+  return lines;
+}
+
+/** The model of a sensor as it is written on the sensor itself. */
+export const sensorModelName = (model: string): string => model.toUpperCase();
+
+/** The Bluetooth address of a sensor is shown only to an administrator, and only while the sensor's Bluetooth is open (it is the one case the node tells it). */
+export const sensorAddress = (sensor: SensorHealth, isAdmin: boolean): string | null => (isAdmin && sensor.bluetooth === "open" && sensor.mac ? sensor.mac : null);
+
+/** A sensor whose Bluetooth is a danger: open, or one that cannot be told closed while the node's rule is to keep it closed (the node says so with `bluetooth_alert`). */
+export const bluetoothAlert = (sensor: SensorHealth): boolean => sensor.bluetooth_alert === true || sensor.bluetooth === "open";
+
+/** The sensors in the order of their number. */
+export const sortedSensors = (sensors: readonly SensorHealth[]): SensorHealth[] => [...sensors].sort((a, b) => a.sensor_id - b.sensor_id);
+
+/** The explanation of a warning with what to do, with the details the server gave filled in; empty when the warning has no explanation of its own. */
+export function warningExplanation(warning: HealthWarning, t: Translate): string {
+  const key = `nh_warn_${warning.code}_d`;
+  const text = t(key);
+  if (text === key) return "";
+  const detail = warning.detail;
+  if (warning.code === "node_sensor_bluetooth_open") return fillAll(text, String(detail.sensors ?? ""), String(detail.models ?? "").split(",").map(sensorModelName).join(", "));
+  if (warning.code === "node_radar_masked") return fillAll(text, String(detail.events_buffered ?? 0));
+  if (warning.code === "node_wifi_jam") return fillAll(text, String(detail.rssi_dbm ?? "?"));
+  return text;
 }

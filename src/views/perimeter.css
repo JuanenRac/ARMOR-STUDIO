@@ -1,0 +1,12 @@
+/* Radar > Perimeter of the node. */
+.pm-card { display: grid; gap: .7rem; }
+.pm-nodes, .pm-events { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.pm-node { display: grid; gap: .3rem; padding: .6rem .8rem; border: 1px solid #193341; border-radius: 12px; background: #09161e; }
+.pm-node.danger { border-color: #8a2a36; }
+.pm-node header { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.pm-node header strong { flex: 1 1 auto; }
+.pm-open { justify-self: start; }
+.pm-events li { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .6rem; padding: .3rem .5rem; border-left: 3px solid #276272; font-size: .84rem; }
+.pm-events li.alert { border-left-color: #ff8d98; }
+.pm-events li.bluetooth { background: #2a1217; }
+.pm-events time { color: #8ea7b2; font-variant-numeric: tabular-nums; }

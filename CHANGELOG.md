@@ -6,6 +6,19 @@ All notable changes to this project are documented here.
 
 - The repository has a security policy, a code of conduct, a contributing guide and a support file.
 - The banner follows the animated style of the ecosystem banners, with the name, the kind and the technologies of the project.
+- **Configuration > Diagnostics:** a new administrators' tab to ask a node for its diagnostic package or its log, read what it handed over and download both.
+- **Read-only access for somebody else:** issue a diagnostic token for the nodes you choose, for 5 minutes up to 24 hours (2 hours by default), with a note; the screen says in plain words what a token can and cannot do.
+- **The secret is shown once:** the token appears a single time with a Copy button and a clear warning, is never kept in the browser and is gone when the screen is closed.
+- **The list of tokens:** state (active, expired, revoked), nodes, expiry, uses and last use, with a Revoke button that asks first.
+- **The package of a node:** versions, why it last started, memory, the tasks with the least stack, the memory gate, the core dump summary and the settings it allows to be read, plus the log; the node can be asked again after 15 seconds.
+- **Health card, last dirty start:** a node that restarted because of a fault now says why, how long it had been running, how much internal memory it had and whether a core dump was kept.
+- **Health card, memory gate, core dump and settings check:** shows whether the gate is closed and how many times it closed, the core dump, and whether a saved copy of the settings was restored or a bad change was undone.
+- **Sensors of a radar node:** a table with model, state, firmware and the Bluetooth of each sensor, an alert chip when it is open, and a notice for an LD2412 with a faulty or unknown firmware; the Bluetooth address is shown to administrators only.
+- **Three new warnings** for radar nodes (a sensor with its Bluetooth open, sensors covered while the perimeter is on, Wi-Fi jamming suspected), each with its explanation and what to do, in the eight languages.
+- **History:** the dirty starts, the sensor Bluetooth changes, the radar perimeter events and the issue, revocation, use and refusal of diagnostic tokens are written in words in the eight languages.
+- **Radar > Perimeter of the node:** the state of the perimeter engine of each radar node, the recent events it raised (a sensor whose Bluetooth opens is highlighted) and a button that opens the panel of the node, where the zones are edited.
+- **Help, tour and assistant:** new paragraphs in the Configuration, System and Radar help, a tour step for the Diagnostics tab and two assistant answers (temporary read-only access, and why a node crashed), in the eight languages.
+
 ## [0.8.0.7] - The status arrives live, lighter menus, wider help cards, four more logos and the keyboard of the designers
 
 - **The status arrives live:** Studio opens the live channel of the server and takes the state it pushes at once, so an alarm, an arming or a node coming back shows in a fraction of a second; while the channel is open the status is asked only every twenty seconds as a safety net (every three without it, as before), and the bottom bar says Live. If the channel cannot be opened or is cut, Studio tries again after a longer wait each time and goes on as it always did.

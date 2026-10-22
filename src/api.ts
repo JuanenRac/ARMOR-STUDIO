@@ -16,6 +16,7 @@ export * from "./api/electrical";
 export * from "./api/alarmNodes";
 export * from "./api/nodeHealth";
 export * from "./api/nodeControl";
+export * from "./api/diagnostics";
 export * from "./api/security";
 export * from "./api/remoteAccess";
 export * from "./api/network";

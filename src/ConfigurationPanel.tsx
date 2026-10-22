@@ -4,6 +4,7 @@ import { parseServerOrigin } from "./config";
 import { UsersPanel } from "./UsersPanel";
 import { BrokerPanel, FilesPanel, ServicesPanel } from "./AdminPanel";
 import { FirmwarePanel } from "./FirmwarePanel";
+import { DiagnosticsPanel } from "./DiagnosticsPanel";
 import { CapturePanel } from "./CapturePanel";
 import { NotificationsPanel } from "./NotificationsPanel";
 import { InstallationPanel } from "./InstallationPanel";
@@ -16,7 +17,7 @@ import "./configuration.css";
 import { MenuTitle } from "./menuLogos";
 import { BatteryMaintenance } from "./BatteryMaintenance";
 
-type Tab = "general" | "users" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications" | "capture" | "preferences" | "security" | "batteries";
+type Tab = "general" | "users" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications" | "capture" | "preferences" | "security" | "batteries" | "diagnostics";
 type Props = {
   t: (key: string) => string;
   origin: string; setOrigin: (value: string) => void;
@@ -30,7 +31,7 @@ type Props = {
 
 const VIEWER_TABS: readonly string[] = ["general", "users", "preferences", "security"];
 /** The tabs in groups, from what is the person's own to what is the system's: the interface; people, alerts and what is recorded; the nodes' firmware and Studio's updates; the server and what it runs on. */
-const tabGroups: Tab[][] = [["general", "preferences"], ["users", "security", "notifications", "capture"], ["firmware", "batteries", "updates"], ["services", "broker", "files", "installation", "console"]];
+const tabGroups: Tab[][] = [["general", "preferences"], ["users", "security", "notifications", "capture"], ["firmware", "batteries", "updates"], ["services", "broker", "files", "diagnostics", "installation", "console"]];
 
 /** Can the browser reach something at this address at all? (no-cors: only a network failure rejects, which is what a wrong scheme or port gives.) */
 async function reachable(url: string): Promise<boolean> {
@@ -112,6 +113,7 @@ export function ConfigurationPanel(props: Props) {
     {tab === "security" && <SecurityPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "services" && <ServicesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "broker" && <BrokerPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
+    {tab === "diagnostics" && <DiagnosticsPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "files" && <FilesPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "installation" && <InstallationPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}
     {tab === "notifications" && <NotificationsPanel t={t} origin={props.origin} isAdmin={props.isAdmin} />}

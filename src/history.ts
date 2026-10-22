@@ -52,7 +52,11 @@ export function describeEvent(event: ArmorEvent, t: (key: string) => string): st
     if (event.previous_version && event.version) parts.push(`${event.previous_version} → ${event.version}`);
     else if (event.version) parts.push(`${t("sa_firmware")} ${event.version}`);
     if (event.profile && event.action.startsWith("maintenance_")) parts.push(t(`mr_${event.profile}`));
-    else if (event.profile) parts.push(`${t("sa_profile")} ${event.profile}`);
+    else if (event.profile && (event.action === "dirty_boot" || event.action === "radar_event")) {
+      // for these two the profile is the cause of the restart or the kind of the radar event: say it in words when there are words for it
+      const key = event.action === "dirty_boot" ? `nh_cause_${event.profile}` : `re_${event.profile}`;
+      parts.push(t(key) === key ? event.profile : t(key));
+    } else if (event.profile) parts.push(`${t("sa_profile")} ${event.profile}`);
     if (event.by) parts.push(`${t("sa_by")} ${event.by}`);
     if (event.outcome === "denied") parts.push(t("sa_refused"));
     if (event.outcome === "failed") parts.push(t("sa_failed"));

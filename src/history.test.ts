@@ -101,6 +101,30 @@ describe("the tabs of the history", () => {
     expect(historyQuery({ ...DEFAULT_FILTERS, tab: "settings" }, now)).toEqual({ order: "desc", type: "system", category: "settings" });
   });
 
+  it("reads the events of the dirty starts, the sensor Bluetooth, the radar perimeter and the diagnostic tokens in every language", () => {
+    const at = "2026-01-01T00:00:00.000Z";
+    const events = [
+      { id: 1, at, type: "system", category: "node", action: "dirty_boot", subject: "radar-1", profile: "task_watchdog" },
+      { id: 2, at, type: "system", category: "node", action: "sensor_bluetooth_open", subject: "radar-1" },
+      { id: 3, at, type: "system", category: "node", action: "sensor_bluetooth_closed", subject: "radar-1" },
+      { id: 4, at, type: "system", category: "node", action: "radar_event", subject: "radar-1", profile: "tripwire" },
+      { id: 5, at, type: "system", category: "settings", action: "diagnostic_token_issued", subject: "dt-1", by: "ana" },
+      { id: 6, at, type: "system", category: "settings", action: "diagnostic_token_revoked", subject: "dt-1", by: "ana" },
+      { id: 7, at, type: "system", category: "settings", action: "diagnostic_token_used", subject: "dt-1" },
+      { id: 8, at, type: "system", category: "settings", action: "diagnostic_token_denied", subject: "dt-1", outcome: "denied" },
+    ] as ArmorEvent[];
+    expect(describeEvent(events[0]!, key => text("en", key))).toBe("Node · radar-1 · restarted by a fault · a task stopped answering (task watchdog)");
+    expect(describeEvent(events[3]!, key => text("en", key))).toBe("Node · radar-1 · radar perimeter event · Tripwire crossed");
+    expect(describeEvent(events[4]!, key => text("en", key))).toBe("Settings · dt-1 · read-only diagnostic token issued · by ana");
+    const seen = new Set<string>();
+    for (const locale of locales) for (const event of events) {
+      const line = describeEvent(event, key => text(locale, key));
+      expect(line, locale).not.toMatch(/(sc|sa|nh_cause|re)_[a-z_]+/);
+      if (locale !== "en") seen.add(line);
+    }
+    expect(seen.size).toBeGreaterThan(30);
+  });
+
   it("reads a connection and a system event in every language", () => {
     const at = "2026-01-01T00:00:00.000Z";
     const connection = { id: 1, at, type: "connection", action: "login", client_kind: "android", client_id: "0123456789abcdef", user: "ana", app_version: "0.6.6", two_factor: true, origin: "remote" } as ArmorEvent;
