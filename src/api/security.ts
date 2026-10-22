@@ -1,3 +1,4 @@
+import type { SecurityOptions } from "../capabilities";
 import { userCall } from "./transport";
 // ---- security: the second factor, the sessions of the person, using the server from outside the house ------------------------------------------------
 export type SessionRow = { id: string; created: number; last_seen: number; origin: "local" | "remote"; ip: string; agent: string; current: boolean };
@@ -12,3 +13,8 @@ export const totpEnable = (origin: string, code: string) => userCall<{ enabled: 
 export const totpDisable = (origin: string, password: string) => userCall<void>(origin, "DELETE", "/api/v1/studio/totp", { password });
 export const elevateSession = (origin: string, proof: { password?: string; code?: string }) => userCall<{ elevated_for_s: number }>(origin, "POST", "/api/v1/studio/elevate", proof);
 export const remoteCheck = (origin: string) => userCall<RemoteCheck>(origin, "GET", "/api/v1/remote/check");
+
+// ---- the security options of the server (an administrator) -----------------------------------------------------------------------------------------------
+export type SecurityOptionsState = { settings: SecurityOptions; stored: SecurityOptions; defaults: SecurityOptions; locked: string[] };
+export const readSecurityOptions = (origin: string) => userCall<SecurityOptionsState>(origin, "GET", "/api/v1/security/settings");
+export const changeSecurityOptions = (origin: string, change: Partial<SecurityOptions>) => userCall<SecurityOptionsState>(origin, "PUT", "/api/v1/security/settings", change);

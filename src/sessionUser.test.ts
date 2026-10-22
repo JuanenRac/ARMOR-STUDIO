@@ -7,7 +7,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("who is signed in", () => {
   it("is the user when the server names one", async () => {
     vi.stubGlobal("fetch", answer(200, { authenticated: true, user: { id: "u1", username: "admin", role: "admin" } }));
-    expect(await sessionUserState("http://x:1")).toEqual({ state: "user", user: { id: "u1", username: "admin", role: "admin" } });
+    expect(await sessionUserState("http://x:1")).toEqual({ state: "user", user: { id: "u1", username: "admin", role: "admin" }, capabilities: null });
   });
 
   it("is nobody only when the server says so", async () => {

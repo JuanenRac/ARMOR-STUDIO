@@ -28,3 +28,9 @@ The browser talks only to Studio's own origin; nginx proxies `/api/` to the serv
 ## Orders to the nodes
 
 The health card can restart, pause, put in standby, identify, read and put in maintenance one node or all of them. It is shown to administrators only, and the server checks the role again. Restart, pause and standby need the name of the node (or a word for all of them) typed, and every order needs a recent proof of identity: when the server asks for one, Studio asks you to sign in again before repeating the order. Nothing in the console erases a node, resets it to factory settings or powers it off, and the server and the CM5 cannot be reached this way.
+
+## What the person may do, and the security options of the server
+
+The session answer carries `capabilities`: what the person may do (arm, disarm, acknowledge, operate, camera control, administer, users, security options) and the parts the server offers. Studio shows, hides and disables from that one answer (`src/capabilities.ts`); the server checks the role again on every route, so hiding is a convenience and never the protection. A server that sends no `capabilities` is an older one: the role decides as it always did, and anything that needs a route only the new server has is not offered.
+
+An administrator of a server that offers them sees, in Configuration > Security, six options: the PIN to disarm or silence a siren, what the voice assistant asks before silencing the alarm, whether an alarm panel ties its saved armed state to its zones and PIN, whether the server tells the panels their Zigbee zones and signs those messages, and whether FFmpeg reads the cameras through a local tunnel. Each one starts the way the server always behaved; an option the server's environment fixes is shown and cannot be changed here; choosing a lower one shows a warning and asks first, and the server writes the change in its audit trail.

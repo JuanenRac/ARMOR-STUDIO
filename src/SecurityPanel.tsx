@@ -10,6 +10,9 @@ import { askConfirm } from "./askConfirm";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
 import "./security.css";
 import { errorText } from "./apiErrorText";
+import { changeSecurityOptions, readSecurityOptions, type SecurityOptionsState } from "./api/security";
+import type { SecurityOptions } from "./capabilities";
+import { useCapabilities } from "./sessionContext";
 
 type Props = { t: (key: string) => string; origin: string; isAdmin: boolean };
 type Say = (text: string, bad?: boolean) => void;
@@ -190,7 +193,61 @@ function RemoteSettings({ t, origin }: { t: (key: string) => string; origin: str
   </article>;
 }
 
+type OptionKey = keyof SecurityOptions;
+/** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
+const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean }> = [
+  { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN" },
+  { key: "voice.silence_confirmation", id: "voice", values: ["double_turn", "pin", "off"] },
+  { key: "alarm.config_hash", id: "hash", values: [true, false], node: true },
+  { key: "server.zone_feed", id: "feed", values: [true, false], node: true },
+  { key: "server.zone_feed_signature", id: "sign", values: [true, false], node: true },
+  { key: "media.rtsp_proxy", id: "rtsp", values: [true, false] },
+];
+const valueName = (t: (key: string) => string, id: string, value: string | boolean) => typeof value === "boolean" ? t(value ? "sec_opt_on" : "sec_opt_off") : t(`sec_opt_${id}_${value}`);
+/** The options an administrator turns on and off: only where the server announced them. Lowering one asks first; the one the environment fixes cannot be moved from here. */
+export const isLowering = (values: Array<string | boolean>, from: string | boolean | undefined, to: string | boolean): boolean => values.indexOf(to) > values.indexOf(from ?? values[0]!);
+
+function ServerOptions({ t, origin }: { t: (key: string) => string; origin: string }) {
+  const [state, setState] = useState<SecurityOptionsState | null>(null);
+  const [message, setMessage] = useState({ text: "", bad: false });
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { let live = true; void readSecurityOptions(origin).then(value => { if (live) setState(value); }, error => { if (live) setMessage({ text: explain(t, error), bad: true }); }); return () => { live = false; }; }, [origin, t]);
+  const change = async (option: (typeof OPTIONS)[number], value: string | boolean) => {
+    if (!state || busy) return;
+    if (isLowering(option.values, state.settings[option.key], value) && !(await askConfirm(`${t("sec_opt_confirm")} ${t(`sec_opt_${option.id}`)} - ${valueName(t, option.id, value)}
+${t(`sec_opt_${option.id}_warn`)}`, t))) return;
+    setBusy(true);
+    try { setState(await changeSecurityOptions(origin, { [option.key]: value })); setMessage({ text: t("sec_opt_saved"), bad: false }); }
+    catch (error) { setMessage({ text: errorText(t, error, "sec_err_"), bad: true }); }
+    finally { setBusy(false); }
+  };
+  if (!state) return message.text ? <Message message={message} /> : null;
+  return <article className="stack-card sec-card" data-testid="security-options">
+    <h3>{t("sec_group_options")}</h3>
+    <p className="muted">{t("sec_opt_help")}</p>
+    {OPTIONS.map(option => {
+      const current = state.settings[option.key];
+      const fixed = state.locked.includes(option.key);
+      const lowest = option.values[option.values.length - 1];
+      return <fieldset key={option.key} className="sec-option" data-testid={`security-option-${option.id}`} disabled={busy || fixed}>
+        <legend>{t(`sec_opt_${option.id}`)}</legend>
+        <p className="muted">{t(`sec_opt_${option.id}_help`)}</p>
+        <select aria-label={t(`sec_opt_${option.id}`)} value={String(current)} onChange={event => { const picked = option.values.find(value => String(value) === event.target.value); if (picked !== undefined) void change(option, picked); }}>
+          {option.values.map(value => <option key={String(value)} value={String(value)}>{valueName(t, option.id, value)}</option>)}
+        </select>
+        {current === lowest && <p className="notice bad" role="alert" data-testid={`security-option-${option.id}-warning`}>{t(`sec_opt_${option.id}_warn`)}</p>}
+        {fixed && <p className="muted">{t("sec_opt_fixed").replace("ARMOR_DISARM_PIN", option.fixedBy ?? "ARMOR_DISARM_PIN")}</p>}
+      </fieldset>;
+    })}
+    <p className="muted">{t("sec_opt_node_pending")}</p>
+    <Message message={message} />
+  </article>;
+}
+
 export function SecurityPanel({ t, origin, isAdmin }: Props) {
+  // Offered only when the server says it has them (an older server has no such route) and the person is allowed.
+  const capabilities = useCapabilities();
+  const offersOptions = isAdmin && capabilities.can("security_settings") && capabilities.has("security_settings");
   return <div className="sec-page" data-testid="security-panel">
     <div className="panel-heading"><h3>{t("sec_title")}</h3><p className="muted">{t("sec_help")}</p></div>
     <section className="sec-section" data-testid="security-group-account">
@@ -201,6 +258,7 @@ export function SecurityPanel({ t, origin, isAdmin }: Props) {
       <h4 className="sec-section-title">{t("sec_group_server")}</h4>
       <div className="sec-row"><RemoteCheckCard t={t} origin={origin} />{isAdmin && <RemoteSettings t={t} origin={origin} />}</div>
     </section>
+    {offersOptions && <section className="sec-section" data-testid="security-group-options"><h4 className="sec-section-title">{t("sec_group_options")}</h4><div className="sec-row"><ServerOptions t={t} origin={origin} /></div></section>}
     {isAdmin && <RemoteAccessSetup t={t} origin={origin} />}
   </div>;
 }

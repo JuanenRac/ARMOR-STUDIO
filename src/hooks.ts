@@ -5,6 +5,7 @@
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { createCameraStreamUrl, listCameraStatus, listCameraViews, listConfiguredCameras, readInfo, remoteCheck, readStatus, sessionUserState, type Reachability, type ServerInfo, type StudioUser } from "./api";
 import { mergeServerCameras } from "./cameras";
+import type { AnnouncedCapabilities } from "./capabilities";
 import { DEMO_STATE, type Camera } from "./domain";
 import type { SystemState } from "./types";
 import { useViewActive } from "./viewSlots";
@@ -234,7 +235,7 @@ export function usePolled<T>(load: () => Promise<T>, everyMs: number, key: unkno
  * could not be had. Only the server saying "nobody" clears the user: a failed or slow answer keeps the last one, so a hiccup of the network
  * never takes the administrator role away (the Users tab would say "only an administrator" until the page was reloaded).
  */
-export type SessionUser = { user: StudioUser | null; known: boolean; /** Why the last attempt to ask could not be answered (empty when it could). */ reason: string; refresh: () => void };
+export type SessionUser = { user: StudioUser | null; /** What the server announced for this person (null: an older server, or nobody signed in). */ capabilities?: AnnouncedCapabilities | null; known: boolean; /** Why the last attempt to ask could not be answered (empty when it could). */ reason: string; refresh: () => void };
 /** Whether the server counts this session as coming from outside the house, and the second-factor policy it applies there; asked once per server, null while unknown or from inside. */
 export function useRemoteConnection(origin: string, enabled: boolean): { policy: string } | null {
   const [state, setState] = useState<{ policy: string } | null>(null);
@@ -248,14 +249,14 @@ export function useRemoteConnection(origin: string, enabled: boolean): { policy:
 }
 
 export function useSessionUser(origin: string): SessionUser {
-  const [answer, setAnswer] = useState<{ user: StudioUser | null; known: boolean; reason: string }>({ user: null, known: false, reason: "" });
+  const [answer, setAnswer] = useState<{ user: StudioUser | null; capabilities?: AnnouncedCapabilities | null; known: boolean; reason: string }>({ user: null, capabilities: null, known: false, reason: "" });
   const [tick, setTick] = useState(0);
   useEffect(() => {
     let cancelled = false, retry: number | undefined;
     const ask = () => void sessionUserState(origin).then(result => {
       if (cancelled) return;
-      if (result.state === "user") setAnswer({ user: result.user, known: true, reason: "" });
-      else if (result.state === "anonymous") setAnswer({ user: null, known: true, reason: "" });
+      if (result.state === "user") setAnswer({ user: result.user, capabilities: result.capabilities, known: true, reason: "" });
+      else if (result.state === "anonymous") setAnswer({ user: null, capabilities: null, known: true, reason: "" });
       else { setAnswer(current => ({ ...current, reason: result.reason })); retry = window.setTimeout(ask, 4_000); }
     });
     ask();

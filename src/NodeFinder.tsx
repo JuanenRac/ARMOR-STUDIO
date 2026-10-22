@@ -6,7 +6,7 @@
  */
 import { useContext, useEffect, useMemo, useState, type FormEvent } from "react";
 import { adminProvisionNode, ApiError, firmwareProbe, sendNetworkOrder, type ProvisionResult } from "./api";
-import { SessionUserContext } from "./sessionContext";
+import { useCapabilities } from "./sessionContext";
 import { KnownNodesContext } from "./knownNodes";
 import "./actionButtons.css";
 import type { Translate } from "./components/camera";
@@ -108,7 +108,7 @@ export function NodeFinder({ t, origin, network, knownIds, knownIps, wantKind, o
   // A node whose panel title could not be read is asked for its kind (its own session answer says it), so a radar node never shows in the solar menu or the other way round.
   const [asked, setAsked] = useState<Record<string, string>>({});
   const toAsk = listed.filter(item => item.online && !item.kind && asked[item.ip] === undefined).map(item => item.ip).join(",");
-  const mayAsk = useContext(SessionUserContext)?.user?.role === "admin";
+  const mayAsk = useCapabilities().can("administer");
   useEffect(() => {
     if (!toAsk || !mayAsk) return;
     let cancelled = false;
@@ -117,7 +117,7 @@ export function NodeFinder({ t, origin, network, knownIds, knownIps, wantKind, o
   }, [toAsk, origin, mayAsk]);
   const candidates = useMemo(() => listed.filter(item => !(wantKind && !item.kind && asked[item.ip] && asked[item.ip] !== wantKind)), [listed, asked, wantKind]);
   const [state, setState] = useState<"idle" | "searching" | "failed">("idle");
-  const isAdmin = useContext(SessionUserContext)?.user?.role === "admin";
+  const isAdmin = useCapabilities().can("administer");
   const [adopting, setAdopting] = useState("");
   const hasWatcher = Boolean(network?.nodes.some(node => !node.stale));
   const search = async () => {

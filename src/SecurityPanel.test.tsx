@@ -2,7 +2,8 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ElevationDialog } from "./ElevationHost";
-import { envValue, SecurityPanel, setEnvLines } from "./SecurityPanel";
+import { envValue, isLowering, SecurityPanel, setEnvLines } from "./SecurityPanel";
+import { SessionUserContext } from "./sessionContext";
 import { locales, requiredUiKeys, text } from "./i18n";
 
 describe("the security screen", () => {
@@ -19,6 +20,22 @@ describe("the security screen", () => {
     const wanted = requiredUiKeys.filter(key => key.startsWith("sec_") || key.startsWith("rem_") || key.startsWith("login_totp_") || key === "tabSecurity");
     expect(wanted.length).toBeGreaterThan(130);
     for (const locale of locales) for (const key of wanted) expect(text(locale, key).trim().length, `${locale} ${key}`).toBeGreaterThan(0);
+  });
+
+  it("offers the security options of the server only to an administrator of a server that announces them, and asks before one is lowered", () => {
+    const t = (key: string) => text("en", key);
+    const session = (role: "admin" | "operator", announced: boolean) => ({ user: { id: "u", username: "x", role }, known: true, reason: "", refresh: () => undefined,
+      capabilities: announced ? { version: 1, actions: { security_settings: role === "admin" }, features: ["security_settings"] } : null });
+    const draw = (role: "admin" | "operator", announced: boolean) => renderToStaticMarkup(createElement(SessionUserContext.Provider, { value: session(role, announced) }, createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: role === "admin" })));
+    expect(draw("admin", true)).toContain("security-group-options");
+    expect(draw("admin", false)).not.toContain("security-group-options");   // an older server: no such page, whatever the role
+    expect(draw("operator", true)).not.toContain("security-group-options");
+    expect(renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: true }))).not.toContain("security-group-options");
+    expect(isLowering(["always", "if_set", "never"], "if_set", "never")).toBe(true);
+    expect(isLowering(["always", "if_set", "never"], "if_set", "always")).toBe(false);
+    expect(isLowering(["double_turn", "pin", "off"], "pin", "off")).toBe(true);
+    expect(isLowering([true, false], true, false)).toBe(true);
+    expect(isLowering([true, false], false, true)).toBe(false);
   });
 
   it("draws the cards of the account, and the dialog that asks for the password again", () => {

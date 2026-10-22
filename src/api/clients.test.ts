@@ -45,7 +45,7 @@ describe("whether the session is still valid", () => {
   it("who is signed in: the user, nobody, or unknown with a reason that is never mistaken for 'not an administrator'", async () => {
     const user = { id: "u1", username: "ana", role: "operator" };
     answers.push(json(200, { authenticated: true, user }), json(200, { authenticated: true }), json(200, { authenticated: false }), text(401), text(503), () => { throw new DOMException("timed out", "TimeoutError"); }, () => { throw "weird"; });
-    expect(await sessionUserState(O)).toEqual({ state: "user", user });
+    expect(await sessionUserState(O)).toEqual({ state: "user", user, capabilities: null });
     expect(await sessionUserState(O)).toEqual({ state: "anonymous" });
     expect(await sessionUserState(O)).toEqual({ state: "anonymous" });
     expect(await sessionUserState(O)).toEqual({ state: "anonymous" });

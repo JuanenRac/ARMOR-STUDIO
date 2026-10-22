@@ -1,5 +1,6 @@
 import { ApiError, endpoint, localSession, timedFetch } from "./transport";
 import type { StudioUser } from "./users";
+import { parseCapabilities, type AnnouncedCapabilities } from "../capabilities";
 /**
  * Whether the Studio session is still valid. Only the server saying so ends it: a slow answer, a rate limit or a network
  * hiccup is "unknown" and must never throw the operator back to the sign-in page.
@@ -54,13 +55,13 @@ export async function closeStudioSession(origin: string): Promise<void> {
   await timedFetch(endpoint(origin, "/api/v1/studio/session"), { method: "DELETE", ...localSession }).catch(() => undefined);
 }
 /** Who is signed in: the user, nobody (the server said so), or unknown (it could not be asked - never to be taken as "not an administrator"). */
-export type SessionUserState = { state: "user"; user: StudioUser } | { state: "anonymous" } | { state: "unknown"; reason: string };
+export type SessionUserState = { state: "user"; user: StudioUser; capabilities: AnnouncedCapabilities | null } | { state: "anonymous" } | { state: "unknown"; reason: string };
 export async function sessionUserState(origin: string): Promise<SessionUserState> {
   try {
     const response = await timedFetch(endpoint(origin, "/api/v1/studio/session"), { headers: { Accept: "application/json" }, ...localSession });
     if (response.status === 401) return { state: "anonymous" };
     if (!response.ok) return { state: "unknown", reason: `the server answered ${response.status}` };
-    const body = await response.json() as { authenticated?: boolean; user?: StudioUser };
-    return body.authenticated && body.user ? { state: "user", user: body.user } : { state: "anonymous" };
+    const body = await response.json() as { authenticated?: boolean; user?: StudioUser; capabilities?: unknown };
+    return body.authenticated && body.user ? { state: "user", user: body.user, capabilities: parseCapabilities(body.capabilities) } : { state: "anonymous" };
   } catch (error) { return { state: "unknown", reason: error instanceof Error && error.name ? `${error.name}: ${error.message}`.slice(0, 120) : "no answer" }; }
 }

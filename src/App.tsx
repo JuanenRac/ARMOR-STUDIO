@@ -25,6 +25,7 @@ import { ViewSlot, viewsToDraw } from "./viewSlots";
 import { AboutDialog, HelpDialog, PinDialog, Sidebar, StatusBar, TopBar } from "./components/chrome";
 import { DesignVersionsDialog } from "./DesignVersionsDialog";
 import { SessionUserContext } from "./sessionContext";
+import { resolveCapabilities } from "./capabilities";
 import { KnownNodesContext } from "./knownNodes";
 import { Ticking } from "./components/Ticking";
 import { StreamRenewContext } from "./streamContext";
@@ -123,8 +124,12 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const [alarmDesign, setAlarmDesign] = useState<AlarmDesign>(EMPTY_ALARM_DESIGN);
   const [versionsOf, setVersionsOf] = useState<"site" | "electrical" | "network" | "alarm" | null>(null);
   const sessionUser = useSessionUser(origin);
-  const isAdmin = sessionUser.user?.role === "admin";
-  const isViewer = sessionUser.user?.role === "viewer";
+  // What the person may do comes from the server's announcement (an older server sends none, and the role then decides as it always did): see capabilities.ts.
+  const capabilities = useMemo(() => resolveCapabilities(sessionUser.user?.role, sessionUser.capabilities), [sessionUser.user?.role, sessionUser.capabilities]);
+  const signedIn = sessionUser.user !== null;
+  const isAdmin = capabilities.can("administer");
+  const isViewer = signedIn && !capabilities.can("operate");
+  const cannotArm = signedIn && !capabilities.can("arm");
   const [pendingMode, setPendingMode] = useState<"armed" | "disarmed" | null>(null);
   const [checkOpen, setCheckOpen] = useState(false);
   const [restored, setRestored] = useState(false);
@@ -340,8 +345,8 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const visitedViews = useRef(new Set<View>());
   const shownPanels = useRef(new Map<View, ReactNode>());
   const panels: Record<View, ReactNode> = {
-    overview: <Ticking>{now => <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} readOnly={isViewer} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} panels={alarmNodesPoll.data ?? null} solar={solarPoll.data ?? null} electrical={electricalPoll.data ?? null} network={networkPoll.data ?? null} />}</Ticking>,
-    alarms: <Ticking>{now => <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} readOnly={isViewer} />}</Ticking>,
+    overview: <Ticking>{now => <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} readOnly={cannotArm} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} panels={alarmNodesPoll.data ?? null} solar={solarPoll.data ?? null} electrical={electricalPoll.data ?? null} network={networkPoll.data ?? null} />}</Ticking>,
+    alarms: <Ticking>{now => <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} readOnly={cannotArm} />}</Ticking>,
     alarmPanels: <Ticking>{now => <AlarmPanelsView openDesigner={() => setView("alarmDesigner")} t={t} origin={origin} nodes={alarmNodesPoll.data ?? null} unreachable={alarmNodesPoll.failed} network={networkPoll.data ?? null} isAdmin={isAdmin} now={now} />}</Ticking>,
     electrical: <Ticking>{now => <ElectricalView openDevices={() => setView("devices")} t={t} origin={origin} readings={electricalPoll.data ?? null} unreachable={electricalPoll.failed} design={electrical} openDesigner={() => setView("electricalDesigner")} network={networkPoll.data} now={now} />}</Ticking>,
     inverters: <Ticking>{now => <InvertersView t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} network={networkPoll.data} />}</Ticking>,
@@ -379,7 +384,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   return <SessionUserContext.Provider value={sessionUser}><KnownNodesContext.Provider value={knownNodes}><StreamRenewContext.Provider value={renewStream}><div className="studio-frame"><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
     <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} alarmBadge={alarmsPending} t={t} />
     <section className="main-stage" data-tour="stage">
-      <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={isViewer} checkPerimeter={() => setCheckOpen(true)} remote={remoteConnection} t={t} />
+      <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={cannotArm} checkPerimeter={() => setCheckOpen(true)} remote={remoteConnection} t={t} />
       {viewsToDraw(VIEW_ORDER, view, visitedViews.current).map(shown => {
         // a hidden menu keeps the last thing it was given (the same element: React does not draw it again every second); it is refreshed when it is shown
         if (shown === view) shownPanels.current.set(shown, panels[shown]);
@@ -391,7 +396,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     <RichTooltips t={t} />
     {helpOpen && <HelpDialog initial={view} close={() => setHelpOpen(false)} t={t} language={language} />}
     <Assistant view={view} t={t} language={language} go={setView} openHelp={() => setHelpOpen(true)} />
-    <AlarmPopups popups={announcer.popups} open={announcer.open} dismiss={announcer.dismiss} dismissAll={announcer.dismissAll} acknowledge={sessionUser.user?.role === "viewer" ? undefined : id => { void acknowledgeAlarm(origin, id).then(alarmPoll.reload, () => undefined); }} t={t} />
+    <AlarmPopups popups={announcer.popups} open={announcer.open} dismiss={announcer.dismiss} dismissAll={announcer.dismissAll} acknowledge={signedIn && !capabilities.can("acknowledge") ? undefined : id => { void acknowledgeAlarm(origin, id).then(alarmPoll.reload, () => undefined); }} t={t} />
     {aboutOpen && <AboutDialog version={studioVersion} revision={state.revision} close={() => setAboutOpen(false)} t={t} />}
     {versionsOf && <DesignVersionsDialog kind={versionsOf} origin={origin} t={t} close={() => setVersionsOf(null)}
       draft={versionsOf === "site" ? siteSync.draft : null} restoreDraft={siteSync.restoreDraft}

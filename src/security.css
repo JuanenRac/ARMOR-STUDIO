@@ -27,3 +27,7 @@
 .remote-steps > li.ok { border-color: #2f7d58; background: rgba(20, 70, 48, .35); }
 .remote-steps > li p { margin: .3rem 0 0; max-width: none; line-height: 1.45; }
 @media (max-width: 760px) { .sec-row { grid-template-columns: minmax(0, 1fr); } }
+.sec-option { display: flex; flex-direction: column; gap: .4rem; margin: 0; padding: .7rem .85rem; border: 1px solid #244b59; border-radius: 8px; min-width: 0; }
+.sec-option > legend { padding: 0 .35rem; font-weight: 600; }
+.sec-option > p { margin: 0; max-width: none; line-height: 1.4; }
+.sec-option select { max-width: 100%; }
