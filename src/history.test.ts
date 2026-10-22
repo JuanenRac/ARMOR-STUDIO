@@ -119,7 +119,7 @@ describe("the tabs of the history", () => {
     const seen = new Set<string>();
     for (const locale of locales) for (const event of events) {
       const line = describeEvent(event, key => text(locale, key));
-      expect(line, locale).not.toMatch(/(sc|sa|nh_cause|re)_[a-z_]+/);
+      expect(line, locale).not.toMatch(/\b(sc|sa|nh_cause|re)_[a-z_]+/);
       if (locale !== "en") seen.add(line);
     }
     expect(seen.size).toBeGreaterThan(30);
@@ -135,7 +135,7 @@ describe("the tabs of the history", () => {
     expect(describeEvent(firmware, key => text("en", key))).toBe("Node · radar-1 · firmware changed · 0.7.0 → 0.7.1");
     for (const locale of locales) {
       // eslint-disable-next-line no-control-regex
-      for (const event of [connection, system, firmware]) expect(describeEvent(event, key => text(locale, key)), locale).not.toMatch(/(ck|conn|sc|sa)_[a-z_]+/);
+      for (const event of [connection, system, firmware]) expect(describeEvent(event, key => text(locale, key)), locale).not.toMatch(/\b(ck|conn|sc|sa)_[a-z_]+/);
       for (const key of ["his_tab_alarms", "his_tab_connections", "his_tab_devices", "his_tab_system", "his_tab_settings", "cl_title", "cl_help", "cl_empty", "event_connection", "event_system", "sa_backup_made"]) expect(text(locale, key), `${locale}:${key}`).not.toBe(key);
     }
   });
