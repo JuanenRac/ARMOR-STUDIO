@@ -6,8 +6,8 @@
  */
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import {
-  adminAccounts, adminAddAccount, adminFile, adminFiles, adminRemoveAccount, adminSaveFile, adminServiceAction, adminServices, adminStatus,
-  ApiError, type AdminFile, type AdminFileInfo, type AdminService, type BrokerAccount,
+  adminAccounts, adminAddAccount, adminFile, adminFiles, adminRemoveAccount, adminSaveFile, adminServiceAction, adminServices, adminStatus, setAdminSecret,
+  ApiError, type AdminFile, type AdminFileInfo, type AdminProtection, type AdminService, type BrokerAccount,
 } from "./api";
 import { ConfirmDialog } from "./components/chrome";
 import { ActionIcon, actionsFor, type ServiceAction } from "./views/ServicesView";
@@ -34,6 +34,20 @@ function useAgent(origin: string, isAdmin: boolean): "checking" | "ready" | "mis
     return () => { live = false; };
   }, [origin, isAdmin]);
   return state;
+}
+
+/** What the admin agent does about rewriting the broker rules and the env files: open (the admin token alone, with the warning), a second secret (typed here, kept in memory only), or never from here. */
+export function AgentProtection({ t, origin }: { t: Translate; origin: string }) {
+  const [protection, setProtection] = useState<AdminProtection | undefined>(undefined);
+  const [secret, setSecret] = useState("");
+  useEffect(() => { let live = true; void adminStatus(origin).then(status => { if (live) setProtection(status.sensitive_writes ?? null); }, () => { if (live) setProtection(null); }); return () => { live = false; }; }, [origin]);
+  useEffect(() => () => setAdminSecret(""), []);
+  if (!protection) return null;
+  if (protection.mode === "open") return <p className="notice" role="note" data-testid="agent-open">{t("adm_sensitive_open")}</p>;
+  if (protection.mode === "read_only") return <p className="muted" role="note" data-testid="agent-read-only">{t("adm_sensitive_read_only")}</p>;
+  return <label className="adm-secret-field" data-testid="agent-second-secret">{t("adm_sensitive_second")}
+    <input type="password" autoComplete="off" value={secret} onChange={event => { setSecret(event.target.value); setAdminSecret(event.target.value); }} />
+    <small className="hint">{t("adm_sensitive_second_help")}</small></label>;
 }
 
 function Gate({ t, state }: { t: Translate; state: "checking" | "missing" | "denied" }) {
@@ -129,6 +143,7 @@ export function FilesPanel({ t, origin, isAdmin }: Props) {
   const current = files.find(item => item.id === open);
   return <div className="adm-files">
     <article className="stack-card"><h3>{t("adm_files")}</h3><p className="muted">{t("adm_files_help")}</p>
+      <AgentProtection t={t} origin={origin} />
       <ul className="adm-file-list">{files.map(item => <li key={item.id}><button className={item.id === open ? "active" : ""} onClick={() => setOpen(item.id)}><strong>{item.id}</strong><small>{item.description}</small></button></li>)}</ul>
     </article>
     {current && <FileEditor key={current.id} t={t} origin={origin} info={current} />}
@@ -210,6 +225,7 @@ export function BrokerPanel({ t, origin, isAdmin }: Props) {
     <BrokerTlsCard t={t} state={tls} />
 
     <article className="stack-card adm-card"><h3>{t("adm_accounts")} <small className="user-chip">{accounts.length}</small></h3><p className="muted">{t("adm_accounts_help")}</p>
+      <AgentProtection t={t} origin={origin} />
       <form className="adm-form" onSubmit={event => void add(event)}>
         <label>{t("adm_role")}<select value={form.role} onChange={event => setForm({ ...form, role: event.target.value })}>{ROLES.map(role => <option key={role} value={role}>{t(`adm_role_${role}`)}</option>)}</select></label>
         <label>{t("adm_name")}<input value={form.name} onChange={event => setForm({ ...form, name: event.target.value.toLowerCase() })} placeholder="nodo-radar-2" autoComplete="off" /></label>

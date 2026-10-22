@@ -22,9 +22,9 @@ let elevationAsker: ((origin: string) => Promise<boolean>) | null = null;
 export const setElevationAsker = (asker: ((origin: string) => Promise<boolean>) | null): void => { elevationAsker = asker; };
 /** Asks the person to prove themselves again, for a call that is not made through `userCall` (an upload). False when they did not, or when nothing can ask. */
 export const askElevation = (origin: string): Promise<boolean> => (elevationAsker ? elevationAsker(origin) : Promise.resolve(false));
-export async function userCall<T>(origin: string, method: string, route: string, body?: unknown, retried = false): Promise<T> {
+export async function userCall<T>(origin: string, method: string, route: string, body?: unknown, retried = false, extraHeaders?: Record<string, string>): Promise<T> {
   const response = await timedFetch(endpoint(origin, route), {
-    method, headers: { Accept: "application/json", ...(body === undefined ? {} : { "Content-Type": "application/json" }) }, ...localSession,
+    method, headers: { Accept: "application/json", ...(body === undefined ? {} : { "Content-Type": "application/json" }), ...(extraHeaders ?? {}) }, ...localSession,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   if (response.status === 204) return undefined as T;
@@ -32,7 +32,7 @@ export async function userCall<T>(origin: string, method: string, route: string,
   // The administration answers `{ error: "a_code" }` (some of them with a line number, "invalid_line:3"); the users' answers carry a separate `code`.
   const machine = typeof parsed.error === "string" && /^[a-z_]+(:\d+)?$/.test(parsed.error) ? parsed.error : undefined;
   if (!response.ok) {
-    if (response.status === 403 && parsed.code === "elevation_required" && !retried && elevationAsker && await elevationAsker(origin)) return userCall<T>(origin, method, route, body, true);
+    if (response.status === 403 && parsed.code === "elevation_required" && !retried && elevationAsker && await elevationAsker(origin)) return userCall<T>(origin, method, route, body, true, extraHeaders);
     throw new ApiError(response.status, parsed.code ?? machine ?? (response.status === 403 || response.status === 401 ? "forbidden" : "generic"));
   }
   return parsed;
