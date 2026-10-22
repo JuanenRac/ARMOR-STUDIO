@@ -126,7 +126,7 @@ ARMOR-STUDIO/
 
 ## 🛠️ 開発環境
 
-**必要なもの:** Node.js 22+, a running ARMOR-SERVER (otherwise Studio shows demonstration data)
+**必要なもの:** Node.js 22+, 稼働中の ARMOR-SERVER（なければ Studio はデモデータを表示します）
 
 ```powershell
 npm install

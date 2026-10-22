@@ -126,7 +126,7 @@ ARMOR-STUDIO/
 
 ## 🛠️ 开发环境
 
-**环境要求:** Node.js 22+, a running ARMOR-SERVER (otherwise Studio shows demonstration data)
+**环境要求:** Node.js 22+, 运行中的 ARMOR-SERVER（否则 Studio 显示演示数据）
 
 ```powershell
 npm install

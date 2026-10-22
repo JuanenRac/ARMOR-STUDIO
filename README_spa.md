@@ -126,7 +126,7 @@ ARMOR-STUDIO/
 
 ## 🛠️ Entorno de desarrollo
 
-**Requisitos:** Node.js 22+, a running ARMOR-SERVER (otherwise Studio shows demonstration data)
+**Requisitos:** Node.js 22+, un ARMOR-SERVER en marcha (si no, Studio muestra datos de demostración)
 
 ```powershell
 npm install
