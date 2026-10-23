@@ -17,6 +17,7 @@ export type SecurityOptions = {
   "voice.multipart_turn": boolean;
   "panel.live_events": boolean;
   "client.device_lock": "user" | "sensitive" | "always";
+  "nodes.nvs_encryption": "off" | "secrets";
   /** The most audio of a spoken turn and the most spoken answer handed back to the wall panel, in bytes. */
   "voice.turn_max_bytes": number;
   "voice.reply_audio_max_bytes": number;

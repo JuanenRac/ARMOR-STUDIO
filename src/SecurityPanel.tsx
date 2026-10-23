@@ -206,6 +206,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "voice.multipart_turn", id: "voiceturn", values: [false, true] },
   { key: "panel.live_events", id: "panellive", values: [false, true] },
   { key: "client.device_lock", id: "lock", values: ["always", "sensitive", "user"], calm: true },
+  { key: "nodes.nvs_encryption", id: "nvs", values: ["secrets", "off"], node: true, calm: true },
 ];
 const valueName = (t: (key: string) => string, id: string, value: string | boolean) => typeof value === "boolean" ? t(value ? "sec_opt_on" : "sec_opt_off") : t(`sec_opt_${id}_${value}`);
 /** The options an administrator turns on and off: only where the server announced them. Lowering one asks first; the one the environment fixes cannot be moved from here. */
