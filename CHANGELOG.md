@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 - The repository has a security policy, a code of conduct, a contributing guide and a support file.
 - The banner follows the animated style of the ecosystem banners, with the name, the kind and the technologies of the project.
+- **The sizes of a spoken turn are fields in Configuration > Security:** the most audio the wall panel may send in one turn and the most spoken answer the server hands back in the binary form, as whole numbers checked against the ceilings of the server (3200 to 1920000 and 3200 to 1000000 bytes) before anything is sent, with the range and the seconds of speech it means beside them, in the eight languages. The server keeps them in its settings (the environment is where they start), they count at once, and raising one asks for confirmation because a longer turn costs the server more.
+- **The PIN to disarm is also told to the alarm panels:** the option now says it reaches the panels (a panel can fix its own rule), and the note under the options counts four options for the panels instead of three.
 - **Configuration > Diagnostics:** a new administrators' tab to ask a node for its diagnostic package or its log, read what it handed over and download both.
 - **Read-only access for somebody else:** issue a diagnostic token for the nodes you choose, for 5 minutes up to 24 hours (2 hours by default), with a note; the screen says in plain words what a token can and cannot do.
 - **The secret is shown once:** the token appears a single time with a Copy button and a clear warning, is never kept in the browser and is gone when the screen is closed.

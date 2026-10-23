@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ElevationDialog } from "./ElevationHost";
-import { envValue, isLowering, SecurityPanel, setEnvLines } from "./SecurityPanel";
+import { envValue, isLowering, SecurityPanel, setEnvLines, VOICE_LIMITS, voiceLimitValue } from "./SecurityPanel";
 import { SessionUserContext } from "./sessionContext";
 import { locales, requiredUiKeys, text } from "./i18n";
 
@@ -61,5 +61,20 @@ describe("the security screen", () => {
     const dialog = renderToStaticMarkup(createElement(ElevationDialog, { t, origin: "http://127.0.0.1:8080", done: () => undefined }));
     expect(dialog).toContain("Confirm that it is you");
     expect(dialog).toContain('type="password"');
+  });
+  it("holds the sizes of a spoken turn to the ceilings of the server before it asks, and has every phrase of the fields in all eight languages", () => {
+    expect(voiceLimitValue("voice.turn_max_bytes", "480000")).toBe(480000);
+    expect(voiceLimitValue("voice.turn_max_bytes", " 3200 ")).toBe(3200);
+    expect(voiceLimitValue("voice.turn_max_bytes", "1920000")).toBe(1920000);
+    for (const bad of ["3199", "1920001", "", "abc", "12.5", "-5", "1e5", "0003200000000"]) expect(voiceLimitValue("voice.turn_max_bytes", bad), bad).toBeUndefined();
+    expect(voiceLimitValue("voice.reply_audio_max_bytes", "1000000")).toBe(1000000);
+    expect(voiceLimitValue("voice.reply_audio_max_bytes", "1000001")).toBeUndefined();
+    expect(VOICE_LIMITS["voice.turn_max_bytes"].max).toBe(1_920_000);
+    for (const locale of locales) for (const id of ["sec_voice_title", "sec_voice_help", "sec_voice_turn", "sec_voice_reply", "sec_voice_range", "sec_voice_seconds", "sec_voice_save", "sec_voice_invalid", "sec_voice_warn", "sec_voice_confirm"]) {
+      const words = text(locale, id);
+      expect(words.trim().length, `${locale} ${id}`).toBeGreaterThan(3);
+      expect(words, `${locale} ${id} is not the key`).not.toBe(id);
+    }
+    for (const locale of locales) { expect(text(locale, "sec_voice_range")).toContain("{min}"); expect(text(locale, "sec_voice_range")).toContain("{max}"); expect(text(locale, "sec_voice_seconds")).toContain("{seconds}"); }
   });
 });

@@ -193,10 +193,10 @@ function RemoteSettings({ t, origin }: { t: (key: string) => string; origin: str
   </article>;
 }
 
-type OptionKey = keyof SecurityOptions;
+type OptionKey = Exclude<keyof SecurityOptions, "voice.turn_max_bytes" | "voice.reply_audio_max_bytes">;
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
 const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean }> = [
-  { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN" },
+  { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN", node: true },
   { key: "voice.silence_confirmation", id: "voice", values: ["double_turn", "pin", "off"] },
   { key: "alarm.config_hash", id: "hash", values: [true, false], node: true },
   { key: "server.zone_feed", id: "feed", values: [true, false], node: true },
@@ -211,6 +211,59 @@ const valueName = (t: (key: string) => string, id: string, value: string | boole
 /** The options an administrator turns on and off: only where the server announced them. Lowering one asks first; the one the environment fixes cannot be moved from here. */
 export const isLowering = (values: Array<string | boolean>, from: string | boolean | undefined, to: string | boolean): boolean => values.indexOf(to) > values.indexOf(from ?? values[0]!);
 
+/** The two sizes of a spoken turn: the ranges the server holds them to (its own ceilings). */
+export const VOICE_LIMITS = {
+  "voice.turn_max_bytes": { min: 3_200, max: 1_920_000, id: "turn" },
+  "voice.reply_audio_max_bytes": { min: 3_200, max: 1_000_000, id: "reply" },
+} as const;
+type VoiceLimitKey = keyof typeof VOICE_LIMITS;
+/** The whole number a field holds, or undefined when it is not a whole number inside the range of that limit. */
+export function voiceLimitValue(key: VoiceLimitKey, text: string): number | undefined {
+  const trimmed = text.trim();
+  if (!/^\d{1,9}$/.test(trimmed)) return undefined;
+  const value = Number(trimmed);
+  return value >= VOICE_LIMITS[key].min && value <= VOICE_LIMITS[key].max ? value : undefined;
+}
+const fill = (text: string, values: Record<string, string | number>) => text.replace(/\{(\w+)\}/g, (whole, name: string) => (name in values ? String(values[name]) : whole));
+
+/** The sizes of a spoken turn, as numbers an administrator types; the server refuses what is outside its ceilings and the field says so before it asks. */
+function VoiceLimits({ t, state, apply, busy }: { t: (key: string) => string; state: SecurityOptionsState; apply: (change: Partial<SecurityOptions>, raising: boolean) => Promise<boolean>; busy: boolean }) {
+  const keys = Object.keys(VOICE_LIMITS) as VoiceLimitKey[];
+  const [typed, setTyped] = useState<Record<string, string>>({});
+  const [invalid, setInvalid] = useState(false);
+  const shown = (key: VoiceLimitKey) => typed[key] ?? String(state.settings[key] ?? "");
+  const save = async (event: FormEvent) => {
+    event.preventDefault();
+    const change: Record<string, number> = {};
+    let raising = false;
+    for (const key of keys) {
+      const value = voiceLimitValue(key, shown(key));
+      if (value === undefined) { setInvalid(true); return; }
+      if (value !== state.settings[key]) { change[key] = value; if (value > Number(state.settings[key])) raising = true; }
+    }
+    setInvalid(false);
+    if (!Object.keys(change).length) return;
+    if (await apply(change as Partial<SecurityOptions>, raising)) setTyped({});
+  };
+  const locked = state.locked.some(key => keys.includes(key as VoiceLimitKey));
+  return <fieldset className="sec-option" data-testid="security-voice-limits" disabled={busy || locked}>
+    <legend>{t("sec_voice_title")}</legend>
+    <p className="muted">{t("sec_voice_help")}</p>
+    <form onSubmit={event => void save(event)}>
+      {keys.map(key => {
+        const limit = VOICE_LIMITS[key], value = voiceLimitValue(key, shown(key));
+        return <label key={key}>{t(`sec_voice_${limit.id}`)}
+          <input inputMode="numeric" value={shown(key)} aria-invalid={value === undefined} data-testid={`security-voice-${limit.id}`} onChange={event => { setInvalid(false); setTyped(current => ({ ...current, [key]: event.target.value.replace(/\D/g, "") })); }} />
+          <span className="muted">{fill(t("sec_voice_range"), { min: limit.min, max: limit.max })}{value !== undefined && limit.id === "turn" ? ` - ${fill(t("sec_voice_seconds"), { seconds: Math.round(value / 32_000) })}` : ""}</span>
+        </label>;
+      })}
+      {invalid && <p className="notice bad" role="alert" data-testid="security-voice-invalid">{t("sec_voice_invalid")}</p>}
+      <p className="muted">{t("sec_voice_warn")}</p>
+      <button className="primary" disabled={busy}>{t("sec_voice_save")}</button>
+    </form>
+  </fieldset>;
+}
+
 function ServerOptions({ t, origin }: { t: (key: string) => string; origin: string }) {
   const [state, setState] = useState<SecurityOptionsState | null>(null);
   const [message, setMessage] = useState({ text: "", bad: false });
@@ -223,6 +276,14 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
     setBusy(true);
     try { setState(await changeSecurityOptions(origin, { [option.key]: value })); setMessage({ text: t("sec_opt_saved"), bad: false }); }
     catch (error) { setMessage({ text: errorText(t, error, "sec_err_"), bad: true }); }
+    finally { setBusy(false); }
+  };
+  const applyLimits = async (change: Partial<SecurityOptions>, raising: boolean): Promise<boolean> => {
+    if (busy) return false;
+    if (raising && !(await askConfirm(`${t("sec_voice_confirm")}\n${t("sec_voice_warn")}`, t))) return false;
+    setBusy(true);
+    try { setState(await changeSecurityOptions(origin, change)); setMessage({ text: t("sec_opt_saved"), bad: false }); return true; }
+    catch (error) { setMessage({ text: errorText(t, error, "sec_err_"), bad: true }); return false; }
     finally { setBusy(false); }
   };
   if (!state) return message.text ? <Message message={message} /> : null;
@@ -243,6 +304,7 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
         {fixed && <p className="muted">{t("sec_opt_fixed").replace("ARMOR_DISARM_PIN", option.fixedBy ?? "ARMOR_DISARM_PIN")}</p>}
       </fieldset>;
     })}
+    {typeof state.settings["voice.turn_max_bytes"] === "number" && <VoiceLimits t={t} state={state} apply={applyLimits} busy={busy} />}
     <p className="muted">{t("sec_opt_node_pending")}</p>
     <Message message={message} />
   </article>;
