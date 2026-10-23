@@ -16,6 +16,7 @@ export type SecurityOptions = {
   "network.login_secure_only": boolean;
   "voice.multipart_turn": boolean;
   "panel.live_events": boolean;
+  "client.device_lock": "user" | "sensitive" | "always";
 };
 /** As the server sends it. */
 export type AnnouncedCapabilities = {

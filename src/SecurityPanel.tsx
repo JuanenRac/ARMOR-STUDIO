@@ -195,7 +195,7 @@ function RemoteSettings({ t, origin }: { t: (key: string) => string; origin: str
 
 type OptionKey = keyof SecurityOptions;
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
-const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean }> = [
+const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean }> = [
   { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN" },
   { key: "voice.silence_confirmation", id: "voice", values: ["double_turn", "pin", "off"] },
   { key: "alarm.config_hash", id: "hash", values: [true, false], node: true },
@@ -205,6 +205,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "network.login_secure_only", id: "netlogin", values: [true, false] },
   { key: "voice.multipart_turn", id: "voiceturn", values: [false, true] },
   { key: "panel.live_events", id: "panellive", values: [false, true] },
+  { key: "client.device_lock", id: "lock", values: ["always", "sensitive", "user"], calm: true },
 ];
 const valueName = (t: (key: string) => string, id: string, value: string | boolean) => typeof value === "boolean" ? t(value ? "sec_opt_on" : "sec_opt_off") : t(`sec_opt_${id}_${value}`);
 /** The options an administrator turns on and off: only where the server announced them. Lowering one asks first; the one the environment fixes cannot be moved from here. */
@@ -238,7 +239,7 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
         <select aria-label={t(`sec_opt_${option.id}`)} value={String(current)} onChange={event => { const picked = option.values.find(value => String(value) === event.target.value); if (picked !== undefined) void change(option, picked); }}>
           {option.values.map(value => <option key={String(value)} value={String(value)}>{valueName(t, option.id, value)}</option>)}
         </select>
-        {current === lowest && <p className="notice bad" role="alert" data-testid={`security-option-${option.id}-warning`}>{t(`sec_opt_${option.id}_warn`)}</p>}
+        {current === lowest && !option.calm && <p className="notice bad" role="alert" data-testid={`security-option-${option.id}-warning`}>{t(`sec_opt_${option.id}_warn`)}</p>}
         {fixed && <p className="muted">{t("sec_opt_fixed").replace("ARMOR_DISARM_PIN", option.fixedBy ?? "ARMOR_DISARM_PIN")}</p>}
       </fieldset>;
     })}

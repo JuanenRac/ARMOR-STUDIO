@@ -34,12 +34,14 @@ describe("the security screen", () => {
     expect(isLowering(["always", "if_set", "never"], "if_set", "never")).toBe(true);
     expect(isLowering(["always", "if_set", "never"], "if_set", "always")).toBe(false);
     expect(isLowering(["double_turn", "pin", "off"], "pin", "off")).toBe(true);
+    expect(isLowering(["always", "sensitive", "user"], "always", "user")).toBe(true);
+    expect(isLowering(["always", "sensitive", "user"], "user", "sensitive")).toBe(false);
     expect(isLowering([true, false], true, false)).toBe(true);
     expect(isLowering([true, false], false, true)).toBe(false);
   });
 
   it("offers the option that keeps device logins from nodes that did not come over TLS, in every language, with its warning", () => {
-    for (const locale of locales) for (const id of ["sec_opt_netlogin", "sec_opt_netlogin_help", "sec_opt_netlogin_warn", "sec_opt_voiceturn", "sec_opt_voiceturn_help", "sec_opt_voiceturn_warn", "sec_opt_panellive", "sec_opt_panellive_help", "sec_opt_panellive_warn"]) {
+    for (const locale of locales) for (const id of ["sec_opt_netlogin", "sec_opt_netlogin_help", "sec_opt_netlogin_warn", "sec_opt_voiceturn", "sec_opt_voiceturn_help", "sec_opt_voiceturn_warn", "sec_opt_panellive", "sec_opt_panellive_help", "sec_opt_panellive_warn", "sec_opt_lock", "sec_opt_lock_help", "sec_opt_lock_warn", "sec_opt_lock_user", "sec_opt_lock_sensitive", "sec_opt_lock_always"]) {
       const words = text(locale, id);
       expect(words.trim().length, `${locale} ${id}`).toBeGreaterThan(8);
       expect(words, `${locale} ${id} is not the key`).not.toBe(id);
