@@ -24,4 +24,14 @@ describe("the Electrical menu", () => {
       expect(html).not.toContain("elLive");
     }
   });
+  it("says how fresh the reading of a channel is and how many reads failed, when the node says it, in every language", () => {
+    const fresh: ElectricalReadings = { ...readings, nodes: [{ ...readings.nodes[0], reading: { ...readings.nodes[0].reading, channels: [{ id: "c1", domain: "ac", voltage_v: 230.4, power_w: 1200, state: "closed", reading_age_ms: 1500, errors: 3 }] } }] };
+    for (const language of ["en", "es", "de", "fr", "it", "ja", "zh", "pt"] as const) {
+      const html = renderToStaticMarkup(createElement(ElectricalView, { t: (key: string) => text(language, key), origin: "http://x", readings: fresh, unreachable: false, design, openDesigner: () => undefined, now: Date.now() }));
+      expect(html, language).toContain(text(language, "elReadingAge").replace("{0}", "1.5"));
+      expect(html, language).toContain(text(language, "elReadErrors").replace("{0}", "3"));
+    }
+    const quiet = renderToStaticMarkup(createElement(ElectricalView, { t: (key: string) => text("en", key), origin: "http://x", readings, unreachable: false, design, openDesigner: () => undefined, now: Date.now() }));
+    expect(quiet).not.toContain("failed reads");
+  });
 });

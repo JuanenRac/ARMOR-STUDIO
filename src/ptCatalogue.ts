@@ -1252,6 +1252,8 @@ export const PT_CATALOGUE: Record<string, string> = {
  "solarWarnings": "Avisos e avarias",
  "solarNoWarnings": "nenhum",
  "solarWarningsUnknown": "desconhecidos",
+ "elReadingAge": "lido há {0} s",
+ "elReadErrors": "{0} leituras falhadas",
  "elEstimatedTip": "Estimado, não medido: o nó calculou esta potência com uma corrente e uma tensão nominal (potência aparente), por isso pode ser superior ao consumo real",
  "solarWarningsUnknownTip": "O protocolo deste inversor não permite perguntar os seus avisos: uma lista vazia não significa que não haja",
  "solarModules": "módulos",

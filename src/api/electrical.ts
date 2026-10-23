@@ -8,6 +8,8 @@ export const electricalElements = (origin: string) => userCall<ElectricalElement
 // ---- what the ARMOR-ELECTRICAL nodes measure -------------------------------------------------------------------------------------------
 export type ElectricalChannelReading = {
   id: string; domain: "ac" | "dc"; label?: string; voltage_v?: number; current_a?: number; power_w?: number; energy_kwh?: number; power_estimated?: boolean; frequency_hz?: number; power_factor?: number;
+  /** How old the last reading of the channel was when the node sent it, in milliseconds, and how many reads of it failed since the node started (the node says them when it can). */
+  reading_age_ms?: number; errors?: number;
   state?: "closed" | "open" | "unknown"; alarm?: boolean; alarm_code?: string;
 };
 /** A switch of a node (a source transfer): what its auxiliary contacts show, never what was asked. Studio only reads it: nothing here sends a command. */

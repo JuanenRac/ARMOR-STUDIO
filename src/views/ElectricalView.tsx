@@ -102,7 +102,7 @@ function NodeCard({ t, origin, node, drawn, now }: { t: Translate; origin: strin
 
 function Channel({ t, channel }: { t: Translate; channel: ElectricalChannelReading }) {
   return <div className={`el-row ${channel.alarm ? "alarm" : ""}`} role="row">
-    <span><b>{channel.label ?? channel.id}</b><small>{channel.domain.toUpperCase()}</small></span>
+    <span><b>{channel.label ?? channel.id}</b><small>{channel.domain.toUpperCase()}{channel.reading_age_ms !== undefined ? ` · ${t("elReadingAge").replace("{0}", (channel.reading_age_ms / 1000).toFixed(1))}` : ""}{channel.errors ? ` · ${t("elReadErrors").replace("{0}", String(channel.errors))}` : ""}</small></span>
     <span>{number(channel.voltage_v, 1, "")}</span><span>{number(channel.current_a, 2, "")}</span><span title={channel.power_estimated ? t("elEstimatedTip") : undefined}>{channel.power_estimated && channel.power_w !== undefined ? "≈ " : ""}{number(channel.power_w, 0, "")}</span>
     <span>{number(channel.energy_kwh, 2, "")}</span><span>{number(channel.frequency_hz, 1, "")}</span><span>{number(channel.power_factor, 2, "")}</span>
     <span className={channel.alarm ? "fail" : channel.state === "open" ? "warn" : "ok"}>{channel.alarm ? (channel.alarm_code ?? t("elLiveAlarm")) : channel.state ? t(`elLive_${channel.state}`) : "–"}</span>
