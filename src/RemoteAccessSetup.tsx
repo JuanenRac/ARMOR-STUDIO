@@ -5,8 +5,8 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { ddnsRemove, ddnsSetup, ddnsUpdate, listNodePanels, nodePanelFingerprint, nodePanelUrl, remoteSetupState, removeNodePanel, saveNodePanel, vpnAddPeer, vpnRemovePeer,
-  vpnSetup, vpnShowPeer, type DdnsInput, type NodePanel, type RemoteSetupState, type VpnPeerConfig } from "./api";
+import { ddnsRemove, ddnsSetup, ddnsUpdate, listNodePanels, remoteTls, nodePanelFingerprint, nodePanelUrl, remoteSetupState, removeNodePanel, saveNodePanel, vpnAddPeer, vpnRemovePeer,
+  vpnSetup, vpnShowPeer, type DdnsInput, type NodePanel, type RemoteSetupState, type RemoteTls, type VpnPeerConfig } from "./api";
 import { askConfirm } from "./askConfirm";
 import { errorText } from "./apiErrorText";
 
@@ -131,6 +131,29 @@ function Ddns({ t, origin, state, reload }: Props & { state: RemoteSetupState; r
   </article>;
 }
 
+/** The text that pairs a phone with the installation's own HTTPS: the pin of the authority that signs it, for the name the phone reaches the house by. */
+function PhonePairing({ t, origin }: Props) {
+  const [host, setHost] = useState(() => { try { const name = new URL(origin).hostname; return name === "localhost" || /^[0-9.]+$/.test(name) ? "" : name; } catch { return ""; } });
+  const [found, setFound] = useState<RemoteTls | null>(null);
+  const [message, say] = useMessage();
+  const [busy, setBusy] = useState(false);
+  const show = async () => { say(""); setBusy(true); try { setFound(await remoteTls(origin, host.trim().toLowerCase())); } catch (error) { setFound(null); say(explain(t, error), true); } finally { setBusy(false); } };
+  const copy = async () => { try { await navigator.clipboard.writeText(found?.text ?? ""); say(t("rem_pair_copied")); } catch { say(""); } };
+  return <article className="stack-card sec-card" data-testid="remote-pairing">
+    <h3>{t("rem_pair_title")}</h3>
+    <p className="muted">{t("rem_pair_help")}</p>
+    <label>{t("rem_pair_host")}<input value={host} onChange={event => setHost(event.target.value)} placeholder="casa.duckdns.org" /></label>
+    <p><button type="button" disabled={busy} onClick={() => void show()}>{t("rem_pair_show")}</button></p>
+    {found && !found.present && <p className="notice">{t("rem_pair_none")}</p>}
+    {found && found.present && !found.pin && <p className="notice bad">{t("rem_pair_error")}</p>}
+    {found?.text && <>
+      <p><code className="mono" data-testid="pairing-text">{found.text}</code> <button type="button" onClick={() => void copy()}>{t("rem_pair_copy")}</button></p>
+      <p className="muted small">{fill(t("rem_pair_until"), found.subject ?? "-", found.not_after ?? "-")}</p>
+    </>}
+    <Notice message={message} />
+  </article>;
+}
+
 function NodePanels({ t, origin }: Props) {
   const [panels, setPanels] = useState<NodePanel[]>([]);
   const [message, say] = useMessage();
@@ -209,6 +232,7 @@ export function RemoteAccessSetup({ t, origin }: Props) {
       <Guide t={t} origin={origin} state={state} />
       <div className="sec-row"><Vpn t={t} origin={origin} state={state} reload={load} /><Ddns t={t} origin={origin} state={state} reload={load} /></div>
     </>}
+    <PhonePairing t={t} origin={origin} />
     <NodePanels t={t} origin={origin} />
   </section>;
 }

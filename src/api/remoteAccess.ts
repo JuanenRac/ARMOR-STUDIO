@@ -8,6 +8,9 @@ export type RemoteSetupState = {
 export type VpnPeerConfig = { name: string; config: string; qr_svg: string | null };
 export type DdnsInput = { provider: "duckdns" | "cloudflare" | "url"; domain?: string; token?: string; zone?: string; record_name?: string; url?: string };
 export type NodePanel = { id: string; address: string; scheme: "http" | "https"; port: number; fingerprint?: string; label?: string };
+export type RemoteTls = { present: boolean; pin?: string; text?: string; subject?: string; not_after?: string; error?: string };
+/** The key of the authority that signs the installation's own HTTPS and the text that pairs a phone with it (`armor-pin:<host>:<pin>`). */
+export const remoteTls = (origin: string, host: string) => userCall<RemoteTls>(origin, "GET", `/api/v1/admin/remote/tls${host ? `?host=${encodeURIComponent(host)}` : ""}`);
 export const remoteSetupState = (origin: string) => userCall<RemoteSetupState>(origin, "GET", "/api/v1/admin/remote");
 export const vpnSetup = (origin: string, input: { endpoint: string; port?: number; lan?: string; route_lan?: string }) => userCall<RemoteSetupState>(origin, "POST", "/api/v1/admin/remote/wireguard/setup", input);
 export const vpnAddPeer = (origin: string, name: string, fullTunnel: boolean) => userCall<VpnPeerConfig>(origin, "POST", "/api/v1/admin/remote/wireguard/peers", { name, full_tunnel: fullTunnel });

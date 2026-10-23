@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ElevationDialog } from "./ElevationHost";
 import { envValue, isLowering, SecurityPanel, setEnvLines, VOICE_LIMITS, voiceLimitValue } from "./SecurityPanel";
+import { RemoteAccessSetup } from "./RemoteAccessSetup";
 import { SessionUserContext } from "./sessionContext";
 import { locales, requiredUiKeys, text } from "./i18n";
 
@@ -76,5 +77,17 @@ describe("the security screen", () => {
       expect(words, `${locale} ${id} is not the key`).not.toBe(id);
     }
     for (const locale of locales) { expect(text(locale, "sec_voice_range")).toContain("{min}"); expect(text(locale, "sec_voice_range")).toContain("{max}"); expect(text(locale, "sec_voice_seconds")).toContain("{seconds}"); }
+  });
+
+  it("offers the text that pairs a phone with the HTTPS of the house, in every language", () => {
+    for (const locale of locales) {
+      const html = renderToStaticMarkup(createElement(RemoteAccessSetup, { t: (key: string) => text(locale, key), origin: "https://casa.duckdns.org" }));
+      expect(html, locale).toContain(text(locale, "rem_pair_title").replace(/'/g, "&#x27;"));
+      expect(html, locale).toContain("casa.duckdns.org");   // the name of the house is the one the field starts with
+      for (const id of ["rem_pair_help", "rem_pair_host", "rem_pair_show", "rem_pair_copy", "rem_pair_none", "rem_pair_error", "rem_pair_until"]) {
+        expect(text(locale, id).trim().length, `${locale} ${id}`).toBeGreaterThan(1);
+        expect(text(locale, id), `${locale} ${id} is not the key`).not.toBe(id);
+      }
+    }
   });
 });
