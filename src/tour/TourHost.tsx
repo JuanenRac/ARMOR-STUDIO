@@ -7,7 +7,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { View } from "../domain";
 import { getPrefs, setPrefs, usePrefs } from "../prefs";
 import type { Locale } from "../i18n";
-import { Mascot } from "../assistant/Assistant";
+import { Mascot } from "../assistant/Mascot";
 import { getAlerts, useAlerts } from "../alerts/settings";
 import { speakAssistant, stopAssistantSpeech } from "../alerts/sounds";
 import { stepTour, stopTour, useActiveTour } from "./tourStore";

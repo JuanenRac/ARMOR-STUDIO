@@ -8,7 +8,6 @@ import { ConfirmHost } from "./askConfirm";
 import { ElevationHost } from "./ElevationHost";
 import { useAlarmAnnouncer } from "./alerts/useAlarmAnnouncer";
 import { AlarmPopups } from "./alerts/AlarmPopups";
-import { Assistant } from "./assistant/Assistant";
 import { PreflightDialog } from "./preflight/PreflightDialog";
 import type { RouteContext } from "./alerts/route";
 import { getPrefs, openingView, setPrefs, usePrefs } from "./prefs";
@@ -93,6 +92,8 @@ const studioVersion = manifest.version;
 
 // The menus that bring the most code (the four designers and the weather map with its own library) are fetched the first time they are opened, so the sign-in is not held back by their code or by
 // the language tables.
+// The assistant carries everything it knows how to answer, in every language, so it is fetched on its own after the page is drawn.
+const Assistant = lazy(() => import("./assistant/Assistant").then(module => ({ default: module.Assistant })));
 const SiteDesignerInteractive = lazy(() => import("./SiteDesignerInteractive").then(module => ({ default: module.SiteDesignerInteractive })));
 const ElectricalDesigner = lazy(() => import("./ElectricalDesigner").then(module => ({ default: module.ElectricalDesigner })));
 const NetworkDesigner = lazy(() => import("./NetworkDesigner").then(module => ({ default: module.NetworkDesigner })));
@@ -401,7 +402,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     <TourHost t={t} language={language} view={view} setView={setView} />
     <RichTooltips t={t} />
     {helpOpen && <HelpDialog initial={view} close={() => setHelpOpen(false)} t={t} language={language} />}
-    <Assistant view={view} t={t} language={language} go={setView} openHelp={() => setHelpOpen(true)} />
+    <Suspense fallback={null}><Assistant view={view} t={t} language={language} go={setView} openHelp={() => setHelpOpen(true)} /></Suspense>
     <AlarmPopups popups={announcer.popups} open={announcer.open} dismiss={announcer.dismiss} dismissAll={announcer.dismissAll} acknowledge={signedIn && !capabilities.can("acknowledge") ? undefined : id => { void acknowledgeAlarm(origin, id).then(alarmPoll.reload, () => undefined); }} t={t} />
     {aboutOpen && <AboutDialog version={studioVersion} revision={state.revision} close={() => setAboutOpen(false)} t={t} />}
     {versionsOf && <DesignVersionsDialog kind={versionsOf} origin={origin} t={t} close={() => setVersionsOf(null)}

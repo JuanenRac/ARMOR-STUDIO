@@ -16,23 +16,11 @@ import { getAlerts, useAlerts } from "../alerts/settings";
 import { speakAssistant, stopAssistantSpeech } from "../alerts/sounds";
 import { answer as answerQuestion, suggestions, type Answer } from "./engine";
 import type { Topic } from "./knowledge";
+import { Mascot } from "./Mascot";
 import "./assistant.css";
 
 const SCALE = { small: 0.8, normal: 1, large: 1.35 } as const;
 const clamp = (value: number, low: number, high: number): number => Math.min(high, Math.max(low, value));
-
-export function Mascot({ talking, speaking = false, scale = 1 }: { talking: boolean; /** Reading aloud: the mouth opens and closes like a person talking. */ speaking?: boolean; scale?: number }) {
-  return <svg className={`mascot ${talking ? "talking" : ""} ${speaking ? "speaking" : ""}`} viewBox="0 0 64 72" width={Math.round(56 * scale)} height={Math.round(63 * scale)} aria-hidden="true" focusable="false">
-    <line className="mascot-antenna" x1="32" y1="4" x2="32" y2="14" /><circle className="mascot-bulb" cx="32" cy="4" r="3" />
-    <rect className="mascot-head" x="10" y="14" width="44" height="34" rx="12" />
-    <rect className="mascot-visor" x="16" y="22" width="32" height="16" rx="8" />
-    <circle className="mascot-eye" cx="25" cy="30" r="3.2" /><circle className="mascot-eye" cx="39" cy="30" r="3.2" />
-    <path className="mascot-mouth" d="M26 43 Q32 47 38 43" />
-    <g className="mascot-speak"><g className="mascot-speak-open"><ellipse cx="32" cy="44" rx="6" ry="4.2" /></g></g>
-    <rect className="mascot-body" x="18" y="50" width="28" height="16" rx="7" />
-    <circle className="mascot-core" cx="32" cy="58" r="3" />
-  </svg>;
-}
 
 export function Assistant({ view, t, language, go, openHelp }: { view: View; t: (key: string) => string; language: Locale; go: (view: View) => void; openHelp: (view: string) => void }) {
   const prefs = usePrefs();
