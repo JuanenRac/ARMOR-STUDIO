@@ -7,7 +7,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { View } from "../domain";
 import type { Locale } from "../i18n";
-import { HELP_SECTIONS } from "../helpText";
+import { HELP_SECTIONS } from "../helpSections";
 import { setPrefs, usePrefs } from "../prefs";
 import { startTour, useActiveTour } from "../tour/tourStore";
 import { menuTourId } from "../tour/menuTours";

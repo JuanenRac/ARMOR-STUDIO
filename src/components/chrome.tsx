@@ -14,7 +14,7 @@ import { useClock } from "../hooks";
 import { formatUptime } from "../history";
 import type { Translate } from "./camera";
 import { ArmorMark } from "../menuLogos";
-import { HELP_SECTIONS } from "../helpText";
+import { HELP_SECTIONS } from "../helpSections";
 import { HELP_TECH } from "../helpTech";
 import { TourArt, ART_OF_VIEW, type ArtId } from "../tour/TourArt";
 import "../help.css";

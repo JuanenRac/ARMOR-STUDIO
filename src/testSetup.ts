@@ -1,4 +1,4 @@
-import { ensureLocale } from "./i18n";
+import { ensureLocale, locales } from "./i18n";
 
-// The tests read the phrases of every language: Portuguese, which the console fetches when it is first chosen, is loaded before any of them runs.
-await ensureLocale("pt");
+// The tests read the phrases of every language: the console fetches each one when it is first chosen, so all of them are loaded before any test runs.
+await Promise.all(locales.map(locale => ensureLocale(locale)));

@@ -6,8 +6,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 import { locales, text, type Locale } from "./i18n";
-import { hintCatalogue } from "./hintText";
-import { hintsPt } from "./hintsPt";
+import { HINT_KEYS, HINT_PREFIX } from "./locales/keys";
 import { fallbackHint, fallbackKind, fallbackLabel } from "./hintFallback";
 
 const ACTIVE = "button, a[href], select, input:not([type=hidden]), textarea, summary, [role=tab], [role=button]";   // the controls that always say what they are, even with no row in the catalogue
@@ -20,7 +19,7 @@ const labelsOf = (locale: Locale): Map<string, string[]> => {
   let map = reverse.get(locale);
   if (!map) {
     map = new Map();
-    for (const key of Object.keys(hintCatalogue)) {
+    for (const key of HINT_KEYS) {
       const label = normal(text(locale, key.replace(/^nav:/, "")));
       if (!label) continue;
       const list = map.get(label);
@@ -86,7 +85,7 @@ function apply(element: Element, locale: Locale): void {
     if (owned) { html.removeAttribute("title"); delete html.dataset.hintKey; }
     return;
   }
-  const hint = locale === "pt" ? (hintsPt[key] ?? hintCatalogue[key][0]) : hintCatalogue[key][locales.indexOf(locale)];
+  const hint = text(locale, HINT_PREFIX + key);
   const current = html.getAttribute("title");
   // A title the code wrote on purpose stays; one that only repeats the label (or one we wrote earlier) is replaced by the explanation.
   if (current && !owned && !words.includes(normal(current))) return;

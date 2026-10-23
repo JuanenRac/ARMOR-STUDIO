@@ -12,7 +12,9 @@
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "locales": "node tools/build_locales.mjs",
+    "locales:check": "node tools/build_locales.mjs --check"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",

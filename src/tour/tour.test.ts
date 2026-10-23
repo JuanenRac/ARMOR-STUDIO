@@ -7,7 +7,8 @@ import { ART_IDS, ART_OF_VIEW } from "./TourArt";
 import { TOURS, TOUR_TARGETS, moveStep, placeCard, stepKey } from "./tours";
 
 import configurationSource from "../ConfigurationPanel.tsx?raw";
-import { MENU_STEPS, menuTourCatalogues, menuTourId } from "./menuTours";
+import { MENU_STEPS, menuTourCatalogues } from "./menuToursText";
+import { menuTourId } from "./menuTours";
 // every component of the page, so that a part a step lights up can be looked for in all of them
 const components = import.meta.glob("../**/*.tsx", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
 const PAGE = Object.entries(components).filter(([path]) => !path.endsWith(".test.tsx")).map(([, text]) => text).join("\n");
