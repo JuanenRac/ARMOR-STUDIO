@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { readSite, saveSite } from "./api";
 import { applySiteDoc, buildSiteDoc, siteDocKey, type SiteDesign } from "./siteSync";
 import { isUntouchedDemo } from "./domain";
+import { forUser, storageUser } from "./storageScope";
 
 export type SiteSyncStatus = "idle" | "saved" | "saving" | "offline";
 export type SiteDraftInfo = { savedAt: string };
@@ -20,12 +21,17 @@ const SAVE_DELAY_MS = 1500, POLL_MS = 6000, DRAFT_KEY = "armor-studio-site-draft
 type Draft = { origin: string; baseRevision: number | null; savedAt: string; doc: Record<string, unknown> };
 const readDraft = (): Draft | null => {
   try {
-    const raw = JSON.parse(window.localStorage.getItem(DRAFT_KEY) ?? "null") as Partial<Draft> | null;
+    let stored = window.localStorage.getItem(forUser(DRAFT_KEY));
+    if (!stored && storageUser()) {   // the draft kept before drafts were kept per person: the first person to sign in takes it over
+      stored = window.localStorage.getItem(DRAFT_KEY);
+      if (stored) { window.localStorage.setItem(forUser(DRAFT_KEY), stored); window.localStorage.removeItem(DRAFT_KEY); }
+    }
+    const raw = JSON.parse(stored ?? "null") as Partial<Draft> | null;
     return raw && typeof raw.origin === "string" && typeof raw.savedAt === "string" && typeof raw.doc === "object" && raw.doc !== null
       ? { origin: raw.origin, baseRevision: typeof raw.baseRevision === "number" ? raw.baseRevision : null, savedAt: raw.savedAt, doc: raw.doc as Record<string, unknown> } : null;
   } catch { return null; }
 };
-const writeDraft = (draft: Draft | null) => { try { if (draft) window.localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); else window.localStorage.removeItem(DRAFT_KEY); } catch { /* A full or blocked storage only means there is no draft. */ } };
+const writeDraft = (draft: Draft | null) => { try { if (draft) window.localStorage.setItem(forUser(DRAFT_KEY), JSON.stringify(draft)); else window.localStorage.removeItem(forUser(DRAFT_KEY)); } catch { /* A full or blocked storage only means there is no draft. */ } };
 
 export function useSiteSync({ origin, enabled, design, apply, onConflict, onNotice }: {
   origin: string; enabled: boolean; design: SiteDesign; apply: (next: SiteDesign) => void; onConflict: () => void; onNotice?: (message: "recovered" | "kept") => void;

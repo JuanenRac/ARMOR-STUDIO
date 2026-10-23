@@ -19,6 +19,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type
 import { acknowledgeAlarm, listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
 import { clearSessionMemory } from "./sessionMemory";
+import { rememberUser, setStorageUser } from "./storageScope";
 import { cameraCoveringNode } from "./alerts/coverage";
 import { useConnectionAnnouncer } from "./alerts/useConnectionAnnouncer";
 import { ViewSlot, viewsToDraw } from "./viewSlots";
@@ -124,6 +125,8 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const [alarmDesign, setAlarmDesign] = useState<AlarmDesign>(EMPTY_ALARM_DESIGN);
   const [versionsOf, setVersionsOf] = useState<"site" | "electrical" | "network" | "alarm" | null>(null);
   const sessionUser = useSessionUser(origin);
+  setStorageUser(sessionUser.user?.id ?? null);   // before anything below reads or writes what this browser keeps for the person (the same value again is harmless)
+  if (sessionUser.user) rememberUser(origin, sessionUser.user.id);
   // What the person may do comes from the server's announcement (an older server sends none, and the role then decides as it always did): see capabilities.ts.
   const capabilities = useMemo(() => resolveCapabilities(sessionUser.user?.role, sessionUser.capabilities), [sessionUser.user?.role, sessionUser.capabilities]);
   const signedIn = sessionUser.user !== null;
@@ -254,13 +257,13 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   /** The designer hands back a whole model; only the parts that changed are stored again. */
   const design = useMemo(() => ({ dimensions, terrain, buildings, openings, roofItems, wallLamps, features, sensors, placements, cameras }), [dimensions, terrain, buildings, openings, roofItems, wallLamps, features, sensors, placements, cameras]);
   const siteSync = useSiteSync({
-    origin, enabled: restored && operatorUnlocked, design, onConflict: () => setNotice(t("siteConflict")), onNotice: kind => setNotice(t(kind === "recovered" ? "versionsDraftRecovered" : "versionsDraftNotice")),
+    origin, enabled: restored && operatorUnlocked && signedIn, design, onConflict: () => setNotice(t("siteConflict")), onNotice: kind => setNotice(t(kind === "recovered" ? "versionsDraftRecovered" : "versionsDraftNotice")),
     apply: next => { setDimensions(next.dimensions); setTerrain(next.terrain); setBuildings(next.buildings); setOpenings(next.openings); setRoofItems(next.roofItems); setWallLamps(next.wallLamps); setFeatures(next.features); setSensors(next.sensors); setPlacements(next.placements); setCameras(next.cameras); },
   });
   // The three drawings are also kept in this browser (for this server), so they are there when the server is not.
-  const electricalStatus = useElectricalSync({ origin, enabled: restored && operatorUnlocked, persist: restored, design: electrical, apply: setElectrical, onConflict: () => setNotice(t("elConflict")) });
-  const networkStatus = useNetworkSync({ origin, enabled: restored && operatorUnlocked, persist: restored, design: networkDesign, apply: setNetworkDesign, onConflict: () => setNotice(t("elConflict")) });
-  const alarmDesignStatus = useAlarmDesignSync({ origin, enabled: restored && operatorUnlocked, persist: restored, design: alarmDesign, apply: setAlarmDesign, onConflict: () => setNotice(t("elConflict")) });
+  const electricalStatus = useElectricalSync({ origin, enabled: restored && operatorUnlocked && signedIn, persist: restored && signedIn, design: electrical, apply: setElectrical, onConflict: () => setNotice(t("elConflict")) });
+  const networkStatus = useNetworkSync({ origin, enabled: restored && operatorUnlocked && signedIn, persist: restored && signedIn, design: networkDesign, apply: setNetworkDesign, onConflict: () => setNotice(t("elConflict")) });
+  const alarmDesignStatus = useAlarmDesignSync({ origin, enabled: restored && operatorUnlocked && signedIn, persist: restored && signedIn, design: alarmDesign, apply: setAlarmDesign, onConflict: () => setNotice(t("elConflict")) });
   const applySite = (next: SiteModel) => {
     if (next.terrain !== site.terrain) setTerrain(next.terrain);
     if (next.buildings !== site.buildings) setBuildings(next.buildings);
