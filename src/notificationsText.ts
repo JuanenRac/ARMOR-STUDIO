@@ -19,6 +19,7 @@ const rows: Record<string, Row> = {
   nt_telegram: ["Telegram", "Telegram", "Telegram", "Telegram", "Telegram", "Telegram", "Telegram"],
   nt_homeassistant: ["Home Assistant", "Home Assistant", "Home Assistant", "Home Assistant", "Home Assistant", "Home Assistant", "Home Assistant"],
   nt_language: ["Language of the sentences", "Idioma de las frases", "Sprache der Sätze", "Langue des phrases", "Lingua delle frasi", "文章の言語", "语句语言"],
+  nt_counts: ["delivered {0} · failed {1} · dropped {2} · waiting {3}", "entregados {0} · fallidos {1} · descartados {2} · en espera {3}", "zugestellt {0} · fehlgeschlagen {1} · verworfen {2} · wartend {3}", "livrés {0} · échoués {1} · abandonnés {2} · en attente {3}", "consegnati {0} · falliti {1} · scartati {2} · in attesa {3}", "配信 {0} · 失敗 {1} · 破棄 {2} · 待機中 {3}", "已送达 {0} · 失败 {1} · 丢弃 {2} · 等待中 {3}"],
   nt_test_all: ["Send a test to every place", "Enviar una prueba a todos los lugares", "Test an alle Ziele senden", "Envoyer un test à tous les endroits", "Invia una prova a tutte le destinazioni", "すべての送信先にテストを送信", "向所有去处发送测试"],
   nt_test_one: ["Test", "Probar", "Testen", "Tester", "Prova", "テスト", "测试"],
   nt_result_ok: ["delivered", "entregado", "zugestellt", "livré", "consegnato", "配信済み", "已送达"],

@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [0.8.0.8] - Diagnostics of the nodes, read-only access and the sensors of a radar node
 
+- **Notifications show what each place has come to:** under every place the alarms go to, the messages delivered, failed, dropped and waiting since the server started and why the last one failed, in the eight languages.
 - The repository has a security policy, a code of conduct, a contributing guide and a support file.
 - The banner follows the animated style of the ecosystem banners, with the name, the kind and the technologies of the project.
 - **The sizes of a spoken turn are fields in Configuration > Security:** the most audio the wall panel may send in one turn and the most spoken answer the server hands back in the binary form, as whole numbers checked against the ceilings of the server (3200 to 1920000 and 3200 to 1000000 bytes) before anything is sent, with the range and the seconds of speech it means beside them, in the eight languages. The server keeps them in its settings (the environment is where they start), they count at once, and raising one asks for confirmation because a longer turn costs the server more.

@@ -26,4 +26,8 @@ describe("the notifications screen", () => {
     expect(wanted.length).toBeGreaterThan(20);
     for (const locale of locales) for (const key of wanted) expect(text(locale, key).trim().length, `${locale} ${key}`).toBeGreaterThan(0);
   });
+
+  it("tells the counters of a place with its four numbers in every language", () => {
+    for (const locale of locales) for (const slot of ["{0}", "{1}", "{2}", "{3}"]) expect(text(locale, "nt_counts"), `${locale} ${slot}`).toContain(slot);
+  });
 });

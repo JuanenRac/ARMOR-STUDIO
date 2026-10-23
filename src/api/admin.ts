@@ -27,7 +27,8 @@ export const adminRemoveAccount = (origin: string, user: string) => userCall<{ o
 export const adminProvisionNode = (origin: string, request: { node_id: string; address: string; kind?: "radar" | "solar" | "electrical" | "network" | "alarm"; broker_host: string; broker_port?: number; panel_user?: string; panel_password?: string }) => userCall<ProvisionResult>(origin, "POST", "/api/v1/admin/nodes/provision", request, false, withSecret());
 // ---- Where the alarms are sent ----------------------------------------------------------------------------------------------------------------------
 
-export type NotificationsStatus = { webhook: boolean; mqtt: boolean; telegram: boolean; ntfy: boolean; homeassistant: boolean; language: string };
+export type ChannelMetrics = { delivered: number; failed: number; dropped: number; queued: number; last_delivered_at?: string; last_failure_at?: string; last_failure?: string };
+export type NotificationsStatus = { webhook: boolean; mqtt: boolean; telegram: boolean; ntfy: boolean; homeassistant: boolean; language: string; metrics?: Record<string, ChannelMetrics> };
 export type NotificationTestResult = { channel: string; ok: boolean; detail: string };
 export const notificationsStatus = (origin: string) => userCall<NotificationsStatus>(origin, "GET", "/api/v1/admin/notifications");
 export const notificationsTest = (origin: string, channel?: string) => userCall<{ results: NotificationTestResult[] }>(origin, "POST", "/api/v1/admin/notifications/test", channel ? { channel } : {});

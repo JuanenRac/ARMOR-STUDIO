@@ -3577,6 +3577,7 @@ export const PT_CATALOGUE: Record<string, string> = {
  "nt_telegram": "Telegram",
  "nt_homeassistant": "Home Assistant",
  "nt_language": "Idioma das frases",
+ "nt_counts": "entregues {0} · falhadas {1} · descartadas {2} · em espera {3}",
  "nt_test_all": "Enviar um teste a todos os destinos",
  "nt_test_one": "Testar",
  "nt_result_ok": "entregue",

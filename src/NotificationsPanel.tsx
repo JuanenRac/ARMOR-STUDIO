@@ -39,11 +39,12 @@ export function NotificationsPanel({ t, origin, isAdmin }: Props) {
         <article className="stack-card fw-card">
           <ul className="node-finder-list">
             {PLACES.map(place => {
-              const on = status?.[place] === true, result = results[place];
+              const on = status?.[place] === true, result = results[place], counts = status?.metrics?.[place];
               return <li key={place} className={on ? "" : "off"}>
                 <span className="state-dot" aria-hidden />
                 <div><strong>{t(`nt_${place}`)}</strong>
-                  <small>{on ? t("nt_on") : t("nt_off")}{result ? ` · ${result.ok ? t("nt_result_ok") : `${t("nt_result_fail")}: ${result.detail}`}` : ""}</small></div>
+                  <small>{on ? t("nt_on") : t("nt_off")}{result ? ` · ${result.ok ? t("nt_result_ok") : `${t("nt_result_fail")}: ${result.detail}`}` : ""}</small>
+                  {counts && <small data-testid={`nt-counts-${place}`}>{t("nt_counts").replace("{0}", String(counts.delivered)).replace("{1}", String(counts.failed)).replace("{2}", String(counts.dropped)).replace("{3}", String(counts.queued))}{counts.last_failure ? ` · ${counts.last_failure}` : ""}</small>}</div>
                 {on && <button type="button" onClick={() => void test(place)} disabled={busy !== ""}>{busy === place ? "…" : t("nt_test_one")}</button>}
               </li>;
             })}
