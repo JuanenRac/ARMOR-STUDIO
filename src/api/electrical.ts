@@ -5,7 +5,7 @@ import { endpoint, localSession, timedFetch, userCall } from "./transport";
 export type ElectricalElement = { id: string; name: string; kind: DeviceKind; protocol: DeviceProtocol; location: string; online: boolean; last_seen: string | null; risk: DeviceRisk; on?: boolean; power_w?: number; voltage_v?: number; current_a?: number; energy_kwh?: number; switchable: boolean };
 export type ElectricalElements = { elements: ElectricalElement[]; totals: { elements: number; online: number; on: number; power_w: number; energy_kwh: number } };
 export const electricalElements = (origin: string) => userCall<ElectricalElements>(origin, "GET", "/api/v1/electrical/devices");
-// ---- what the ARMOR-ELECTRICAL nodes measure -------------------------------------------------------------------------------------------
+// ---- what the ARMOR-NODE-ELECTRICAL nodes measure -------------------------------------------------------------------------------------------
 export type ElectricalChannelReading = {
   id: string; domain: "ac" | "dc"; label?: string; voltage_v?: number; current_a?: number; power_w?: number; energy_kwh?: number; power_estimated?: boolean; frequency_hz?: number; power_factor?: number;
   /** How old the last reading of the channel was when the node sent it, in milliseconds, and how many reads of it failed since the node started (the node says them when it can). */

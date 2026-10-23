@@ -34,7 +34,7 @@ type Props = {
   t: (key: string) => string;
   design: Design; setDesign: (next: Design) => void; status: SyncStatus;
   nodeIds: string[]; solarDevices: SolarDeviceView[]; solarWaiting: SolarRegistration[];
-  /** What the ARMOR-ELECTRICAL nodes report: an element tied to a node and a channel shows its figures. */
+  /** What the ARMOR-NODE-ELECTRICAL nodes report: an element tied to a node and a channel shows its figures. */
   electricalNodes?: ElectricalNodeReading[];
   /** The site design, to draw its motors and water equipment as loads. */
   site?: { openings: readonly Opening[]; features: readonly SiteFeature[]; roofItems: readonly RoofItem[] };

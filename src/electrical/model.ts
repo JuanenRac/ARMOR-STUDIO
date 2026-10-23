@@ -106,14 +106,14 @@ export const KINDS: readonly KindDef[] = BASE_KINDS.map(def => ({ ...def, props:
 
 const BY_KIND = new Map(KINDS.map(def => [def.kind, def]));
 export const kindDef = (kind: string): KindDef | undefined => BY_KIND.get(kind);
-/** The elements that gather signals: an ARMOR-ELECTRICAL node, and an automation controller (a PLC). A signal wire joins one of them to what it measures or switches. */
+/** The elements that gather signals: an ARMOR-NODE-ELECTRICAL node, and an automation controller (a PLC). A signal wire joins one of them to what it measures or switches. */
 export const isHub = (kind: string): boolean => kind === "node" || kind === "plc";
 export const isKind = (kind: unknown): kind is string => typeof kind === "string" && BY_KIND.has(kind);
 export const kindsIn = (category: Category): KindDef[] => KINDS.filter(def => def.category === category);
 
 // ---- the document -----------------------------------------------------------------------------------------------------------------
 
-/** What an element is tied to outside the drawing: a solar device the server reads (`node/device`), or an ARMOR-ELECTRICAL node and the id of one of its channels. */
+/** What an element is tied to outside the drawing: a solar device the server reads (`node/device`), or an ARMOR-NODE-ELECTRICAL node and the id of one of its channels. */
 export type Binding = { solar?: string; node?: string; channel?: string };
 export type ElementState = "closed" | "open";
 export type Element = { id: string; kind: string; x: number; y: number; name: string; props: Props; bind?: Binding; state?: ElementState };

@@ -1,5 +1,5 @@
 import { userCall } from "./transport";
-// ---- the alarm nodes (ARMOR-ALARM) -------------------------------------------------------------------------------------------------------
+// ---- the alarm nodes (ARMOR-NODE-ALARM) -------------------------------------------------------------------------------------------------------
 export type AlarmPhase = "disarmed" | "exit_delay" | "armed" | "entry_delay" | "alarm";
 export type AlarmZoneReading = { id: string; name?: string; kind: "instant" | "entry" | "interior" | "always"; state: "normal" | "triggered" | "tamper" | "trouble"; bypassed: boolean };
 export type AlarmEventReading = { ago_s: number; kind: "armed" | "exit_delay_started" | "entry_delay_started" | "alarm" | "siren_timed_out" | "disarmed" | "bad_pin" | "locked_out" | "zone_bypassed" | "siren_silenced"; zone?: string };

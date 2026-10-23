@@ -1,5 +1,5 @@
 /**
- * The Electrical menu: what the ARMOR-ELECTRICAL nodes measure, live. The totals of the house (the grid's power and energy, the nodes, the alarms), one card per node with
+ * The Electrical menu: what the ARMOR-NODE-ELECTRICAL nodes measure, live. The totals of the house (the grid's power and energy, the nodes, the alarms), one card per node with
  * its channels (voltage, current, power, energy, frequency, power factor, whether the line is closed) and its transfer switches as their auxiliary contacts show them.
  * Read only: nothing here sends a command. It belongs with the Electrical Designer, where the same nodes are drawn into the diagram of the house.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
