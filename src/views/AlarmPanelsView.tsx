@@ -1,5 +1,5 @@
 /**
- * The Alarm panels menu: what the ARMOR-ALARM nodes say about the house's alarm, live. The totals (panels, guarding, sounding), one card per node with its phase and mode,
+ * The Alarm panels menu: what the ARMOR-NODE-ALARM nodes say about the house's alarm, live. The totals (panels, guarding, sounding), one card per node with its phase and mode,
  * its zones and its last events, and - for an administrator, only when the server, the node and the broker all allow it - the buttons that arm and disarm it and, while its siren sounds, silence it.
  * A disarm (or a silence) from here asks for the PIN of the signed-in user (the server checks it; the node never sees it); an accepted command is not an armed alarm, and the card shows what the node says next.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.

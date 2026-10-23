@@ -379,7 +379,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   };
 
   const serverName = (() => { try { return new URL(origin).host; } catch { return origin; } })();
-  // A wall-panel account is for the panels (ARMOR-ALARM, ARMOR-HMI), not for Studio: every menu would answer it with a refusal.
+  // A wall-panel account is for the panels (ARMOR-NODE-ALARM, ARMOR-NODE-HMI), not for Studio: every menu would answer it with a refusal.
   if (sessionUser.user?.role === "panel") return <main className="studio-login-shell"><div className="studio-login-card"><h1>A.R.M.O.R. Studio</h1><p role="alert">{t("panel_account_notice")}</p><button className="primary" onClick={onSignOut}>{t("signOut")}</button></div></main>;
   return <SessionUserContext.Provider value={sessionUser}><KnownNodesContext.Provider value={knownNodes}><StreamRenewContext.Provider value={renewStream}><div className="studio-frame"><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
     <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} alarmBadge={alarmsPending} t={t} />

@@ -1,4 +1,4 @@
-/* The Alarm panels menu (the ARMOR-ALARM nodes), on the same look as the Electrical menu. */
+/* The Alarm panels menu (the ARMOR-NODE-ALARM nodes), on the same look as the Electrical menu. */
 .alarm-panels { display: grid; gap: 1rem; align-content: start; }
 .ap-card { gap: .8rem; }
 .ap-card.sounding { border-color: #ff6f79; box-shadow: 0 0 0 1px #ff6f7955, 0 0 24px #ff6f7933; }

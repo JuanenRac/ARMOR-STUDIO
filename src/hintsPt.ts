@@ -139,7 +139,7 @@ export const hintsPt: Record<string, string> = {
  "solarAddInverter": "Declara um inversor solar para que as suas leituras tenham um lugar.",
  "solarAddBattery": "Declara uma bateria para que as suas leituras tenham um lugar.",
  "solarExampleButton": "Mostra leituras inventadas para ver como fica o ecrã. Não se guarda nada.",
- "solarNode": "O nó de ligação que lê este equipamento (um nó ARMOR-SOLAR).",
+ "solarNode": "O nó de ligação que lê este equipamento (um nó ARMOR-NODE-SOLAR).",
  "solarIdentifier": "O nome curto que o nó usa para este equipamento, tal como está escrito nas definições do nó.",
  "solarConnection": "Como este equipamento está ligado ao nó (porta e protocolo).",
  "solarHistory": "Mostra como mudaram as leituras deste equipamento ao longo do tempo.",
