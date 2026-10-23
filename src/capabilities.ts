@@ -14,6 +14,7 @@ export type SecurityOptions = {
   "server.zone_feed_signature": boolean;
   "media.rtsp_proxy": boolean;
   "network.login_secure_only": boolean;
+  "voice.multipart_turn": boolean;
 };
 /** As the server sends it. */
 export type AnnouncedCapabilities = {
