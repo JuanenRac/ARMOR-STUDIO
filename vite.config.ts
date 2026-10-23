@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import { readFileSync } from "node:fs";
 
@@ -16,4 +16,6 @@ export default defineConfig({
   // Bind the IPv4 loopback address explicitly.  Vite's default `localhost`
   // resolution may select IPv6 on Windows, leaving 127.0.0.1 unavailable.
   server: { host: "127.0.0.1", port: 5178, strictPort: true },
+  // Portuguese is fetched the first time it is chosen; the tests read every language, so it is there before any of them runs.
+  test: { setupFiles: ["./src/testSetup.ts"] },
 });

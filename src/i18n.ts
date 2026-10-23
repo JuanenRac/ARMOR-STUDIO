@@ -43,7 +43,6 @@ import { notificationsCatalogue } from "./notificationsText";
 import { installationCatalogue } from "./installationText";
 import { sessionCatalogue } from "./sessionText";
 import { historyLogCatalogue } from "./historyLogText";
-import { PT_CATALOGUE } from "./ptCatalogue";
 import { ptHelpCatalogue } from "./helpText";
 import { ptMenuTourCatalogue } from "./tour/menuTours";
 export const locales = ["en", "es", "de", "fr", "it", "ja", "zh", "pt"] as const;
@@ -264,6 +263,18 @@ Object.assign(zh, {"toolboxTitle": "设计工具", "toolboxDrag": "拖动以移�
 for (const [code, catalogue] of Object.entries({ en, es, de, fr, it, ja, zh, pt })) { Object.assign(catalogue, designerCatalogues[code as Locale] ?? {}); Object.assign(catalogue, usersCatalogues[code as Locale] ?? {}); Object.assign(catalogue, securityCatalogues[code as Locale] ?? {}); Object.assign(catalogue, installationCatalogue(code as Locale)); Object.assign(catalogue, radarCatalogues[code as Locale] ?? {}); Object.assign(catalogue, solarCatalogues[code as Locale] ?? {}); Object.assign(catalogue, chromeCatalogues[code as Locale] ?? {}); Object.assign(catalogue, versionsCatalogues[code as Locale] ?? {}); Object.assign(catalogue, alarmDetailCatalogues[code as Locale] ?? {}); Object.assign(catalogue, networkOrdersCatalogues[code as Locale] ?? {}); Object.assign(catalogue, systemMetricsCatalogues[code as Locale] ?? {}); Object.assign(catalogue, ingestCatalogues[code as Locale] ?? {}); Object.assign(catalogue, energyCatalogues[code as Locale] ?? {}); Object.assign(catalogue, configCatalogues[code as Locale] ?? {}); Object.assign(catalogue, devicesCatalogues[code as Locale] ?? {}); Object.assign(catalogue, alarmsCatalogues[code as Locale] ?? {}); Object.assign(catalogue, overviewCatalogues[code as Locale] ?? {}); Object.assign(catalogue, servicesCatalogues[code as Locale] ?? {}); Object.assign(catalogue, weatherCatalogues[code as Locale] ?? {}); Object.assign(catalogue, electricalCatalogues[code as Locale] ?? {}); Object.assign(catalogue, networkCatalogues[code as Locale] ?? {}); Object.assign(catalogue, alarmDesignerCatalogues[code as Locale] ?? {}); Object.assign(catalogue, maintenanceCatalogues[code as Locale] ?? {}); Object.assign(catalogue, tourCatalogues[code as Locale] ?? {}); Object.assign(catalogue, menuTourCatalogues[code as Locale] ?? {}); Object.assign(catalogue, prefsCatalogues[code as Locale] ?? {}); Object.assign(catalogue, alertsCatalogues[code as Locale] ?? {}); Object.assign(catalogue, helpBookCatalogues[code as Locale] ?? {}); Object.assign(catalogue, alarmPanelsCatalogues[code as Locale] ?? {}); Object.assign(catalogue, nodeHealthCatalogues[code as Locale] ?? {}); Object.assign(catalogue, nodeControlCatalogues[code as Locale] ?? {}); Object.assign(catalogue, diagnosticsCatalogues[code as Locale] ?? {}); Object.assign(catalogue, armProfilesCatalogues[code as Locale] ?? {}); Object.assign(catalogue, helpCatalogue(code as Locale)); Object.assign(catalogue, adminCatalogue(code as Locale)); Object.assign(catalogue, firmwareCatalogue(code as Locale)); Object.assign(catalogue, notificationsCatalogue(code as Locale)); Object.assign(catalogue, sessionCatalogue(code as Locale)); Object.assign(catalogue, historyLogCatalogue(code as Locale)); Object.assign(catalogue, batteryCatalogue(code as Locale)); }
 
 const translations: Record<Locale, Catalogue> = { en, es, de, fr, it, ja, zh, pt };
-Object.assign(pt, PT_CATALOGUE, ptHelpCatalogue(), ptMenuTourCatalogue(), SECURITY_PT);
+// Portuguese is the biggest table of phrases and is read by one language only: its main table is fetched when it is first asked for (see ensureLocale), and until it arrives a phrase that
+// is not in the smaller tables below is shown in English.
+const ptSmall = (): Catalogue => ({ ...ptHelpCatalogue(), ...ptMenuTourCatalogue(), ...SECURITY_PT });
+Object.assign(pt, ptSmall());
+let ptLoading: Promise<void> | null = null;
+let ptLoaded = false;
+/** Resolves when the phrases of the language are there; the languages other than Portuguese are always there. */
+export function ensureLocale(locale: Locale): Promise<void> {
+  if (locale !== "pt" || ptLoaded) return Promise.resolve();
+  ptLoading ??= import("./ptCatalogue").then(module => { Object.assign(pt, module.PT_CATALOGUE, ptSmall()); ptLoaded = true; });
+  return ptLoading;
+}
+export const isLocaleLoaded = (locale: Locale): boolean => locale !== "pt" || ptLoaded;
 export const requiredUiKeys = Object.keys(en);
 export function text(locale: Locale, key: string): string { return translations[locale][key] ?? en[key] ?? key; }

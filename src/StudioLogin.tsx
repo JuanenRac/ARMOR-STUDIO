@@ -1,7 +1,7 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { ApiError, completeStudioSession, openStudioSession } from "./api";
 import { LANGUAGES, type LanguageCode } from "./domain";
-import { text } from "./i18n";
+import { ensureLocale, isLocaleLoaded, text } from "./i18n";
 import { parseStudioSettings, SETTINGS_KEY } from "./settings";
 
 type Props = { origin: string; onAuthenticated: (origin: string) => void };
@@ -49,6 +49,8 @@ export function StudioLogin({ origin: initialOrigin, onAuthenticated }: Props) {
   /** The challenge of the first step, when the account has the second factor on: the form then asks for the code. */
   const [challenge, setChallenge] = useState("");
   const [code, setCode] = useState("");
+  const [, setLoadedLocale] = useState(0);
+  useEffect(() => { const language = loginLanguage(); if (isLocaleLoaded(language)) return undefined; let live = true; void ensureLocale(language).then(() => { if (live) setLoadedLocale(count => count + 1); }); return () => { live = false; }; }, []);
   const t = (key: string) => text(loginLanguage(), key);
   const submit = async (event: FormEvent) => {
     event.preventDefault(); setBusy(true); setNotice("");

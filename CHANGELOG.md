@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [0.8.0.8] - Diagnostics of the nodes, read-only access and the sensors of a radar node
 
+- **Portuguese is fetched when it is first chosen:** its main table of phrases (183 kB) is a file of its own that the console and the sign-in screen load the first time Portuguese is the language, so the other seven languages no longer carry it; until it arrives a phrase that is not in the smaller Portuguese tables shows in English.
 - **Electrical channels show how fresh their reading is:** under the name of each channel, how long ago the node read it and how many reads failed, when the node says it, in the eight languages.
 - **A new alarm is told:** "the name used to reach the house from outside no longer points to its public address" (`network_dns_stale`), in the eight languages, for the day the address changed and the dynamic DNS did not follow.
 - **Notifications show what each place has come to:** under every place the alarms go to, the messages delivered, failed, dropped and waiting since the server started and why the last one failed, in the eight languages.

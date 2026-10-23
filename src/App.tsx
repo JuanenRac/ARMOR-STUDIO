@@ -45,7 +45,7 @@ import { NAV } from "./domain";
 const VIEW_ORDER = NAV.map(([key]) => key);
 import type { SiteModel } from "./designer/ops";
 import { usePolled, useFullscreen, useCameraReachability, useServerCameras, useServerInfo, useRemoteConnection, useServerStatus, useSessionUser, useStreamUrls } from "./hooks";
-import { text } from "./i18n";
+import { ensureLocale, isLocaleLoaded, text } from "./i18n";
 import { HistoryView } from "./HistoryView";
 import { MediaLibrary } from "./MediaLibrary";
 import { parseStudioSettings, serializeStudioSettings, SETTINGS_KEY, siteExport, type StudioSettings } from "./settings";
@@ -143,7 +143,10 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const [discovered, setDiscovered] = useState<DiscoveredCamera[]>([]);
   // The same function for as long as the language is the same: effects that list it among their dependencies (the rules of the history, the evidence library) were run again every second,
   // when the clock of the console draws it anew, and replaced what the person was editing with the copy of the server.
-  const t = useCallback((key: string, ...args: Array<string | number>) => args.reduce<string>((value, arg, index) => value.split(`{${index}}`).join(String(arg)), text(language, key)), [language]);
+  // Portuguese arrives as a separate file the first time it is chosen: the page is drawn again when it has.
+  const [loadedLocales, setLoadedLocales] = useState(0);
+  useEffect(() => { if (!isLocaleLoaded(language)) { let live = true; void ensureLocale(language).then(() => { if (live) setLoadedLocales(count => count + 1); }); return () => { live = false; }; } return undefined; }, [language]);
+  const t = useCallback((key: string, ...args: Array<string | number>) => args.reduce<string>((value, arg, index) => value.split(`{${index}}`).join(String(arg)), text(language, key)), [language, loadedLocales]);   // eslint-disable-line react-hooks/exhaustive-deps
   const [notice, setNotice] = useState("");
 
   const { state, connection: connectionState, latencyMs, live: liveChannel, apply: applyState } = useServerStatus(origin, { live: true });
