@@ -15,6 +15,7 @@ export type SecurityOptions = {
   "media.rtsp_proxy": boolean;
   "network.login_secure_only": boolean;
   "voice.multipart_turn": boolean;
+  "panel.live_events": boolean;
 };
 /** As the server sends it. */
 export type AnnouncedCapabilities = {

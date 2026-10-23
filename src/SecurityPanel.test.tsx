@@ -39,7 +39,7 @@ describe("the security screen", () => {
   });
 
   it("offers the option that keeps device logins from nodes that did not come over TLS, in every language, with its warning", () => {
-    for (const locale of locales) for (const id of ["sec_opt_netlogin", "sec_opt_netlogin_help", "sec_opt_netlogin_warn", "sec_opt_voiceturn", "sec_opt_voiceturn_help", "sec_opt_voiceturn_warn"]) {
+    for (const locale of locales) for (const id of ["sec_opt_netlogin", "sec_opt_netlogin_help", "sec_opt_netlogin_warn", "sec_opt_voiceturn", "sec_opt_voiceturn_help", "sec_opt_voiceturn_warn", "sec_opt_panellive", "sec_opt_panellive_help", "sec_opt_panellive_warn"]) {
       const words = text(locale, id);
       expect(words.trim().length, `${locale} ${id}`).toBeGreaterThan(8);
       expect(words, `${locale} ${id} is not the key`).not.toBe(id);
