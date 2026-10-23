@@ -1,18 +1,11 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { menuEntries, quiet, signIn } from "./support";
 
 const user = process.env.ARMOR_STUDIO_USER ?? "";
 const password = process.env.ARMOR_STUDIO_PASSWORD ?? "";
 
-async function signIn(page: Page): Promise<void> {
-  await page.goto("/");
-  // The sign-in screen speaks the language of the browser, so the fields are found by their test ids and not by their words.
-  await page.getByTestId("login-user").fill(user);
-  await page.getByTestId("login-password").fill(password);
-  await page.getByTestId("login-submit").click();
-  await expect(page.locator(".sidebar")).toBeVisible();
-}
-
 test("the login screen shows and refuses a wrong password", async ({ page }) => {
+  await quiet(page);
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "A.R.M.O.R. Studio" })).toBeVisible();
   await page.getByTestId("login-user").fill("nobody");
@@ -29,7 +22,7 @@ test.describe("signed in", () => {
     page.on("pageerror", error => problems.push(`pageerror: ${error.message}`));
     page.on("console", message => { if (message.type() === "error") problems.push(`console: ${message.text()}`); });
     await signIn(page);
-    const buttons = page.locator(".sidebar nav button");
+    const buttons = menuEntries(page);
     const count = await buttons.count();
     expect(count).toBeGreaterThan(8);
     for (let index = 0; index < count; index += 1) {
@@ -46,7 +39,7 @@ test.describe("signed in", () => {
 
   test("the configuration menu offers the node firmware and the notifications", async ({ page }) => {
     await signIn(page);
-    await page.locator(".sidebar nav button", { hasText: /configuraci|configuration/i }).first().click();
+    await menuEntries(page).filter({ hasText: /configuraci|configuration/i }).first().click();
     const tabs = page.locator(".config-tabs");
     await expect(tabs.getByText(/firmware/i).first()).toBeVisible();
     await expect(tabs.getByText(/notificaci|notifications/i).first()).toBeVisible();
@@ -59,7 +52,7 @@ for (const [width, height] of [[1366, 768], [1093, 614]] as const) {
     test.skip(!user || !password, "set ARMOR_STUDIO_USER and ARMOR_STUDIO_PASSWORD");
     await page.setViewportSize({ width, height });
     await signIn(page);
-    const buttons = page.locator(".sidebar nav button");
+    const buttons = menuEntries(page);
     const count = await buttons.count();
     for (let index = 0; index < count; index += 1) {
       const button = buttons.nth(index);
