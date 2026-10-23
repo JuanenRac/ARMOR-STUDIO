@@ -20,7 +20,7 @@ python e2e/ci_stack.py                     # needs nginx; NGINX_BIN and NGINX_MI
 python e2e/ci_stack.py -- --grep proxy     # what follows -- goes to `playwright test`
 ```
 
-To turn it off without touching the code, set the repository variable `ARMOR_STUDIO_E2E` to `off`, or disable the workflow in the Actions tab.
+To turn it off without touching the code, set the repository variable `ARMOR_E2E` to `off`, or disable the workflow in the Actions tab.
 
 ## By hand, against a Studio that is already running
 
