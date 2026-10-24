@@ -1444,6 +1444,8 @@ const catalogue: Record<string, string> = {
 "mode_wrong_pin": "Il PIN non è corretto: il sistema non è stato disattivato.",
 "mode_pin_locked": "Troppi PIN errati: attendi prima di riprovare.",
 "mode_pin_not_set": "Questo utente non ha un PIN per disattivare: lo imposta un amministratore in Configurazione > Utenti.",
+"pw_show": "Mostra la password",
+"pw_hide": "Nascondi la password",
 "pinPlaceholder": "Il tuo PIN, se ne hai uno",
 "modeNoAnswer": "Il server non ha risposto, la modalità non è cambiata. Riprova.",
 "modeServerError": "Il server ha rifiutato la modifica (errore {status}).",

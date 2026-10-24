@@ -3,6 +3,7 @@
  * and the removal of one.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { PasswordInput } from "./components/PasswordInput";
 import { IgnoreZonesEditor } from "./IgnoreZonesEditor";
 import { askConfirm } from "./askConfirm";
 import { snapshotHasLogin } from "./snapshotLogin";
@@ -93,7 +94,7 @@ export function CameraSettings(props: Props) {
       <div className="camera-field camera-field-wide"><label><span>{t("rtspPath")}</span><input placeholder="Streaming/Channels/101" value={form.rtspPath} onChange={event => update("rtspPath", event.target.value)} /></label><p className="field-help">{t("rtspPathHelp")}</p></div>
       <div className="camera-field camera-field-wide"><label><span>{t("previewPath")}</span><input placeholder="12" value={form.previewPath ?? ""} onChange={event => update("previewPath", event.target.value)} /></label><p className="field-help">{t("previewPathHelp")}</p></div>
       <div className="camera-field"><label><span>{t("cameraUser")}</span><input autoComplete="username" value={form.username} onChange={event => update("username", event.target.value)} /></label></div>
-      <div className="camera-field"><label><span>{t("cameraPassword")}</span><input type="password" autoComplete="current-password" placeholder={selected?.hasCredentials && !form.password ? "••••••••" : undefined} value={form.password} onChange={event => update("password", event.target.value)} /></label><p className="field-help">{selected?.hasCredentials && !form.password ? t("credentialsStored") : t("credentialNotice")}</p></div>
+      <div className="camera-field"><label><span>{t("cameraPassword")}</span><PasswordInput t={t} autoComplete="current-password" placeholder={selected?.hasCredentials && !form.password ? "••••••••" : undefined} value={form.password} onChange={event => update("password", event.target.value)} /></label><p className="field-help">{selected?.hasCredentials && !form.password ? t("credentialsStored") : t("credentialNotice")}</p></div>
       <div className="camera-field camera-field-wide"><label><span>{t("snapshotUrl")}</span><input placeholder="http://camera/snapshot.jpg" value={form.snapshotUrl} onChange={event => update("snapshotUrl", event.target.value)} /></label></div>
       <div className="camera-form-actions"><button className="primary" onClick={() => void saveCamera()}>{t("saveCamera")}</button><button disabled={!form.id || !(selected?.hasCredentials || (form.username && form.password))} onClick={() => void discoverRtsp()}>{t("discoverRtsp")}</button>{form.id && <button className="danger-button" onClick={() => void removeCamera()}>{t("deleteCamera")}</button>}</div><p className="notice">{message}</p>
     </article>

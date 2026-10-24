@@ -3,6 +3,7 @@
  * of the app), `POST /api/v1/studio/elevate` makes the session good for a few minutes, and the action that was refused is tried again by itself. Mounted once in the app.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { PasswordInput } from "./components/PasswordInput";
 import { useEffect, useState, type FormEvent } from "react";
 import { ApiError, elevateSession, setElevationAsker } from "./api";
 import { useDialogFocus } from "./components/useDialogFocus";
@@ -43,7 +44,7 @@ export function ElevationDialog({ t, origin, done }: { t: Translate; origin: str
       onMouseDown={event => event.stopPropagation()} onSubmit={event => void submit(event)} data-testid="elevation-dialog">
       <h2 id="elev-title">{t("sec_elev_title")}</h2>
       <p id="elev-text">{t("sec_elev_help")}</p>
-      <label>{t("sec_elev_password")}<input type="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} autoFocus /></label>
+      <label>{t("sec_elev_password")}<PasswordInput t={t} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} autoFocus /></label>
       <label>{t("sec_elev_code")}<input inputMode="numeric" autoComplete="one-time-code" value={code} onChange={event => setCode(event.target.value)} /></label>
       {message && <p className="login-notice" role="alert">{message}</p>}
       <div className="confirm-actions">

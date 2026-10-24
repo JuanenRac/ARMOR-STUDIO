@@ -1457,6 +1457,8 @@ const catalogue: Record<string, string> = {
 "mode_wrong_pin": "PIN が違います。警戒は解除されませんでした。",
 "mode_pin_locked": "PIN の誤りが多すぎます。しばらく待ってからやり直してください。",
 "mode_pin_not_set": "このユーザーには解除用の PIN がありません。管理者が「設定 > ユーザー」で設定します。",
+"pw_show": "パスワードを表示",
+"pw_hide": "パスワードを隠す",
 "pinPlaceholder": "PIN（設定している場合）",
 "modeNoAnswer": "サーバーが応答せず、モードは変更されていません。もう一度お試しください。",
 "modeServerError": "サーバーが変更を拒否しました（エラー {status}）。",

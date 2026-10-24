@@ -3,6 +3,7 @@
  * with creation, renaming, new passwords, roles and removal. Passwords are only ever typed here; the server keeps a hash.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { PasswordInput } from "./components/PasswordInput";
 import { askConfirm } from "./askConfirm";
 import { useCallback, useContext, useEffect, useState, type FormEvent } from "react";
 import { changeAccount, clearUserPin, createUser, deleteUser, listUsers, setMyPin, setUserPin, updateUser, type ListedUser, type Role } from "./api";
@@ -95,16 +96,16 @@ export function UsersPanel({ t, origin }: Props) {
       <p className="muted">{t("accountHelp")}</p>
       <form className="users-form" onSubmit={event => void saveAccount(event)}>
         <label>{t("userName")}<input value={account.username} autoComplete="username" maxLength={40} onChange={event => setAccount({ ...account, username: event.target.value })} /></label>
-        <label>{t("currentPassword")}<input type="password" autoComplete="current-password" value={account.current} onChange={event => setAccount({ ...account, current: event.target.value })} /></label>
-        <label>{t("newPassword")}<input type="password" autoComplete="new-password" placeholder={t("keepPassword")} value={account.next} onChange={event => setAccount({ ...account, next: event.target.value })} /></label>
-        <label>{t("confirmPassword")}<input type="password" autoComplete="new-password" value={account.repeat} onChange={event => setAccount({ ...account, repeat: event.target.value })} /></label>
+        <label>{t("currentPassword")}<PasswordInput t={t} autoComplete="current-password" value={account.current} onChange={event => setAccount({ ...account, current: event.target.value })} /></label>
+        <label>{t("newPassword")}<PasswordInput t={t} autoComplete="new-password" placeholder={t("keepPassword")} value={account.next} onChange={event => setAccount({ ...account, next: event.target.value })} /></label>
+        <label>{t("confirmPassword")}<PasswordInput t={t} autoComplete="new-password" value={account.repeat} onChange={event => setAccount({ ...account, repeat: event.target.value })} /></label>
         <div className="users-actions"><button className="primary" type="submit" disabled={!me || !account.current}>{t("saveAccount")}</button></div>
       </form>
       <h4>{t("pinTitle")}</h4>
       <p className="muted small">{t("pinHelp")} {t("currentPassword")}</p>
       <div className="users-form">
-        <label>{t("pinValue")}<input type="password" inputMode="numeric" autoComplete="off" maxLength={10} value={mine.pin} onChange={event => setMine({ ...mine, pin: digits(event.target.value) })} /></label>
-        <label>{t("duressValue")}<input type="password" inputMode="numeric" autoComplete="off" maxLength={10} value={mine.duress} onChange={event => setMine({ ...mine, duress: digits(event.target.value) })} /></label>
+        <label>{t("pinValue")}<PasswordInput t={t} inputMode="numeric" autoComplete="off" maxLength={10} value={mine.pin} onChange={event => setMine({ ...mine, pin: digits(event.target.value) })} /></label>
+        <label>{t("duressValue")}<PasswordInput t={t} inputMode="numeric" autoComplete="off" maxLength={10} value={mine.duress} onChange={event => setMine({ ...mine, duress: digits(event.target.value) })} /></label>
         <div className="users-actions"><button className="primary" disabled={!me || !account.current || mine.pin.length < 4} onClick={() => void saveMyPin()}>{t("pinSave")}</button><button disabled={!me || !account.current} onClick={() => void saveMyPin(true)}>{t("pinClear")}</button></div>
       </div>
     </article>
@@ -122,11 +123,11 @@ export function UsersPanel({ t, origin }: Props) {
                 {editing === user.id
                   ? <div className="users-edit">
                       <label>{t("userName")}<input value={draft.username} maxLength={40} onChange={event => setDraft({ ...draft, username: event.target.value })} /></label>
-                      <label>{t("newPassword")}<input type="password" autoComplete="new-password" placeholder={t("keepPassword")} value={draft.password} onChange={event => setDraft({ ...draft, password: event.target.value })} /></label>
+                      <label>{t("newPassword")}<PasswordInput t={t} autoComplete="new-password" placeholder={t("keepPassword")} value={draft.password} onChange={event => setDraft({ ...draft, password: event.target.value })} /></label>
                       <label>{t("role")}<select value={draft.role} onChange={event => setDraft({ ...draft, role: event.target.value as Role })}>{ROLES.map(role => <option key={role} value={role}>{roleName(role)}</option>)}</select></label>
                       <p className="muted small">{t(`roleHelp_${draft.role}`)}</p>
-                      <label>{t("pinValue")}<input type="password" inputMode="numeric" autoComplete="off" maxLength={10} placeholder={user.hasPin ? t("keepPassword") : ""} value={draft.pin} onChange={event => setDraft({ ...draft, pin: digits(event.target.value) })} /></label>
-                      <label>{t("duressValue")}<input type="password" inputMode="numeric" autoComplete="off" maxLength={10} value={draft.duress} onChange={event => setDraft({ ...draft, duress: digits(event.target.value) })} /></label>
+                      <label>{t("pinValue")}<PasswordInput t={t} inputMode="numeric" autoComplete="off" maxLength={10} placeholder={user.hasPin ? t("keepPassword") : ""} value={draft.pin} onChange={event => setDraft({ ...draft, pin: digits(event.target.value) })} /></label>
+                      <label>{t("duressValue")}<PasswordInput t={t} inputMode="numeric" autoComplete="off" maxLength={10} value={draft.duress} onChange={event => setDraft({ ...draft, duress: digits(event.target.value) })} /></label>
                       <div className="users-actions"><button className="primary" onClick={() => void saveEdit(user)}>{t("saveUser")}</button><button onClick={() => setEditing("")}>{t("cancel")}</button></div>
                     </div>
                   : <>
@@ -141,7 +142,7 @@ export function UsersPanel({ t, origin }: Props) {
             <h3>{t("addUser")}</h3>
             <form className="users-form" onSubmit={event => void add(event)}>
               <label>{t("userName")}<input value={fresh.username} autoComplete="off" maxLength={40} onChange={event => setFresh({ ...fresh, username: event.target.value })} /></label>
-              <label>{t("newPassword")}<input type="password" autoComplete="new-password" value={fresh.password} onChange={event => setFresh({ ...fresh, password: event.target.value })} /></label>
+              <label>{t("newPassword")}<PasswordInput t={t} autoComplete="new-password" value={fresh.password} onChange={event => setFresh({ ...fresh, password: event.target.value })} /></label>
               <label>{t("role")}<select value={fresh.role} onChange={event => setFresh({ ...fresh, role: event.target.value as Role })}>{ROLES.map(role => <option key={role} value={role}>{roleName(role)}</option>)}</select></label>
               <p className="muted small">{t("userName")}: {t("userNameRule")} · {rule}</p>
               <div className="users-actions"><button className="primary" type="submit" disabled={!fresh.username.trim() || !fresh.password}>{t("createUser")}</button></div>

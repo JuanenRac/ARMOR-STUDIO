@@ -5,6 +5,7 @@
  * Laid out in two columns: the nodes on the left; the firmware, the access and the start on the right; the progress under both.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { PasswordInput } from "./components/PasswordInput";
 import { onSessionCleared } from "./sessionMemory";
 import { nodeKindOf } from "./nodeKind";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
@@ -209,7 +210,7 @@ export function FirmwarePanel({ t, origin, isAdmin, network }: Props) {
           <h3>{t("fw_sec_login")}</h3>
           <p className="muted small">{t("fw_login_help")}</p>
           <div className="camera-field"><label><span>{t("fw_user")}</span><input value={login.user} autoComplete="off" onChange={event => setLogin({ ...login, user: event.target.value })} /></label></div>
-          <div className="camera-field"><label><span>{t("fw_password")}</span><input type="password" value={login.password} autoComplete="new-password" onChange={event => setLogin({ ...login, password: event.target.value })} /></label></div>
+          <div className="camera-field"><label><span>{t("fw_password")}</span><PasswordInput t={t} value={login.password} autoComplete="new-password" onChange={event => setLogin({ ...login, password: event.target.value })} /></label></div>
         </article>
 
         <article className="stack-card camera-form fw-card" aria-label={t("fw_sec_go")}>

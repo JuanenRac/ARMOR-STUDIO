@@ -4,6 +4,7 @@
  * The privileged work is done by the admin agent behind the server; when it is not installed these screens say so and change nothing.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { PasswordInput } from "./components/PasswordInput";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import {
   adminAccounts, adminAddAccount, adminFile, adminFiles, adminRemoveAccount, adminSaveFile, adminServiceAction, adminServices, adminStatus, setAdminSecret,
@@ -46,7 +47,7 @@ export function AgentProtection({ t, origin }: { t: Translate; origin: string })
   if (protection.mode === "open") return <p className="notice" role="note" data-testid="agent-open">{t("adm_sensitive_open")}</p>;
   if (protection.mode === "read_only") return <p className="muted" role="note" data-testid="agent-read-only">{t("adm_sensitive_read_only")}</p>;
   return <label className="adm-secret-field" data-testid="agent-second-secret">{t("adm_sensitive_second")}
-    <input type="password" autoComplete="off" value={secret} onChange={event => { setSecret(event.target.value); setAdminSecret(event.target.value); }} />
+    <PasswordInput t={t} autoComplete="off" value={secret} onChange={event => { setSecret(event.target.value); setAdminSecret(event.target.value); }} />
     <small className="hint">{t("adm_sensitive_second_help")}</small></label>;
 }
 

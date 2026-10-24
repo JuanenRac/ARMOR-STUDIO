@@ -1454,6 +1454,8 @@ const catalogue: Record<string, string> = {
 "mode_wrong_pin": "El PIN no es correcto: el sistema no se ha desarmado.",
 "mode_pin_locked": "Demasiados PIN erróneos: espera un poco antes de volver a intentarlo.",
 "mode_pin_not_set": "Este usuario no tiene un PIN para desarmar: lo pone un administrador en Configuración > Usuarios.",
+"pw_show": "Mostrar la contraseña",
+"pw_hide": "Ocultar la contraseña",
 "pinPlaceholder": "Tu PIN, si tienes uno",
 "modeNoAnswer": "El servidor no ha respondido, así que el modo no ha cambiado. Inténtalo de nuevo.",
 "modeServerError": "El servidor ha rechazado el cambio (error {status}).",

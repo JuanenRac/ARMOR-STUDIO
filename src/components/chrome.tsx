@@ -2,6 +2,7 @@
  * The Studio shell: sidebar, top bar, and the About and Help dialogs.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { PasswordInput } from "./PasswordInput";
 import { useState } from "react";
 import { useDialogFocus } from "./useDialogFocus";
 import { setAlerts, useAlerts } from "../alerts/settings";
@@ -178,7 +179,7 @@ export function PinDialog({ title, text, confirmLabel, confirm, cancel, t }: { t
       onSubmit={event => { event.preventDefault(); confirm(pin); }}>
       <h2 id="pin-title">{title}</h2>
       <p id="pin-text">{text}</p>
-      <label className="pin-field">{t("pinLabel")}<input type="password" inputMode="numeric" autoComplete="one-time-code" maxLength={10} value={pin} autoFocus
+      <label className="pin-field">{t("pinLabel")}<PasswordInput t={t} inputMode="numeric" autoComplete="one-time-code" maxLength={10} value={pin} autoFocus
         placeholder={t("pinPlaceholder")} onChange={event => setPin(event.target.value.replace(/[^0-9]/g, ""))} /></label>
       <div className="confirm-actions">
         <button type="button" onClick={cancel}>{t("cancelAction")}</button>

@@ -4,6 +4,7 @@
  * opened, and in the solar menus its name goes into the form of a new equipment.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { PasswordInput } from "./components/PasswordInput";
 import { useContext, useEffect, useMemo, useState, type FormEvent } from "react";
 import { adminProvisionNode, ApiError, firmwareProbe, sendNetworkOrder, type ProvisionResult } from "./api";
 import { useCapabilities } from "./sessionContext";
@@ -85,7 +86,7 @@ function AdoptForm({ t, origin, candidate, close }: { t: Translate; origin: stri
     <label>{t("adm_adopt_id")}<input value={form.node_id} onChange={event => setForm({ ...form, node_id: event.target.value.toLowerCase() })} placeholder="nodo-radar-2" autoComplete="off" /></label>
     <label>{t("adm_adopt_broker")}<input value={form.broker_host} onChange={event => setForm({ ...form, broker_host: event.target.value })} autoComplete="off" /></label>
     <label>{t("adm_adopt_user")}<input value={form.user} onChange={event => setForm({ ...form, user: event.target.value })} autoComplete="off" /></label>
-    <label>{t("adm_adopt_password")}<input type="password" value={form.password} onChange={event => setForm({ ...form, password: event.target.value })} autoComplete="new-password" /></label>
+    <label>{t("adm_adopt_password")}<PasswordInput t={t} value={form.password} onChange={event => setForm({ ...form, password: event.target.value })} autoComplete="new-password" /></label>
     <div className="adm-foot"><button type="button" onClick={close}>{t("close")}</button><button className="primary" type="submit" disabled={busy || !/^[a-z0-9][a-z0-9_-]{0,63}$/.test(form.node_id) || form.broker_host.trim() === ""}>{t("adm_adopt_go")}</button></div>
     {error && <p className="notice bad" role="status">{error}</p>}
     {result?.written && <p className="notice" role="status">{t("adm_adopt_written")}</p>}

@@ -5,6 +5,7 @@
  * keyboard); the model, the operations, the checks and the storage of the drawing are in ./network.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { PasswordInput } from "./components/PasswordInput";
 import { useViewActive } from "./viewSlots";
 import { askConfirm } from "./askConfirm";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
@@ -424,7 +425,7 @@ export function NetworkDesigner({ t, design, setDesign, status, overview, camera
     const title = t(`ndp_${prop.key}`);
     if (prop.type === "number") return <label key={prop.key}>{title}<input type="number" min={prop.min} max={prop.max} step={prop.step ?? 1} value={typeof value === "number" ? value : 0} onChange={event => { const next = Number(event.target.value); if (event.target.value !== "" && Number.isFinite(next)) commit(setProp(designRef.current, element.id, prop.key, next), `prop:${element.id}:${prop.key}`); }} /></label>;
     if (prop.type === "choice") return <label key={prop.key}>{title}<select value={String(value)} onChange={event => commit(setProp(designRef.current, element.id, prop.key, event.target.value))}>{prop.choices.map(choice => <option key={choice} value={choice}>{choiceText(choice)}</option>)}</select></label>;
-    return <label key={prop.key}>{title}<input type={prop.secret ? "password" : "text"} autoComplete="off" maxLength={prop.max} value={String(value ?? "")} onChange={event => commit(setProp(designRef.current, element.id, prop.key, event.target.value.trim()), `prop:${element.id}:${prop.key}`)} /></label>;
+    return <label key={prop.key}>{title}<PasswordInput t={t} secret={prop.secret} autoComplete="off" maxLength={prop.max} value={String(value ?? "")} onChange={event => commit(setProp(designRef.current, element.id, prop.key, event.target.value.trim()), `prop:${element.id}:${prop.key}`)} /></label>;
   };
   const elementPanel = (element: Element): ReactNode => {
     const def = kindDef(element.kind)!;

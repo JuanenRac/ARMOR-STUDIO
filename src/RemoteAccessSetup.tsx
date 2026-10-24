@@ -4,6 +4,7 @@
  * The work is done by the maintenance helper; this only asks for it and says what happened in plain words.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { PasswordInput } from "./components/PasswordInput";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { ddnsRemove, ddnsSetup, ddnsUpdate, listNodePanels, remoteTls, nodePanelFingerprint, nodePanelUrl, remoteSetupState, removeNodePanel, saveNodePanel, vpnAddPeer, vpnRemovePeer,
   vpnSetup, vpnShowPeer, type DdnsInput, type NodePanel, type RemoteSetupState, type RemoteTls, type VpnPeerConfig } from "./api";
@@ -124,7 +125,7 @@ function Ddns({ t, origin, state, reload }: Props & { state: RemoteSetupState; r
       {provider === "cloudflare" && <><label>{t("rem_ddns_zone")}<input value={form.zone} onChange={event => setForm({ ...form, zone: event.target.value })} /></label>
         <label>{t("rem_ddns_record")}<input value={form.record} onChange={event => setForm({ ...form, record: event.target.value })} /></label></>}
       {provider === "url" ? <label>{t("rem_ddns_address")}<input value={form.url} onChange={event => setForm({ ...form, url: event.target.value })} placeholder="https://…?ip={ip}" /></label>
-        : <label>{t("rem_ddns_token")}<input type="password" autoComplete="off" value={form.token} onChange={event => setForm({ ...form, token: event.target.value })} /></label>}
+        : <label>{t("rem_ddns_token")}<PasswordInput t={t} autoComplete="off" value={form.token} onChange={event => setForm({ ...form, token: event.target.value })} /></label>}
       <button className="primary" disabled={busy || !ready}>{t("rem_ddns_save")}</button>
     </form>}
     <Notice message={message} />

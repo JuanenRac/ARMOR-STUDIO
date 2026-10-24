@@ -3,6 +3,7 @@
  * a request (to check an outside-the-house set-up from a phone on mobile data) and, for an administrator, the settings of that access in the form of a few choices instead of a file.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { PasswordInput } from "./components/PasswordInput";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { adminFile, adminSaveFile, adminStatus, endMySession, endOtherSessions, listMySessions, remoteCheck, totpDisable, totpEnable, totpSetup, totpState,
   type RemoteCheck, type SessionRow, type TotpState } from "./api";
@@ -51,7 +52,7 @@ function SecondFactor({ t, origin }: { t: (key: string) => string; origin: strin
     <p className="muted">{t("sec_2fa_help")}</p>
     {state && <p className="notice"><b>{state.enabled ? t("sec_2fa_state_on") : t("sec_2fa_state_off")}</b>{state.enabled && <> {state.recovery_left} {t("sec_2fa_left")}</>}</p>}
     {state && !state.enabled && !setup && <form onSubmit={event => void start(event)}>
-      <label>{t("sec_2fa_password")}<input type="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} /></label>
+      <label>{t("sec_2fa_password")}<PasswordInput t={t} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} /></label>
       <button className="primary" disabled={password === ""}>{t("sec_2fa_start")}</button>
     </form>}
     {setup && <form onSubmit={event => void enable(event)}>
@@ -63,7 +64,7 @@ function SecondFactor({ t, origin }: { t: (key: string) => string; origin: strin
     </form>}
     {codes && <div className="notice" role="status" data-testid="recovery-codes"><strong>{t("sec_2fa_codes_title")}</strong><p>{t("sec_2fa_codes_help")}</p><pre className="mono">{codes.join("\n")}</pre></div>}
     {state?.enabled && <form onSubmit={event => void disable(event)}>
-      <label>{t("sec_2fa_password")}<input type="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} /></label>
+      <label>{t("sec_2fa_password")}<PasswordInput t={t} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} /></label>
       <button disabled={password === ""}>{t("sec_2fa_disable")}</button>
     </form>}
     <Message message={message} />

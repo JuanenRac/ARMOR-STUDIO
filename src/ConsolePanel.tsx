@@ -4,6 +4,7 @@
  * with a time limit; the folder is remembered from one command to the next; the output comes in as it is printed; a running command can be stopped. Every command is in the audit trail.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { PasswordInput } from "./components/PasswordInput";
 import { onSessionCleared } from "./sessionMemory";
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { ApiError, cancelConsoleJob, lockConsole, readConsole, readConsoleJob, runConsole, unlockConsole, type ConsoleJob, type ConsoleState } from "./api";
@@ -115,7 +116,7 @@ export function ConsolePanel({ t, origin, isAdmin }: Props) {
     <form onSubmit={event => void unlock(event)}>
       <h4>{t("mc_lock_title")}</h4>
       <p className="muted">{t("mc_lock_help")}</p>
-      <label>{t("mc_password")}<input type="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} autoFocus /></label>
+      <label>{t("mc_password")}<PasswordInput t={t} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} autoFocus /></label>
       <button className="primary" type="submit" disabled={password === ""}>{t("mc_unlock")}</button>
     </form>
     {message && <p className="notice" role="alert">{message}</p>}

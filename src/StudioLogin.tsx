@@ -1,3 +1,4 @@
+import { PasswordInput } from "./components/PasswordInput";
 import { useEffect, useState, type FormEvent } from "react";
 import { ApiError, completeStudioSession, openStudioSession } from "./api";
 import { LANGUAGES, type LanguageCode } from "./domain";
@@ -87,7 +88,7 @@ export function StudioLogin({ origin: initialOrigin, onAuthenticated }: Props) {
     </> : <>
     <label>{t("login_server")}<input name="server" id="studio-login-server" value={origin} onChange={event => setOrigin(event.target.value)} inputMode="url" autoComplete="url" required /></label>
     <label>{t("login_user")}<input data-testid="login-user" name="username" id="studio-login-user" value={username} onChange={event => setUsername(event.target.value)} autoComplete="username" required /></label>
-    <label>{t("login_password")}<input data-testid="login-password" name="password" id="studio-login-password" value={password} onChange={event => setPassword(event.target.value)} type="password" autoComplete="current-password" required /></label>
+    <label>{t("login_password")}<PasswordInput t={t} data-testid="login-password" name="password" id="studio-login-password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password" required /></label>
     <label className="login-remember"><input type="checkbox" name="remember" id="studio-login-remember" data-testid="login-remember" checked={remember} onChange={event => { setRemember(event.target.checked); if (!event.target.checked) storeRememberedUser(false, ""); }} />{t("login_remember")}</label>
     <button className="primary" data-testid="login-submit" disabled={busy}>{busy ? t("login_busy") : t("login_enter")}</button>
     {notice && <p className="login-notice" role="alert">{notice}</p>}

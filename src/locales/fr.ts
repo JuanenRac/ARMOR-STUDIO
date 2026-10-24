@@ -1435,6 +1435,8 @@ const catalogue: Record<string, string> = {
 "mode_wrong_pin": "Le code PIN n'est pas bon : le système n'a pas été désarmé.",
 "mode_pin_locked": "Trop de codes PIN erronés : patientez avant de réessayer.",
 "mode_pin_not_set": "Cet utilisateur n'a pas de code PIN pour désarmer : un administrateur le définit dans Configuration > Utilisateurs.",
+"pw_show": "Afficher le mot de passe",
+"pw_hide": "Masquer le mot de passe",
 "pinLabel": "Code PIN",
 "pinPlaceholder": "Votre code PIN, si vous en avez un",
 "modeNoAnswer": "Le serveur n'a pas répondu, le mode n'a pas changé. Réessayez.",

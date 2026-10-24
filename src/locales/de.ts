@@ -1428,6 +1428,8 @@ const catalogue: Record<string, string> = {
 "mode_wrong_pin": "Die PIN ist falsch: das System wurde nicht unscharf geschaltet.",
 "mode_pin_locked": "Zu viele falsche PINs: Bitte warten Sie, bevor Sie es erneut versuchen.",
 "mode_pin_not_set": "Dieser Benutzer hat keine PIN zum Entschärfen: Ein Administrator legt sie unter Konfiguration > Benutzer fest.",
+"pw_show": "Passwort anzeigen",
+"pw_hide": "Passwort verbergen",
 "pinPlaceholder": "Ihre PIN, falls vorhanden",
 "modeNoAnswer": "Der Server hat nicht geantwortet, der Modus wurde nicht geändert. Versuchen Sie es erneut.",
 "modeServerError": "Der Server hat die Änderung abgelehnt (Fehler {status}).",

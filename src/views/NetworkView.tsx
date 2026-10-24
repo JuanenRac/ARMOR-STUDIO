@@ -5,6 +5,7 @@
  * devices, hide them from the list and ask to be told when one comes back; an administrator marks the ones that are known, which quiets the alarm of a new device.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import { PasswordInput } from "../components/PasswordInput";
 import { useEffect, useMemo, useState } from "react";
 import { forgetDeviceLogin, forgetDeviceNote, listNetwork, readNetworkHistory, saveDeviceLogin, saveDeviceNote } from "../api";
 import { ViewTabs } from "../components/ViewTabs";
@@ -105,7 +106,7 @@ function DeviceDetail({ t, origin, node, device, isAdmin, reload, now, close, st
     <p className="hint">{t("no_login_help")}</p>
     {isAdmin ? <form className="net-form" onSubmit={event => { event.preventDefault(); void keepLogin(); }}>
       <label>{t("no_login_user")}<input value={loginUser} maxLength={64} autoComplete="off" onChange={event => setLoginUser(event.target.value)} /></label>
-      <label>{t("no_login_password")}<input type="password" value={loginPassword} maxLength={128} autoComplete="new-password" placeholder={device.login ? "••••••" : ""} onChange={event => setLoginPassword(event.target.value)} /></label>
+      <label>{t("no_login_password")}<PasswordInput t={t} value={loginPassword} maxLength={128} autoComplete="new-password" placeholder={device.login ? "••••••" : ""} onChange={event => setLoginPassword(event.target.value)} /></label>
       <div className="net-actions"><button className="primary" type="submit" disabled={!loginUser.trim()}>{t("no_login_keep")}</button>{device.login && <button type="button" onClick={() => void dropLogin()}>{t("no_login_forget")}</button>}</div>
     </form> : <p className="hint">{t("net_admin_only")}</p>}
 
