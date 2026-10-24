@@ -43,6 +43,22 @@
 | Technik | React 19 / TypeScript / Vite |
 | Auf echter Hardware | Täglich am CM5-Testaufbau im Einsatz (echter Server, echte IP-Kameras, ein echter Radarknoten); die Menüs für Solar, Elektro, Alarmzentralen und Touchpanel warten auf echte Knoten |
 
+## 🚦 Projektstatus
+
+Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heute ist. Sie beruht auf dem, was das Repository zeigen kann (Tests, Builds, Läufe), nicht auf dem, was geplant ist.
+
+🟢 Fertig und überprüft · 🟡 Funktioniert, mit bekannten Grenzen · 🟠 Teilweise fertig oder noch nicht überprüft · 🔴 Nicht gemacht oder funktioniert nicht
+
+| Bereich | Stand | Was das hier bedeutet |
+|---|---|---|
+| Software | 🟢 | Die Konsole läuft täglich gegen den echten Server des CM5-Prüfstands. |
+| Tests | 🟢 | 959 Unit-Tests bestehen (`npm test`) und die Browser-Tests laufen: Einstellungen, Zusammenführen der Kameras, Solardiagramme, Geometrie und Prüfungen der Designer, Alarm-Ansager, Wörterbuch des Assistenten und jedes Menü in den acht Sprachen. |
+| Oberfläche | 🟡 | Live-Video und PTZ sind nicht mit jeder möglichen Kamera belegt, es gab keine formale Prüfung der Barrierefreiheit oder Bedienbarkeit, und die Bilder der Hilfe entstehen mit Beispieldaten. |
+| Hardware | 🟡 | Er wird täglich mit dem echten Server, echten IP-Kameras und einem echten Radar-Knoten genutzt; die Menüs für Solar, Elektrik, Alarmzentrale und Touch-Panel warten auf echte Knoten. |
+| Sicherheit | 🟡 | Sitzungen, Rollen und die Ablehnung von Kamera-Zugangsdaten in Adressen sind durch Tests abgedeckt; es gab keine unabhängige Prüfung. |
+| Integration | 🟡 | Solange der Server nicht erreichbar ist, zeigt Studio Demodaten und sagt das in der oberen Leiste. |
+| Dokumentation | 🟢 | Acht Sprachen, die eingebaute Hilfe und die geführten Rundgänge, die Sicherheitshinweise und das Änderungsprotokoll sind aktuell. |
+
 ## 🎯 Überblick
 
 **ARMOR-STUDIO** ist die Konsole des Bedieners. Sie hält nie ein Kamerapasswort, eine RTSP-Adresse oder ein Token: sie meldet sich mit Benutzername und Passwort am Server an, erhält eine **HttpOnly**-Sitzung von 8 Stunden, und alles Privilegierte läuft über diese Sitzung.

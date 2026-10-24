@@ -43,6 +43,22 @@
 | Technologie | React 19 / TypeScript / Vite |
 | Sur matériel réel | Utilisé chaque jour sur le banc de test CM5 (vrai serveur, vraies caméras IP, un vrai nœud radar) ; les menus solaire, électrique, centrales d'alarme et panneau tactile attendent de vrais nœuds |
 
+## 🚦 État du projet
+
+Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'hui. Elle est écrite d'après ce que le dépôt peut montrer (tests, compilations, exécutions), pas d'après ce qui est prévu.
+
+🟢 Fait et vérifié · 🟡 Fonctionne, avec des limites connues · 🟠 À moitié fait ou pas encore vérifié · 🔴 Pas fait ou ne fonctionne pas
+
+| Domaine | État | Ce que cela veut dire ici |
+|---|---|---|
+| Logiciel | 🟢 | La console tourne au quotidien contre le vrai serveur du banc d'essai CM5. |
+| Tests | 🟢 | 959 tests unitaires réussissent (`npm test`) et les tests de navigateur s'exécutent : réglages, fusion des caméras, graphiques solaires, géométrie et contrôles des concepteurs, annonceur d'alarmes, dictionnaire de l'assistant et chaque menu dans les huit langues. |
+| Interface | 🟡 | La vidéo en direct et le PTZ ne sont pas prouvés avec toutes les caméras possibles, il n'y a pas eu de revue formelle d'accessibilité ou d'utilisabilité, et les images de l'aide sont faites avec des données d'exemple. |
+| Matériel | 🟡 | Il est utilisé chaque jour avec le vrai serveur, de vraies caméras IP et un vrai nœud radar ; les menus solaire, électrique, de centrale d'alarme et de panneau tactile attendent de vrais nœuds. |
+| Sécurité | 🟡 | Les sessions, les rôles et le refus des identifiants de caméra dans les adresses sont couverts par des tests ; il n'y a pas eu de revue indépendante. |
+| Intégration | 🟡 | Tant que le serveur est injoignable, Studio affiche des données de démonstration et le dit dans la barre du haut. |
+| Documentation | 🟢 | Huit langues, l'aide intégrée et les visites guidées, les notes de sécurité et le journal des modifications sont à jour. |
+
 ## 🎯 Présentation
 
 **ARMOR-STUDIO** est la console de l'opérateur. Elle ne détient jamais un mot de passe de caméra, une adresse RTSP ni un jeton : elle se connecte au serveur avec un nom et un mot de passe, reçoit une session **HttpOnly** de 8 heures, et tout ce qui est privilégié passe par cette session.

@@ -43,6 +43,22 @@
 | Tecnología | React 19 / TypeScript / Vite |
 | En hardware real | Usado a diario contra el banco de pruebas de la CM5 (servidor real, cámaras IP reales, un nodo radar real); los menús solar, eléctrico, de centrales de alarma y de panel táctil esperan nodos reales |
 
+## 🚦 Estado del proyecto
+
+Cada línea es una parte de este repositorio y la luz dice hasta dónde llega hoy. Se escribe con lo que el repositorio puede demostrar (pruebas, compilaciones, ejecuciones), no con lo previsto.
+
+🟢 Hecho y verificado · 🟡 Funciona, con límites conocidos · 🟠 Hecho a medias o sin verificar · 🔴 Sin hacer o sin funcionar
+
+| Área | Estado | Qué significa aquí |
+|---|---|---|
+| Software | 🟢 | La consola funciona a diario contra el servidor real del banco de pruebas CM5. |
+| Pruebas | 🟢 | Pasan 959 pruebas unitarias (`npm test`) y se ejecutan las pruebas de navegador: ajustes, fusión de cámaras, gráficas solares, geometría y comprobaciones de los diseñadores, el anunciador de alarmas, el diccionario del asistente y cada menú en los ocho idiomas. |
+| Interfaz | 🟡 | El vídeo en vivo y el PTZ no están probados con todas las cámaras posibles, no ha habido una revisión formal de accesibilidad o usabilidad, y las imágenes de la Ayuda se hacen con datos de ejemplo. |
+| Hardware | 🟡 | Se usa a diario con el servidor real, cámaras IP reales y un nodo radar real; los menús solar, eléctrico, de panel de alarma y de panel táctil esperan nodos reales. |
+| Seguridad | 🟡 | Las sesiones, los roles y el rechazo de credenciales de cámara en las direcciones están cubiertos por pruebas; no ha habido una revisión independiente. |
+| Integración | 🟡 | Mientras no se puede alcanzar el servidor, Studio muestra datos de demostración y lo dice en la barra superior. |
+| Documentación | 🟢 | Ocho idiomas, la Ayuda integrada y los recorridos guiados, las notas de seguridad y el historial de cambios están al día. |
+
 ## 🎯 Descripción general
 
 **ARMOR-STUDIO** es la consola del operador. Nunca guarda una contraseña de cámara, una dirección RTSP ni un token: inicia sesión en el servidor con usuario y contraseña, recibe una sesión **HttpOnly** de 8 horas y todo lo privilegiado viaja por esa sesión.
