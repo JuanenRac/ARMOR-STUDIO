@@ -34,8 +34,34 @@ import type { RadarEventList as ClientRadarEventList } from "../nodeHealth";
 import type { RemoteTls as ClientRemoteTls } from "../remoteAccess";
 import type { Rules as ClientRules } from "../history";
 import type { ZoneLink as ClientZoneLink } from "../alarmNodes";
+import type { AdminFile as ClientAdminFile } from "../admin";
+import type { ArmProfiles as ClientArmProfiles } from "../alarmNodes";
+import type { ArmorEvent as ClientArmorEvent } from "../history";
+import type { Automation as ClientAutomation } from "../devices";
+import type { BatteryOperation as ClientBatteryOperation } from "../battery";
+import type { Camera as ClientCamera } from "../../domain";
+import type { NodeHealthDetail as ClientNodeHealthDetail } from "../nodeHealth";
+import type { ConnectionState as ClientConnectionState } from "../system";
+import type { ConsoleState as ClientConsoleState } from "../maintenance";
+import type { FirmwareProbe as ClientFirmwareProbe } from "../firmware";
+import type { FirmwareRelease as ClientFirmwareRelease } from "../firmware";
+import type { HistorySummary as ClientHistorySummary } from "../history";
+import type { InstallationReport as ClientInstallationReport } from "../admin";
+import type { NetworkOverview as ClientNetworkOverview } from "../../networkModel";
+import type { NodeDiagnostics as ClientNodeDiagnostics } from "../diagnostics";
+import type { NodeHealthList as ClientNodeHealthList } from "../nodeHealth";
+import type { Preferences as ClientPreferences } from "../session";
+import type { Preflight as ClientPreflight } from "../system";
+import type { RemoteCheck as ClientRemoteCheck } from "../security";
+import type { ServerInfo as ClientServerInfo } from "../system";
+import type { SolarOverview as ClientSolarOverview } from "../solar";
+import type { SystemState as ClientSystemState } from "../../types";
+import type { SystemSummary as ClientSystemSummary } from "../system";
+import type { TotpState as ClientTotpState } from "../security";
 
 type Fits<Server, Client> = [Server] extends [Client] ? true : never;
+/** The other way round: what the console reads is something the contract allows (for a type the console narrows to the cases it handles). */
+type Within<Client, Server> = [Client] extends [Server] ? true : never;
 
 /** The types of this console that the contract's own types are assignable to. */
 type Checked = {
@@ -65,9 +91,33 @@ type Checked = {
   RemoteTls: Fits<Rest.RemoteTls, ClientRemoteTls>;
   Rules: Fits<Rest.Rules, ClientRules>;
   ZoneLink: Fits<Rest.ZoneLink, ClientZoneLink>;
+  AdminFile: Fits<Rest.AdminFile, ClientAdminFile>;
+  ArmProfiles: Fits<Rest.ArmProfiles, ClientArmProfiles>;
+  Automation: Fits<Rest.Automation, ClientAutomation>;
+  BatteryOperation: Fits<Rest.BatteryOperation, ClientBatteryOperation>;
+  ConnectionState: Fits<Rest.ConnectionState, ClientConnectionState>;
+  ConsoleState: Fits<Rest.ConsoleState, ClientConsoleState>;
+  FirmwareRelease: Fits<Rest.FirmwareRelease, ClientFirmwareRelease>;
+  HistorySummary: Fits<Rest.HistorySummary, ClientHistorySummary>;
+  InstallationReport: Fits<Rest.InstallationReport, ClientInstallationReport>;
+  NetworkOverview: Fits<Rest.NetworkOverview, ClientNetworkOverview>;
+  NodeDiagnostics: Fits<Rest.NodeDiagnostics, ClientNodeDiagnostics>;
+  NodeHealthList: Fits<Rest.NodeHealthList, ClientNodeHealthList>;
+  Preferences: Fits<Rest.Preferences, ClientPreferences>;
+  Preflight: Fits<Rest.Preflight, ClientPreflight>;
+  RemoteCheck: Fits<Rest.RemoteCheck, ClientRemoteCheck>;
+  ServerInfo: Fits<Rest.ServerInfo, ClientServerInfo>;
+  SolarOverview: Fits<Rest.SolarOverview, ClientSolarOverview>;
+  SystemState: Fits<Rest.SystemState, ClientSystemState>;
+  SystemSummary: Fits<Rest.SystemSummary, ClientSystemSummary>;
+  TotpState: Fits<Rest.TotpState, ClientTotpState>;
+  ArmorEvent: Within<ClientArmorEvent, Rest.ArmorEvent>;
+  NodeHealthDetail: Fits<Rest.NodeHealthDetail, ClientNodeHealthDetail>;
+  CameraShared: Fits<Rest.Camera, Pick<ClientCamera, "id" | "name" | "host" | "snapshotUrl" | "username" | "onvifPort" | "rtspPort" | "rtspPath" | "previewPath" | "hasCredentials" | "liveVideoAvailable">>;
+  FirmwareProbe: Fits<Rest.FirmwareProbe, { nodes: ClientFirmwareProbe[] }>;
 };
 // A type in which one of them is `never` cannot be assigned `true`: that is the failure.
-export const checked: { [K in keyof Checked]: true } = {
+export const checked: Checked = {
   Alarm: true,
   AlarmNodes: true,
   AutomationAction: true,
@@ -94,10 +144,41 @@ export const checked: { [K in keyof Checked]: true } = {
   RemoteTls: true,
   Rules: true,
   ZoneLink: true,
+  AdminFile: true,
+  ArmProfiles: true,
+  Automation: true,
+  BatteryOperation: true,
+  ConnectionState: true,
+  ConsoleState: true,
+  FirmwareRelease: true,
+  HistorySummary: true,
+  InstallationReport: true,
+  NetworkOverview: true,
+  NodeDiagnostics: true,
+  NodeHealthList: true,
+  Preferences: true,
+  Preflight: true,
+  RemoteCheck: true,
+  ServerInfo: true,
+  SolarOverview: true,
+  SystemState: true,
+  SystemSummary: true,
+  TotpState: true,
+  ArmorEvent: true,
+  NodeHealthDetail: true,
+  CameraShared: true,
+  FirmwareProbe: true,
 };
 
-/** Types of this console that have the name of a schema of the contract and are not compared yet: the contract leaves optional what the console takes as always there (or the other way round). */
-export const NOT_YET_COMPARED: readonly string[] = ["AdminFile", "ArmProfiles", "ArmorEvent", "Automation", "BatteryOperation", "Camera", "ConnectionState", "ConsoleState", "FirmwareProbe", "FirmwareRelease", "HistorySummary", "InstallationReport", "NetworkOverview", "NodeDiagnostics", "NodeHealthList", "Preferences", "Preflight", "RemoteCheck", "ServerInfo", "SiteDesign", "SolarOverview", "SystemState", "SystemSummary", "TotpState"];
+/**
+ * Types of this console that carry the name of a schema of the contract and are not compared with it, and why: the console means something else by the name.
+ * A new type of the console that takes the name of a schema has to be compared above or named here, or the last test of this file fails.
+ */
+export const NOT_THE_SAME_THING: Readonly<Record<string, string>> = {
+  SiteDesign: "the contract's SiteDesign is the saved envelope ({ revision, updated_at, updated_by, site }); the console's is the document inside it (`site`), whose shape the contract leaves to the editor",
+};
+/** The comparisons above that are made under another name than the schema's, by the name they are made under. */
+const UNDER_ANOTHER_NAME: Readonly<Record<string, string>> = { CameraShared: "Camera" };
 
 const common = path.join(process.cwd(), "..", "ARMOR-COMMON", "generated");
 const required = process.env.ARMOR_REQUIRE_SIBLINGS === "1";
@@ -115,8 +196,21 @@ describe("the types of the HTTP contract", () => {
     });
   }
 
-  it("compares the types of the console that exist in the contract and says which it does not compare yet", () => {
-    expect(Object.keys(checked).length).toBeGreaterThan(20);
-    expect(NOT_YET_COMPARED.filter(name => name in checked)).toEqual([]);
+  it("compares every type of the console that has the name of a schema of the contract, or says why it does not", () => {
+    const schemas = new Set([...fs.readFileSync(path.join(__dirname, "armor-rest.ts"), "utf8").matchAll(/^export type (\w+) =/gm)].map(match => match[1]));
+    const compared = new Set([...Object.keys(checked).map(name => UNDER_ANOTHER_NAME[name] ?? name), ...Object.keys(NOT_THE_SAME_THING)]);
+    const found: string[] = [];
+    const walk = (folder: string): void => {
+      for (const entry of fs.readdirSync(folder, { withFileTypes: true })) {
+        const full = path.join(folder, entry.name);
+        if (entry.isDirectory()) { if (entry.name !== "contract") walk(full); continue; }
+        if (!/\.tsx?$/.test(entry.name) || /\.test\./.test(entry.name)) continue;
+        for (const match of fs.readFileSync(full, "utf8").matchAll(/^export type (\w+)/gm)) if (schemas.has(match[1]) && !compared.has(match[1])) found.push(`${match[1]} (${path.relative(path.join(__dirname, ".."), full)})`);
+      }
+    };
+    walk(path.join(__dirname, ".."));
+    expect(found).toEqual([]);
+    expect(Object.keys(checked).length).toBeGreaterThanOrEqual(50);
+    expect(Object.keys(NOT_THE_SAME_THING).every(name => schemas.has(name))).toBe(true);
   });
 });

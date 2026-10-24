@@ -211,8 +211,8 @@ export function StatusBar(props: StatusBarProps) {
       {item(t("sbCameras"), `${camerasReachable}/${camerasTotal}`, camerasTone)}
       <span className={`sb-mode ${mode}`}>{mode === "armed" ? t("armed") : t("disarmed")}</span>
       {highAlerts > 0 && <span className="sb-alert">{highAlerts} {t("sbHigh")}</span>}
-      {info && item(t("sbServer"), `v${info.version}`)}
-      {info && item(t("sbUptime"), formatUptime(info.uptime_s))}
+      {info?.version !== undefined && item(t("sbServer"), `v${info.version}`)}
+      {info?.uptime_s !== undefined && item(t("sbUptime"), formatUptime(info.uptime_s))}
       {info?.mqtt !== undefined && item("MQTT", info.mqtt ? t("sbOn") : t("sbOff"), info.mqtt ? "" : "dim")}
       {info?.live_video !== undefined && item(t("sbVideo"), info.live_video ? t("sbOn") : t("sbOff"), info.live_video ? "" : "dim")}
       {live && item(t("sbLive"), t("sbOn"))}
