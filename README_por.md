@@ -134,8 +134,10 @@ ARMOR-STUDIO/
 │   ├── weather/      the Weather menu: radar map, clouds, forecast
 │   └── ...           ConfigurationPanel (tabs: General, Preferences, Users, Notifications, Automatic capture, Node firmware, Updates, Server, Services, Broker, Files, Installation, Console), MediaLibrary, HistoryView, StudioLogin, one *Text.ts per area (eight languages, one row per phrase); locales/ holds the table of each language, written from them
 ├── public/help/      the pictures of the Help, one set per language
+├── index.html        the page Vite builds the app from
+├── nginx/            default.conf.template, security_headers.conf (the web server of the image and its security headers)
 ├── e2e/              browser tests (Playwright)
-├── tools/            serve.mjs (+ tests), build_locales.mjs (writes locales/)
+├── tools/            serve.mjs (+ tests), build_locales.mjs (writes locales/), the shared CI checks (armor_ci_validate.py, armor_project_tool.py, _armor_readme_parity.py)
 ├── docs/             security model
 └── images/           brand assets
 ```
