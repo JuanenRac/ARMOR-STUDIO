@@ -25,6 +25,7 @@ const ROWS: Record<string, Row> = {
   tileInternet_down: ["internet down", "sin internet", "kein Internet", "pas d'internet", "niente internet", "インターネット不通", "无法上网"],
   tileInternet_degraded: ["internet degraded", "internet degradado", "Internet gestört", "internet dégradé", "internet degradato", "インターネット低下", "网络不稳"],
   tileInternet_unknown: ["internet unknown", "internet sin datos", "Internet unbekannt", "internet inconnu", "internet sconosciuto", "インターネット不明", "网络未知"],
+  tileNodes: ["All nodes", "Todos los nodos", "Alle Knoten", "Tous les nœuds", "Tutti i nodi", "すべてのノード", "全部节点"],
   tileOffline: ["offline", "sin conexión", "offline", "hors ligne", "offline", "オフライン", "离线"],
   tileAlarms: ["Alarms", "Alarmas", "Alarme", "Alarmes", "Allarmi", "アラーム", "警报"], tileRadar: ["Radar nodes", "Nodos radar", "Radarknoten", "Nœuds radar", "Nodi radar", "レーダーノード", "雷达节点"], tileCameras: ["Cameras", "Cámaras", "Kameras", "Caméras", "Telecamere", "カメラ", "摄像头"], tileDevices: ["Devices", "Dispositivos", "Geräte", "Appareils", "Dispositivi", "デバイス", "设备"],
   tileAutomations: ["Automations", "Automatizaciones", "Automatisierungen", "Automatisations", "Automazioni", "オートメーション", "自动化"], tileSite: ["Site design", "Diseño del sitio", "Standortentwurf", "Plan du site", "Progetto del sito", "敷地設計", "场地设计"], tileEvidence: ["Evidence", "Evidencias", "Beweise", "Preuves", "Prove", "証拠", "证据"], tileSystem: ["Server", "Servidor", "Server", "Serveur", "Server", "サーバー", "服务器"],

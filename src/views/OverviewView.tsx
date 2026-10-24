@@ -13,6 +13,7 @@ import { ago, deviceProblem, KindIcon } from "../deviceKinds";
 import { usePolled } from "../hooks";
 import type { Reachability } from "../api";
 import type { NodeState } from "../types";
+import type { NodeCensus } from "../nodeCensus";
 import type { Camera, Dimensions, View } from "../domain";
 import type { Translate } from "../components/camera";
 import { AlarmSource } from "./AlarmsView";
@@ -25,6 +26,8 @@ type Props = {
   model: SiteModel; dimensions: Dimensions; setView: (view: View) => void; onDevice: (id: string) => void; now: number;
   /** What the other parts of Studio last read (null: not read yet): the alarm panels, the solar equipment, the electrical nodes and the network node. */
   panels?: AlarmNodes | null; solar?: SolarOverview | null; electrical?: ElectricalReadings | null; network?: NetworkOverview | null;
+  /** Every kind of node, counted (radar, solar, electrical, alarm and hmi), not only the radar nodes of the stream. */
+  census?: NodeCensus | null;
 };
 
 const size = (bytes: number): string => bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1)} GB` : bytes >= 1e6 ? `${(bytes / 1e6).toFixed(0)} MB` : `${Math.round(bytes / 1e3)} kB`;
@@ -36,7 +39,7 @@ function Tile({ colour, label, value, sub, onClick, alert, icon }: { colour: str
   </button>;
 }
 
-export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras, reachability, devices, alarms, model, dimensions, setView, onDevice, now, panels = null, solar = null, electrical = null, network = null, readOnly = false }: Props) {
+export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras, reachability, devices, alarms, model, dimensions, setView, onDevice, now, panels = null, solar = null, electrical = null, network = null, census = null, readOnly = false }: Props) {
   const system = usePolled(() => readSystem(origin), 6000, origin).data;
   const feed = usePolled(() => listHistory(origin, { limit: 12 }), 5000, origin).data?.events ?? [];
   const active = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at);
@@ -50,7 +53,9 @@ export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras
   const silentNodes = nodes.filter(node => !node.online || node.stale);
   const silentCameras = cameras.filter(camera => reachability[camera.id] === "offline");
   const silentPanels = (panels?.nodes ?? []).filter(node => node.stale);
-  const attentionCount = troubled.length + silentNodes.length + silentCameras.length + silentPanels.length;
+  // the nodes of the other kinds that do not report (the radar ones are in silentNodes and the alarm panels in silentPanels)
+  const silentOthers = (census?.silent ?? []).filter(node => node.family !== "radar" && !silentPanels.some(panel => panel.node_id === node.node_id));
+  const attentionCount = troubled.length + silentNodes.length + silentCameras.length + silentPanels.length + silentOthers.length;
   const internet = network?.totals.internet ?? null;
   const internetKey = internet === "up" ? "up" : internet === "degraded" ? "degraded" : internet === "down" || internet === "lan_down" ? "down" : "unknown";
   const pv = solar ? Math.round(solar.totals.pv_w) : null;
@@ -73,6 +78,8 @@ export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras
       <Tile colour={active.length ? (critical ? "#ff4d5e" : "#ffb020") : "#34d399"} alert={active.length > 0} icon="!" label={t("tileAlarms")} value={active.length} sub={active.length ? t("alarmsActive") : t("allClear")} onClick={() => setView("alarms")} />
       <Tile colour="#f472b6" icon="▣" label={t("tilePanels")} value={panels ? `${panels.totals.armed}/${panels.totals.nodes}` : "—"} sub={panels && panels.totals.sounding > 0 ? `${panels.totals.sounding} ${t("tileSounding")}` : t("tileGuarding")} alert={(panels?.totals.sounding ?? 0) > 0} onClick={() => setView("alarmPanels")} />
       <Tile colour="#38bdf8" icon="◌" label={t("tileRadar")} value={`${nodesOnline}/${nodes.length}`} sub={`${tracks} ${t("tileTracks")}`} onClick={() => setView("radar")} />
+      <Tile colour="#22d3ee" icon="▦" label={t("tileNodes")} value={census ? `${census.online}/${census.total}` : "—"}
+        sub={census && census.families.length ? census.families.map(entry => `${t(`nh_family_${entry.family}`)} ${entry.online}/${entry.total}`).join(" · ") : t("tileOnline")} onClick={() => setView("system")} />
       <Tile colour="#a78bfa" icon="◉" label={t("tileCameras")} value={`${camerasReachable}/${cameras.length}`} sub={t("tileReachable")} onClick={() => setView("cameras")} />
       <Tile colour="#34d399" icon="◈" label={t("tileDevices")} value={`${devicesOnline}/${devices.length}`} sub={triggered ? `${triggered} ${t("tileTriggered")}` : t("tileOnline")} alert={triggered > 0} onClick={() => setView("devices")} />
       <Tile colour="#fbbf24" icon="☀" label={t("tileEnergy")} value={pv === null ? "—" : `${pv} W`} sub={solar?.totals.soc_percent != null ? `${Math.round(solar.totals.soc_percent)} % ${t("tileBattery")}` : electrical?.totals.grid_w != null ? `${Math.round(electrical.totals.grid_w)} W ${t("tileGrid")}` : "—"} onClick={() => setView("inverters")} />
@@ -95,6 +102,7 @@ export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras
           {attentionCount === 0 ? <p className="ov-ok">✓ {t("nothingToAttend")}</p> : <ul className="ov-list">
             {silentNodes.slice(0, 3).map(node => <li key={`n-${node.node_id}`} className="warning" onClick={() => setView("radar")}><span className="ov-kind">◌</span><div><strong>{node.node_id}</strong><small>{t("alarm_node_down")}</small></div></li>)}
             {silentPanels.slice(0, 2).map(node => <li key={`p-${node.node_id}`} className="warning" onClick={() => setView("alarmPanels")}><span className="ov-kind">▣</span><div><strong>{node.node_id}</strong><small>{t("tileOffline")}</small></div></li>)}
+            {silentOthers.slice(0, 3).map(node => <li key={`o-${node.node_id}`} className="warning" onClick={() => setView("system")}><span className="ov-kind">▦</span><div><strong>{node.node_id}</strong><small>{t(`nh_family_${node.family}`)} · {t("tileOffline")}</small></div></li>)}
             {silentCameras.slice(0, 2).map(camera => <li key={`c-${camera.id}`} className="warning" onClick={() => setView("cameras")}><span className="ov-kind">◉</span><div><strong>{camera.name}</strong><small>{t("alarm_camera_down")}</small></div></li>)}
             {troubled.slice(0, 3).map(device => <li key={device.id} className="warning" onClick={() => onDevice(device.id)}><span className="ov-kind"><KindIcon kind={device.kind} size={18} /></span><div><strong>{device.name}</strong><small>{t(`problem_${deviceProblem(device)}`)}</small></div></li>)}
           </ul>}

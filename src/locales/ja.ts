@@ -2027,6 +2027,7 @@ const catalogue: Record<string, string> = {
 "tileInternet_down": "インターネット不通",
 "tileInternet_degraded": "インターネット低下",
 "tileInternet_unknown": "インターネット不明",
+"tileNodes": "すべてのノード",
 "tileOffline": "オフライン",
 "tileAlarms": "アラーム",
 "tileRadar": "レーダーノード",

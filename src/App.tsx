@@ -15,7 +15,8 @@ import { TourHost } from "./tour/TourHost";
 import { RichTooltips } from "./tour/RichTooltips";
 import { shouldAutoStart, startTour } from "./tour/tourStore";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { acknowledgeAlarm, listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
+import { readNodeHealth, acknowledgeAlarm, listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
+import { nodeCensus } from "./nodeCensus";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
 import { clearSessionMemory } from "./sessionMemory";
 import { rememberUser, setStorageUser } from "./storageScope";
@@ -176,6 +177,9 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     ips: nodes.flatMap(node => (node.panel ? [node.panel.ip] : [])),
   }), [nodes, solarPoll.data, electricalPoll.data, alarmNodesPoll.data]);
   const networkPoll = usePolled(() => listNetwork(origin), 5000, origin, { always: true });
+  // the count of every kind of node (radar, solar, electrical, alarm, hmi), from the health they report and from the radar stream
+  const nodeHealthPoll = usePolled(() => readNodeHealth(origin), 10_000, origin, { always: true });
+  const census = useMemo(() => nodeCensus(nodes, nodeHealthPoll.data), [nodes, nodeHealthPoll.data]);
   const devices = devicePoll.data?.devices ?? [];
   const alarms = alarmPoll.data;
   const alertContext = useMemo<RouteContext>(() => ({
@@ -352,7 +356,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const visitedViews = useRef(new Set<View>());
   const shownPanels = useRef(new Map<View, ReactNode>());
   const panels: Record<View, ReactNode> = {
-    overview: <Ticking>{now => <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} readOnly={cannotArm} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} panels={alarmNodesPoll.data ?? null} solar={solarPoll.data ?? null} electrical={electricalPoll.data ?? null} network={networkPoll.data ?? null} />}</Ticking>,
+    overview: <Ticking>{now => <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} readOnly={cannotArm} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} panels={alarmNodesPoll.data ?? null} solar={solarPoll.data ?? null} electrical={electricalPoll.data ?? null} network={networkPoll.data ?? null} census={census} />}</Ticking>,
     alarms: <Ticking>{now => <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} readOnly={cannotArm} />}</Ticking>,
     alarmPanels: <Ticking>{now => <AlarmPanelsView openDesigner={() => setView("alarmDesigner")} t={t} origin={origin} nodes={alarmNodesPoll.data ?? null} unreachable={alarmNodesPoll.failed} network={networkPoll.data ?? null} isAdmin={isAdmin} now={now} />}</Ticking>,
     electrical: <Ticking>{now => <ElectricalView openDevices={() => setView("devices")} t={t} origin={origin} readings={electricalPoll.data ?? null} unreachable={electricalPoll.failed} design={electrical} openDesigner={() => setView("electricalDesigner")} network={networkPoll.data} now={now} />}</Ticking>,
@@ -413,7 +417,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     {pendingMode === "armed" && <PreflightDialog origin={origin} names={{ cameras, devices }} confirm={() => void changeMode("armed")} cancel={() => setPendingMode(null)} t={t} />}
   </main>
   <StatusBar serverName={serverName} synced={connectionState === "synced"} mode={state.mode}
-    nodesOnline={nodes.filter(node => node.online && !node.stale).length} nodesTotal={nodes.length}
+    nodesOnline={census.online} nodesTotal={census.total}
     camerasReachable={cameras.filter(camera => reachability[camera.id] === "online").length} camerasTotal={cameras.length}
     highAlerts={nodes.filter(node => node.online && !node.stale && node.alert_level === "high").length}
     info={serverInfo} latencyMs={latencyMs} live={liveChannel} revision={state.revision} onSignOut={onSignOut} t={t} />

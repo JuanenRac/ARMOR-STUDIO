@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The overview and the bottom bar count every kind of node, not only the radar ones:** a new tile of the overview shows how many nodes answer out of all of them, with the figure of each kind (radar, solar, electrical, alarm and hmi); the bottom bar counts the same; a node of another kind that stopped reporting appears in "Needs attention" with its kind. The count takes the health every node reports and the radar stream, and a node that is in both is counted once.
 - **Every password field has an eye button to see what is typed or to hide it again:** the sign-in, the elevation prompt, the users and their PINs, the security and two-factor panels, the console, the cameras, the firmware, the node adoption, the remote access token, the network designer and the admin secret use one component (`PasswordInput`) that starts hidden, keeps the attributes of the field and names the button in the eight languages.
 - **A camera with a snapshot address and no live video shows its still picture through the server:** the tile asks the server for a ticket (`/preview-ticket`) and puts the picture address in the image, because the address Studio keeps carries no login; if the server cannot give one, the stored address is used as before.
 

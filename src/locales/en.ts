@@ -2057,6 +2057,7 @@ const catalogue: Record<string, string> = {
 "tileInternet_down": "internet down",
 "tileInternet_degraded": "internet degraded",
 "tileInternet_unknown": "internet unknown",
+"tileNodes": "All nodes",
 "tileOffline": "offline",
 "tileAlarms": "Alarms",
 "tileRadar": "Radar nodes",
