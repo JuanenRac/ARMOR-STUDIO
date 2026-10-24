@@ -58,6 +58,16 @@ export async function createCameraStreamUrl(origin: string, id: string): Promise
   if (!isCameraPath(body.path)) throw new Error("Camera stream ticket response is invalid");
   return endpoint(origin, body.path);
 }
+/** The still picture of a camera that has a snapshot address but no live video: the server fetches it with the camera's login (the address Studio stores carries none) and hands out a short-lived ticket for it. */
+export async function createCameraPreviewUrl(origin: string, id: string): Promise<string> {
+  const response = await timedFetch(endpoint(origin, `/api/v1/cameras/${encodeURIComponent(id)}/preview-ticket`), {
+    method: "POST", headers: { Accept: "application/json" }, ...localSession,
+  });
+  if (!response.ok) throw new Error(`Camera picture ticket returned ${response.status}`);
+  const body = await response.json() as { path?: string };
+  if (!isCameraPath(body.path)) throw new Error("Camera picture ticket response is invalid");
+  return endpoint(origin, body.path);
+}
 export async function sendPtz(origin: string, id: string, command: string): Promise<void> {
   const response = await timedFetch(origin.replace(/\/$/, "") + "/api/v1/cameras/" + encodeURIComponent(id) + "/ptz", {
     method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify({ command }),

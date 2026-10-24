@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+- **A camera with a snapshot address and no live video shows its still picture through the server:** the tile asks the server for a ticket (`/preview-ticket`) and puts the picture address in the image, because the address Studio keeps carries no login; if the server cannot give one, the stored address is used as before.
+
 ## [0.8.0.9] - Languages fetched one by one, a versioned browser store, typed contract and the pairing text for the HTTPS
 
 - **Studio is tried the way it is deployed:** a workflow of its own (`e2e.yml`, switched off with the repository variable `ARMOR_E2E=off`) builds Studio and the server, puts the nginx of the image (its own template and headers file) in front of the server and drives a real browser through the sign-in, the live channel, the saving of the design of the site and every menu, and checks the security headers of the page, of the assets and of the fallback, the health route, the configuration route and what the proxy tells the server about who is asking.

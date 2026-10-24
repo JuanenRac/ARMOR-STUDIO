@@ -48,7 +48,7 @@ export function CameraTile({ camera, selected, select, toggle, snapshot, record,
   const unreachable = powered && reachability === "offline";
   return <article className={`camera-tile ${selected ? "selected" : ""}`} onClick={select} onDoubleClick={expand}>
     <div className="camera-image">
-      {powered && camera.liveVideoAvailable && streamUrl ? <LiveImage src={streamUrl} alt={`${t("cameraMonitor")}: ${camera.name}`} onLost={() => renewStream(camera.id)} /> : powered && camera.snapshotUrl ? <img src={camera.snapshotUrl} alt={`${t("snapshot")}: ${camera.name}`} /> : <div className="camera-placeholder"><span>◉</span><p>{configured ? t("noStream") : t("selectCameraFirst")}</p></div>}
+      {powered && camera.liveVideoAvailable && streamUrl ? <LiveImage src={streamUrl} alt={`${t("cameraMonitor")}: ${camera.name}`} onLost={() => renewStream(camera.id)} /> : powered && camera.snapshotUrl ? <img src={streamUrl || camera.snapshotUrl} alt={`${t("snapshot")}: ${camera.name}`} /> : <div className="camera-placeholder"><span>◉</span><p>{configured ? t("noStream") : t("selectCameraFirst")}</p></div>}
       <span className={`live-chip ${powered && !unreachable ? "online" : "offline"}`}>{unreachable ? t("unreachable") : powered ? t("online") : t("powerOff")}</span>
       <div className="camera-overlay-actions" aria-label={`${t("cameraMonitor")}: ${camera.name}`}>
         <button className={powered ? "" : "power-off"} title={powered ? t("powerOff") : t("powerOn")} aria-label={powered ? t("powerOff") : t("powerOn")} disabled={!powered && !configured} onClick={event => { event.stopPropagation(); toggle(); }}>⏻</button>

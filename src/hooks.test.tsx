@@ -4,7 +4,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const api = vi.hoisted(() => ({
-  createCameraStreamUrl: vi.fn(), listCameraStatus: vi.fn(), listCameraViews: vi.fn(), listConfiguredCameras: vi.fn(), readInfo: vi.fn(), readStatus: vi.fn(), sessionUserState: vi.fn(),
+  createCameraPreviewUrl: vi.fn(), createCameraStreamUrl: vi.fn(), listCameraStatus: vi.fn(), listCameraViews: vi.fn(), listConfiguredCameras: vi.fn(), readInfo: vi.fn(), readStatus: vi.fn(), sessionUserState: vi.fn(),
 }));
 vi.mock("./api", () => api);
 
@@ -173,6 +173,23 @@ describe("the stream address of each live camera", () => {
     await flush();
     expect(api.createCameraStreamUrl).toHaveBeenCalledTimes(2);
     expect(seen.urls.a).toBe("http://s/stream/a?t=1");
+  });
+
+  it("a camera with a snapshot address and no live video gets the address of its still picture, and loses it when it is switched off", async () => {
+    api.createCameraStreamUrl.mockImplementation(async (_origin: string, id: string) => `live-${id}`);
+    api.createCameraPreviewUrl.mockImplementation(async (_origin: string, id: string) => `still-${id}`);
+    let list = [camera("a"), camera("s", { liveVideoAvailable: false, snapshotUrl: "http://cam/snap.jpg" }), camera("n", { liveVideoAvailable: false })];
+    let seen!: ReturnType<typeof useStreamUrls>;
+    const Probe = () => { seen = useStreamUrls("http://s", list); return null; };
+    root = createRoot(document.createElement("div"));
+    await act(async () => { root!.render(createElement(Probe)); });
+    await flush();
+    expect(seen.urls).toEqual({ a: "live-a", s: "still-s" });
+    expect(api.createCameraPreviewUrl).toHaveBeenCalledTimes(1);
+    list = [camera("a"), camera("s", { liveVideoAvailable: false, snapshotUrl: "http://cam/snap.jpg", enabled: false })];
+    await act(async () => { root!.render(createElement(Probe)); });
+    await flush();
+    expect(Object.keys(seen.urls)).toEqual(["a"]);
   });
 
   it("a camera whose address cannot be had does not take the others with it, and a camera that stops being live loses its address", async () => {

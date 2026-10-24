@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  ApiError, captureSnapshot, closeStudioSession, completeStudioSession, createCameraStreamUrl, deleteDesignVersion, deleteDesignVersions, deleteHistory, deleteMedia, forgetNode, getPreferences, listCameraStatus,
+  ApiError, captureSnapshot, closeStudioSession, completeStudioSession, createCameraPreviewUrl, createCameraStreamUrl, deleteDesignVersion, deleteDesignVersions, deleteHistory, deleteMedia, forgetNode, getPreferences, listCameraStatus,
   listConfiguredCameras, listConnections, listDesignVersions, listHistory, listMedia, mediaUrl, openStudioSession, readDesignVersion, readHistorySummary, readMediaProof, readRules, readSite, saveAlarmDesign,
   saveElectrical, saveNetworkDesign, savePreferences, saveRules, saveSite, sendPtz, sessionUserState, setMediaProtected, setSystemMode, studioSessionState, type MediaItem,
 } from "../api";
@@ -261,6 +261,13 @@ describe("cameras and evidence", () => {
     await expect(createCameraStreamUrl(O, "c1")).rejects.toThrow("invalid");
     await expect(createCameraStreamUrl(O, "c1")).rejects.toThrow("invalid");
     await expect(createCameraStreamUrl(O, "c1")).rejects.toThrow("ticket returned 403");
+  });
+
+  it("the still picture of a camera comes with a ticket that points inside the cameras of the server", async () => {
+    answers.push(json(201, { path: "/api/v1/cameras/c1/preview?ticket=t" }), json(201, { path: "https://evil.example/x" }), text(422));
+    expect(await createCameraPreviewUrl(O, "c1")).toBe("http://armor.local:8080/api/v1/cameras/c1/preview?ticket=t");
+    await expect(createCameraPreviewUrl(O, "c1")).rejects.toThrow("invalid");
+    await expect(createCameraPreviewUrl(O, "c1")).rejects.toThrow("ticket returned 422");
   });
 
   it("a stream ticket path cannot climb out of the cameras route or name another host", async () => {

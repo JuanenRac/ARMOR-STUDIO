@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-959%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-961%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.0.9-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**正直さのチェック - 今日動いているもの:** Studio は [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) と通信し、959 件のユニットテスト（設定の解析、カメラの統合、ソーラーグラフの計算、設計ツールの幾何と検査、警報アナウンサー、アシスタントの辞書、8 言語での全メニューの描画、静的ホスト）とブラウザテストでカバーされています。CM5 テストベンチで、実際のサーバー、実際の IP カメラ、基板上のレーダーノードと組み合わせて日常的に動作しており、ヘルプの画像は例示データで作られています。**まだ**証明されていないもの：あらゆるカメラでのライブ映像と PTZ、実機でのソーラー・電気・警報盤・タッチパネルのメニュー（存在するのはレーダーノードのみ）、正式なアクセシビリティ・ユーザビリティ評価。サーバーに接続できない間、Studio はデモデータを表示し、上部バーでそれを示します。
+**正直さのチェック - 今日動いているもの:** Studio は [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) と通信し、961 件のユニットテスト（設定の解析、カメラの統合、ソーラーグラフの計算、設計ツールの幾何と検査、警報アナウンサー、アシスタントの辞書、8 言語での全メニューの描画、静的ホスト）とブラウザテストでカバーされています。CM5 テストベンチで、実際のサーバー、実際の IP カメラ、基板上のレーダーノードと組み合わせて日常的に動作しており、ヘルプの画像は例示データで作られています。**まだ**証明されていないもの：あらゆるカメラでのライブ映像と PTZ、実機でのソーラー・電気・警報盤・タッチパネルのメニュー（存在するのはレーダーノードのみ）、正式なアクセシビリティ・ユーザビリティ評価。サーバーに接続できない間、Studio はデモデータを表示し、上部バーでそれを示します。
 
 ---
 
@@ -39,7 +39,7 @@
 |---|---|
 | バージョン | `0.8.0.9` |
 | 成熟度 | 確立 |
-| テスト | 959 (`npm test`) |
+| テスト | 961 (`npm test`) |
 | 技術 | React 19 / TypeScript / Vite |
 | 実機での確認 | CM5 テストベンチ（実サーバー、実際の IP カメラ、実際のレーダーノード）で毎日使用。ソーラー・電気・警報盤・タッチパネルのメニューは実ノードを待っています |
 
@@ -52,7 +52,7 @@
 | 領域 | 状態 | ここでの意味 |
 |---|---|---|
 | ソフトウェア | 🟢 | コンソールは CM5 テストベンチの実際のサーバーに対して毎日使われています。 |
-| テスト | 🟢 | 959 件のユニットテストが通り（`npm test`）、ブラウザーテストも実行されます：設定、カメラの統合、太陽光のグラフ、デザイナーの図形と検査、警報アナウンス、アシスタントの辞書、8 言語すべてのメニュー。 |
+| テスト | 🟢 | 961 件のユニットテストが通り（`npm test`）、ブラウザーテストも実行されます：設定、カメラの統合、太陽光のグラフ、デザイナーの図形と検査、警報アナウンス、アシスタントの辞書、8 言語すべてのメニュー。 |
 | インターフェース | 🟡 | ライブ映像と PTZ はすべてのカメラで確認したわけではなく、アクセシビリティやユーザビリティの正式なレビューもありません。ヘルプの画像はサンプルデータで作っています。 |
 | ハードウェア | 🟡 | 実際のサーバー、実際の IP カメラ、実際のレーダーノードとともに毎日使っています。太陽光・電気・警報パネル・タッチパネルのメニューは、実機のノードを待っています。 |
 | セキュリティ | 🟡 | セッション、ロール、アドレスにカメラのログイン情報を含めることの拒否はテストでカバーされています。独立したレビューはありません。 |
@@ -149,7 +149,7 @@ npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
 npm run locales     # write the table of each language (src/locales) after changing a phrase
-npm test            # 959 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
+npm test            # 961 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```

@@ -3,7 +3,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
-import { createCameraStreamUrl, listCameraStatus, listCameraViews, listConfiguredCameras, readInfo, remoteCheck, readStatus, sessionUserState, type Reachability, type ServerInfo, type StudioUser } from "./api";
+import { createCameraPreviewUrl, createCameraStreamUrl, listCameraStatus, listCameraViews, listConfiguredCameras, readInfo, remoteCheck, readStatus, sessionUserState, type Reachability, type ServerInfo, type StudioUser } from "./api";
 import { mergeServerCameras } from "./cameras";
 import type { AnnouncedCapabilities } from "./capabilities";
 import { DEMO_STATE, type Camera } from "./domain";
@@ -88,22 +88,25 @@ export function useServerStatus(origin: string, options: StatusOptions = {}): { 
 /**
  * One short-lived stream address per live camera. An address is asked once for each camera and kept while the camera stays live: the list of cameras is read again
  * every minute, and asking again each time gave every picture a new address, so all the streams were dropped and started over (slow, and the pictures blinked).
- * A camera whose address cannot be had does not take the others with it.
+ * A camera whose address cannot be had does not take the others with it. A camera with a snapshot address and no live video gets the address of its still picture instead,
+ * which the server fetches with the camera's login (the address Studio keeps carries none).
  */
 export function useStreamUrls(origin: string, cameras: readonly Camera[]): { urls: Record<string, string>; renew: (id: string) => void } {
   const [urls, setUrls] = useState<Record<string, string>>({});
   const liveIds = cameras.filter(camera => camera.enabled && camera.liveVideoAvailable).map(camera => camera.id).sort().join(",");
+  const stillIds = cameras.filter(camera => camera.enabled && !camera.liveVideoAvailable && camera.snapshotUrl).map(camera => camera.id).sort().join(",");
   useEffect(() => {
     let cancelled = false;
     const live = liveIds ? liveIds.split(",") : [];
-    setUrls(current => Object.fromEntries(Object.entries(current).filter(([id]) => live.includes(id))));
-    for (const id of live) {
-      void createCameraStreamUrl(origin, id)
+    const still = stillIds ? stillIds.split(",") : [];
+    setUrls(current => Object.fromEntries(Object.entries(current).filter(([id]) => live.includes(id) || still.includes(id))));
+    for (const id of [...live, ...still]) {
+      void (live.includes(id) ? createCameraStreamUrl : createCameraPreviewUrl)(origin, id)
         .then(url => { if (!cancelled) setUrls(current => current[id] ? current : { ...current, [id]: url }); })
-        .catch(() => { /* this camera shows no picture until the set of live cameras changes */ });
+        .catch(() => { /* this camera shows no picture until the set of live cameras changes (a still one keeps showing its stored address) */ });
     }
     return () => { cancelled = true; };
-  }, [origin, liveIds]);
+  }, [origin, liveIds, stillIds]);
   // A new address for one camera whose picture stopped (the old one may have expired); the picture switches over when the new stream shows its first frame.
   const renew = useCallback((id: string) => {
     void createCameraStreamUrl(origin, id).then(url => setUrls(current => ({ ...current, [id]: url }))).catch(() => undefined);
