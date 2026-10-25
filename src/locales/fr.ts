@@ -2013,7 +2013,7 @@ const catalogue: Record<string, string> = {
 "tileInternet_down": "pas d'internet",
 "tileInternet_degraded": "internet dégradé",
 "tileInternet_unknown": "internet inconnu",
-"tileNodes": "Tous les nœuds",
+"tileNodes": "Nœuds",
 "tileOffline": "hors ligne",
 "tileAlarms": "Alarmes",
 "tileRadar": "Nœuds radar",

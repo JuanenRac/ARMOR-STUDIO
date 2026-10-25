@@ -58,11 +58,12 @@
   .ov-hero { padding: .5rem 1rem; border-radius: 16px; flex-wrap: nowrap; gap: 1rem; }
   .ov-hero .eyebrow { display: none; } .ov-hero h2 { font-size: 1.3rem; margin: 0; } .ov-hero .muted { margin: 0; font-size: .7rem; max-width: none; }
   .ov-hero-state { padding: .35rem .8rem; gap: .8rem; } .ov-hero-state strong { font-size: 1.05rem; } .ov-hero-state small { font-size: .5rem; }
-  .ov-tiles { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; }
-  .ov-tile { padding: .45rem .65rem; border-radius: 14px; grid-template-columns: auto minmax(0, 1fr); column-gap: .5rem; align-items: center; }
+  /* every tile on ONE row, however many there are (nine now): the columns are made as tiles come, all of the same width, and what does not fit is cut with an ellipsis */
+  .ov-tiles { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 3px; }
+  .ov-tile { min-width: 0; padding: .4rem .5rem; border-radius: 14px; grid-template-columns: auto minmax(0, 1fr); column-gap: .5rem; align-items: center; }
   .ov-tile > strong, .ov-tile > small { grid-column: 1 / -1; }
-  .ov-tile-icon { width: 24px; height: 24px; border-radius: 8px; font-size: .85rem; } .ov-tile-label { margin: 0; font-size: .5rem; letter-spacing: .2em; }
-  .ov-tile strong { font-size: 1.5rem; line-height: 1.05; } .ov-tile small { font-size: .62rem; }
+  .ov-tile-icon { width: 22px; height: 22px; border-radius: 8px; font-size: .8rem; } .ov-tile-label { margin: 0; font-size: .5rem; letter-spacing: .12em; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ov-tile strong { font-size: 1.4rem; line-height: 1.05; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ov-tile small { font-size: .6rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .ov-main { grid-template-columns: minmax(0, 1fr) 360px; gap: 4px; min-height: 0; }
   .ov-card { padding: .5rem .65rem; border-radius: 14px; gap: .35rem; }
   .ov-map { min-height: 0; } .ov-map .site-map { min-height: 0; height: 100%; }

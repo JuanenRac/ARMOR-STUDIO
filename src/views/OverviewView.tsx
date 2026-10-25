@@ -36,7 +36,7 @@ const size = (bytes: number): string => bytes >= 1e9 ? `${(bytes / 1e9).toFixed(
 const EVENT_ICON: Record<ArmorEvent["type"], string> = { alert: "◌", node: "▣", camera: "◉", mode: "⏻", device: "◈", alarm: "!", connection: "⇄", system: "⚙" };
 
 function Tile({ colour, label, value, sub, onClick, alert, icon }: { colour: string; label: string; value: ReactNode; sub: ReactNode; onClick: () => void; alert?: boolean; icon: string }) {
-  return <button className={`ov-tile ${alert ? "alert" : ""}`} style={{ "--accent": colour } as CSSProperties} onClick={onClick}>
+  return <button className={`ov-tile ${alert ? "alert" : ""}`} style={{ "--accent": colour } as CSSProperties} onClick={onClick} title={label}>
     <span className="ov-tile-icon">{icon}</span><span className="ov-tile-label">{label}</span><strong>{value}</strong><small>{sub}</small>
   </button>;
 }

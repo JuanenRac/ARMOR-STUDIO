@@ -1995,7 +1995,7 @@ export const PT_CATALOGUE: Record<string, string> = {
  "overviewHelp": "Tudo o que protege o local num relance: alarmes, radares, câmaras, dispositivos, automatizações e o desenho onde vivem.",
  "tileAlarms": "Alarmes",
  "tileRadar": "Nós de radar",
- "tileNodes": "Todos os nós",
+ "tileNodes": "Nós",
  "tileCameras": "Câmaras",
  "tileDevices": "Dispositivos",
  "tileAutomations": "Automatizações",
