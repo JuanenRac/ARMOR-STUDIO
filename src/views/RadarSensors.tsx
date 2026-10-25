@@ -27,7 +27,7 @@ function Field({ label, unit, value, min, max, step, onChange }: { label: string
 }
 
 export function RadarSensors({ t, sensors, dimensions, nodes, rules, targetsBySensor, setSensors, openZones, openDesigner }: Props) {
-  const [open, setOpen] = useState(sensors[0]?.id ?? "");
+  const [open, setOpen] = useState("");   // every radar starts folded: the person opens the one they want
   const [wizard, setWizard] = useState<{ name: string; node: string; heading: number; kind: Sensor["kind"] } | null>(null);
   const patch = (id: string, change: Partial<Sensor>) => setSensors(sensors.map(sensor => sensor.id === id ? { ...sensor, ...change } : sensor));
   const add = () => {
