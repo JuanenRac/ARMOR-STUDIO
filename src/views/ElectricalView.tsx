@@ -56,10 +56,12 @@ function ElectricalEnergyCard({ t, origin }: { t: Props["t"]; origin: string }) 
 
 export function ElectricalView({ openDevices, t, origin, readings, unreachable, design, openDesigner, network = null, now, isAdmin = false }: Props) {
   const nodes = readings?.nodes ?? [];
-  const tools = useNodeTools(origin, isAdmin);
   const drawn = useMemo(() => drawnNodeIds(design), [design]);
   const totals = readings?.totals;
-  return <div className="solar-view electrical-live">
+  const tools = useNodeTools(origin, isAdmin);
+  const [chosen, setChosen] = useState("");
+  const current = nodes.find(node => node.node_id === chosen) ?? nodes[0];
+  return <div className="solar-view electrical-live bat-view">
     <header className="solar-head" data-tour="el-head">
       <MenuLogo kind="electrical" size={68} />
       <div className="solar-title"><p className="eyebrow">{t("navEnergy")}</p><h2>{t("electrical")}</h2><span className="muted">{t("electricalLiveHelp")}</span></div>
@@ -71,14 +73,41 @@ export function ElectricalView({ openDevices, t, origin, readings, unreachable, 
       </div>}
     </header>
     {unreachable && <p className="solar-notice bad">{t("elLiveUnreachable")}</p>}
-    <DesignerLink title={t("elLiveRole")} text={t("elLiveRoleText")} button={t("elLiveOpenDesigner")} open={openDesigner} />
-    <ElectricalEnergyCard t={t} origin={origin} />
-    <ElectricalDevices t={t} origin={origin} openDevices={openDevices} now={now} />
-    <NodeFinder t={t} origin={origin} network={network} wantKind="electrical" knownIds={nodes.map(node => node.node_id)} />
-    {nodes.length === 0 ? <div className="solar-empty"><MenuLogo kind="electrical" size={92} /><h3>{t("elLiveNone")}</h3><p>{t("elLiveNoneHelp")}</p></div>
-      : nodes.map(node => <NodeCard key={node.node_id} t={t} origin={origin} node={node} drawn={drawn.has(node.node_id.toLowerCase())} now={now} tools={tools} panel={panelFromNetwork(network, node.node_id)} />)}
+    <details className="bat-section" open={nodes.length === 0}>
+      <summary><b>{t("bat_nodes_equipment")}</b><span className="muted">{nodes.length} {t("bat_nodes_word")}</span></summary>
+      <div className="bat-section-body">
+        <DesignerLink title={t("elLiveRole")} text={t("elLiveRoleText")} button={t("elLiveOpenDesigner")} open={openDesigner} />
+        <NodeFinder t={t} origin={origin} network={network} wantKind="electrical" knownIds={nodes.map(node => node.node_id)} />
+      </div>
+    </details>
+    {nodes.length === 0 ? <div className="solar-empty"><MenuLogo kind="electrical" size={92} /><h3>{t("elLiveNone")}</h3><p>{t("elLiveNoneHelp")}</p></div> : <>
+      <ElecFleet t={t} nodes={nodes} drawn={drawn} now={now} current={current} choose={id => setChosen(id)} />
+      {current && <NodeCard key={current.node_id} t={t} origin={origin} node={current} drawn={drawn.has(current.node_id.toLowerCase())} now={now} tools={tools} panel={panelFromNetwork(network, current.node_id)} />}
+    </>}
+    <details className="bat-section"><summary><b>{t("elEnergyTitle")}</b></summary><div className="bat-section-body"><ElectricalEnergyCard t={t} origin={origin} /></div></details>
+    <details className="bat-section" open={false}><summary><b>{t("elDevicesTitle")}</b></summary><div className="bat-section-body"><ElectricalDevices t={t} origin={origin} openDevices={openDevices} now={now} /></div></details>
     <NodeToolsFooter t={t} tools={tools} />
   </div>;
+}
+
+/** Every electrical node, one row each: its state, its channels, what the grid gives, the alarms and the switches, and the way to choose the node that the detail shows. */
+function ElecFleet({ t, nodes, drawn, now, current, choose }: { t: Translate; nodes: ElectricalNodeReading[]; drawn: Set<string>; now: number; current: ElectricalNodeReading | undefined; choose: (id: string) => void }) {
+  return <section className="bat-fleet el-fleet" data-tour="el-fleet" aria-label={t("elLiveNodes")}>
+    <div className="bat-row head" role="row"><span>{t("bat_node_col")}</span><span>{t("elLiveState")}</span><span>{t("elLiveChannel")}</span><span>{t("elLiveGrid")}</span><span>kWh</span><span>{t("elLiveAlarms")}</span><span>{t("elLiveDrawn")}</span></div>
+    {nodes.map(node => {
+      const grid = node.reading.channels.find(channel => channel.id === "grid") ?? node.reading.channels[0];
+      const alarms = node.reading.channels.filter(channel => channel.alarm).length + (node.reading.switches ?? []).filter(item => item.fault !== "none").length;
+      return <button type="button" key={node.node_id} role="row" aria-pressed={node === current} className={`bat-row ${node === current ? "on" : ""} ${node.stale ? "is-stale" : ""} ${alarms > 0 ? "is-fault" : ""}`} onClick={() => choose(node.node_id)}>
+        <span className="bat-node"><b>{node.node_id}</b></span>
+        <span><span className={`el-pill ${node.stale ? "bad" : "good"}`}>{node.stale ? t("solarNodeState_stale") : t("solarNodeState_reporting")}</span> <small className="muted">{ago(node.received_at, now)}</small></span>
+        <span>{node.reading.channels.length}</span>
+        <span>{grid && grid.power_w !== undefined ? formatPower(grid.power_w) : "–"}</span>
+        <span>{grid && grid.energy_kwh !== undefined ? grid.energy_kwh.toFixed(2) : "–"}</span>
+        <span className={alarms > 0 ? "bad" : ""}>{alarms > 0 ? alarms : "–"}</span>
+        <span className={drawn.has(node.node_id.toLowerCase()) ? "ok" : "warn"}>{drawn.has(node.node_id.toLowerCase()) ? "✓" : "✗"}</span>
+      </button>;
+    })}
+  </section>;
 }
 
 function Tile({ label, value, bad = false, title }: { label: string; value: string; bad?: boolean; title?: string }) {
@@ -87,7 +116,7 @@ function Tile({ label, value, bad = false, title }: { label: string; value: stri
 
 function NodeCard({ t, origin, node, drawn, now, tools, panel }: { t: Translate; origin: string; node: ElectricalNodeReading; drawn: boolean; now: number; tools: NodeTools; panel: { ip: string; port: number } | null }) {
   const { channels, switches = [], switching_enabled: switching } = node.reading;
-  return <article className={`el-node-card ${node.stale ? "stale" : ""}`}>
+  return <article className={`el-node-card bat-detail ${node.stale ? "stale" : ""}`}>
     <header>
       <strong>{node.node_id}</strong>
       <span className={`el-pill ${node.stale ? "bad" : "good"}`}>{node.stale ? t("solarNodeState_stale") : t("solarNodeState_reporting")} · {ago(node.received_at, now)}</span>
@@ -140,9 +169,11 @@ function ChannelHistory({ t, origin, node, now }: { t: Translate; origin: string
       {channels.length > 1 && <select value={channel.id} aria-label={t("elLiveChannel")} onChange={event => setChosen(event.target.value)}>{channels.map(item => <option key={item.id} value={item.id}>{item.label ?? item.id}</option>)}</select>}
       <div className="solar-ranges">{HISTORY_RANGES.map(range => <button key={range.minutes} className={minutes === range.minutes ? "active" : ""} onClick={() => setMinutes(range.minutes)}>{t(range.key)}</button>)}</div>
     </div>
+    <div className="bat-charts">
     <LineChart t={t} samples={history} from={from} to={now} series={[{ key: "power_w", label: t("elPower"), color: SOLAR_COLOURS.pv, unit: "W" }]} />
     <LineChart t={t} samples={history} from={from} to={now} decimals={1} series={[{ key: "voltage_v", label: t("elVoltage"), color: SOLAR_COLOURS.load, unit: "V" }]} />
     <LineChart t={t} samples={history} from={from} to={now} decimals={2} series={[{ key: "current_a", label: t("elCurrent"), color: SOLAR_COLOURS.battery, unit: "A" }]} />
+    </div>
   </div>;
 }
 

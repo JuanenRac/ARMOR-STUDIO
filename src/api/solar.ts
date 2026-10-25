@@ -10,6 +10,10 @@ export async function listSolar(origin: string): Promise<SolarOverview> {
 export const saveSolarDevice = (origin: string, device: { kind: SolarKind; name: string; node_id: string; device?: string; model: string; connection: string; notes: string }) => userCall<SolarRegistration>(origin, "POST", "/api/v1/solar/devices", device);
 export const deleteSolarDevice = (origin: string, node: string, device: string) => userCall<void>(origin, "DELETE", `/api/v1/solar/devices/${encodeURIComponent(node)}/${encodeURIComponent(device)}`);
 export const solarExample = (origin: string, node: string, device: string) => userCall<{ accepted: boolean }>(origin, "POST", `/api/v1/solar/devices/${encodeURIComponent(node)}/${encodeURIComponent(device)}/example`);
+/** Takes away the example reading of one declared device (it waits for its first real reading); a device that reports for real is never touched. */
+export const removeSolarExample = (origin: string, node: string, device: string) => userCall<void>(origin, "DELETE", `/api/v1/solar/devices/${encodeURIComponent(node)}/${encodeURIComponent(device)}/example`);
+/** Takes away every example reading; says how many went. */
+export const removeSolarExamples = (origin: string, ) => userCall<{ removed: number }>(origin, "DELETE", "/api/v1/solar/examples");
 /** The energy of each day, in kilowatt-hours (see the server's /solar/energy). */
 export type SolarEnergyDay = { date: string; pv_kwh: number; load_kwh: number; battery_in_kwh: number; battery_out_kwh: number };
 export const solarEnergy = (origin: string, days: number) => userCall<{ days: SolarEnergyDay[] }>(origin, "GET", `/api/v1/solar/energy?days=${days}`);

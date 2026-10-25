@@ -5,7 +5,7 @@
  */
 import { askConfirm } from "./askConfirm";
 import { useState, type FormEvent } from "react";
-import { deleteSolarDevice, saveSolarDevice, solarExample } from "./api";
+import { deleteSolarDevice, removeSolarExample, saveSolarDevice, solarExample } from "./api";
 import type { Translate } from "./components/camera";
 import { CONNECTION_LABEL, modelName, type SolarCatalog, type SolarDeviceView, type SolarKind, type SolarRegistration } from "./solarModel";
 import { InverterLogo, BatteryLogo } from "./solarGraphics";
@@ -87,7 +87,9 @@ export function SolarEquipment({ kind, t, origin, catalog, registrations, report
             <span className={`solar-pill ${status === "reporting" ? "ok" : status === "example" ? "warn" : ""}`}>{status === "waiting" ? t("solarWaiting") : status === "example" ? t("solarExampleBadge") : t("solarReporting")}</span>
           </div>
           <div className="solar-declared-actions">
-            <button disabled={busy} onClick={() => void act(() => solarExample(origin, item.node_id, item.device), t("solarExampleDone"))}>{t("solarExampleButton")}</button>
+            {status === "example"
+              ? <button disabled={busy} onClick={() => void act(() => removeSolarExample(origin, item.node_id, item.device), t("bat_examples_removed"))}>{t("solarExampleRemove")}</button>
+              : status === "waiting" && <button disabled={busy} onClick={() => void act(() => solarExample(origin, item.node_id, item.device), t("solarExampleDone"))}>{t("solarExampleButton")}</button>}
             <button disabled={busy} onClick={() => { setMessage(null); setForm({ editing: true, name: item.name, node_id: item.node_id, device: item.device, model: item.model, connection: item.connection, notes: item.notes }); }}>{t("solarEditDevice")}</button>
             <button disabled={busy} className="danger-button" onClick={async () => { if (await askConfirm(t("solarConfirmDelete"), t)) void act(() => deleteSolarDevice(origin, item.node_id, item.device), t("solarDeleted")); }}>{t("solarDelete")}</button>
           </div>

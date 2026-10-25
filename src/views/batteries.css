@@ -81,3 +81,23 @@ button.bat-row:not(#ui):focus-visible { outline: 2px solid #4be2e9; outline-offs
   .bat-summary { flex-wrap: wrap; } .bat-summary > svg { width: 84px; }
   .bat-view .solar-totals { width: 100%; }
 }
+
+/* the inverters table and the detail of an inverter use the same pieces: other columns, and the picture beside the gauges */
+.inv-fleet .bat-row { grid-template-columns: minmax(5.5rem, 1fr) minmax(8rem, 1.8fr) minmax(5rem, .9fr) repeat(2, minmax(5rem, 1fr)) minmax(7.5rem, 1.3fr) minmax(4rem, .8fr) minmax(4rem, .8fr) minmax(3rem, .6fr); min-width: 50rem; }
+.inv-fleet .bat-soc b { min-width: 3.6rem; }
+.inv-top { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1rem; align-items: center; }
+.inv-top .solar-gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.inv-top .sl-gauge svg { max-width: 8.5rem; }
+.bat-examples { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; padding: .35rem .7rem; border: 1px solid #8a6a1c; border-radius: 12px; background: #261e0a; }
+.bat-examples button:not(#ui) { display: inline-flex; align-items: center; gap: .4rem; min-height: 0; padding: .2rem .8rem; font-size: .78rem; border: 1px solid #8a6a1c; border-radius: 999px; background: transparent; color: #ffc85a; box-shadow: none; transform: none; cursor: pointer; }
+.bat-examples button:not(#ui):hover { background: #3a2c0c; transform: none; }
+@media (max-width: 1100px) { .inv-top { grid-template-columns: 1fr; } }
+@media (max-height: 820px), (max-width: 1400px) { .inv-top { gap: .6rem; } .inv-top .sl-gauge svg { max-width: 6.6rem; } }
+.el-fleet .bat-row { grid-template-columns: minmax(7rem, 1.4fr) minmax(9rem, 1.6fr) minmax(4rem, .7fr) minmax(5.5rem, 1fr) minmax(4rem, .8fr) minmax(3.5rem, .7fr) minmax(3.5rem, .7fr); min-width: 42rem; }
+.el-fleet .bat-node b { color: #dcecf2; }
+/* denser channel rows and a lower picture of the flow, so that the node or the inverter and its numbers share the screen */
+.el-node-card.bat-detail .el-row { padding-top: .28rem; padding-bottom: .28rem; }
+.el-node-card.bat-detail .el-row small { display: inline; margin-left: .4rem; }
+.inv-top > :first-child { max-height: 20rem; min-width: 0; } .inv-top > :first-child svg { max-height: 20rem; width: 100%; }
+@media (max-height: 820px), (max-width: 1400px) { .el-node-card.bat-detail .el-row { padding-top: .18rem; padding-bottom: .18rem; font-size: .82rem; } .inv-top > :first-child, .inv-top > :first-child svg { max-height: 14rem; } }
+.el-node-card.bat-detail .el-row b { display: inline; }

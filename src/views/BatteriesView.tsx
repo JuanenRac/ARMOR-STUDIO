@@ -18,6 +18,7 @@ import { SolarNodes } from "../SolarNodes";
 import type { NetworkOverview } from "../networkModel";
 import "./solar.css";
 import "./batteries.css";
+import { ExamplesBar } from "./ExamplesBar";
 
 type Props = { t: Translate; origin: string; devices: SolarDeviceView[]; waiting: SolarRegistration[]; catalog: SolarCatalog | null; reload: () => void; totals: SolarTotals | null; now: number; unreachable: boolean; network?: NetworkOverview | null; isAdmin?: boolean };
 type Battery = SolarDeviceView & { reading: SolarBatteryReading };
@@ -53,6 +54,7 @@ export function BatteriesView({ t, origin, devices, totals, now, unreachable, wa
       </div>
     </details>
     {stacks.length === 0 ? (registrations.length > 0 ? <p className="solar-notice">{t("solarWaitingHelp")}</p> : <div className="solar-empty"><BatteryLogo size={92} /><h3>{t("solarNone")}</h3><p>{t("solarNoneHelp")}</p><p>{t("solarNoneAdd")}</p></div>) : <>
+      <ExamplesBar t={t} origin={origin} count={stacks.filter(item => item.example).length} reload={reload} />
       <Fleet t={t} stacks={stacks} current={current} choose={key => setChosen(key)} />
       {current && <StackPanel t={t} stack={current} now={now} history={history.data?.samples ?? []} minutes={minutes} setMinutes={setMinutes} />}
       <details className="bat-section">

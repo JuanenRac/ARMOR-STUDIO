@@ -13,6 +13,8 @@ import { SolarEquipment } from "../SolarEquipment";
 import { SolarNodes } from "../SolarNodes";
 import type { NetworkOverview } from "../networkModel";
 import "./solar.css";
+import "./batteries.css";
+import { ExamplesBar } from "./ExamplesBar";
 
 type Props = { t: Translate; origin: string; devices: SolarDeviceView[]; waiting: SolarRegistration[]; catalog: SolarCatalog | null; reload: () => void; totals: SolarTotals | null; now: number; unreachable: boolean; network?: NetworkOverview | null; isAdmin?: boolean };
 type Inverter = SolarDeviceView & { reading: SolarInverterReading };
@@ -26,7 +28,8 @@ export function InvertersView({ t, origin, devices, totals, now, unreachable, wa
   const [minutes, setMinutes] = useState<number>(60);
   const current = inverters.find(item => `${item.node_id}/${item.device}` === chosen) ?? inverters[0];
   const history = usePolled(() => (current ? solarHistory(origin, current.node_id, current.device, minutes) : Promise.resolve(null)), 15_000, `${current?.node_id}/${current?.device}/${minutes}/${origin}`);
-  return <div className="solar-view">
+  const nodeCount = new Set([...devices.map(d => d.node_id), ...waiting.map(item => item.node_id)]).size;
+  return <div className="solar-view bat-view">
     <header className="solar-head" data-tour="inv-head">
       <InverterLogo size={68} />
       <div className="solar-title"><p className="eyebrow">{t("navEnergy")}</p><h2>{t("inverters")}</h2><span className="muted">{t("solarHelp")}</span></div>
@@ -38,18 +41,51 @@ export function InvertersView({ t, origin, devices, totals, now, unreachable, wa
       </div>}
     </header>
     {unreachable && <p className="solar-notice bad">{t("solarNoHistory")}</p>}
-    <SolarNodes t={t} origin={origin} isAdmin={isAdmin} network={network} devices={devices} registrations={[...devices.flatMap(d => (d.registered ? [d.registered] : [])), ...waiting]} now={now} />
-    <SolarEquipment kind="inverter" network={network} t={t} origin={origin} catalog={catalog} registrations={registrations} reporting={inverters} reload={reload} />
+    <details className="bat-section" open={inverters.length === 0}>
+      <summary><b>{t("bat_nodes_equipment")}</b><span className="muted">{nodeCount} {t("bat_nodes_word")} · {registrations.length} {t("bat_equipment_word")}</span></summary>
+      <div className="bat-section-body">
+        <SolarNodes t={t} origin={origin} isAdmin={isAdmin} network={network} devices={devices} registrations={[...devices.flatMap(d => (d.registered ? [d.registered] : [])), ...waiting]} now={now} />
+        <SolarEquipment kind="inverter" network={network} t={t} origin={origin} catalog={catalog} registrations={registrations} reporting={inverters} reload={reload} />
+      </div>
+    </details>
     {inverters.length === 0 ? (registrations.length > 0 ? <p className="solar-notice">{t("solarWaitingHelp")}</p> : <div className="solar-empty"><InverterLogo size={92} /><h3>{t("solarNone")}</h3><p>{t("solarNoneHelp")}</p><p>{t("solarNoneAdd")}</p></div>) : <>
-      {inverters.length > 1 && <div className="solar-tabs" role="tablist">{inverters.map(item => {
-        const key = `${item.node_id}/${item.device}`;
-        return <button key={key} role="tab" aria-selected={item === current} className={item === current ? "active" : ""} onClick={() => setChosen(key)}>{displayName(item)}{item.stale && <i className="solar-stale-dot" title={t("solarStale")} />}</button>;
-      })}</div>}
+      <ExamplesBar t={t} origin={origin} count={inverters.filter(item => item.example).length} reload={reload} />
+      <InvFleet t={t} inverters={inverters} current={current} choose={key => setChosen(key)} />
       {current && <InverterPanel t={t} inverter={current} now={now} history={history.data?.samples ?? []} minutes={minutes} setMinutes={setMinutes} />}
-      <EnergyCard t={t} origin={origin} kind="inverter" />
-      <EnergyAlarmsCard t={t} origin={origin} />
+      <details className="bat-section">
+        <summary><b>{t("bat_energy_alarms")}</b></summary>
+        <div className="bat-section-body"><EnergyCard t={t} origin={origin} kind="inverter" /><EnergyAlarmsCard t={t} origin={origin} /></div>
+      </details>
     </>}
   </div>;
+}
+
+/** Every inverter of every node, one row each and with the node in the first column: the whole installation at a glance, and the way to choose the inverter that the detail shows. */
+function InvFleet({ t, inverters, current, choose }: { t: Translate; inverters: Inverter[]; current: Inverter | undefined; choose: (key: string) => void }) {
+  const groups = useMemo(() => {
+    const byNode = new Map<string, Inverter[]>();
+    for (const item of inverters) byNode.set(item.node_id, [...(byNode.get(item.node_id) ?? []), item]);
+    return [...byNode.entries()].sort(([a], [b]) => a.localeCompare(b));
+  }, [inverters]);
+  return <section className="bat-fleet inv-fleet" data-tour="inv-fleet" aria-label={t("inverters")}>
+    <div className="bat-row head" role="row"><span>{t("bat_node_col")}</span><span>{t("inverters")}</span><span>{t("solarMode")}</span><span>{t("solarPv")}</span><span>{t("solarLoad")}</span><span>{t("solarBattery")}</span><span>{t("solarGrid")}</span><span>{t("solarHeatsink")}</span><span>{t("solarWarnings")}</span></div>
+    {groups.map(([node, items]) => <div key={node} className="bat-group" role="rowgroup">
+      {items.map((item, index) => {
+        const key = `${item.node_id}/${item.device}`, r = item.reading;
+        return <button type="button" key={key} role="row" aria-pressed={item === current} className={`bat-row ${item === current ? "on" : ""} ${item.stale ? "is-stale" : ""} ${r.mode === "fault" ? "is-fault" : ""}`} onClick={() => choose(key)}>
+          <span className="bat-node">{index === 0 ? <><b>{node}</b><small>{items.length} {t("inverters").toLowerCase()}</small></> : null}</span>
+          <span className="bat-name"><b>{displayName(item)}</b>{item.stale && <i className="solar-stale-dot" title={t("solarStale")} />}{item.example && <span className="solar-pill warn">{t("solarExampleBadge")}</span>}</span>
+          <span><span className={`solar-pill ${r.mode === "fault" ? "bad" : r.mode === "battery" ? "warn" : "ok"}`}>{t(`solarMode_${r.mode}`)}</span></span>
+          <span>{formatPower(r.pv_w)}</span>
+          <span className="bat-soc"><span className="solar-bar"><i style={{ width: `${Math.min(100, Math.round(r.load_percent))}%`, background: r.load_percent > 85 ? SOLAR_COLOURS.bad : SOLAR_COLOURS.load }} /></span><b>{formatPower(r.out_w)}</b></span>
+          <span>{Math.round(r.battery_percent)} % · {r.battery_v.toFixed(1)} V</span>
+          <span>{r.grid_v.toFixed(0)} V</span>
+          <span className={r.heatsink_c > 80 ? "bad" : r.heatsink_c > 60 ? "warn" : ""}>{Math.round(r.heatsink_c)} °C</span>
+          <span className={r.warnings.length > 0 ? "warn" : ""}>{r.warnings.length > 0 ? r.warnings.length : "–"}</span>
+        </button>;
+      })}
+    </div>)}
+  </section>;
 }
 
 function Tile({ colour, label, value }: { colour: string; label: string; value: string }) {
@@ -63,22 +99,24 @@ function InverterPanel({ t, inverter, now, history, minutes, setMinutes }: { t: 
   const from = now - minutes * 60_000;
   const age = Math.max(0, Math.round((now - Date.parse(inverter.received_at)) / 1000));
   return <>
-    <section data-tour="inv-flow" className={`solar-card flow-card ${inverter.stale ? "is-stale" : ""} ${r.mode === "fault" ? "is-fault" : ""}`}>
+    <section data-tour="inv-flow" className={`solar-card flow-card bat-detail ${inverter.stale ? "is-stale" : ""} ${r.mode === "fault" ? "is-fault" : ""}`}>
       <div className="solar-card-head">
         <h3>{displayName(inverter)} <small>{inverter.node_id}</small></h3>
         {inverter.example && <span className="solar-pill warn">{t("solarExampleBadge")}</span>}
         <span className={`solar-pill ${r.mode === "fault" ? "bad" : r.mode === "battery" ? "warn" : "ok"}`}>{t(`solarMode_${r.mode}`)}</span>
         <span className="muted">{inverter.stale ? t("solarStale") : `${t("solarUpdated")} ${age} s`}</span>
       </div>
+      <div className="inv-top">
       <FlowDiagram inverter={r} t={t} />
-    </section>
-    <section className="solar-card">
       <div className="solar-gauges" data-tour="inv-gauges">
         <Gauge value={r.pv_w} max={niceScale([0, seen]).high || 1000} label={t("solarPv")} display={formatPower(r.pv_w)} colour={SOLAR_COLOURS.pv} />
         <Gauge value={r.load_percent} max={100} label={t("solarLoad")} display={`${Math.round(r.load_percent)} %`} colour={r.load_percent > 85 ? SOLAR_COLOURS.bad : SOLAR_COLOURS.load} />
         <Gauge value={r.battery_percent} max={100} label={t("solarBattery")} display={`${Math.round(r.battery_percent)} %`} colour={TONE[levelTone(r.battery_percent)]} />
         <Gauge value={r.heatsink_c} max={100} label={t("solarHeatsink")} display={`${Math.round(r.heatsink_c)} °C`} colour={r.heatsink_c > 80 ? SOLAR_COLOURS.bad : r.heatsink_c > 60 ? SOLAR_COLOURS.pv : SOLAR_COLOURS.battery} />
       </div>
+      </div>
+    </section>
+    <section className="solar-card bat-detail">
       <dl className="solar-readings">
         <div><dt>{t("solarGrid")}</dt><dd>{r.grid_v.toFixed(1)} V · {r.grid_hz.toFixed(1)} Hz</dd></div>
         <div><dt>{t("solarOutput")}</dt><dd>{r.out_v.toFixed(1)} V · {r.out_hz.toFixed(1)} Hz</dd></div>
@@ -108,16 +146,21 @@ function InverterPanel({ t, inverter, now, history, minutes, setMinutes }: { t: 
         {r.warnings.length === 0 ? (r.warnings_known === false ? <span className="solar-chip" title={t("solarWarningsUnknownTip")}>{t("solarWarningsUnknown")}</span> : <span className="solar-chip ok">{t("solarNoWarnings")}</span>) : r.warnings.map(name => <span key={name} className="solar-chip bad">{humanize(name)}</span>)}
       </div>
     </section>
-    <UnitInfoCard t={t} reading={r} />
-    <section className="solar-card">
+    {hasUnitInfo(r) && <details className="bat-section"><summary><b>{t("solarUnitInfo")}</b></summary><div className="bat-section-body"><UnitInfoCard t={t} reading={r} /></div></details>}
+    <section className="solar-card bat-history">
       <div className="solar-card-head"><h3>{t("solarHistory")}</h3>
         <div className="solar-ranges" data-tour="inv-history">{RANGES.map(range => <button key={range.minutes} className={minutes === range.minutes ? "active" : ""} onClick={() => setMinutes(range.minutes)}>{t(range.key)}</button>)}</div>
       </div>
+      <div className="bat-charts">
       <LineChart t={t} samples={history} from={from} to={now} series={[{ key: "pv_w", label: t("solarPvPower"), color: SOLAR_COLOURS.pv, unit: "W" }, { key: "out_w", label: t("solarLoadPower"), color: SOLAR_COLOURS.load, unit: "W" }]} />
       <LineChart t={t} samples={history} from={from} to={now} series={[{ key: "battery_percent", label: t("solarChargeLevel"), color: SOLAR_COLOURS.battery, unit: "%" }]} />
+      </div>
     </section>
   </>;
 }
+
+/** Whether the unit said anything about itself (see UnitInfoCard). */
+export const hasUnitInfo = (reading: SolarInverterReading): boolean => Boolean(reading.serial || reading.firmware || typeof reading.pv_energy_total_wh === "number" || (reading.ratings && ratingRows(reading.ratings).length > 0));
 
 /** What the unit says about itself: the serial number and the firmware, the energy the panels have made in all, and its ratings and settings. Nothing when it said none of it. */
 export function UnitInfoCard({ t, reading }: { t: Translate; reading: SolarInverterReading }) {
