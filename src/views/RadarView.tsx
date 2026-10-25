@@ -21,10 +21,12 @@ import "./radar-map.css";
 import { MenuTitle } from "../menuLogos";
 import { DesignerLink } from "../components/DesignerLink";
 import { NodeFinder } from "../NodeFinder";
+import { NodeToolsBar, NodeToolsFooter, useNodeTools } from "./NodeTools";
 import type { NetworkOverview } from "../networkModel";
 
 type Props = {
   nodes: NodeState[]; model: SiteModel; dimensions: Dimensions; origin: string;
+  /** An administrator can configure the nodes, give them orders and forget them. */ isAdmin?: boolean;
   forget: (id: string) => void; openDesigner: () => void; openZones: () => void; setSensors: (next: Sensor[]) => void; t: Translate;
   /** What the network node has found, to look for radar nodes on the network. */
   network?: NetworkOverview | null;
@@ -53,8 +55,9 @@ function useLiveNodes(origin: string, fallback: NodeState[]): NodeState[] {
 
 export { panelUrl };
 
-export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forget, openDesigner, openZones, setSensors, t, network = null }: Props) {
+export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forget, openDesigner, openZones, setSensors, t, network = null, isAdmin = false }: Props) {
   const nodes = useLiveNodes(origin, consoleNodes);
+  const tools = useNodeTools(origin, isAdmin);
   const [rules, setRules] = useState<Rules | null>(null);
   useEffect(() => { void readRules(origin).then(setRules).catch(() => setRules(null)); }, [origin]);
   const box = useRef<HTMLDivElement>(null);
@@ -174,10 +177,11 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
         {nodes.map(node => <div className="node-row" key={node.node_id}>
           <span className={`state-dot ${node.online && !node.stale ? node.alert_level : "silent"}`} />
           <div><strong>{node.node_id}</strong><small>{node.stale ? t("staleWord") : node.online ? t("online") : t("offlineWord")} · {node.online && !node.stale ? `${node.target_count} ${t("tracksWord")}` : `— ${t("tracksWord")}`} · {model.sensors.filter(sensor => sensor.node === node.node_id).length} {t("radarNodeLinked")} · {node.lux ?? "—"} lux{node.panel ? ` · ${t("firmwareWord")} ${node.panel.firmware}` : ""}</small></div>
-          {node.panel && <a className="panel-link" href={panelUrl(node.panel)} target="_blank" rel="noopener noreferrer" title={`${node.panel.name} · ${node.panel.ip}`}>{t("openNodePanel")}</a>}
           <b>{node.online && !node.stale ? node.alert_level : "—"}</b>
-          {(!node.online || node.stale) && <button className="danger-button" title={t("forgetNode")} onClick={async () => { if (await askConfirm(`${t("confirmForgetNode")} ${node.node_id}`, t)) forget(node.node_id); }}>{t("forgetNode")}</button>}
+          <NodeToolsBar t={t} tools={tools} id={node.node_id} panel={node.panel} silent={!node.online || Boolean(node.stale)}
+            forget={async () => { if (await askConfirm(`${t("confirmForgetNode")} ${node.node_id}`, t)) forget(node.node_id); }} />
         </div>)}
+        <NodeToolsFooter t={t} tools={tools} />
         {unmapped.map(item => <p key={item.node} className="muted small warn-line"><b>{item.node}</b> {t("unmappedNode")}</p>)}
         {!nodes.length && <p className="muted">{t("noRadar")}</p>}
       </article>}

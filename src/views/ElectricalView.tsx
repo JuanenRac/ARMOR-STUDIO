@@ -20,8 +20,9 @@ import type { NetworkOverview } from "../networkModel";
 import { formatEnergy, formatPower } from "../solarModel";
 import "./solar.css";
 import "./electrical-live.css";
+import { NodeToolsBar, NodeToolsFooter, panelFromNetwork, useNodeTools, type NodeTools } from "./NodeTools";
 
-type Props = { openDevices?: () => void; t: Translate; origin: string; readings: ElectricalReadings | null; unreachable: boolean; design: Design; openDesigner: () => void; network?: NetworkOverview | null; now: number };
+type Props = { openDevices?: () => void; t: Translate; origin: string; readings: ElectricalReadings | null; unreachable: boolean; design: Design; openDesigner: () => void; network?: NetworkOverview | null; now: number; isAdmin?: boolean };
 
 const number = (value: number | undefined, digits: number, unit: string): string => (typeof value === "number" && Number.isFinite(value) ? `${value.toFixed(digits)} ${unit}` : "–");
 const ago = (iso: string, now: number): string => {
@@ -53,8 +54,9 @@ function ElectricalEnergyCard({ t, origin }: { t: Props["t"]; origin: string }) 
   </article>;
 }
 
-export function ElectricalView({ openDevices, t, origin, readings, unreachable, design, openDesigner, network = null, now }: Props) {
+export function ElectricalView({ openDevices, t, origin, readings, unreachable, design, openDesigner, network = null, now, isAdmin = false }: Props) {
   const nodes = readings?.nodes ?? [];
+  const tools = useNodeTools(origin, isAdmin);
   const drawn = useMemo(() => drawnNodeIds(design), [design]);
   const totals = readings?.totals;
   return <div className="solar-view electrical-live">
@@ -74,7 +76,8 @@ export function ElectricalView({ openDevices, t, origin, readings, unreachable, 
     <ElectricalDevices t={t} origin={origin} openDevices={openDevices} now={now} />
     <NodeFinder t={t} origin={origin} network={network} wantKind="electrical" knownIds={nodes.map(node => node.node_id)} />
     {nodes.length === 0 ? <div className="solar-empty"><MenuLogo kind="electrical" size={92} /><h3>{t("elLiveNone")}</h3><p>{t("elLiveNoneHelp")}</p></div>
-      : nodes.map(node => <NodeCard key={node.node_id} t={t} origin={origin} node={node} drawn={drawn.has(node.node_id.toLowerCase())} now={now} />)}
+      : nodes.map(node => <NodeCard key={node.node_id} t={t} origin={origin} node={node} drawn={drawn.has(node.node_id.toLowerCase())} now={now} tools={tools} panel={panelFromNetwork(network, node.node_id)} />)}
+    <NodeToolsFooter t={t} tools={tools} />
   </div>;
 }
 
@@ -82,7 +85,7 @@ function Tile({ label, value, bad = false, title }: { label: string; value: stri
   return <div className="solar-tile" title={title} style={{ borderColor: bad ? "#ff6f7988" : "#22d3ee55" }}><small>{label}</small><b style={{ color: bad ? "#ff8e99" : "#5df0c4" }}>{value}</b></div>;
 }
 
-function NodeCard({ t, origin, node, drawn, now }: { t: Translate; origin: string; node: ElectricalNodeReading; drawn: boolean; now: number }) {
+function NodeCard({ t, origin, node, drawn, now, tools, panel }: { t: Translate; origin: string; node: ElectricalNodeReading; drawn: boolean; now: number; tools: NodeTools; panel: { ip: string; port: number } | null }) {
   const { channels, switches = [], switching_enabled: switching } = node.reading;
   return <article className={`el-node-card ${node.stale ? "stale" : ""}`}>
     <header>
@@ -90,6 +93,7 @@ function NodeCard({ t, origin, node, drawn, now }: { t: Translate; origin: strin
       <span className={`el-pill ${node.stale ? "bad" : "good"}`}>{node.stale ? t("solarNodeState_stale") : t("solarNodeState_reporting")} · {ago(node.received_at, now)}</span>
       <span className={`el-pill ${drawn ? "good" : "warn"}`}>{drawn ? t("elLiveDrawn") : t("elLiveNotDrawn")}</span>
       {switching === false && <span className="el-pill warn">{t("elLiveSwitchingOff")}</span>}
+      <NodeToolsBar t={t} tools={tools} id={node.node_id} panel={panel} silent={node.stale} />
     </header>
     <div className="el-channels" role="table" data-tour="el-channels">
       <div className="el-row head" role="row"><span>{t("elLiveChannel")}</span><span>V</span><span>A</span><span>W</span><span>kWh</span><span>Hz</span><span>PF</span><span>{t("elLiveState")}</span></div>

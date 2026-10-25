@@ -1403,6 +1403,8 @@ export const PT_CATALOGUE: Record<string, string> = {
  "mode_pin_locked": "Demasiados PIN errados: espere um pouco antes de tentar de novo.",
  "mode_pin_not_set": "Este utilizador não tem PIN para desarmar: um administrador define-o em Configuração > Utilizadores.",
  "pinLabel": "PIN",
+ "rn_open_direct": "Abrir o painel próprio do nó (mesma rede)",
+ "rn_configure": "Alterar os parâmetros do nó (através do servidor, de qualquer lugar)",
  "pw_show": "Mostrar a palavra-passe",
  "pw_hide": "Ocultar a palavra-passe",
  "pinPlaceholder": "O seu PIN, se tiver um",

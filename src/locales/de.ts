@@ -1430,6 +1430,8 @@ const catalogue: Record<string, string> = {
 "mode_pin_not_set": "Dieser Benutzer hat keine PIN zum Entschärfen: Ein Administrator legt sie unter Konfiguration > Benutzer fest.",
 "pw_show": "Passwort anzeigen",
 "pw_hide": "Passwort verbergen",
+"rn_open_direct": "Eigenes Panel des Knotens öffnen (gleiches Netzwerk)",
+"rn_configure": "Parameter des Knotens ändern (über den Server, von überall)",
 "pinPlaceholder": "Ihre PIN, falls vorhanden",
 "modeNoAnswer": "Der Server hat nicht geantwortet, der Modus wurde nicht geändert. Versuchen Sie es erneut.",
 "modeServerError": "Der Server hat die Änderung abgelehnt (Fehler {status}).",

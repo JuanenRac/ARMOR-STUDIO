@@ -1446,6 +1446,8 @@ const catalogue: Record<string, string> = {
 "mode_pin_not_set": "Questo utente non ha un PIN per disattivare: lo imposta un amministratore in Configurazione > Utenti.",
 "pw_show": "Mostra la password",
 "pw_hide": "Nascondi la password",
+"rn_open_direct": "Apri il pannello del nodo (stessa rete)",
+"rn_configure": "Modifica i parametri del nodo (tramite il server, da ovunque)",
 "pinPlaceholder": "Il tuo PIN, se ne hai uno",
 "modeNoAnswer": "Il server non ha risposto, la modalità non è cambiata. Riprova.",
 "modeServerError": "Il server ha rifiutato la modifica (errore {status}).",

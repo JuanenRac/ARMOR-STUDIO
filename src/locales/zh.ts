@@ -1460,6 +1460,8 @@ const catalogue: Record<string, string> = {
 "mode_pin_not_set": "该用户没有撤防用的 PIN：由管理员在“配置 > 用户”中设置。",
 "pw_show": "显示密码",
 "pw_hide": "隐藏密码",
+"rn_open_direct": "打开节点自带面板（同一网络）",
+"rn_configure": "修改节点参数（通过服务器，随时随地）",
 "pinPlaceholder": "你的 PIN（如已设置）",
 "modeNoAnswer": "服务器没有响应，模式未更改。请重试。",
 "modeServerError": "服务器拒绝了更改（错误 {status}）。",

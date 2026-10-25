@@ -1456,6 +1456,8 @@ const catalogue: Record<string, string> = {
 "mode_pin_not_set": "Este usuario no tiene un PIN para desarmar: lo pone un administrador en Configuración > Usuarios.",
 "pw_show": "Mostrar la contraseña",
 "pw_hide": "Ocultar la contraseña",
+"rn_open_direct": "Abrir el panel propio del nodo (misma red)",
+"rn_configure": "Cambiar los parámetros del nodo (a través del servidor, desde cualquier sitio)",
 "pinPlaceholder": "Tu PIN, si tienes uno",
 "modeNoAnswer": "El servidor no ha respondido, así que el modo no ha cambiado. Inténtalo de nuevo.",
 "modeServerError": "El servidor ha rechazado el cambio (error {status}).",

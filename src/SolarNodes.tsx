@@ -7,6 +7,8 @@
 import { useMemo } from "react";
 import type { Translate } from "./components/camera";
 import type { SolarDeviceView, SolarRegistration } from "./solarModel";
+import type { NetworkOverview } from "./networkModel";
+import { NodeToolsBar, NodeToolsFooter, panelFromNetwork, useNodeTools } from "./views/NodeTools";
 
 export type SolarNodeState = "reporting" | "example" | "stale" | "waiting";
 export type SolarNodeSummary = { id: string; inverters: number; batteries: number; reporting: number; lastMs: number | null; state: SolarNodeState };
@@ -40,8 +42,9 @@ const since = (ms: number, now: number): string => {
   return s < 90 ? `${s} s` : s < 5400 ? `${Math.round(s / 60)} min` : `${Math.round(s / 3600)} h`;
 };
 
-export function SolarNodes({ t, devices, registrations, now }: { t: Translate; devices: readonly SolarDeviceView[]; registrations: readonly SolarRegistration[]; now: number }) {
+export function SolarNodes({ t, origin, isAdmin = false, network = null, devices, registrations, now }: { t: Translate; origin: string; isAdmin?: boolean; network?: NetworkOverview | null; devices: readonly SolarDeviceView[]; registrations: readonly SolarRegistration[]; now: number }) {
   const nodes = useMemo(() => summariseNodes(devices, registrations), [devices, registrations]);
+  const tools = useNodeTools(origin, isAdmin);
   return <section className="solar-nodes" aria-label={t("solarNodesTitle")}>
     <h3>{t("solarNodesTitle")}</h3>
     <p className="muted small">{t("solarNodesRole")}</p>
@@ -53,7 +56,9 @@ export function SolarNodes({ t, devices, registrations, now }: { t: Translate; d
           <small>{[node.inverters ? `${node.inverters} ${t("solarNodeInverters")}` : "", node.batteries ? `${node.batteries} ${t("solarNodeBatteries")}` : ""].filter(Boolean).join(" · ")}</small>
         </div>
         <span className="solar-node-state">{t(`solarNodeState_${node.state}`)}{node.lastMs !== null && node.state !== "waiting" ? ` · ${since(node.lastMs, now)}` : ""}</span>
+        <NodeToolsBar t={t} tools={tools} id={node.id} panel={panelFromNetwork(network, node.id)} silent={node.state === "stale" || node.state === "waiting"} />
       </article>)}
     </div>}
+    <NodeToolsFooter t={t} tools={tools} />
   </section>;
 }

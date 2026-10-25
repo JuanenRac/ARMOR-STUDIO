@@ -1437,6 +1437,8 @@ const catalogue: Record<string, string> = {
 "mode_pin_not_set": "Cet utilisateur n'a pas de code PIN pour désarmer : un administrateur le définit dans Configuration > Utilisateurs.",
 "pw_show": "Afficher le mot de passe",
 "pw_hide": "Masquer le mot de passe",
+"rn_open_direct": "Ouvrir le panneau propre du nœud (même réseau)",
+"rn_configure": "Modifier les paramètres du nœud (via le serveur, de n'importe où)",
 "pinLabel": "Code PIN",
 "pinPlaceholder": "Votre code PIN, si vous en avez un",
 "modeNoAnswer": "Le serveur n'a pas répondu, le mode n'a pas changé. Réessayez.",
