@@ -94,6 +94,6 @@ export function TourArt({ art, size = 120 }: { art: ArtId; size?: number }) {
 /** Which picture goes with each menu: the one shown in its rich hint and in the tour that visits it. */
 export const ART_OF_VIEW: Record<View, ArtId> = {
   overview: "monitor", weather: "energy", alarms: "bell", alarmPanels: "alarm", cameras: "camera", radar: "radar", record: "camera", history: "monitor", inverters: "energy", batteries: "energy",
-  electrical: "energy", devices: "house", automations: "settings", network: "network", siteDesigner: "design", alarmDesigner: "design", electricalDesigner: "design", networkDesigner: "design",
+  electrical: "energy", devices: "house", automations: "settings", network: "network", hmi: "house", siteDesigner: "design", alarmDesigner: "design", electricalDesigner: "design", networkDesigner: "design",
   system: "admin", services: "admin", configuration: "settings",
 };

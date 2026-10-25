@@ -4,7 +4,7 @@
  */
 import type { SystemState } from "./types";
 
-export type View = "overview" | "weather" | "alarms" | "alarmPanels" | "cameras" | "radar" | "inverters" | "batteries" | "electrical" | "devices" | "automations" | "record" | "history" | "network" | "services" | "siteDesigner" | "electricalDesigner" | "networkDesigner" | "alarmDesigner" | "system" | "configuration";
+export type View = "overview" | "weather" | "alarms" | "alarmPanels" | "cameras" | "radar" | "inverters" | "batteries" | "electrical" | "devices" | "automations" | "record" | "history" | "network" | "hmi" | "services" | "siteDesigner" | "electricalDesigner" | "networkDesigner" | "alarmDesigner" | "system" | "configuration";
 export type GridSize = 1 | 2 | 4 | 6 | 8 | 9 | 12 | 16;
 export const GRID_SIZES: readonly GridSize[] = [1, 2, 4, 6, 8, 9, 12, 16];
 
@@ -153,7 +153,7 @@ export const NAV_GROUPS: ReadonlyArray<{ title: string; items: ReadonlyArray<rea
   { title: "navMonitor", items: [["overview", "⌂"], ["weather", "☁"], ["alarms", "!"]] },
   { title: "navSecurity", items: [["alarmPanels", "▣"], ["cameras", "◉"], ["radar", "◌"], ["record", "●"], ["history", "≡"]] },
   { title: "navEnergy", items: [["inverters", "☀"], ["batteries", "▮"], ["electrical", "⌁"]] },
-  { title: "navHouse", items: [["devices", "◈"], ["automations", "⚡"], ["network", "⇄"]] },
+  { title: "navHouse", items: [["devices", "◈"], ["automations", "⚡"], ["network", "⇄"], ["hmi", "▭"]] },
   { title: "navDesign", items: [["siteDesigner", "⌗"], ["alarmDesigner", "⚑"], ["electricalDesigner", "⌁"], ["networkDesigner", "⌬"]] },
   { title: "navAdmin", items: [["system", "▤"], ["services", "▦"], ["configuration", "⚙"]] },
 ];

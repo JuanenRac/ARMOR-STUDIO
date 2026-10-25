@@ -73,6 +73,7 @@ import { CameraMonitorView } from "./views/monitoring";
 import { OverviewView } from "./views/OverviewView";
 import { SystemView } from "./views/SystemView";
 import { ServicesView } from "./views/ServicesView";
+import { ScreenView } from "./views/ScreenView";
 import { RadarView } from "./views/RadarView";
 import { InvertersView } from "./views/InvertersView";
 import { BatteriesView } from "./views/BatteriesView";
@@ -366,6 +367,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     automations: <Ticking>{now => <AutomationsView t={t} origin={origin} automations={automationPoll.data?.automations ?? []} reload={automationPoll.reload} devices={devices} now={now} />}</Ticking>,
     system: <SystemView t={t} origin={origin} isAdmin={isAdmin} />,
     services: <ServicesView t={t} origin={origin} />,
+    hmi: <ScreenView t={t} origin={origin} isAdmin={isAdmin} network={networkPoll.data} />,
     weather: <WeatherView t={t} locale={language} origin={origin} />,
     cameras: <CameraMonitorView openDesigner={() => setView("siteDesigner")} cameras={cameras} selected={selected} selectedId={selectedCamera} gridSize={gridSize} setGridSize={setGridSize} recordingIds={recordingCameraIds} streamUrls={streamUrls} reachability={reachability} notice={notice} t={t} select={setSelectedCamera} toggle={camera => updateCamera(camera.id, { enabled: !camera.enabled })} snapshot={camera => void saveSnapshot(camera)} record={camera => void toggleRecording(camera)} expand={expand} ptz={commandPtz} slots={slots} setSlot={(index, id) => setSlots(current => { const next = [...current]; while (next.length <= index) next.push(""); next[index] = id; return next; })}
       settings={<CameraSettings t={t} origin={origin} isAdmin={isAdmin} cameras={cameras} selectedCameraId={selectedCamera} onCameraSelected={setSelectedCamera}

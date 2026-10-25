@@ -6,7 +6,7 @@
 import { useId } from "react";
 import "./anim.css";
 
-export type LogoKind = "overview" | "weather" | "alarms" | "cameras" | "radar" | "devices" | "automations" | "record" | "history" | "network" | "system" | "services" | "configuration" | "electrical" | "alarmPanels" | "drawSite" | "drawAlarm" | "drawElectrical" | "drawNetwork";
+export type LogoKind = "overview" | "weather" | "alarms" | "cameras" | "radar" | "devices" | "automations" | "record" | "history" | "network" | "system" | "services" | "hmi" | "configuration" | "electrical" | "alarmPanels" | "drawSite" | "drawAlarm" | "drawElectrical" | "drawNetwork";
 const CYAN = "#00E5FF", AMBER = "#FFB020", GREEN = "#5DF0C4", RED = "#FF6F79";
 
 /** The shield of the sidebar: a radar sweep turns inside it and a ring of light leaves it now and then. */
@@ -91,6 +91,9 @@ const DRAWINGS: Record<LogoKind, React.ReactNode> = {
     <g className="ml-gear" style={{ transformOrigin: "22px 22px" }}><circle cx="22" cy="22" r="8" stroke={AMBER} /><path d="M22 5 v6 M22 33 v6 M5 22 h6 M33 22 h6 M10 10 l4 4 M30 30 l4 4 M34 10 l-4 4 M10 34 l4 -4" stroke={AMBER} strokeWidth="3" /></g>
     <path className="ml-pulse" d="M22 52 h26 a8 8 0 0 0 0 -16 a11 11 0 0 0 -21 -2 a9 9 0 0 0 -5 18 z" />
     <path className="ml-draw" d="M28 56 l-2 5 M36 56 l-2 5 M44 56 l-2 5" stroke={CYAN} strokeWidth="2.4" />
+  </>,
+  hmi: <>
+    <rect x="8" y="12" width="48" height="32" rx="4" /><path d="M24 52 h16" /><path d="M32 44 v8" /><path className="ml-pulse" d="M16 30 h8 l3 -7 l5 13 l4 -9 l3 3 h9" strokeWidth="2.4" />
   </>,
   services: <>
     <rect x="9" y="9" width="21" height="21" rx="4" /><rect x="34" y="9" width="21" height="21" rx="4" /><rect x="9" y="34" width="21" height="21" rx="4" /><rect x="34" y="34" width="21" height="21" rx="4" />

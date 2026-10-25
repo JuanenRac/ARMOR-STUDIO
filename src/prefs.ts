@@ -19,7 +19,7 @@ export type StartView = View | "last";
 export const ASSISTANT_SIZES = ["small", "normal", "large"] as const;
 export type AssistantSize = (typeof ASSISTANT_SIZES)[number];
 
-export const VIEWS: readonly View[] = ["overview", "weather", "alarms", "alarmPanels", "cameras", "radar", "inverters", "batteries", "electrical", "devices", "automations", "record", "history", "network", "services", "siteDesigner", "electricalDesigner", "networkDesigner", "alarmDesigner", "system", "configuration"];
+export const VIEWS: readonly View[] = ["overview", "weather", "alarms", "alarmPanels", "cameras", "radar", "inverters", "batteries", "electrical", "devices", "automations", "record", "history", "network", "hmi", "services", "siteDesigner", "electricalDesigner", "networkDesigner", "alarmDesigner", "system", "configuration"];
 
 export type Prefs = {
   /** The guided tours are offered (the first visit starts the welcome one, the Help and the preferences list them). */

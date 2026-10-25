@@ -5,6 +5,44 @@
 import type { MenuSteps } from "./menuStepsTypes";
 
 export const ENERGY_HOUSE_STEPS: MenuSteps = {
+  hmi: [
+    { target: "scr-head", placement: "bottom",
+      t: ["The wall panels that answer", "Los paneles de pared que responden", "Die Wandpanels, die antworten", "Les panneaux muraux qui répondent", "I pannelli a muro che rispondono", "応答している壁面パネル", "在线的壁挂面板", "Os painéis de parede que respondem"],
+      b: [
+        "Every wall panel (ARMOR-NODE-HMI) that has reported its health to the server is listed here, and the counter says how many answer out of all of them. A touch screen that stops reporting is shown as silent, and the alarms of the system say it too.",
+        "Cada panel de pared (ARMOR-NODE-HMI) que ha informado de su salud al servidor aparece aquí, y el contador dice cuántos responden de todos. Una pantalla táctil que deja de informar se muestra como silenciosa, y las alarmas del sistema también lo dicen.",
+        "Jedes Wandpanel (ARMOR-NODE-HMI), das seinen Zustand an den Server gemeldet hat, steht hier, und der Zähler sagt, wie viele von allen antworten. Ein Touchscreen, der nicht mehr berichtet, wird als stumm angezeigt, und die Alarme des Systems melden es ebenfalls.",
+        "Chaque panneau mural (ARMOR-NODE-HMI) qui a rapporté sa santé au serveur figure ici, et le compteur dit combien répondent sur le total. Un écran tactile qui cesse de rapporter est affiché comme muet, et les alarmes du système le signalent aussi.",
+        "Ogni pannello a muro (ARMOR-NODE-HMI) che ha riferito la propria salute al server compare qui, e il contatore dice quanti rispondono sul totale. Un touch screen che smette di riferire è mostrato come muto, e lo dicono anche gli allarmi del sistema.",
+        "サーバーに状態を報告した壁面パネル（ARMOR-NODE-HMI）はすべてここに並び、カウンターが全体のうち応答している数を示します。報告が止まったタッチ画面は「無通信」と表示され、システムのアラームでも知らされます。",
+        "已向服务器上报状态的每块壁挂面板（ARMOR-NODE-HMI）都会列在这里，计数器显示总数中有多少在响应。停止上报的触摸屏会显示为“沉默”，系统报警也会提示。",
+        "Cada painel de parede (ARMOR-NODE-HMI) que comunicou a sua saúde ao servidor aparece aqui, e o contador diz quantos respondem do total. Um ecrã tátil que deixa de comunicar é mostrado como silencioso, e os alarmes do sistema também o dizem.",
+      ] },
+    { target: "scr-tools", placement: "bottom",
+      t: ["The icon buttons of a panel", "Los botones con icono de un panel", "Die Symbolschaltflächen eines Panels", "Les boutons à icône d'un panneau", "I pulsanti con icona di un pannello", "パネルのアイコンボタン", "面板的图标按钮", "Os botões com ícone de um painel"],
+      b: [
+        "Open its own page in your network, change its parameters through the server from anywhere (the screen, the sounds, the network), see the details of its health, give it an order such as restart or identify, and forget it when it was taken away. The pencil registers the address of its page when it changed.",
+        "Abrir su propia página en tu red, cambiar sus parámetros a través del servidor desde cualquier sitio (la pantalla, los sonidos, la red), ver el detalle de su salud, darle una orden como reiniciar o identificar y olvidarlo cuando se ha retirado. El lápiz registra la dirección de su página cuando ha cambiado.",
+        "Seine eigene Seite in Ihrem Netzwerk öffnen, seine Parameter über den Server von überall ändern (Bildschirm, Töne, Netzwerk), die Einzelheiten seines Zustands sehen, ihm einen Befehl wie Neustart oder Identifizieren geben und es vergessen, wenn es entfernt wurde. Der Stift trägt die Adresse seiner Seite ein, wenn sie sich geändert hat.",
+        "Ouvrir sa propre page dans votre réseau, modifier ses paramètres via le serveur de n'importe où (l'écran, les sons, le réseau), voir le détail de sa santé, lui donner un ordre comme redémarrer ou identifier, et l'oublier quand il a été retiré. Le crayon enregistre l'adresse de sa page quand elle a changé.",
+        "Aprire la sua pagina nella tua rete, modificarne i parametri tramite il server da ovunque (lo schermo, i suoni, la rete), vedere il dettaglio della sua salute, dargli un ordine come riavvia o identifica e dimenticarlo quando è stato rimosso. La matita registra l'indirizzo della sua pagina quando è cambiato.",
+        "同じネットワークからパネル自身のページを開く、サーバー経由でどこからでもパラメータ（画面・音・ネットワーク）を変更する、状態の詳細を見る、再起動や識別などの操作を送る、取り外したパネルを削除する、ができます。ページのアドレスが変わったときは鉛筆で登録します。",
+        "可在你的网络内打开面板自带页面，通过服务器随时随地修改其参数（屏幕、声音、网络），查看状态详情，向它下达重启或识别等指令，并在面板被拆除后将其忘记。页面地址变化时，用铅笔登记新地址。",
+        "Abrir a sua própria página na sua rede, alterar os seus parâmetros através do servidor a partir de qualquer lugar (o ecrã, os sons, a rede), ver o detalhe da sua saúde, dar-lhe uma ordem como reiniciar ou identificar e esquecê-lo quando foi retirado. O lápis regista o endereço da sua página quando mudou.",
+      ] },
+    { target: "scr-node", placement: "left",
+      t: ["The health of a panel", "La salud de un panel", "Der Zustand eines Panels", "La santé d'un panneau", "La salute di un pannello", "パネルの状態", "面板的状态", "A saúde de um painel"],
+      b: [
+        "The card of each panel says whether it answers, its firmware and board, how long it has been on, why it last restarted, its memory, its network link and signal, and any warning the server raised. The orders (restart, pause, standby) are only for administrators and ask for confirmation.",
+        "La tarjeta de cada panel dice si responde, su firmware y su placa, cuánto lleva encendido, por qué se reinició la última vez, su memoria, su enlace de red y su señal, y cualquier aviso que el servidor haya levantado. Las órdenes (reiniciar, pausar, reposo) son solo para administradores y piden confirmación.",
+        "Die Karte jedes Panels sagt, ob es antwortet, seine Firmware und Platine, wie lange es läuft, warum es zuletzt neu gestartet ist, seinen Speicher, seine Netzwerkverbindung und sein Signal sowie jede Warnung des Servers. Die Befehle (Neustart, Pause, Standby) sind Administratoren vorbehalten und verlangen eine Bestätigung.",
+        "La carte de chaque panneau dit s'il répond, son firmware et sa carte, depuis combien de temps il est allumé, pourquoi il a redémarré la dernière fois, sa mémoire, son lien réseau et son signal, et tout avertissement levé par le serveur. Les ordres (redémarrer, pause, veille) sont réservés aux administrateurs et demandent une confirmation.",
+        "La scheda di ogni pannello dice se risponde, il suo firmware e la sua scheda, da quanto è acceso, perché si è riavviato l'ultima volta, la sua memoria, il collegamento di rete e il segnale, e ogni avviso sollevato dal server. Gli ordini (riavvia, pausa, standby) sono riservati agli amministratori e chiedono conferma.",
+        "各パネルのカードには、応答しているか、ファームウェアと基板、稼働時間、前回の再起動の理由、メモリ、ネットワーク接続と電波、サーバーが出した警告が表示されます。操作（再起動、一時停止、スタンバイ）は管理者のみで、確認が求められます。",
+        "每块面板的卡片会显示它是否在响应、固件和主板、已运行时间、上次重启的原因、内存、网络连接与信号，以及服务器发出的任何警告。指令（重启、暂停、待机）仅限管理员，并会要求确认。",
+        "O cartão de cada painel diz se responde, o firmware e a placa, há quanto tempo está ligado, porque reiniciou da última vez, a memória, a ligação de rede e o sinal, e qualquer aviso levantado pelo servidor. As ordens (reiniciar, pausar, standby) são só para administradores e pedem confirmação.",
+      ] },
+  ],
   inverters: [
     { target: "inv-head", placement: "bottom",
       t: ["The totals and the solar node", "Los totales y el nodo solar", "Die Summen und der Solarknoten", "Les totaux et le nœud solaire", "I totali e il nodo solare", "合計とソーラーノード", "汇总与太阳能节点", "Os totais e o nó solar"],

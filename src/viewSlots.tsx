@@ -9,7 +9,7 @@ import { createContext, useContext, type ReactNode } from "react";
 import type { View } from "./domain";
 
 /** The menus that stay open once visited: the ones with forms, tabs, selections and settings. */
-export const KEPT_VIEWS: ReadonlySet<View> = new Set<View>(["alarms", "alarmPanels", "electrical", "inverters", "batteries", "devices", "automations", "record", "history", "network", "services", "system", "configuration", "alarmDesigner", "electricalDesigner", "networkDesigner"]);
+export const KEPT_VIEWS: ReadonlySet<View> = new Set<View>(["alarms", "alarmPanels", "electrical", "inverters", "batteries", "devices", "automations", "record", "history", "network", "hmi", "services", "system", "configuration", "alarmDesigner", "electricalDesigner", "networkDesigner"]);
 
 /** False inside a menu that is open but hidden. */
 const ViewActiveContext = createContext(true);

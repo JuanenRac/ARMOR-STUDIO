@@ -21,6 +21,7 @@ export const hintsPt: Record<string, string> = {
  "nav:electricalDesigner": "Desenhador elétrico: desenhe a instalação elétrica, verifique-a e associe-a a nós em direto.",
  "nav:networkDesigner": "Desenhador de rede: desenhe a rede (routers, comutadores, câmaras) e associe-a ao que foi encontrado.",
  "nav:system": "Sistema: a saúde do servidor - memória, disco, ligações, MQTT, vídeo e o registo de auditoria.",
+ "nav:hmi": "Painel tátil: os painéis de parede (ecrãs táteis) que comunicaram, o seu estado e os botões para abrir, configurar, dar ordens e esquecer cada um.",
  "nav:services": "Serviços: os serviços do A.R.M.O.R. que correm no servidor e se cada um está ativo.",
  "nav:configuration": "Configuração: endereço do servidor, câmaras, utilizadores e preferências.",
  "collapse": "Recolhe o menu da esquerda só para ícones.",

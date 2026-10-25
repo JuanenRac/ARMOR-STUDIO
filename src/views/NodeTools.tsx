@@ -53,8 +53,8 @@ export function NodeToolsBar({ t, tools, id, panel = null, silent, forget }: { t
 }
 
 /** The dialog of an order, the order under way and the health card of the node whose details are open. */
-export function NodeToolsFooter({ t, tools }: { t: Translate; tools: NodeTools }) {
-  const open = tools.detailsOf ? tools.healthOf(tools.detailsOf) : null;
+export function NodeToolsFooter({ t, tools, details = true }: { t: Translate; tools: NodeTools; /** False when the list shows the health card of each node itself. */ details?: boolean }) {
+  const open = details && tools.detailsOf ? tools.healthOf(tools.detailsOf) : null;
   return <>
     {open && tools.health.data && <div className="nt-detail"><NodeCard t={t} node={open} levels={tools.health.data.levels} now={Date.now()} opened toggle={() => tools.setDetailsOf(null)} origin={tools.origin} isAdmin={tools.isAdmin}
       forget={() => void forgetNodeHealth(tools.origin, open.node_id).then(() => { tools.setDetailsOf(null); tools.health.reload(); })}
