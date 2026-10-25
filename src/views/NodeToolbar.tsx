@@ -25,6 +25,7 @@ export const NODE_ICONS: Record<string, ReactNode> = {
   standby: <svg {...ICON}><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" /></svg>,
   identify: <svg {...ICON}><circle cx="12" cy="12" r="3" /><circle cx="12" cy="12" r="8" /><path d="M12 1v3" /><path d="M12 20v3" /><path d="M1 12h3" /><path d="M20 12h3" /></svg>,
   diagnostics: <svg {...ICON}><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4V3h6v1" /><path d="M9 11h6" /><path d="M9 15h4" /></svg>,
+  address: <svg {...ICON}><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17z" /><path d="M13.5 6.5l3 3" /></svg>,
   forget: <svg {...ICON}><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M6 7l1 13h10l1-13" /><path d="M9 7V4h6v3" /></svg>,
 };
 
@@ -35,8 +36,11 @@ export type ToolbarProps = {
   t: Translate; origin: string; id: string;
   /** Where the node's own panel is, when it is known (a radar node says it itself; for the others the network node found it). */
   panel?: { ip: string; port: number } | null;
-  /** The node does not answer: it can be forgotten. */
+  /** The node does not answer (an administrator can forget one that answers too, and it comes back when it speaks again). */
   silent: boolean;
+  /** The server knows the address of the panel (an administrator registered it): only then can it open the panel through the server. */
+  registered: boolean;
+  editAddress: () => void;
   /** What the server knows of this node's health, when it has reported (the orders depend on its state). */
   health?: NodeHealthItem | null;
   isAdmin: boolean; detailsOpen: boolean; toggleDetails: () => void;
@@ -48,13 +52,16 @@ function IconButton({ label, icon, onClick, href, tone = "", pressed }: { label:
   return <button type="button" className={`nt-btn ${tone}`} title={label} aria-label={label} aria-pressed={pressed} onClick={onClick}>{icon}</button>;
 }
 
-export function NodeToolbar({ t, origin, id, panel = null, silent, health = null, isAdmin, detailsOpen, toggleDetails, control, forget }: ToolbarProps) {
+export function NodeToolbar({ t, origin, id, panel = null, silent, registered, editAddress, health = null, isAdmin, detailsOpen, toggleDetails, control, forget }: ToolbarProps) {
   const orders = health && !health.stale ? actionsFor(health).filter(action => QUICK.includes(action.operation)) : [];
   return <div className="nt-bar" role="group" aria-label={id}>
     {panel && <IconButton label={t("rn_open_direct")} icon={NODE_ICONS.open} href={panelUrl(panel)} />}
-    {isAdmin && <IconButton label={t("rn_configure")} icon={NODE_ICONS.configure} href={nodePanelUrl(origin, id)} />}
+    {isAdmin && (registered
+      ? <IconButton label={t("rn_configure")} icon={NODE_ICONS.configure} href={nodePanelUrl(origin, id)} />
+      : <IconButton label={t("rn_configure_register")} icon={NODE_ICONS.configure} onClick={editAddress} tone="warn" />)}
+    {isAdmin && <IconButton label={t("rn_edit_address")} icon={NODE_ICONS.address} onClick={editAddress} />}
     {health && <IconButton label={detailsOpen ? t("nh_hide") : t("nh_details")} icon={NODE_ICONS.details} onClick={toggleDetails} pressed={detailsOpen} />}
     {isAdmin && orders.map(action => <IconButton key={action.operation} label={t(action.label)} icon={NODE_ICONS[action.operation]} onClick={() => control(action)} tone={action.operation === "restart" || action.operation === "standby" ? "warn" : ""} />)}
-    {isAdmin && silent && <IconButton label={t("forgetNode")} icon={NODE_ICONS.forget} onClick={forget} tone="danger" />}
+    {isAdmin && <IconButton label={t("forgetNode")} icon={NODE_ICONS.forget} onClick={forget} tone={silent ? "danger" : "warn"} />}
   </div>;
 }
