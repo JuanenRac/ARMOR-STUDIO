@@ -1,0 +1,12 @@
+/* The site in 3D for the overview and the radar menu (components/SiteLive3D.tsx). */
+.live3d { position: relative; width: 100%; height: 100%; min-height: 380px; overflow: hidden; border-radius: 12px; background: radial-gradient(circle at 50% 40%, #0b2731, #050d13 75%); }
+.live3d .viewport3d { position: absolute; inset: 0; }
+.live3d .v3d-hint { opacity: .75; }
+.live3d-loading { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; }
+/* the small row of view buttons, in place of the floating toolbox of the designer */
+.v3d-mini { position: absolute; top: 8px; left: 8px; z-index: 3; display: inline-flex; gap: 2px; padding: 2px; border: 1px solid color-mix(in srgb, var(--t-a1, #22d3ee) 40%, transparent); border-radius: 999px; background: color-mix(in srgb, #06141b 85%, transparent); }
+.v3d-mini-btn:not(#ui) { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 26px; min-height: 0; padding: 0; margin: 0; cursor: pointer; border: 0; border-radius: 999px; color: #9bc3cc; background: transparent; box-shadow: none; transform: none; filter: none; }
+.v3d-mini-btn:not(#ui) svg { width: 16px; height: 16px; }
+.v3d-mini-btn:not(#ui):hover { color: var(--t-a1, #22d3ee); background: color-mix(in srgb, var(--t-a1, #22d3ee) 14%, transparent); transform: none; }
+.v3d-mini-btn.on:not(#ui) { color: #031318; background: var(--t-a1, #22d3ee); }
+.v3d-mini-btn:not(#ui):focus-visible { outline: 2px solid var(--t-a1, #22d3ee); outline-offset: 1px; }

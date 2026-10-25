@@ -5,7 +5,7 @@
  */
 import { askConfirm } from "../askConfirm";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { readRules, readStatus, type Rules } from "../api";
+import { readRules, readStatus, type Rules, type StudioDevice } from "../api";
 import { bounds, centroid, offsetPolygon } from "../designer/geometry";
 import { arcPoints, cameraView, fitTransform, headingOf, radarView, sectorPoints, toMetres, type Point } from "../designer/model";
 import type { SiteModel } from "../designer/ops";
@@ -21,12 +21,15 @@ import "./radar-map.css";
 import { MenuTitle } from "../menuLogos";
 import { DesignerLink } from "../components/DesignerLink";
 import { NodeFinder } from "../NodeFinder";
+import { SiteLive3D } from "../components/SiteLive3D";
+import { MapModeToggle, useMapMode } from "../components/MapModeToggle";
 import { NodeToolsBar, NodeToolsFooter, useNodeTools } from "./NodeTools";
 import type { NetworkOverview } from "../networkModel";
 
 type Props = {
   nodes: NodeState[]; model: SiteModel; dimensions: Dimensions; origin: string;
   /** An administrator can configure the nodes, give them orders and forget them. */ isAdmin?: boolean;
+  /** The devices of the system, for the 3D view of the site. */ devices?: StudioDevice[];
   forget: (id: string) => void; openDesigner: () => void; openZones: () => void; setSensors: (next: Sensor[]) => void; t: Translate;
   /** What the network node has found, to look for radar nodes on the network. */
   network?: NetworkOverview | null;
@@ -55,9 +58,10 @@ function useLiveNodes(origin: string, fallback: NodeState[]): NodeState[] {
 
 export { panelUrl };
 
-export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forget, openDesigner, openZones, setSensors, t, network = null, isAdmin = false }: Props) {
+export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forget, openDesigner, openZones, setSensors, t, network = null, isAdmin = false, devices = [] }: Props) {
   const nodes = useLiveNodes(origin, consoleNodes);
   const tools = useNodeTools(origin, isAdmin);
+  const [mapMode, setMapMode] = useMapMode("armor-studio-radar-map");
   const [rules, setRules] = useState<Rules | null>(null);
   useEffect(() => { void readRules(origin).then(setRules).catch(() => setRules(null)); }, [origin]);
   const box = useRef<HTMLDivElement>(null);
@@ -107,11 +111,12 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
     <article className="radar-map-card" data-tour="radar-map">
       <header>
         <MenuTitle kind="radar"><p className="eyebrow">{t("radarFusion")}</p><h2>{t("radarMap")}</h2></MenuTitle>
-        <div className="radar-map-stats"><span><b>{placed.length}</b> {t("targetsLive")}</span><span><b>{counted}</b> {t("legendCounted").toLowerCase()}</span></div>
+        <div className="radar-map-stats"><MapModeToggle t={t} mode={mapMode} onChange={setMapMode} /><span><b>{placed.length}</b> {t("targetsLive")}</span><span><b>{counted}</b> {t("legendCounted").toLowerCase()}</span></div>
       </header>
       <p className="muted">{t("radarMapHelp")}</p>
       <DesignerLink title={t("dlRadarTitle")} text={t("dlRadarText")} button={t("dlSiteButton")} open={openDesigner} />
-      <div ref={box} className="radar-map" onWheel={event => { event.preventDefault(); const rect = box.current!.getBoundingClientRect(); zoom(event.deltaY < 0 ? 1.15 : 1 / 1.15, event.clientX - rect.left, event.clientY - rect.top); }}
+      {mapMode === "3d" && <div className="radar-map radar-map-3d"><SiteLive3D t={t} model={model} dimensions={dimensions} devices={devices} nodes={nodes} /></div>}
+      <div ref={box} className="radar-map" style={mapMode === "3d" ? { display: "none" } : undefined} onWheel={event => { event.preventDefault(); const rect = box.current!.getBoundingClientRect(); zoom(event.deltaY < 0 ? 1.15 : 1 / 1.15, event.clientX - rect.left, event.clientY - rect.top); }}
         onPointerDown={event => { drag.current = { x: event.clientX, y: event.clientY, vx: current.x, vy: current.y }; event.currentTarget.setPointerCapture(event.pointerId); }}
         onPointerMove={event => { const start = drag.current; if (start) setView({ scale: current.scale, x: start.vx + event.clientX - start.x, y: start.vy + event.clientY - start.y }); }}
         onPointerUp={() => { drag.current = null; }} onPointerCancel={() => { drag.current = null; }}>

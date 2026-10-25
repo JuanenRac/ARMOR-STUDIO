@@ -26,6 +26,7 @@ import { arrangeToolbox, toolSections } from "./toolItems";
 import type { PlaceHit } from "./Plan2D";
 import { roofSurfaceZ, type SiteModel } from "./ops";
 import { FloatingToolbox, type ToolboxItem } from "./Toolbox";
+import type { PlacedTarget } from "./radarMap";
 
 export type Target3D = { kind: "building" | "opening" | "roofItem" | "wallLamp" | "feature" | "camera" | "sensor" | "device"; id: string };
 export type ViewportProps = {
@@ -43,6 +44,8 @@ export type ViewportProps = {
   onNotice: (text: string) => void;
   /** Undo, redo, delete and turn: the same buttons as in the 2D panel. */
   sharedSections: ToolboxItem[][];
+  /** When given, the viewport only shows the site (a viewer for the overview and the radar menu, with no tools): these are the targets the radars see now, drawn where they stand. */
+  live?: { targets: readonly PlacedTarget[] };
 };
 
 const SELECT = "#00e5ff";
@@ -582,10 +585,22 @@ function Scene(props: ViewportProps & { shadows: boolean; xray: boolean; turntab
     })}
     {layers.cameras && model.cameras.map(camera => <DeviceView key={camera.id} kind="camera" item={camera} dimensions={dimensions} selected={isSelected("camera", camera.id)} hover={hoverKey === `camera:${camera.id}`} showField={layers.fields} hooks={hooks} />)}
     {layers.sensors && model.sensors.map(sensor => <DeviceView key={sensor.id} kind="sensor" item={sensor} dimensions={dimensions} selected={isSelected("sensor", sensor.id)} hover={hoverKey === `sensor:${sensor.id}`} showField={layers.fields} hooks={hooks} />)}
+  {props.live?.targets.map(target => <LiveTarget key={target.key} target={target} />)}
   </>;
 }
 
+const ALERT_COLOUR = { review: "#ffb020", high: "#ff4d5e", normal: "#00e5ff" } as const;
+/** A target the radars see now: a lit ball at the height of a chest and a ring on the ground. It is only drawn: it never takes a click. */
+function LiveTarget({ target }: { target: PlacedTarget }) {
+  const colour = target.counted ? ALERT_COLOUR[target.alert] : "#8b9ba1";
+  return <group position={site(target.point.x, target.point.y)}>
+    <mesh position={[0, 1, 0]} raycast={NO_PICK}><sphereGeometry args={[0.28, 20, 14]} /><meshStandardMaterial color={colour} emissive={colour} emissiveIntensity={0.9} /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]} raycast={NO_PICK}><ringGeometry args={[0.5, 0.65, 32]} /><meshBasicMaterial color={colour} transparent opacity={0.7} side={THREE.DoubleSide} /></mesh>
+  </group>;
+}
+
 export default function Viewport3D(props: ViewportProps) {
+  const viewer = props.live !== undefined;
   const { t, tool } = props;
   const host = useRef<HTMLDivElement>(null), compass = useRef<HTMLDivElement>(null);
   const [shadows, setShadows] = useState(true), [xray, setXray] = useState(false), [turntable, setTurntable] = useState(false);
@@ -625,8 +640,10 @@ export default function Viewport3D(props: ViewportProps) {
       onPointerMissed={() => { /* selection is cleared by the ground itself */ }}>
       <Scene {...props} shadows={shadows} xray={xray} turntable={turntable} layers={layers} request={request} compass={compass} />
     </Canvas>
+    {!viewer && <>
     <FloatingToolbox storageKey="armor-studio-toolbox-3d-v1" title={t("toolboxTitle3d")} sections={sections} containerRef={host} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 12, y: 12 }} />
     {tools3d.branches.map((branch, index) => <FloatingToolbox key={branch.id} storageKey={`armor-studio-toolbox-3d-${branch.id}-v1`} title={branch.title} sections={branch.sections} containerRef={host} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 150 + index * 140, y: 12 }} />)}
+    </>}
     {layersOpen && <div className="v3d-layers" role="group" aria-label={t("layers")}>
       <strong>{t("layers")}</strong>
       {LAYER_KEYS.map(key => <label key={key}><input type="checkbox" checked={layers[key]} onChange={event => setLayers(current => ({ ...current, [key]: event.target.checked }))} /> {t(`layer_${key}`)}</label>)}
@@ -637,6 +654,10 @@ export default function Viewport3D(props: ViewportProps) {
       <button className={`roof-chip ${layers.roofs ? "" : "on"}`} aria-pressed={!layers.roofs} onClick={() => setLayers(current => ({ ...current, roofs: !current.roofs }))} title={layers.roofs ? t("roofsOff") : t("roofsOn")} aria-label={layers.roofs ? t("roofsOff") : t("roofsOn")}>{ICON.roof}</button>
     </div>
     <div ref={compass} className="v3d-compass" aria-label={t("north")} title={t("north")}><svg viewBox="0 0 40 40" width="42" height="42"><circle cx="20" cy="20" r="17" className="n-ring" /><g className="n-rot"><path d="M20 6l5 14H15z" className="n-needle" /><path d="M20 34l-5-14h10z" className="n-tail" /><text x="20" y="4.6" textAnchor="middle" className="n-n">N</text></g></svg></div>
-    <p className="v3d-hint">{t("orbitHint")}</p>
+    <p className="v3d-hint">{viewer ? t("orbitHintLive") : t("orbitHint")}</p>
+    {viewer && <div className="v3d-mini" role="group" aria-label={t("view3d")}>
+      {viewControls.flat().filter(entry => ["iso", "top", "fit", "turntable", "xray"].includes(entry.id)).map(entry =>
+        <button type="button" key={entry.id} className={`v3d-mini-btn ${entry.active ? "on" : ""}`} title={entry.label} aria-label={entry.label} aria-pressed={entry.active} onClick={entry.onClick}>{entry.icon}</button>)}
+    </div>}
   </div>;
 }

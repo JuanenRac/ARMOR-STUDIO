@@ -1,0 +1,7 @@
+/* The 2D / 3D icon buttons of the maps (components/MapModeToggle.tsx): a small pill, never a big button. */
+.map-mode { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid color-mix(in srgb, var(--t-a1, #22d3ee) 40%, transparent); border-radius: 999px; background: color-mix(in srgb, var(--t-panel2, #0b202a) 85%, transparent); vertical-align: middle; }
+.map-mode button:not(#ui) { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 24px; min-height: 0; padding: 0; margin: 0; cursor: pointer; border: 0; border-radius: 999px;
+  color: var(--ui-muted, #86a8b3); background: transparent; box-shadow: none; transform: none; filter: none; transition: background .15s ease, color .15s ease; }
+.map-mode button:not(#ui):hover { color: var(--t-a1, #22d3ee); background: color-mix(in srgb, var(--t-a1, #22d3ee) 14%, transparent); transform: none; }
+.map-mode button.on:not(#ui) { color: #031318; background: var(--t-a1, #22d3ee); }
+.map-mode button:not(#ui):focus-visible { outline: 2px solid var(--t-a1, #22d3ee); outline-offset: 1px; }

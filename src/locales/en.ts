@@ -1493,6 +1493,8 @@ const catalogue: Record<string, string> = {
 "scr_none": "No wall panel has reported yet",
 "scr_none_help": "A wall panel (ARMOR-NODE-HMI) appears here once it is on the network and connected to the broker of the server. Its own page, to set it up the first time, is at its address.",
 "scr_waiting": "Waiting for the first report of:",
+"orbitHintLive": "Left drag: turn · Right drag: pan · Wheel: zoom",
+"loading3d": "Loading the 3D view…",
 "pinLabel": "PIN",
 "pinPlaceholder": "Your PIN, if you have one",
 "modeNoAnswer": "The server did not answer, so the mode was not changed. Try again.",

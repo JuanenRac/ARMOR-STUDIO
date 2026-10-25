@@ -1473,6 +1473,8 @@ const catalogue: Record<string, string> = {
 "scr_none": "Ningún panel de pared ha informado todavía",
 "scr_none_help": "Un panel de pared (ARMOR-NODE-HMI) aparece aquí cuando está en la red y conectado al broker del servidor. Su propia página, para configurarlo la primera vez, está en su dirección.",
 "scr_waiting": "Esperando el primer informe de:",
+"orbitHintLive": "Arrastrar con la izquierda: girar · Con la derecha: desplazar · Rueda: zoom",
+"loading3d": "Cargando la vista 3D…",
 "pinPlaceholder": "Tu PIN, si tienes uno",
 "modeNoAnswer": "El servidor no ha respondido, así que el modo no ha cambiado. Inténtalo de nuevo.",
 "modeServerError": "El servidor ha rechazado el cambio (error {status}).",

@@ -1476,6 +1476,8 @@ const catalogue: Record<string, string> = {
 "scr_none": "報告のある壁面パネルはまだありません",
 "scr_none_help": "壁面パネル（ARMOR-NODE-HMI）は、ネットワークに接続されサーバーのブローカーにつながるとここに表示されます。初回設定用のパネル自身のページは、そのアドレスにあります。",
 "scr_waiting": "最初の報告を待っています：",
+"orbitHintLive": "左ドラッグ：回転 · 右ドラッグ：移動 · ホイール：ズーム",
+"loading3d": "3D ビューを読み込み中…",
 "pinPlaceholder": "PIN（設定している場合）",
 "modeNoAnswer": "サーバーが応答せず、モードは変更されていません。もう一度お試しください。",
 "modeServerError": "サーバーが変更を拒否しました（エラー {status}）。",

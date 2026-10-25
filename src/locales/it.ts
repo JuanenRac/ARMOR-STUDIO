@@ -1463,6 +1463,8 @@ const catalogue: Record<string, string> = {
 "scr_none": "Nessun pannello a muro ha ancora riferito",
 "scr_none_help": "Un pannello a muro (ARMOR-NODE-HMI) compare qui quando è in rete e collegato al broker del server. La sua pagina, per configurarlo la prima volta, è al suo indirizzo.",
 "scr_waiting": "In attesa del primo rapporto di:",
+"orbitHintLive": "Trascina a sinistra: ruota · A destra: sposta · Rotella: zoom",
+"loading3d": "Caricamento della vista 3D…",
 "pinPlaceholder": "Il tuo PIN, se ne hai uno",
 "modeNoAnswer": "Il server non ha risposto, la modalità non è cambiata. Riprova.",
 "modeServerError": "Il server ha rifiutato la modifica (errore {status}).",

@@ -7,6 +7,8 @@ import type { CSSProperties, ReactNode } from "react";
 import { listHistory, readSystem, type AlarmNodes, type Alarm, type ArmorEvent, type ElectricalReadings, type SolarOverview, type StudioDevice } from "../api";
 import type { NetworkOverview } from "../networkModel";
 import { SiteMap } from "../components/SiteMap";
+import { SiteLive3D } from "../components/SiteLive3D";
+import { MapModeToggle, useMapMode } from "../components/MapModeToggle";
 import type { SiteModel } from "../designer/ops";
 import { describeEvent } from "../history";
 import { ago, deviceProblem, KindIcon } from "../deviceKinds";
@@ -41,6 +43,7 @@ function Tile({ colour, label, value, sub, onClick, alert, icon }: { colour: str
 
 export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras, reachability, devices, alarms, model, dimensions, setView, onDevice, now, panels = null, solar = null, electrical = null, network = null, census = null, readOnly = false }: Props) {
   const system = usePolled(() => readSystem(origin), 6000, origin).data;
+  const [mapMode, setMapMode] = useMapMode("armor-studio-overview-map");
   const feed = usePolled(() => listHistory(origin, { limit: 12 }), 5000, origin).data?.events ?? [];
   const active = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at);
   const critical = active.some(alarm => alarm.severity === "critical");
@@ -89,8 +92,10 @@ export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras
 
     <div className="ov-main">
       <article className="ov-card ov-map" data-tour="ov-map">
-        <header><h3>{t("liveMap")}</h3><button className="link-button" onClick={() => setView("siteDesigner")}>{t("qaDesigner")} ▸</button></header>
-        <SiteMap model={model} dimensions={dimensions} devices={devices} nodes={nodes} alarms={alarms?.active ?? []} onDevice={onDevice} empty={t("liveMapEmpty")} />
+        <header><h3>{t("liveMap")}</h3><MapModeToggle t={t} mode={mapMode} onChange={setMapMode} /><button className="link-button" onClick={() => setView("siteDesigner")}>{t("qaDesigner")} ▸</button></header>
+        {mapMode === "3d"
+          ? <SiteLive3D t={t} model={model} dimensions={dimensions} devices={devices} nodes={nodes} />
+          : <SiteMap model={model} dimensions={dimensions} devices={devices} nodes={nodes} alarms={alarms?.active ?? []} onDevice={onDevice} empty={t("liveMapEmpty")} />}
       </article>
       <div className="ov-side" data-tour="ov-side">
         <article className="ov-card">

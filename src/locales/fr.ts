@@ -1453,6 +1453,8 @@ const catalogue: Record<string, string> = {
 "scr_none": "Aucun panneau mural n'a encore rapporté",
 "scr_none_help": "Un panneau mural (ARMOR-NODE-HMI) apparaît ici dès qu'il est sur le réseau et connecté au broker du serveur. Sa propre page, pour le configurer la première fois, est à son adresse.",
 "scr_waiting": "En attente du premier rapport de :",
+"orbitHintLive": "Glisser à gauche : tourner · À droite : déplacer · Molette : zoom",
+"loading3d": "Chargement de la vue 3D…",
 "pinLabel": "Code PIN",
 "pinPlaceholder": "Votre code PIN, si vous en avez un",
 "modeNoAnswer": "Le serveur n'a pas répondu, le mode n'a pas changé. Réessayez.",

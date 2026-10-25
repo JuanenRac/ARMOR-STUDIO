@@ -1403,6 +1403,8 @@ export const PT_CATALOGUE: Record<string, string> = {
  "mode_pin_locked": "Demasiados PIN errados: espere um pouco antes de tentar de novo.",
  "mode_pin_not_set": "Este utilizador não tem PIN para desarmar: um administrador define-o em Configuração > Utilizadores.",
  "pinLabel": "PIN",
+ "orbitHintLive": "Arrastar com a esquerda: rodar · Com a direita: deslocar · Roda: zoom",
+ "loading3d": "A carregar a vista 3D…",
  "hmi": "Painel tátil",
  "scr_help": "Os painéis de parede (ecrãs táteis) que comunicam ao servidor: altere os seus parâmetros, dê-lhes ordens ou esqueça os que foram retirados.",
  "scr_count": "{0} de {1} painéis de parede respondem",

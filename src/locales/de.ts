@@ -1446,6 +1446,8 @@ const catalogue: Record<string, string> = {
 "scr_none": "Noch kein Wandpanel hat sich gemeldet",
 "scr_none_help": "Ein Wandpanel (ARMOR-NODE-HMI) erscheint hier, sobald es im Netzwerk und mit dem Broker des Servers verbunden ist. Seine eigene Seite zur ersten Einrichtung liegt unter seiner Adresse.",
 "scr_waiting": "Warte auf den ersten Bericht von:",
+"orbitHintLive": "Links ziehen: drehen · Rechts ziehen: verschieben · Rad: zoomen",
+"loading3d": "3D-Ansicht wird geladen…",
 "pinPlaceholder": "Ihre PIN, falls vorhanden",
 "modeNoAnswer": "Der Server hat nicht geantwortet, der Modus wurde nicht geändert. Versuchen Sie es erneut.",
 "modeServerError": "Der Server hat die Änderung abgelehnt (Fehler {status}).",

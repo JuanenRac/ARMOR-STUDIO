@@ -1477,6 +1477,8 @@ const catalogue: Record<string, string> = {
 "scr_none": "尚无壁挂面板上报",
 "scr_none_help": "壁挂面板（ARMOR-NODE-HMI）接入网络并连上服务器的代理后会出现在这里。首次设置用的面板自带页面就在它的地址上。",
 "scr_waiting": "等待首次上报：",
+"orbitHintLive": "左键拖动：旋转 · 右键拖动：平移 · 滚轮：缩放",
+"loading3d": "正在加载 3D 视图…",
 "pinPlaceholder": "你的 PIN（如已设置）",
 "modeNoAnswer": "服务器没有响应，模式未更改。请重试。",
 "modeServerError": "服务器拒绝了更改（错误 {status}）。",
