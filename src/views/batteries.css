@@ -1,0 +1,83 @@
+/* The Batteries menu, organised for many nodes with up to eight packs each: a table of every stack, the detail of the chosen one, modules that unfold, charts side by side, and sections that fold.
+   It fits a 1080p screen without a long scroll and tightens itself on a 768p one (short screens) and on narrow ones. */
+.bat-view { gap: .65rem; }
+
+/* sections that fold */
+.bat-section { border: 1px solid #193341; border-radius: 14px; background: #09161e; }
+.bat-section > summary, .bat-module > summary { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .8rem; cursor: pointer; list-style: none; }
+.bat-section > summary::-webkit-details-marker, .bat-module > summary::-webkit-details-marker { display: none; }
+.bat-section > summary { padding: .5rem .9rem; }
+.bat-section > summary::before, .bat-module > summary::before { content: "▸"; color: #4be2e9; font-size: .8rem; transition: transform .15s ease; }
+.bat-section[open] > summary::before, .bat-module[open] > summary::before { transform: rotate(90deg); }
+.bat-section > summary .muted { font-size: .76rem; color: #8ea7b2; }
+.bat-section-body { display: grid; gap: .7rem; padding: 0 .9rem .8rem; }
+.bat-section-body > .solar-card { margin: 0; }
+
+/* the table of every stack, grouped by node */
+.bat-fleet { border: 1px solid #193341; border-radius: 14px; background: #09161e; overflow-x: auto; }
+.bat-row { display: grid; grid-template-columns: minmax(5.5rem, 1fr) minmax(9rem, 2.2fr) minmax(7.5rem, 1.5fr) repeat(4, minmax(4.2rem, 1fr)) minmax(4.5rem, 1fr) minmax(3.4rem, .7fr); align-items: center; gap: .6rem; min-width: 46rem; padding: .32rem .9rem; font-variant-numeric: tabular-nums; font-size: .86rem; }
+.bat-row.head { padding-top: .45rem; padding-bottom: .35rem; font-size: .66rem; letter-spacing: .08em; text-transform: uppercase; color: #79a3b0; border-bottom: 1px solid #142a36; }
+button.bat-row:not(#ui) { width: 100%; text-align: left; margin: 0; border: 0; border-top: 1px solid #0f2330; border-radius: 0; background: transparent; box-shadow: none; transform: none; filter: none; color: #dcecf2; cursor: pointer; min-height: 0; }
+button.bat-row:not(#ui):hover { background: #0d2330; transform: none; }
+button.bat-row.on:not(#ui) { background: #0f3340; box-shadow: inset 3px 0 0 #4be2e9; }
+button.bat-row:not(#ui):focus-visible { outline: 2px solid #4be2e9; outline-offset: -2px; }
+.bat-row.is-stale { opacity: .6; } .bat-row.is-fault .bat-name b { color: #ff8d98; }
+.bat-group + .bat-group > .bat-row:first-child { border-top: 1px solid #276272; }
+.bat-node { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; } .bat-node b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #4be2e9; } .bat-node small { color: #79a3b0; font-size: .68rem; }
+.bat-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .5rem; min-width: 0; }
+.bat-name b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .bat-name small { color: #79a3b0; font-size: .72rem; }
+.bat-name .solar-pill { padding: .05rem .5rem; font-size: .68rem; }
+.bat-soc { display: flex; align-items: center; gap: .5rem; } .bat-soc .solar-bar { flex: 1 1 auto; height: 7px; min-width: 2.5rem; } .bat-soc b { min-width: 2.9rem; text-align: right; }
+.bat-row .ok { color: #5df0c4; } .bat-row .warn { color: #ffc85a; } .bat-row .bad { color: #ff8d98; }
+
+/* the detail of the chosen stack: the summary and the facts side by side, denser than before */
+.bat-detail { padding: .7rem 1rem .8rem; }
+.bat-detail .solar-card-head { margin-bottom: .4rem; }
+.bat-summary { gap: 1.2rem; flex-wrap: nowrap; align-items: center; }
+.bat-facts-col { flex: 1 1 auto; min-width: 0; }
+.bat-facts-col .solar-capacity { margin-top: .5rem; }
+.bat-summary > svg { flex: 0 0 auto; width: 128px; height: auto; }
+.bat-summary .solar-facts { grid-template-columns: repeat(auto-fit, minmax(9.2rem, 1fr)); gap: .35rem .5rem; flex: 1 1 auto; }
+.bat-detail .solar-fact { padding: .3rem .6rem; } .bat-detail .solar-fact dd { font-size: .94rem; } .bat-detail .solar-fact dt { font-size: .62rem; }
+
+/* the modules: a tile each, that unfolds into everything the module reported */
+.bat-modules { display: grid; gap: .45rem; }
+.bat-section-head { display: flex; align-items: baseline; gap: .8rem; }
+.bat-section-head h3 { margin: 0; font-size: 1rem; flex: 1 1 auto; text-transform: capitalize; } .bat-section-head h3 small { color: #79a3b0; font-weight: 400; margin-left: .3rem; }
+.bat-fold { display: inline-flex; gap: .3rem; }
+.bat-fold button:not(#ui) { min-height: 0; padding: .15rem .65rem; font-size: .72rem; border: 1px solid #193341; border-radius: 999px; background: #0a1a23; color: #9bb4c0; box-shadow: none; transform: none; cursor: pointer; }
+.bat-fold button:not(#ui):hover { border-color: #4be2e9; color: #e9ffff; transform: none; }
+.bat-module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr)); gap: .5rem; align-items: start; }
+.bat-module { border: 1px solid #193341; border-radius: 12px; background: #09161e; }
+.bat-module[open] { grid-column: 1 / -1; border-color: #276272; }
+.bat-module.abnormal { border-color: #7a3540; }
+.bat-module.absent { opacity: .5; }
+.bat-module-sum { padding: .45rem .7rem; font-size: .8rem; }
+.bat-module-sum b { font-size: .86rem; }
+.bat-module-sum .solar-pill { padding: .05rem .5rem; font-size: .7rem; }
+.bat-mini { color: #b6d3dc; font-variant-numeric: tabular-nums; }
+.bat-mini-bar { flex: 1 1 100%; height: 5px; }
+.bat-module-body { padding: 0 .8rem .6rem; }
+.bat-module-body .solar-facts.compact { margin: .2rem 0 .6rem; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
+
+/* the history: the charts side by side */
+.bat-history { padding: .7rem 1rem .8rem; }
+.bat-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(21rem, 1fr)); gap: .6rem 1.1rem; }
+.bat-charts .sl-chart, .bat-charts .sl-chart-empty { margin-top: 0; }
+
+/* a short screen (768p) or a narrower window: everything closer, nothing dropped */
+@media (max-height: 820px), (max-width: 1400px) {
+  .bat-view { gap: .45rem; }
+  .bat-view .solar-head { padding: .6rem .9rem; gap: .7rem; } .bat-view .solar-title h2 { font-size: 1.3rem; } .bat-view .solar-title .muted { display: none; } .bat-view .solar-tile { padding: .35rem .6rem; min-width: 6.4rem; } .bat-view .solar-tile b { font-size: 1.05rem; }
+  .bat-row { padding: .2rem .75rem; font-size: .8rem; }
+  .bat-detail, .bat-history { padding: .5rem .8rem .6rem; }
+  .bat-summary > svg { width: 100px; } .bat-summary .solar-facts { grid-template-columns: repeat(auto-fit, minmax(8.2rem, 1fr)); }
+  .bat-module-grid { grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr)); gap: .4rem; }
+  .bat-module-sum { padding: .35rem .55rem; gap: .2rem .4rem; font-size: .74rem; } .bat-module-sum b { font-size: .8rem; } .bat-module-sum .solar-pill { padding: 0 .4rem; font-size: .66rem; }
+  .bat-charts { grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: .4rem .8rem; }
+  .bat-section > summary { padding: .35rem .75rem; }
+}
+@media (max-width: 900px) {
+  .bat-summary { flex-wrap: wrap; } .bat-summary > svg { width: 84px; }
+  .bat-view .solar-totals { width: 100%; }
+}
