@@ -5,6 +5,8 @@ All notable changes to this project are documented here.
 ## [Unreleased]
 
 - **The log of an update does not repeat lines:** when the server restarted in the middle of an update the questions about the job piled up and each answer was added again, so the same lines appeared three and five times. The lines of an answer are now put where they belong, whoever answers first.
+- **The pictures of the README come from shared tools:** `tools/make_architecture.py` draws `images/architecture.svg` from `docs/architecture.json` and `tools/make_structure.py` draws the Repository Structure (the text tree and the animated picture) from `docs/structure.json`; both measure every text, and `--check` fails when a picture, its description or the code it points to disagree. They are vendored from ARMOR-COMMON like the shared CI checks.
+- **The architecture picture of the README is generated:** `docs/architecture.json` describes the boxes and `images/architecture.svg` is drawn from it (the Mermaid diagram stays in the README as text).
 
 ## [0.8.1.0] - Camera kinds and lenses, alarms spoken by menu, the lens view apart from the sweep in 3D
 
