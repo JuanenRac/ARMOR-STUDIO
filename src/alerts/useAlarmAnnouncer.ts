@@ -8,7 +8,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Alarm, Severity } from "../api";
 import { alarmSentence, routeFor, type RouteContext, type Target } from "./route";
 import { playSound, speak, stopSound } from "./sounds";
-import { getAlerts, soundFor } from "./settings";
+import { getAlerts, soundFor, voicedFor } from "./settings";
 
 const ORDER: Record<Severity, number> = { critical: 0, high: 1, warning: 2 };
 export type Popup = { id: string; alarm: Alarm; shownAt: number };
@@ -68,7 +68,9 @@ export function useAlarmAnnouncer(options: Options): { popups: Popup[]; dismiss:
     if (now.sound && !settings.muted) {
       const choice = soundFor(settings, first.severity, first.source.type);
       if (choice !== "none") void playSound(choice, settings.volume);
-      if (settings.voice.enabled && choice !== "none") speak(alarmSentence(first, now.t, settings.voice.say) + (fresh.length > 1 ? `. +${fresh.length - 1}` : ""), settings, now.language);
+      // only an alarm that is not passive is spoken (the first of the batch that is not); the others keep their sound and pop-up
+      const spoken = fresh.find(alarm => voicedFor(settings, alarm.severity, alarm.source.type));
+      if (spoken && choice !== "none") speak(alarmSentence(spoken, now.t, settings.voice.say) + (fresh.length > 1 ? `. +${fresh.length - 1}` : ""), settings, now.language);
     }
     try {
       if (now.notification && fresh.some(alarm => alarm.severity === "critical") && typeof Notification !== "undefined" && Notification.permission === "granted") {

@@ -3661,4 +3661,8 @@ export const PT_CATALOGUE: Record<string, string> = {
  "cam_param_encoder": "Codificador",
  "cam_param_bitrate": "Débito (kbps)",
  "cam_param_resolution": "Resolução",
+ "al_voice_which": "Alarmes que são ditos em voz alta",
+ "al_voice_which_h": "Os que ficam de fora são passivos: mantêm o som, o aviso e o lugar na lista, mas sem voz.",
+ "al_voice_by_source": "Por menu (de onde vem)",
+ "al_voice_by_severity": "Por gravidade",
 };

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ALERT_KEY, DEFAULT_ALERTS, getAlerts, isSoundChoice, parseAlerts, reloadAlerts, resetAlerts, setAlerts, subscribeAlerts } from "./settings";
+import { ALERT_KEY, DEFAULT_ALERTS, getAlerts, isSoundChoice, parseAlerts, reloadAlerts, resetAlerts, setAlerts, subscribeAlerts, voicedFor } from "./settings";
 
 const memory = new Map<string, string>();
 const storage = { getItem: (key: string) => memory.get(key) ?? null, setItem: (key: string, value: string) => void memory.set(key, value), removeItem: (key: string) => void memory.delete(key) };
@@ -83,5 +83,21 @@ describe("the choices about alarms that the person makes", () => {
     expect(parsed.popups.seconds).toBe(120);
     for (const language of ["en_US", "english", "e", "<b>", "en-", "pt-PT-extra-long-tag"]) expect(parseAlerts(JSON.stringify({ voice: { language } })).voice.language, language).toBe("");
     for (const raw of [null, "", "null", "[]", "42", "\"text\"", "true"]) expect(parseAlerts(raw), String(raw)).toEqual(DEFAULT_ALERTS);
+  });
+});
+
+describe("which alarms are spoken", () => {
+  it("leaves the network passive by default and spoken everything else", () => {
+    const settings = parseAlerts(JSON.stringify({ voice: { enabled: true } }));
+    expect(voicedFor(settings, "critical", "network")).toBe(false);
+    expect(voicedFor(settings, "critical", "camera")).toBe(true);
+  });
+  it("follows what the person chose, by menu and by severity, and ignores what is not known", () => {
+    const settings = parseAlerts(JSON.stringify({ voice: { enabled: true, silentSources: ["camera", "moon"], silentSeverities: ["warning", "bogus"] } }));
+    expect(settings.voice.silentSources).toEqual(["camera"]);
+    expect(voicedFor(settings, "critical", "network")).toBe(true);
+    expect(voicedFor(settings, "critical", "camera")).toBe(false);
+    expect(voicedFor(settings, "warning", "node")).toBe(false);
+    expect(voicedFor({ ...settings, voice: { ...settings.voice, enabled: false } }, "critical", "node")).toBe(false);
   });
 });

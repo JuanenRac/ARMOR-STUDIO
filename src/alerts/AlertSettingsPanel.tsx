@@ -107,6 +107,12 @@ export function AlertSettingsPanel({ t, language }: Props) {
             {VOICE_STYLES.map(style => <option key={style} value={style}>{t(`al_style_${style}`)}</option>)}</select></label>
           <label className="pf-range">{t("al_voice_rate")}: <b>{settings.voice.rate} %</b>
             <input type="range" min={LIMITS.rate[0]} max={LIMITS.rate[1]} step={5} value={settings.voice.rate} onChange={event => setVoice({ rate: Number(event.target.value) })} /></label>
+          <h4>{t("al_voice_which")}</h4>
+          <p className="muted pf-hint">{t("al_voice_which_h")}</p>
+          <h5>{t("al_voice_by_source")}</h5>
+          {SOURCES.map((kind: AlarmSourceType) => <label key={kind} className="pf-check"><input type="checkbox" checked={!settings.voice.silentSources.includes(kind)} onChange={() => setVoice({ silentSources: toggleIn(settings.voice.silentSources, kind) })} /> {t(`source_${kind}`)}</label>)}
+          <h5>{t("al_voice_by_severity")}</h5>
+          {SEVERITIES.map((severity: Severity) => <label key={severity} className="pf-check"><input type="checkbox" checked={!settings.voice.silentSeverities.includes(severity)} onChange={() => setVoice({ silentSeverities: toggleIn(settings.voice.silentSeverities, severity) })} /> {t(`severity_${severity}`)}</label>)}
           <h4>{t("al_voice_say")}</h4>
           {check("al_say_severity", settings.voice.say.severity, severity => setVoice({ say: { ...settings.voice.say, severity } }))}
           {check("al_say_type", settings.voice.say.type, type => setVoice({ say: { ...settings.voice.say, type } }))}

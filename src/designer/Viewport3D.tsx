@@ -17,7 +17,7 @@ import type { StudioDevice } from "../api";
 import { DeviceView as PlacedDevice } from "./DeviceMeshes";
 import { bounds, edgeOf, floorBottom, nearestOnOutline, pointInPolygon, roofFrame, roofHeight, roofPieces, totalHeight } from "./geometry";
 import { ICON } from "./icons";
-import { CAMERA_HEIGHT_M, cameraView, clamp, formatMetres, headingOf, radarView, SENSOR_HEIGHT_M, TOOL_GROUPS, toMetres, type Point, type Selection, type Tool } from "./model";
+import { CAMERA_HEIGHT_M, cameraLensDeg, cameraView, clamp, isMotorised, formatMetres, headingOf, radarView, SENSOR_HEIGHT_M, TOOL_GROUPS, toMetres, type Point, type Selection, type Tool } from "./model";
 import { FeatureBody, NEW_FEATURE_KINDS } from "./FeatureMeshes";
 import { floorTexture } from "./floorLooks";
 import { wallPlan } from "./merge";
@@ -386,6 +386,7 @@ function DeviceView({ kind, item, dimensions, selected, hover, showField, hooks 
   const at = toMetres(item, dimensions), heading = headingOf(item, dimensions) * Math.PI / 180, height = item.z ?? (kind === "camera" ? CAMERA_HEIGHT_M : SENSOR_HEIGHT_M);
   const enabled = kind === "sensor" || (item as Camera).enabled, glow = glowOf(selected, hover);
   const view = kind === "camera" ? cameraView(item as Camera) : radarView(item as Sensor), range = view.rangeM, half = view.halfAngleDeg;
+  const motorised = kind === "camera" && isMotorised(item as Camera);
   const cone = kind === "camera" ? [-half, half].map(angle => [Math.cos(angle * Math.PI / 180) * range, Math.sin(angle * Math.PI / 180) * range]) : [];
   return <group position={site(at.x, at.y)}>
     <mesh position={[0, height / 2, 0]} castShadow><cylinderGeometry args={[0.03, 0.04, height, 10]} /><meshStandardMaterial color="#5a6a72" metalness={0.6} roughness={0.5} /></mesh>
@@ -401,7 +402,9 @@ function DeviceView({ kind, item, dimensions, selected, hover, showField, hooks 
       {kind === "sensor"
         ? <Fan range={range} half={half} color="#00e5ff" opacity={selected ? 0.2 : 0.11} height={height} />
         : <>
-            <Fan range={range} half={half} color="#ffb020" opacity={selected ? 0.16 : 0.07} height={0.03} />
+            <Fan range={range} half={half} color="#ffb020" opacity={motorised ? (selected ? 0.09 : 0.04) : selected ? 0.16 : 0.07} height={0.03} />
+            {/* a motorised camera: the sweep above is all it can turn to; this one is what its lens sees at this moment, drawn apart */}
+            {motorised && <Fan range={range} half={cameraLensDeg(item as Camera) / 2} color="#ffe08a" opacity={selected ? 0.3 : 0.16} height={0.05} />}
             {cone.map(([x, z], index) => <Line key={index} points={[[0, height, 0], [x, 0.03, -z]]} color="#ffb020" transparent opacity={selected ? 0.55 : 0.22} lineWidth={1} />)}
           </>}
     </group>}

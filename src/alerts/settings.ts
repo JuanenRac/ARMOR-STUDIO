@@ -32,7 +32,7 @@ export type AlertSettings = {
   sourceSounds: Partial<Record<AlarmSourceType, string>>;
   mutedSeverities: Severity[];
   mutedSources: AlarmSourceType[];
-  voice: { enabled: boolean; language: string; gender: Gender; age: Age; style: VoiceStyle; /** Say aloud when a node, a device or a camera connects. */ sayConnections: boolean; rate: number; say: { type: boolean; severity: boolean; source: boolean } };
+  voice: { /** Kinds of source and severities whose alarms are passive: sound and pop-up, no voice. */ silentSources: AlarmSourceType[]; silentSeverities: Severity[]; enabled: boolean; language: string; gender: Gender; age: Age; style: VoiceStyle; /** Say aloud when a node, a device or a camera connects. */ sayConnections: boolean; rate: number; say: { type: boolean; severity: boolean; source: boolean } };
   popups: { enabled: boolean; seconds: number; blink: boolean; onlyWhileArmed: boolean; maxOnScreen: number };
   /** Take the person to the menu where the alarm is handled as soon as it comes in. */
   redirect: Redirect;
@@ -44,7 +44,7 @@ export const DEFAULT_ALERTS: AlertSettings = {
   muted: false, volume: 70,
   sounds: { critical: "siren", high: "klaxon", warning: "chime" },
   sourceSounds: {}, mutedSeverities: [], mutedSources: [],
-  voice: { enabled: false, language: "", gender: "any", age: "adult", style: "plain", sayConnections: true, rate: 100, say: { type: true, severity: true, source: true } },
+  voice: { silentSources: ["network"], silentSeverities: [], enabled: false, language: "", gender: "any", age: "adult", style: "plain", sayConnections: true, rate: 100, say: { type: true, severity: true, source: true } },
   popups: { enabled: true, seconds: 15, blink: true, onlyWhileArmed: false, maxOnScreen: 4 },
   redirect: "never", blinkTitle: true,
 };
@@ -77,7 +77,7 @@ export function parseAlerts(raw: string | null): AlertSettings {
     muted: bool(source.muted, d.muted), volume: num(source.volume, d.volume, LIMITS.volume),
     sounds: { critical: sound(sounds.critical, d.sounds.critical), high: sound(sounds.high, d.sounds.high), warning: sound(sounds.warning, d.sounds.warning) },
     sourceSounds, mutedSeverities: subset(SEVERITIES, source.mutedSeverities), mutedSources: subset(SOURCES, source.mutedSources),
-    voice: { enabled: bool(voice.enabled, d.voice.enabled), language, gender: oneOf(GENDERS, voice.gender, d.voice.gender), age: oneOf(AGES, voice.age, d.voice.age), style: oneOf(VOICE_STYLES, voice.style, d.voice.style), sayConnections: bool(voice.sayConnections, d.voice.sayConnections), rate: num(voice.rate, d.voice.rate, LIMITS.rate),
+    voice: { silentSources: Array.isArray(voice.silentSources) ? subset(SOURCES, voice.silentSources) : d.voice.silentSources, silentSeverities: subset(SEVERITIES, voice.silentSeverities), enabled: bool(voice.enabled, d.voice.enabled), language, gender: oneOf(GENDERS, voice.gender, d.voice.gender), age: oneOf(AGES, voice.age, d.voice.age), style: oneOf(VOICE_STYLES, voice.style, d.voice.style), sayConnections: bool(voice.sayConnections, d.voice.sayConnections), rate: num(voice.rate, d.voice.rate, LIMITS.rate),
       say: { type: bool(say.type, true), severity: bool(say.severity, true), source: bool(say.source, true) } },
     popups: { enabled: bool(popups.enabled, d.popups.enabled), seconds: num(popups.seconds, d.popups.seconds, LIMITS.seconds), blink: bool(popups.blink, d.popups.blink), onlyWhileArmed: bool(popups.onlyWhileArmed, d.popups.onlyWhileArmed), maxOnScreen: num(popups.maxOnScreen, d.popups.maxOnScreen, LIMITS.onScreen) },
     redirect: oneOf(REDIRECTS, source.redirect, d.redirect), blinkTitle: bool(source.blinkTitle, d.blinkTitle),
@@ -102,6 +102,10 @@ export const resetAlerts = (): AlertSettings => setAlerts(parseAlerts(null));
 export function subscribeAlerts(listener: () => void): () => void { listeners.add(listener); return () => { listeners.delete(listener); }; }
 export const useAlerts = (): AlertSettings => useSyncExternalStore(subscribeAlerts, getAlerts, getAlerts);
 export function reloadAlerts(): void { current = null; }
+
+/** Whether an alarm is spoken aloud: the voice is on and neither its kind of source nor its severity was left passive. */
+export const voicedFor = (settings: AlertSettings, severity: Severity, source: AlarmSourceType): boolean =>
+  settings.voice.enabled && !settings.voice.silentSources.includes(source) && !settings.voice.silentSeverities.includes(severity);
 
 /** The sound that goes with an alarm: its source's own if there is one, else its severity's; silence when it or its severity or source is muted. */
 export function soundFor(settings: AlertSettings, severity: Severity, source: AlarmSourceType): string {
