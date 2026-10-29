@@ -3,15 +3,17 @@
  * and the removal of one.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import type { CameraTraits } from "./api/cameras";
 import { PasswordInput } from "./components/PasswordInput";
 import { IgnoreZonesEditor } from "./IgnoreZonesEditor";
 import { askConfirm } from "./askConfirm";
 import { snapshotHasLogin } from "./snapshotLogin";
 import { useEffect, useState } from "react";
-import { configureCamera, deleteCamera, discoverCameraStreams, type CameraConnection, type DiscoveredCamera } from "./api";
+import { configureCamera, deleteCamera, discoverCameraStreams, type CameraConnection, type DiscoveredCamera, type PublicCameraConnection } from "./api";
+import { CAMERA_PRESETS, cameraWebAddress, isCameraPreset, lensCameras, newLenses, presetKey, presetTraits, type LensDraft } from "./cameraPresets";
 import "./configuration.css";
 
-export type StudioCamera = {
+export type StudioCamera = CameraTraits & {
   id: string; name: string; host: string; snapshotUrl: string; enabled: boolean; x: number; y: number;
   username?: string; onvifPort?: number; rtspPort?: number; rtspPath?: string; previewPath?: string; hasCredentials?: boolean; liveVideoAvailable?: boolean;
 };
@@ -46,6 +48,7 @@ export function CameraSettings(props: Props) {
   const [selectedId, setSelectedId] = useState(props.selectedCameraId || props.cameras[0]?.id || "");
   const [form, setForm] = useState<CameraConnection>(emptyConnection);
   const [message, setMessage] = useState("");
+  const [lenses, setLenses] = useState<LensDraft[]>(() => newLenses(2));
   const selected = props.cameras.find(camera => camera.id === selectedId);
 
   useEffect(() => {
@@ -55,17 +58,39 @@ export function CameraSettings(props: Props) {
   useEffect(() => {
     if (!selected) return;
     setForm({ id: selected.id, name: selected.name, host: selected.host === "Not configured" ? "" : selected.host,
-      snapshotUrl: selected.snapshotUrl, rtspPath: selected.rtspPath ?? "", previewPath: selected.previewPath ?? "", username: selected.username ?? "", password: "", onvifPort: selected.onvifPort ?? 80, rtspPort: selected.rtspPort ?? 554 });
+      snapshotUrl: selected.snapshotUrl, rtspPath: selected.rtspPath ?? "", previewPath: selected.previewPath ?? "", username: selected.username ?? "", password: "", onvifPort: selected.onvifPort ?? 80, rtspPort: selected.rtspPort ?? 554,
+      layout: selected.layout, group: selected.group, lensName: selected.lensName, preset: selected.preset, ptz: selected.ptz, zoom: selected.zoom, webUrl: selected.webUrl, params: selected.params });
   }, [selectedId, selected?.id]);   // eslint-disable-line react-hooks/exhaustive-deps
 
   const update = <K extends keyof CameraConnection>(key: K, value: CameraConnection[K]) => setForm(current => ({ ...current, [key]: value }));
   const selectCamera = (id: string) => { setSelectedId(id); props.onCameraSelected(id); };
-  const newCamera = () => { setSelectedId(""); setForm(emptyConnection()); setMessage(""); };
+  const newCamera = () => { setSelectedId(""); setForm(emptyConnection()); setLenses(newLenses(2)); setMessage(""); };
+  const choosePreset = (value: string) => {
+    if (!isCameraPreset(value)) { update("preset", undefined); return; }
+    setForm(current => ({ ...current, preset: value, ...presetTraits(value) }));
+  };
+  const setParam = (key: "wifiSsid" | "ip" | "encoder" | "resolution", value: string) => setForm(current => ({ ...current, params: { ...current.params, [key]: value } }));
+  const setBitrate = (value: string) => setForm(current => ({ ...current, params: { ...current.params, bitrateKbps: value === "" ? undefined : Number(value) } }));
+  const changeLens = (index: number, change: Partial<LensDraft>) => setLenses(current => current.map((lens, at) => at === index ? { ...lens, ...change } : lens));
+  const isNewMulti = form.preset === "multi" && !form.id;
   const saveCamera = async () => {
     if (!form.name.trim() || !form.host.trim()) { setMessage(t("cameraRequired")); return; }
     if (snapshotHasLogin(form.snapshotUrl)) { setMessage(t("snapshot_login_refused")); return; }
     try {
-      const saved = await configureCamera(props.origin, { ...form, id: form.id || newCameraId(), host: cleanCameraHost(form.host) });
+      const host = cleanCameraHost(form.host);
+      if (isNewMulti) {
+        // One camera per lens, each with its own stream and its own movement, tied by a group.
+        let last: PublicCameraConnection | undefined;
+        for (const camera of lensCameras({ ...form, host }, newCameraId(), lenses)) {
+          last = await configureCamera(props.origin, camera);
+          props.onCameraSaved({ ...last, enabled: true, x: 50, y: 50 });
+        }
+        setForm(current => ({ ...current, password: "" }));
+        if (last) selectCamera(last.id);
+        setMessage(t("cameraSaved"));
+        return;
+      }
+      const saved = await configureCamera(props.origin, { ...form, id: form.id || newCameraId(), host });
       setForm(current => ({ ...current, password: "" }));   // sent: it is not kept
       props.onCameraSaved({ ...saved, enabled: selected?.enabled ?? true, x: selected?.x ?? 50, y: selected?.y ?? 50 });
       selectCamera(saved.id);
@@ -101,14 +126,34 @@ export function CameraSettings(props: Props) {
     </aside>
     <article className="stack-card camera-form"><h3>{form.id ? t("editCamera") : t("newCamera")}</h3>
       <div className="camera-field"><label><span>{t("cameraName")}</span><input value={form.name} onChange={event => update("name", event.target.value)} /></label></div>
+      <div className="camera-field camera-field-wide"><label><span>{t("cam_preset")}</span><select value={form.preset ?? ""} onChange={event => choosePreset(event.target.value)}><option value="">—</option>{CAMERA_PRESETS.map(preset => <option key={preset} value={preset}>{t(presetKey(preset))}</option>)}</select></label>
+        {form.layout === "split" && <p className="field-help">{t("cam_split_note")}</p>}{isNewMulti && <p className="field-help">{t("cam_multi_note")}</p>}</div>
+      <div className="camera-field camera-field-wide camera-traits"><label><input type="checkbox" checked={form.ptz !== false} onChange={event => update("ptz", event.target.checked)} /> {t("cam_can_ptz")}</label> <label><input type="checkbox" checked={form.zoom !== false} onChange={event => update("zoom", event.target.checked)} /> {t("cam_can_zoom")}</label></div>
       <div className="camera-field"><label><span>{t("hostAddress")}</span><input placeholder="192.168.0.200" value={form.host} onChange={event => update("host", event.target.value)} /></label></div>
       <div className="camera-field"><label><span>{t("onvifPort")}</span><input type="number" min="1" max="65535" value={form.onvifPort} onChange={event => update("onvifPort", Number(event.target.value))} /></label></div>
       <div className="camera-field"><label><span>{t("rtspPort")}</span><input type="number" min="1" max="65535" value={form.rtspPort} onChange={event => update("rtspPort", Number(event.target.value))} /></label></div>
-      <div className="camera-field camera-field-wide"><label><span>{t("rtspPath")}</span><input placeholder="Streaming/Channels/101" value={form.rtspPath} onChange={event => update("rtspPath", event.target.value)} /></label><p className="field-help">{t("rtspPathHelp")}</p></div>
-      <div className="camera-field camera-field-wide"><label><span>{t("previewPath")}</span><input placeholder="12" value={form.previewPath ?? ""} onChange={event => update("previewPath", event.target.value)} /></label><p className="field-help">{t("previewPathHelp")}</p></div>
+      {isNewMulti && <fieldset className="camera-field camera-field-wide camera-lenses"><legend>{t("cam_lenses")}</legend>
+        <label><span>{t("cam_lens_count")}</span><input type="number" min="2" max="8" value={lenses.length} onChange={event => setLenses(current => { const wanted = newLenses(Number(event.target.value) || 2); return wanted.map((lens, at) => current[at] ?? lens); })} /></label>
+        {lenses.map((lens, index) => <div key={index} className="camera-lens-row"><b>{t("cam_lens")} {index + 1}</b>
+          <input aria-label={t("cameraName")} value={lens.name} onChange={event => changeLens(index, { name: event.target.value })} />
+          <input aria-label={t("rtspPath")} placeholder={t("rtspPath")} value={lens.rtspPath} onChange={event => changeLens(index, { rtspPath: event.target.value })} />
+          <input aria-label={t("previewPath")} placeholder={t("previewPath")} value={lens.previewPath} onChange={event => changeLens(index, { previewPath: event.target.value })} />
+          <label><input type="checkbox" checked={lens.ptz} onChange={event => changeLens(index, { ptz: event.target.checked })} /> {t("cam_can_ptz")}</label>
+          <label><input type="checkbox" checked={lens.zoom} onChange={event => changeLens(index, { zoom: event.target.checked })} /> {t("cam_can_zoom")}</label></div>)}
+      </fieldset>}
+      <div className="camera-field camera-field-wide" style={{ display: isNewMulti ? "none" : undefined }}><label><span>{t("rtspPath")}</span><input placeholder="Streaming/Channels/101" value={form.rtspPath} onChange={event => update("rtspPath", event.target.value)} /></label><p className="field-help">{t("rtspPathHelp")}</p></div>
+      <div className="camera-field camera-field-wide" style={{ display: isNewMulti ? "none" : undefined }}><label><span>{t("previewPath")}</span><input placeholder="12" value={form.previewPath ?? ""} onChange={event => update("previewPath", event.target.value)} /></label><p className="field-help">{t("previewPathHelp")}</p></div>
       <div className="camera-field"><label><span>{t("cameraUser")}</span><input autoComplete="username" value={form.username} onChange={event => update("username", event.target.value)} /></label></div>
       <div className="camera-field"><label><span>{t("cameraPassword")}</span><PasswordInput t={t} autoComplete="current-password" placeholder={selected?.hasCredentials && !form.password ? "••••••••" : undefined} value={form.password} onChange={event => update("password", event.target.value)} /></label><p className="field-help">{selected?.hasCredentials && !form.password ? t("credentialsStored") : t("credentialNotice")}</p></div>
       <div className="camera-field camera-field-wide"><label><span>{t("snapshotUrl")}</span><input placeholder="http://camera/snapshot.jpg" value={form.snapshotUrl} onChange={event => update("snapshotUrl", event.target.value)} /></label></div>
+      <div className="camera-field camera-field-wide camera-web"><label><span>{t("cam_web_url")}</span><input placeholder="http://192.168.0.200/" value={form.webUrl ?? ""} onChange={event => update("webUrl", event.target.value)} /></label>
+        <button type="button" disabled={!cameraWebAddress(form)} onClick={() => { const address = cameraWebAddress({ ...form, host: cleanCameraHost(form.host) }); if (address) window.open(address, "_blank", "noopener,noreferrer"); }}>{t("cam_open_web")}</button></div>
+      <details className="camera-field camera-field-wide camera-params"><summary>{t("cam_params")}</summary><p className="field-help">{t("cam_params_help")}</p>
+        <label><span>{t("cam_param_wifi")}</span><input value={form.params?.wifiSsid ?? ""} onChange={event => setParam("wifiSsid", event.target.value)} /></label>
+        <label><span>{t("cam_param_ip")}</span><input value={form.params?.ip ?? ""} onChange={event => setParam("ip", event.target.value)} /></label>
+        <label><span>{t("cam_param_encoder")}</span><input placeholder="H.265" value={form.params?.encoder ?? ""} onChange={event => setParam("encoder", event.target.value)} /></label>
+        <label><span>{t("cam_param_bitrate")}</span><input type="number" min="16" value={form.params?.bitrateKbps ?? ""} onChange={event => setBitrate(event.target.value)} /></label>
+        <label><span>{t("cam_param_resolution")}</span><input placeholder="2560x1440" value={form.params?.resolution ?? ""} onChange={event => setParam("resolution", event.target.value)} /></label></details>
       <div className="camera-form-actions"><button className="primary" onClick={() => void saveCamera()}>{t("saveCamera")}</button><button disabled={!form.id || !(selected?.hasCredentials || (form.username && form.password))} onClick={() => void discoverRtsp()}>{t("discoverRtsp")}</button>{form.id && <button className="danger-button" onClick={() => void removeCamera()}>{t("deleteCamera")}</button>}</div><p className="notice">{message}</p>
     </article>
     {form.id && <IgnoreZonesEditor t={t} origin={props.origin} cameraId={form.id} isAdmin={Boolean(props.isAdmin)} />}

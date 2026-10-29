@@ -39,6 +39,13 @@ function readCamera(raw: unknown): Camera | null {
   if (typeof raw.hasCredentials === "boolean") camera.hasCredentials = raw.hasCredentials;
   if (typeof raw.liveVideoAvailable === "boolean") camera.liveVideoAvailable = raw.liveVideoAvailable;
   if (typeof raw.username === "string") camera.username = raw.username.slice(0, 128);
+  if (raw.layout === "single" || raw.layout === "split") camera.layout = raw.layout;
+  if (id(raw.group)) camera.group = raw.group;
+  if (typeof raw.lensName === "string") camera.lensName = raw.lensName.slice(0, 40);
+  if (typeof raw.preset === "string" && /^[a-z0-9_-]{1,40}$/.test(raw.preset)) camera.preset = raw.preset;
+  if (typeof raw.ptz === "boolean") camera.ptz = raw.ptz;
+  if (typeof raw.zoom === "boolean") camera.zoom = raw.zoom;
+  if (typeof raw.webUrl === "string" && /^https?:\/\//i.test(raw.webUrl)) camera.webUrl = raw.webUrl.slice(0, 300);
   if (finite(raw.onvifPort)) camera.onvifPort = raw.onvifPort;
   if (finite(raw.rtspPort)) camera.rtspPort = raw.rtspPort;
   if (finite(raw.heading)) camera.heading = ((raw.heading % 360) + 360) % 360;

@@ -3,6 +3,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import type { SystemState } from "./types";
+import type { CameraTraits } from "./api/cameras";
 
 export type View = "overview" | "weather" | "alarms" | "alarmPanels" | "cameras" | "radar" | "inverters" | "batteries" | "electrical" | "devices" | "automations" | "record" | "history" | "network" | "hmi" | "services" | "siteDesigner" | "electricalDesigner" | "networkDesigner" | "alarmDesigner" | "system" | "configuration";
 export type GridSize = 1 | 2 | 4 | 6 | 8 | 9 | 12 | 16;
@@ -10,7 +11,7 @@ export const GRID_SIZES: readonly GridSize[] = [1, 2, 4, 6, 8, 9, 12, 16];
 
 export const CAMERA_LENSES = ["fixed", "varifocal", "motorised"] as const;
 export type CameraLens = (typeof CAMERA_LENSES)[number];
-export type Camera = {
+export type Camera = CameraTraits & {
   id: string; name: string; host: string; snapshotUrl: string; enabled: boolean; x: number; y: number;
   username?: string; onvifPort?: number; rtspPort?: number; rtspPath?: string; previewPath?: string; hasCredentials?: boolean; liveVideoAvailable?: boolean;
   /** Where it faces, in degrees anticlockwise from east; unset means toward the middle of the site. */

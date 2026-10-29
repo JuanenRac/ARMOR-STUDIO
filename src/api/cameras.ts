@@ -1,6 +1,9 @@
 import { endpoint, localSession, timedFetch, userCall } from "./transport";
 export type DiscoveredCamera = { host: string; ports: number[] };
-export type CameraConnection = { id: string; name: string; host: string; snapshotUrl: string; rtspPath: string; previewPath?: string; username: string; password: string; onvifPort: number; rtspPort: number };
+export type CameraParams = { wifiSsid?: string; ip?: string; encoder?: string; bitrateKbps?: number; resolution?: string };
+/** What a camera is beyond how to reach it (all optional; a camera saved before has none). "split" is one stream with two lenses, one above the other; cameras of one body share `group`. */
+export type CameraTraits = { layout?: "single" | "split"; group?: string; lensName?: string; preset?: string; ptz?: boolean; zoom?: boolean; webUrl?: string; params?: CameraParams };
+export type CameraConnection = CameraTraits & { id: string; name: string; host: string; snapshotUrl: string; rtspPath: string; previewPath?: string; username: string; password: string; onvifPort: number; rtspPort: number };
 export type PublicCameraConnection = Omit<CameraConnection, "password"> & { hasCredentials: boolean; liveVideoAvailable: boolean };
 export type CameraView = Omit<PublicCameraConnection, "username">;
 export type MediaItem = { id: string; cameraId: string; kind: "snapshot" | "recording"; file: string; createdAt: string; bytes: number; protected?: boolean };
