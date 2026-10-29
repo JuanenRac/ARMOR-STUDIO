@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-961%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.8.0.9-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Tests-990%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Version-0.8.1.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**Ehrlichkeitsprüfung - was heute läuft:** Studio spricht mit [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) und wird von 961 Unit-Tests abgedeckt (Einstellungen lesen, Kameras zusammenführen, die Arithmetik der Solardiagramme, Geometrie und Prüfungen der Entwurfswerkzeuge, der Alarmansager, das Wörterbuch des Assistenten, jedes Menü in den acht Sprachen, der statische Host) sowie durch Browsertests. Es läuft im täglichen Einsatz am CM5-Testaufbau mit dem echten Server, echten IP-Kameras und einem Radarknoten auf seiner Platine; die Bilder der Hilfe entstehen mit Beispieldaten. **Nicht** bewiesen sind Livevideo und PTZ mit allen möglichen Kameras, die Menüs für Solar, Elektro, Alarmzentralen und Touchpanel mit echten Geräten (es gibt nur den Radarknoten) sowie eine formale Prüfung auf Barrierefreiheit oder Bedienbarkeit. Solange der Server nicht erreichbar ist, zeigt Studio Demodaten und sagt das in der oberen Leiste.
+**Ehrlichkeitsprüfung - was heute läuft:** Studio spricht mit [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) und wird von 990 Unit-Tests abgedeckt (Einstellungen lesen, Kameras zusammenführen, die Arithmetik der Solardiagramme, Geometrie und Prüfungen der Entwurfswerkzeuge, der Alarmansager, das Wörterbuch des Assistenten, jedes Menü in den acht Sprachen, der statische Host) sowie durch Browsertests. Es läuft im täglichen Einsatz am CM5-Testaufbau mit dem echten Server, echten IP-Kameras und einem Radarknoten auf seiner Platine; die Bilder der Hilfe entstehen mit Beispieldaten. **Nicht** bewiesen sind Livevideo und PTZ mit allen möglichen Kameras, die Menüs für Solar, Elektro, Alarmzentralen und Touchpanel mit echten Geräten (es gibt nur den Radarknoten) sowie eine formale Prüfung auf Barrierefreiheit oder Bedienbarkeit. Solange der Server nicht erreichbar ist, zeigt Studio Demodaten und sagt das in der oberen Leiste.
 
 ---
 
@@ -37,9 +37,9 @@
 
 | | |
 |---|---|
-| Version | `0.8.0.9` |
+| Version | `0.8.1.0` |
 | Reifegrad | Etabliert |
-| Tests | 961 (`npm test`) |
+| Tests | 990 (`npm test`) |
 | Technik | React 19 / TypeScript / Vite |
 | Auf echter Hardware | Täglich am CM5-Testaufbau im Einsatz (echter Server, echte IP-Kameras, ein echter Radarknoten); die Menüs für Solar, Elektro, Alarmzentralen und Touchpanel warten auf echte Knoten |
 
@@ -52,7 +52,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Software | 🟢 | Die Konsole läuft täglich gegen den echten Server des CM5-Prüfstands. |
-| Tests | 🟢 | 961 Unit-Tests bestehen (`npm test`) und die Browser-Tests laufen: Einstellungen, Zusammenführen der Kameras, Solardiagramme, Geometrie und Prüfungen der Designer, Alarm-Ansager, Wörterbuch des Assistenten und jedes Menü in den acht Sprachen. |
+| Tests | 🟢 | 990 Unit-Tests bestehen (`npm test`) und die Browser-Tests laufen: Einstellungen, Zusammenführen der Kameras, Solardiagramme, Geometrie und Prüfungen der Designer, Alarm-Ansager, Wörterbuch des Assistenten und jedes Menü in den acht Sprachen. |
 | Oberfläche | 🟡 | Live-Video und PTZ sind nicht mit jeder möglichen Kamera belegt, es gab keine formale Prüfung der Barrierefreiheit oder Bedienbarkeit, und die Bilder der Hilfe entstehen mit Beispieldaten. |
 | Hardware | 🟡 | Er wird täglich mit dem echten Server, echten IP-Kameras und einem echten Radar-Knoten genutzt; die Menüs für Solar, Elektrik, Alarmzentrale und Touch-Panel warten auf echte Knoten. |
 | Sicherheit | 🟡 | Sitzungen, Rollen und die Ablehnung von Kamera-Zugangsdaten in Adressen sind durch Tests abgedeckt; es gab keine unabhängige Prüfung. |
@@ -151,7 +151,7 @@ npm install
 npm run dev         # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck
 npm run locales     # write the table of each language (src/locales) after changing a phrase
-npm test            # 961 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
+npm test            # 990 tests: designers, settings, cameras, radar map, solar arithmetic, alerts and the assistant, every menu in eight languages, static host
 npm run build       # dist/
 $env:ARMOR_SERVER_ORIGIN="http://192.168.0.180:18080"; node tools/serve.mjs   # serve the build
 ```

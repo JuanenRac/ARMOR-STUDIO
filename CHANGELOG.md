@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here.
 
-## [Unreleased]
+## [0.8.1.0] - Camera kinds and lenses, alarms spoken by menu, the lens view apart from the sweep in 3D
 
 - **The alarms that are spoken can be chosen, by menu and by severity:** in the voice card of the alarm settings, every kind of source (alarms, cameras, nodes, devices, solar, electrical and network) and every severity has a box; an alarm left out is passive, so it keeps its sound, its pop-up and its place in the list but is not read aloud, and when a burst arrives the first alarm that is not passive is the one that is spoken. The network starts passive (its changes are frequent) and everything else spoken, as before.
 - **In the 3D site designer a motorised camera shows what its lens sees apart from everything it can turn to:** as in the 2D plan, the wide faint fan is the whole sweep of the motor and a brighter fan inside it, at the heading of the camera, is the field of view of the lens at that moment; a fixed camera keeps its single fan.
