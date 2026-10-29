@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The README follows the universal layout in the eight languages:** threats and defences, what Studio talks to, the settings of the static host, tests by area and troubleshooting, and the Repository Structure drawn from `docs/structure.json`; the figures come from the code (a session of 7 days, 16 themes, 13 security options, the Weather menu as the only one that reaches other services, 998 tests).
 - **The tabs of the configuration have their own small animated logo**, drawn from the ones of the menus, so each one is told apart at a glance.
 - **The site designer has a quick way to see the properties of any object:** above the properties of the chosen object, a list with every object of the site (terrain, buildings, things on the buildings, openings, objects on the ground, cameras, devices and sensors), the chosen one selected; choosing another one in the list selects it and shows its properties.
 - **The search for the stream of a camera has time to finish:** the call waits up to two and a half minutes (a camera on Wi-Fi can take one) instead of giving up after thirty seconds with a message that said nothing.

@@ -1,0 +1,486 @@
+{
+ "repo": "ARMOR-STUDIO",
+ "ecosystem": "armor",
+ "svg": "en",
+ "cards": [
+  {
+   "name": "src/",
+   "span": 3,
+   "accent": "a",
+   "sub": {
+    "en": "the console, in React and TypeScript",
+    "es": "la consola, en React y TypeScript",
+    "de": "die Konsole in React und TypeScript",
+    "fr": "la console, en React et TypeScript",
+    "it": "la console, in React e TypeScript",
+    "ja": "React と TypeScript のコンソール",
+    "zh": "用 React 和 TypeScript 编写的控制台",
+    "pt": "a consola, em React e TypeScript"
+   },
+   "rows": [
+    {
+     "name": "App.tsx",
+     "desc": {
+      "en": "the shell: menus, groups, live status",
+      "es": "el armazón: menús, grupos, estado en vivo",
+      "de": "die Hülle: Menüs, Gruppen, Live-Status",
+      "fr": "l'ossature : menus, groupes, état en direct",
+      "it": "l'ossatura: menu, gruppi, stato dal vivo",
+      "ja": "骨格：メニュー、グループ、ライブ状態",
+      "zh": "外壳：菜单、分组、实时状态",
+      "pt": "o esqueleto: menus, grupos, estado em direto"
+     }
+    },
+    {
+     "name": "api/",
+     "desc": {
+      "en": "the client of the server, one file per area",
+      "es": "el cliente del servidor, un fichero por área",
+      "de": "der Client des Servers, eine Datei je Bereich",
+      "fr": "le client du serveur, un fichier par domaine",
+      "it": "il client del server, un file per area",
+      "ja": "サーバークライアント（分野ごとに 1 ファイル）",
+      "zh": "服务器客户端，每个领域一个文件",
+      "pt": "o cliente do servidor, um ficheiro por área"
+     }
+    },
+    {
+     "name": "views/",
+     "desc": {
+      "en": "overview, cameras, radar, alarms, energy, network, system",
+      "es": "resumen, cámaras, radar, alarmas, energía, red, sistema",
+      "de": "Übersicht, Kameras, Radar, Alarme, Energie, Netz, System",
+      "fr": "aperçu, caméras, radar, alarmes, énergie, réseau, système",
+      "it": "panoramica, telecamere, radar, allarmi, energia, rete, sistema",
+      "ja": "概要、カメラ、レーダー、アラーム、エネルギー、ネットワーク、システム",
+      "zh": "概览、摄像头、雷达、报警、能源、网络、系统",
+      "pt": "resumo, câmaras, radar, alarmes, energia, rede, sistema"
+     }
+    },
+    {
+     "name": "components/",
+     "desc": {
+      "en": "camera tiles, top bar, sidebar, Help, site map",
+      "es": "teselas de cámara, barra superior, lateral, Ayuda, mapa",
+      "de": "Kamerakacheln, Kopfleiste, Seitenleiste, Hilfe, Karte",
+      "fr": "tuiles caméra, barre, panneau latéral, Aide, carte",
+      "it": "riquadri camera, barra, laterale, Guida, mappa",
+      "ja": "カメラタイル、上部バー、サイドバー、ヘルプ、地図",
+      "zh": "摄像头图块、顶栏、侧栏、帮助、地图",
+      "pt": "mosaicos de câmara, barra, lateral, Ajuda, mapa"
+     }
+    },
+    {
+     "name": "designer/",
+     "desc": {
+      "en": "the Site Designer, 2D plan and 3D view",
+      "es": "el Diseñador de emplazamiento, plano 2D y vista 3D",
+      "de": "der Standort-Designer, 2D-Plan und 3D-Ansicht",
+      "fr": "le concepteur de site, plan 2D et vue 3D",
+      "it": "il progettista del sito, piano 2D e vista 3D",
+      "ja": "サイトデザイナー（2D 図面と 3D）",
+      "zh": "场地设计器，2D 平面图与 3D 视图",
+      "pt": "o desenhador do local, planta 2D e vista 3D"
+     }
+    },
+    {
+     "name": "electrical/  alarm/  network/",
+     "desc": {
+      "en": "the Electrical, Alarm and Network Designers",
+      "es": "los Diseñadores eléctrico, de alarma y de red",
+      "de": "die Elektro-, Alarm- und Netzwerk-Designer",
+      "fr": "les concepteurs électrique, alarme et réseau",
+      "it": "i progettisti elettrico, allarme e rete",
+      "ja": "電気・アラーム・ネットワークデザイナー",
+      "zh": "电气、报警和网络设计器",
+      "pt": "os desenhadores elétrico, de alarme e de rede"
+     },
+     "tree_name": "electrical/ alarm/ network/"
+    },
+    {
+     "name": "alerts/  assistant/  tour/",
+     "desc": {
+      "en": "sounds and voice, the mascot, guided tours",
+      "es": "sonidos y voz, la mascota, visitas guiadas",
+      "de": "Klänge und Stimme, das Maskottchen, geführte Touren",
+      "fr": "sons et voix, la mascotte, visites guidées",
+      "it": "suoni e voce, la mascotte, tour guidati",
+      "ja": "音と声、マスコット、ガイドツアー",
+      "zh": "声音、吉祥物、导览",
+      "pt": "sons e voz, a mascote, visitas guiadas"
+     },
+     "tree_name": "alerts/ assistant/ tour/"
+    },
+    {
+     "name": "weather/  help/  preflight/",
+     "desc": {
+      "en": "Weather menu, Help book, check before arming",
+      "es": "menú del Tiempo, libro de Ayuda, comprobación previa",
+      "de": "Wetter-Menü, Hilfebuch, Prüfung vor dem Scharfschalten",
+      "fr": "menu Météo, livre d'Aide, contrôle avant armement",
+      "it": "menu Meteo, libro della Guida, controllo prima dell'armamento",
+      "ja": "天気メニュー、ヘルプ、警戒前チェック",
+      "zh": "天气菜单、帮助手册、布防前检查",
+      "pt": "menu do Tempo, livro de Ajuda, verificação antes de armar"
+     },
+     "tree_name": "weather/ help/ preflight/"
+    },
+    {
+     "name": "locales/",
+     "desc": {
+      "en": "the table of each language (generated)",
+      "es": "la tabla de cada idioma (generada)",
+      "de": "die Tabelle jeder Sprache (erzeugt)",
+      "fr": "la table de chaque langue (générée)",
+      "it": "la tabella di ogni lingua (generata)",
+      "ja": "各言語の表（生成）",
+      "zh": "每种语言的表（自动生成）",
+      "pt": "a tabela de cada idioma (gerada)"
+     }
+    }
+   ]
+  },
+  {
+   "name": {
+    "en": "assets, tests and tools",
+    "es": "recursos, pruebas y herramientas",
+    "de": "Ressourcen, Tests und Werkzeuge",
+    "fr": "ressources, tests et outils",
+    "it": "risorse, test e strumenti",
+    "ja": "素材・テスト・ツール",
+    "zh": "资源、测试与工具",
+    "pt": "recursos, testes e ferramentas"
+   },
+   "kind": "group",
+   "span": 3,
+   "accent": "b",
+   "columns": 2,
+   "sub": {
+    "en": "served as static files",
+    "es": "servidos como ficheros estáticos",
+    "de": "als statische Dateien ausgeliefert",
+    "fr": "servis comme fichiers statiques",
+    "it": "serviti come file statici",
+    "ja": "静的ファイルとして配信",
+    "zh": "作为静态文件提供",
+    "pt": "servidos como ficheiros estáticos"
+   },
+   "rows": [
+    {
+     "name": "public/",
+     "desc": {
+      "en": "the pictures of the Help, one set per language",
+      "es": "las imágenes de la Ayuda, un juego por idioma",
+      "de": "die Bilder der Hilfe, ein Satz je Sprache",
+      "fr": "les images de l'Aide, un jeu par langue",
+      "it": "le immagini della Guida, un set per lingua",
+      "ja": "ヘルプの画像（言語ごと）",
+      "zh": "帮助图片（每种语言一套）",
+      "pt": "as imagens da Ajuda, um conjunto por idioma"
+     }
+    },
+    {
+     "name": "nginx/",
+     "desc": {
+      "en": "web server of the image and its headers",
+      "es": "servidor web de la imagen y sus cabeceras",
+      "de": "Webserver des Images und seine Header",
+      "fr": "serveur web de l'image et ses en-têtes",
+      "it": "server web dell'immagine e le sue intestazioni",
+      "ja": "イメージの Web サーバーとヘッダー",
+      "zh": "镜像的 Web 服务器及其头",
+      "pt": "servidor web da imagem e os seus cabeçalhos"
+     }
+    },
+    {
+     "name": "e2e/",
+     "desc": {
+      "en": "browser tests (Playwright)",
+      "es": "pruebas de navegador (Playwright)",
+      "de": "Browser-Tests (Playwright)",
+      "fr": "tests navigateur (Playwright)",
+      "it": "test nel browser (Playwright)",
+      "ja": "ブラウザーテスト（Playwright）",
+      "zh": "浏览器测试（Playwright）",
+      "pt": "testes de navegador (Playwright)"
+     }
+    },
+    {
+     "name": "tools/",
+     "desc": {
+      "en": "static host, locale builder, CI checks",
+      "es": "host estático, generador de idiomas, CI",
+      "de": "statischer Host, Sprachgenerator, CI",
+      "fr": "hôte statique, générateur de langues, CI",
+      "it": "host statico, generatore lingue, CI",
+      "ja": "静的ホスト、言語生成、CI",
+      "zh": "静态主机、语言生成器、CI",
+      "pt": "anfitrião estático, gerador de idiomas, CI"
+     },
+     "tree_desc": {
+      "en": "serve.mjs (the static host), build_locales.mjs, the shared CI checks and launcher",
+      "es": "serve.mjs (el host estático), build_locales.mjs, las comprobaciones de CI y el lanzador",
+      "de": "serve.mjs (der statische Host), build_locales.mjs, die gemeinsamen CI-Prüfungen und der Starter",
+      "fr": "serve.mjs (l'hôte statique), build_locales.mjs, les vérifications CI et le lanceur",
+      "it": "serve.mjs (l'host statico), build_locales.mjs, i controlli CI e l'avviatore",
+      "ja": "serve.mjs（静的ホスト）、build_locales.mjs、共通の CI 検査とランチャー",
+      "zh": "serve.mjs（静态主机）、build_locales.mjs、共用的 CI 检查和启动器",
+      "pt": "serve.mjs (o anfitrião estático), build_locales.mjs, as verificações de CI e o lançador"
+     }
+    },
+    {
+     "name": "docs/",
+     "desc": {
+      "en": "the security model",
+      "es": "el modelo de seguridad",
+      "de": "das Sicherheitsmodell",
+      "fr": "le modèle de sécurité",
+      "it": "il modello di sicurezza",
+      "ja": "セキュリティモデル",
+      "zh": "安全模型",
+      "pt": "o modelo de segurança"
+     }
+    },
+    {
+     "name": "images/",
+     "desc": {
+      "en": "banner, icon, README pictures",
+      "es": "banner, icono, imágenes del README",
+      "de": "Banner, Symbol, README-Bilder",
+      "fr": "bannière, icône, images du README",
+      "it": "banner, icona, immagini del README",
+      "ja": "バナー、アイコン、README の画像",
+      "zh": "横幅图、图标、README 图片",
+      "pt": "faixa, ícone, imagens do README"
+     },
+     "tree_desc": {
+      "en": "banner, icon and the pictures of the README",
+      "es": "banner, icono y las imágenes del README",
+      "de": "Banner, Symbol und die Bilder des READMEs",
+      "fr": "bannière, icône et images du README",
+      "it": "banner, icona e immagini del README",
+      "ja": "バナー、アイコン、README の画像",
+      "zh": "横幅图、图标和 README 的图片",
+      "pt": "faixa, ícone e as imagens do README"
+     }
+    },
+    {
+     "name": ".github/",
+     "desc": {
+      "en": "CI, dashboard notice, templates",
+      "es": "CI, aviso al panel, plantillas",
+      "de": "CI, Dashboard-Hinweis, Vorlagen",
+      "fr": "CI, avis au tableau de bord, modèles",
+      "it": "CI, avviso alla dashboard, modelli",
+      "ja": "CI、ダッシュボード通知、テンプレート",
+      "zh": "CI、仪表板通知、模板",
+      "pt": "CI, aviso ao painel, modelos"
+     },
+     "tree_desc": {
+      "en": "CI workflow, dashboard notice, issue and pull-request templates",
+      "es": "flujo de CI, aviso al panel, plantillas de incidencias y pull requests",
+      "de": "CI-Workflow, Dashboard-Hinweis, Vorlagen für Issues und Pull Requests",
+      "fr": "workflow CI, avis au tableau de bord, modèles d'issues et de pull requests",
+      "it": "workflow CI, avviso alla dashboard, modelli per issue e pull request",
+      "ja": "CI ワークフロー、ダッシュボード通知、Issue と Pull Request のテンプレート",
+      "zh": "CI 工作流、仪表板通知、议题和 pull request 模板",
+      "pt": "fluxo de CI, aviso ao painel, modelos de issues e pull requests"
+     }
+    },
+    {
+     "name": "Dockerfile",
+     "desc": {
+      "en": "container image: Node build, nginx host",
+      "es": "imagen de contenedor: build Node, host nginx",
+      "de": "Container-Image: Node-Build, nginx-Host",
+      "fr": "image de conteneur : build Node, hôte nginx",
+      "it": "immagine container: build Node, host nginx",
+      "ja": "コンテナイメージ（Node ビルド、nginx）",
+      "zh": "容器镜像：Node 构建、nginx 主机",
+      "pt": "imagem de contentor: build Node, anfitrião nginx"
+     }
+    }
+   ]
+  },
+  {
+   "name": {
+    "en": "project files",
+    "es": "ficheros del proyecto",
+    "de": "Projektdateien",
+    "fr": "fichiers du projet",
+    "it": "file del progetto",
+    "ja": "プロジェクトのファイル",
+    "zh": "项目文件",
+    "pt": "ficheiros do projeto"
+   },
+   "kind": "group",
+   "span": 3,
+   "accent": "c",
+   "columns": 2,
+   "sub": {
+    "en": "at the root",
+    "es": "en la raíz",
+    "de": "im Stammordner",
+    "fr": "à la racine",
+    "it": "alla radice",
+    "ja": "ルート",
+    "zh": "根目录",
+    "pt": "na raiz"
+   },
+   "rows": [
+    {
+     "name": "armor.project.json",
+     "desc": {
+      "en": "manifest: version, role, maturity",
+      "es": "manifiesto: versión, función, madurez",
+      "de": "Manifest: Version, Rolle, Reife",
+      "fr": "manifeste : version, rôle, maturité",
+      "it": "manifesto: versione, ruolo, maturità",
+      "ja": "マニフェスト：版・役割・成熟度",
+      "zh": "清单：版本、角色、成熟度",
+      "pt": "manifesto: versão, função, maturidade"
+     }
+    },
+    {
+     "name": "CHANGELOG.md",
+     "desc": {
+      "en": "what changed in each version",
+      "es": "qué cambió en cada versión",
+      "de": "was sich in jeder Version geändert hat",
+      "fr": "ce qui a changé à chaque version",
+      "it": "cosa è cambiato in ogni versione",
+      "ja": "各バージョンの変更点",
+      "zh": "每个版本的变化",
+      "pt": "o que mudou em cada versão"
+     }
+    },
+    {
+     "name": "package.json  package-lock.json",
+     "desc": {
+      "en": "dependencies and scripts",
+      "es": "dependencias y scripts",
+      "de": "Abhängigkeiten und Skripte",
+      "fr": "dépendances et scripts",
+      "it": "dipendenze e script",
+      "ja": "依存関係とスクリプト",
+      "zh": "依赖与脚本",
+      "pt": "dependências e scripts"
+     },
+     "tree_name": "package.json package-lock.json"
+    },
+    {
+     "name": "index.html",
+     "desc": {
+      "en": "the page Vite builds the app from",
+      "es": "la página desde la que Vite construye la app",
+      "de": "die Seite, aus der Vite die App baut",
+      "fr": "la page dont Vite construit l'application",
+      "it": "la pagina da cui Vite costruisce l'app",
+      "ja": "Vite がアプリを組み立てる元のページ",
+      "zh": "Vite 据以构建应用的页面",
+      "pt": "a página a partir da qual o Vite constrói a app"
+     }
+    },
+    {
+     "name": "vite.config.ts  eslint.config.js",
+     "desc": {
+      "en": "bundler and lint settings",
+      "es": "ajustes del empaquetador y lint",
+      "de": "Einstellungen für Bundler und Lint",
+      "fr": "réglages du bundler et lint",
+      "it": "impostazioni di bundler e lint",
+      "ja": "バンドラーと lint の設定",
+      "zh": "打包器与 lint 设置",
+      "pt": "definições do empacotador e lint"
+     },
+     "tree_name": "vite.config.ts eslint.config.js"
+    },
+    {
+     "name": "tsconfig.json  tsconfig.app.json",
+     "desc": {
+      "en": "TypeScript settings",
+      "es": "ajustes de TypeScript",
+      "de": "TypeScript-Einstellungen",
+      "fr": "réglages TypeScript",
+      "it": "impostazioni TypeScript",
+      "ja": "TypeScript 設定",
+      "zh": "TypeScript 设置",
+      "pt": "definições do TypeScript"
+     },
+     "tree_name": "tsconfig.json tsconfig.app.json"
+    },
+    {
+     "name": "run.sh  run.bat",
+     "tree_name": "run.sh run.bat",
+     "desc": {
+      "en": "start, shared workflow",
+      "es": "arrancar, flujo compartido",
+      "de": "Start, gemeinsamer Ablauf",
+      "fr": "démarrer, flux partagé",
+      "it": "avvio, flusso condiviso",
+      "ja": "起動（共通フロー）",
+      "zh": "启动（共用流程）",
+      "pt": "arrancar, fluxo partilhado"
+     }
+    },
+    {
+     "name": "build.sh  build.bat",
+     "tree_name": "build.sh build.bat",
+     "desc": {
+      "en": "build and test, shared workflow",
+      "es": "construir y probar, flujo compartido",
+      "de": "Bauen und Testen, gemeinsamer Ablauf",
+      "fr": "construire et tester, flux partagé",
+      "it": "compila e prova, flusso condiviso",
+      "ja": "ビルドとテスト（共通フロー）",
+      "zh": "构建并测试（共用流程）",
+      "pt": "compilar e testar, fluxo partilhado"
+     }
+    },
+    {
+     "name": "build-test.sh  build-test.bat",
+     "tree_name": "build-test.sh build-test.bat",
+     "desc": {
+      "en": "build, test and package",
+      "es": "construir, probar y empaquetar",
+      "de": "Bauen, Testen und Verpacken",
+      "fr": "construire, tester, empaqueter",
+      "it": "compila, prova e impacchetta",
+      "ja": "ビルド、テスト、パッケージ化",
+      "zh": "构建、测试并打包",
+      "pt": "compilar, testar e empacotar"
+     }
+    },
+    {
+     "name": "test.sh  test.bat",
+     "tree_name": "test.sh test.bat",
+     "desc": {
+      "en": "only the tests, never the version",
+      "es": "solo las pruebas, nunca la versión",
+      "de": "nur die Tests, nie die Version",
+      "fr": "seulement les tests, jamais la version",
+      "it": "solo i test, mai la versione",
+      "ja": "テストのみ（版は変えません）",
+      "zh": "只运行测试，不改版本",
+      "pt": "só os testes, nunca a versão"
+     }
+    },
+    {
+     "name": "SECURITY  SUPPORT  CONTRIBUTING  LICENSE",
+     "tree_name": "SECURITY.md SUPPORT.md CONTRIBUTING.md CODE_OF_CONDUCT.md LICENSE",
+     "desc": {
+      "en": "community and licence files",
+      "es": "comunidad y licencia",
+      "de": "Community und Lizenz",
+      "fr": "communauté et licence",
+      "it": "comunità e licenza",
+      "ja": "コミュニティとライセンス",
+      "zh": "社区与许可证",
+      "pt": "comunidade e licença"
+     },
+     "tree_desc": ""
+    }
+   ]
+  }
+ ]
+}
