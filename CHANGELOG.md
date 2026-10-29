@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The layout of the README is checked in the CI:** the validator runs the shared `tools/universal_readme_check.py` and lists, as a warning, what differs from the universal layout of the README.
+- **The Overview of the README keeps its bullets apart:** two bullets that ran together are separate again, in the eight languages.
 - **The camera editor is organised in four steps that fold:** connection (name, address, user and password, with the ports folded away), video stream, type of camera and lenses, and web page and notes; each step says in one line how it stands. One button, "Find the stream for me", saves the camera and tries the paths of its family, shows what answered as lines to use as the main or the lighter stream, and the paths can still be written by hand. The page explains the cameras that show two lenses in one picture.
 - **The log of an update does not repeat lines:** when the server restarted in the middle of an update the questions about the job piled up and each answer was added again, so the same lines appeared three and five times. The lines of an answer are now put where they belong, whoever answers first.
 - **The pictures of the README come from shared tools:** `tools/make_architecture.py` draws `images/architecture.svg` from `docs/architecture.json` and `tools/make_structure.py` draws the Repository Structure (the text tree and the animated picture) from `docs/structure.json`; both measure every text, and `--check` fails when a picture, its description or the code it points to disagree. They are vendored from ARMOR-COMMON like the shared CI checks.
