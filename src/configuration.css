@@ -87,3 +87,36 @@
 .config-grid .wide-card { grid-column: span 2; }
 .config-grid .wide-card .muted, .config-grid .wide-card .eyebrow { max-width: none; }
 @media (max-width: 900px) { .config-grid .wide-card { grid-column: 1 / -1; } }
+
+/* the editor of a camera: four steps that fold, one button that finds the stream, and what was found written down as lines to choose from */
+.cam-editor { display: grid; gap: .75rem; align-content: start; min-width: 0; }
+.cam-ed-head { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .9rem; }
+.cam-ed-head h3 { margin: 0; flex: 1 1 auto; min-width: 8rem; }
+.cam-ed-state { padding: .15rem .65rem; border-radius: 999px; border: 1px solid #276272; font-size: .74rem; color: #9bd9e2; background: #0b2430; }
+.cam-ed-state.draft { border-color: #8a6a1c; color: #ffc85a; background: #261e0a; }
+.cam-ed-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.cam-ed-message { margin: 0; padding: .45rem .75rem; border: 1px solid #276272; border-radius: 10px; background: #0b2430; }
+.cam-step { border: 1px solid #193341; border-radius: 12px; background: #09161e; }
+.cam-step[open] { border-color: #276272; }
+.cam-step > summary { display: flex; align-items: center; gap: .7rem; padding: .6rem .9rem; cursor: pointer; list-style: none; }
+.cam-step > summary::-webkit-details-marker, .cam-sub > summary::-webkit-details-marker { display: none; }
+.cam-step > summary b { display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: #123b46; color: #4be2e9; font-size: .82rem; flex: 0 0 auto; }
+.cam-step > summary span { font-weight: 600; flex: 0 0 auto; }
+.cam-step > summary small { margin-left: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #8ea7b2; }
+.cam-step > summary::after { content: "▸"; color: #4be2e9; font-size: .8rem; transition: transform .15s ease; }
+.cam-step[open] > summary::after { transform: rotate(90deg); }
+.cam-step-body { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .7rem .9rem; padding: .2rem .9rem .9rem; align-items: start; }
+.cam-step-body .camera-field-wide, .cam-step-body .cam-found, .cam-step-body .cam-find { grid-column: 1 / -1; }
+.cam-sub { border: 1px dashed #234b59; border-radius: 10px; padding: .4rem .7rem; }
+.cam-sub > summary { cursor: pointer; list-style: none; color: #9bb4c0; font-size: .85rem; }
+.cam-sub > summary::before { content: "▸ "; color: #4be2e9; }
+.cam-sub[open] > summary::before { content: "▾ "; }
+.cam-sub .cam-step-body { padding: .6rem 0 .2rem; }
+.cam-find { display: grid; gap: .35rem; }
+.cam-find-button { min-height: 2.6rem; font-size: .95rem; }
+.cam-found h4 { margin: 0 0 .35rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: #79a3b0; }
+.cam-found-row { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; padding: .3rem .5rem; border: 1px solid #193341; border-radius: 8px; margin-bottom: .3rem; }
+.cam-found-row code { flex: 1 1 14rem; min-width: 0; overflow-wrap: anywhere; font-size: .78rem; color: #cfeff4; }
+.cam-found-row button { min-height: 0; padding: .2rem .65rem; font-size: .74rem; }
+.cam-tag { padding: .05rem .5rem; border-radius: 999px; background: #0f3340; border: 1px solid #276272; color: #4be2e9; font-size: .7rem; }
+@media (max-width: 700px) { .cam-step > summary small { display: none; } .cam-ed-actions { width: 100%; } }
