@@ -21,6 +21,9 @@ export type SecurityOptions = {
   /** The most audio of a spoken turn and the most spoken answer handed back to the wall panel, in bytes. */
   "voice.turn_max_bytes": number;
   "voice.reply_audio_max_bytes": number;
+  /** The alarm said out loud and the sounds of your own for the wall panel (both off by default). */
+  "alarm_audio.spoken": boolean;
+  "alarm_audio.custom_sounds": boolean;
 };
 /** As the server sends it. */
 export type AnnouncedCapabilities = {

@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-998%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-1004%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.1.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**Verificação de honestidade - o que funciona hoje:** O Studio fala com o [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) e está coberto por 998 testes unitários (leitura de definições, fusão de câmaras, a aritmética dos gráficos solares, a geometria e as verificações dos desenhadores, o anunciador de alarmes, o dicionário do assistente, cada menu desenhado nos oito idiomas, o servidor estático) e por testes no navegador. Funciona em uso diário contra a bancada de testes do CM5 com o servidor real, câmaras IP reais e um nó radar na sua placa; as imagens da Ajuda são feitas com dados de exemplo. O que **não** foi provado é o vídeo em direto e o PTZ com todas as câmaras possíveis, os menus solar, elétrico, de centrais de alarme e de painel tátil com equipamentos reais (só existe o nó radar) e uma revisão formal de acessibilidade ou usabilidade. Enquanto o servidor não é alcançado, o Studio mostra dados de demonstração e di-lo na barra superior.
+**Verificação de honestidade - o que funciona hoje:** O Studio fala com o [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) e está coberto por 1004 testes unitários (leitura de definições, fusão de câmaras, a aritmética dos gráficos solares, a geometria e as verificações dos desenhadores, o anunciador de alarmes, o dicionário do assistente, cada menu desenhado nos oito idiomas, o servidor estático) e por testes no navegador. Funciona em uso diário contra a bancada de testes do CM5 com o servidor real, câmaras IP reais e um nó radar na sua placa; as imagens da Ajuda são feitas com dados de exemplo. O que **não** foi provado é o vídeo em direto e o PTZ com todas as câmaras possíveis, os menus solar, elétrico, de centrais de alarme e de painel tátil com equipamentos reais (só existe o nó radar) e uma revisão formal de acessibilidade ou usabilidade. Enquanto o servidor não é alcançado, o Studio mostra dados de demonstração e di-lo na barra superior.
 
 ---
 
@@ -41,7 +41,7 @@
 | Maturidade | Estabelecido |
 | Função | Consola de operação e desenho da família |
 | Tecnologia | React 19, TypeScript, Vite, Three.js, Leaflet |
-| Testes | 998 (`npm test`, Vitest) e testes de navegador (Playwright) |
+| Testes | 1004 (`npm test`, Vitest) e testes de navegador (Playwright) |
 | Contrato | Só fala com o ARMOR-SERVER (HTTP `/api/v1/*` com sessão HttpOnly, WebSocket `/api/v1/events`) |
 | Escuta em | `127.0.0.1:5178` (`tools/serve.mjs`) |
 | Funciona em | Um navegador; os ficheiros são servidos por `tools/serve.mjs` ou pelo nginx do contentor |
@@ -59,7 +59,7 @@ Cada linha é uma parte deste repositório e a luz diz até onde chega hoje. É 
 | Área | Estado | O que significa aqui |
 |---|---|---|
 | Software | 🟢 | A consola funciona todos os dias contra o servidor real da bancada de testes CM5. |
-| Testes | 🟢 | Passam 998 testes unitários (`npm test`) e correm os testes de navegador: definições, fusão das câmaras, gráficos solares, geometria e verificações dos desenhadores, anunciador de alarmes, dicionário do assistente e cada menu nos oito idiomas. |
+| Testes | 🟢 | Passam 1004 testes unitários (`npm test`) e correm os testes de navegador: definições, fusão das câmaras, gráficos solares, geometria e verificações dos desenhadores, anunciador de alarmes, dicionário do assistente e cada menu nos oito idiomas. |
 | Interface | 🟡 | O vídeo em direto e o PTZ não estão provados com todas as câmaras possíveis, não houve uma revisão formal de acessibilidade ou usabilidade, e as imagens da Ajuda são feitas com dados de exemplo. |
 | Hardware | 🟡 | É usada todos os dias com o servidor real, câmaras IP reais e um nó radar real; os menus solar, elétrico, de painel de alarme e de painel tátil esperam nós reais. |
 | Segurança | 🟡 | As sessões, os papéis e a recusa de credenciais de câmara nos endereços estão cobertos por testes; não houve revisão independente. |
@@ -184,7 +184,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 contra um servidor em 127.0.0.1:8080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # escreve a tabela de cada idioma depois de mudar uma frase
-npm test                                                                       # 998 testes
+npm test                                                                       # 1004 testes
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # serve a compilação
 ```

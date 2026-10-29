@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { adminFile, adminSaveFile, adminStatus, endMySession, endOtherSessions, listMySessions, remoteCheck, totpDisable, totpEnable, totpSetup, totpState,
   type RemoteCheck, type SessionRow, type TotpState } from "./api";
 import { askConfirm } from "./askConfirm";
+import { AlarmSounds } from "./AlarmSounds";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
 import "./security.css";
 import { errorText } from "./apiErrorText";
@@ -206,6 +207,8 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "network.login_secure_only", id: "netlogin", values: [true, false] },
   { key: "voice.multipart_turn", id: "voiceturn", values: [false, true] },
   { key: "panel.live_events", id: "panellive", values: [false, true] },
+  { key: "alarm_audio.spoken", id: "alspoken", values: [false, true], calm: true },
+  { key: "alarm_audio.custom_sounds", id: "alsounds", values: [false, true], calm: true },
   { key: "client.device_lock", id: "lock", values: ["always", "sensitive", "user"], calm: true },
   { key: "nodes.nvs_encryption", id: "nvs", values: ["secrets", "off"], node: true, calm: true },
 ];
@@ -306,6 +309,7 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
         {fixed && <p className="muted">{t("sec_opt_fixed").replace("ARMOR_DISARM_PIN", option.fixedBy ?? "ARMOR_DISARM_PIN")}</p>}
       </fieldset>;
     })}
+    {typeof state.settings["alarm_audio.custom_sounds"] === "boolean" && <AlarmSounds t={t} origin={origin} spokenOn={state.settings["alarm_audio.spoken"] === true} customOn={state.settings["alarm_audio.custom_sounds"]} />}
     {typeof state.settings["voice.turn_max_bytes"] === "number" && <VoiceLimits t={t} state={state} apply={applyLimits} busy={busy} />}
     <p className="muted">{t("sec_opt_node_pending")}</p>
     <Message message={message} />
