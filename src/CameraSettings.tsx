@@ -28,6 +28,19 @@ const emptyConnection = (): CameraConnection => ({ id: "", name: "", host: "", s
 // No password is kept here after it is sent: the server keeps the credentials (encrypted), an empty password with the same user name keeps them, and a Map that lived as long as the tab
 // filled the password again for whoever signed in next on a shared computer.
 
+/** A camera id that also works when Studio is opened over plain http (no secure context, so no crypto.randomUUID). */
+export function newCameraId(): string {
+  const bytes = new Uint8Array(4);
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") crypto.getRandomValues(bytes);
+  else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+  return "cam-" + Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
+}
+
+/** The server accepts a bare host name or address: drop a pasted scheme, credentials, port and path. */
+export function cleanCameraHost(value: string): string {
+  return value.trim().replace(/^[a-z][a-z0-9+.-]*:\/\//i, "").replace(/^[^@/]*@/, "").replace(/[/?#].*$/, "").replace(/:\d+$/, "");
+}
+
 export function CameraSettings(props: Props) {
   const { t } = props;
   const [selectedId, setSelectedId] = useState(props.selectedCameraId || props.cameras[0]?.id || "");
@@ -52,13 +65,13 @@ export function CameraSettings(props: Props) {
     if (!form.name.trim() || !form.host.trim()) { setMessage(t("cameraRequired")); return; }
     if (snapshotHasLogin(form.snapshotUrl)) { setMessage(t("snapshot_login_refused")); return; }
     try {
-      const saved = await configureCamera(props.origin, { ...form, id: form.id || "cam-" + crypto.randomUUID().slice(0, 8) });
+      const saved = await configureCamera(props.origin, { ...form, id: form.id || newCameraId(), host: cleanCameraHost(form.host) });
       setForm(current => ({ ...current, password: "" }));   // sent: it is not kept
       props.onCameraSaved({ ...saved, enabled: selected?.enabled ?? true, x: selected?.x ?? 50, y: selected?.y ?? 50 });
       selectCamera(saved.id);
       setForm(current => ({ ...current, id: saved.id }));
       setMessage(t("cameraSaved"));
-    } catch { setMessage(t("cameraSaveFailed")); }
+    } catch (error) { setMessage(`${t("cameraSaveFailed")} (${error instanceof Error ? error.message : ""})`); }
   };
   const discoverRtsp = async () => {
     if (!form.id) { setMessage(t("selectCameraFirst")); return; }
