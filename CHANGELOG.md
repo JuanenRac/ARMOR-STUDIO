@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+- **The log of an update does not repeat lines:** when the server restarted in the middle of an update the questions about the job piled up and each answer was added again, so the same lines appeared three and five times. The lines of an answer are now put where they belong, whoever answers first.
+
 ## [0.8.1.0] - Camera kinds and lenses, alarms spoken by menu, the lens view apart from the sweep in 3D
 
 - **The alarms that are spoken can be chosen, by menu and by severity:** in the voice card of the alarm settings, every kind of source (alarms, cameras, nodes, devices, solar, electrical and network) and every severity has a box; an alarm left out is passive, so it keeps its sound, its pop-up and its place in the list but is not read aloud, and when a burst arrives the first alarm that is not passive is the one that is spoken. The network starts passive (its changes are frequent) and everything else spoken, as before.

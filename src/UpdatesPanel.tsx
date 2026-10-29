@@ -19,6 +19,9 @@ type Props = { t: Translate; origin: string; isAdmin: boolean };
 
 const POLL_MS = 700;
 const JOB_KEY = "armor-studio-update-job";
+/** The log with the lines of an answer that starts at `since`: whatever was after that point is replaced, never added twice. */
+export const mergeLog = (lines: readonly string[], since: number, fresh: readonly string[]): string[] => (fresh.length === 0 ? [...lines] : [...lines.slice(0, Math.max(0, since)), ...fresh]);
+
 /** The job the person was following: kept so that going to another menu and coming back finds the same steps and the same log (the work itself runs in the maintenance helper). */
 const storedJob = (): string => { try { return window.localStorage.getItem(JOB_KEY) ?? ""; } catch { return ""; } };
 const keepJob = (id: string): void => { try { if (id) window.localStorage.setItem(JOB_KEY, id); else window.localStorage.removeItem(JOB_KEY); } catch { /* storage may be blocked */ } };
@@ -89,10 +92,12 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
     if (!job || job.state !== "running") return;
     let cancelled = false;
     const timer = window.setInterval(() => {
-      readMaintJob(origin, job.id, logLines.current.length).then(next => {
+      const since = logLines.current.length;
+      readMaintJob(origin, job.id, since).then(next => {
         if (cancelled) return;
         setWaiting(false);
-        logLines.current = [...logLines.current, ...next.log];
+        // The lines the answer carries start at `since`: put them there, so that two answers to the same question (the server restarts in the middle of an update and the requests pile up) do not print the same lines twice.
+        logLines.current = mergeLog(logLines.current, since, next.log);
         setJob({ ...next, log: logLines.current });
         if (next.state !== "running") void load(false);
       }).catch(() => { if (!cancelled) setWaiting(true); });
