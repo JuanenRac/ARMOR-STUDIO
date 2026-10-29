@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.1.1] - A camera editor in four steps, a window for each lens, a quick view of any object in the designer, options for the alarm audio and animated logos
+
 - **An option for the warning about a sign-in from a new country:** Configuration > Security shows `login.country_alert` (on by default), in the eight languages, with the warning when it is lowered. It acts when the server has a country database.
 - **The sound of the alarms on the wall panel is set in Configuration > Security:** two new options, the alarm said out loud (`alarm_audio.spoken`) and the sounds of your own (`alarm_audio.custom_sounds`), both off by default and shown only on a server that offers them; and a card where an administrator uploads, listens to and removes a short sound for each origin of alarm (device, solar, electrical, network, alarm panel, other). The file picked can be of any format the browser knows: it is converted here to the 16 kHz 16-bit mono WAVE the server accepts, refused before sending if it lasts longer than the server allows, and the server's own refusals (not a sound, too short, silent, option off) are told in the eight languages. The card also says whether the spoken alarm is ready (it needs a voice gateway with a speech engine). Tests: 4 (before 998 in all).
 - **The introductions of the Installation, Console and Notifications tabs are shorter** in the eight languages, so they fit the lines the layout leaves them on a 1366 px screen without losing what they say.
