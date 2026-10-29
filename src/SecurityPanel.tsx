@@ -205,6 +205,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "server.zone_feed_signature", id: "sign", values: [true, false], node: true },
   { key: "media.rtsp_proxy", id: "rtsp", values: [true, false] },
   { key: "network.login_secure_only", id: "netlogin", values: [true, false] },
+  { key: "login.country_alert", id: "country", values: [true, false] },
   { key: "voice.multipart_turn", id: "voiceturn", values: [false, true] },
   { key: "panel.live_events", id: "panellive", values: [false, true] },
   { key: "alarm_audio.spoken", id: "alspoken", values: [false, true], calm: true },

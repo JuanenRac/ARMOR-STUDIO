@@ -42,7 +42,7 @@ describe("the security screen", () => {
   });
 
   it("offers the option that keeps device logins from nodes that did not come over TLS, in every language, with its warning", () => {
-    for (const locale of locales) for (const id of ["sec_opt_netlogin", "sec_opt_netlogin_help", "sec_opt_netlogin_warn", "sec_opt_voiceturn", "sec_opt_voiceturn_help", "sec_opt_voiceturn_warn", "sec_opt_panellive", "sec_opt_panellive_help", "sec_opt_panellive_warn", "sec_opt_nvs", "sec_opt_nvs_help", "sec_opt_nvs_off", "sec_opt_nvs_secrets", "sec_opt_nvs_warn", "sec_opt_lock", "sec_opt_lock_help", "sec_opt_lock_warn", "sec_opt_lock_user", "sec_opt_lock_sensitive", "sec_opt_lock_always"]) {
+    for (const locale of locales) for (const id of ["sec_opt_netlogin", "sec_opt_netlogin_help", "sec_opt_netlogin_warn", "sec_opt_country", "sec_opt_country_help", "sec_opt_country_warn", "sec_opt_voiceturn", "sec_opt_voiceturn_help", "sec_opt_voiceturn_warn", "sec_opt_panellive", "sec_opt_panellive_help", "sec_opt_panellive_warn", "sec_opt_nvs", "sec_opt_nvs_help", "sec_opt_nvs_off", "sec_opt_nvs_secrets", "sec_opt_nvs_warn", "sec_opt_lock", "sec_opt_lock_help", "sec_opt_lock_warn", "sec_opt_lock_user", "sec_opt_lock_sensitive", "sec_opt_lock_always"]) {
       const words = text(locale, id);
       expect(words.trim().length, `${locale} ${id}`).toBeGreaterThan(8);
       expect(words, `${locale} ${id} is not the key`).not.toBe(id);
