@@ -27,6 +27,8 @@ async function introductions(page: Page): Promise<Intro[]> {
 
 test.describe("the introductions of the menus", () => {
   test.skip(!user || !password, "set ARMOR_STUDIO_USER and ARMOR_STUDIO_PASSWORD");
+  // Six more sign-ins would reach the limit of the sign-in of the server in the CI, where the other browser tests already sign in many times: this one is run by hand.
+  test.skip(!!process.env.CI, "run by hand: the CI keeps within the limit of sign-ins of the server");
 
   for (const language of LANGUAGES) for (const screen of SCREENS) {
     test(`${language} at ${screen.width}x${screen.height} take at most ${screen.most} lines`, async ({ page }) => {
