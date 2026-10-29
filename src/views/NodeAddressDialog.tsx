@@ -8,7 +8,6 @@ import { ApiError, saveNodePanel } from "../api";
 import type { Translate } from "../components/camera";
 import { useDialogFocus } from "../components/useDialogFocus";
 import { DialogLogo } from "../menuLogos";
-$line
 
 /** An IPv4 address of the local network, as the server accepts it. */
 export const PRIVATE_IPV4 = /^(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})$/;

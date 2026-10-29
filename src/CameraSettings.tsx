@@ -117,7 +117,7 @@ export function CameraSettings(props: Props) {
     } catch { setMessage(t("rtspDiscoverFailed")); }
     finally { setFinding(false); }
   };
-  const useFound = async (path: string, as: "rtspPath" | "previewPath") => {
+  const applyFound = async (path: string, as: "rtspPath" | "previewPath") => {
     const clean = path.replace(/^\/+/, "");
     update(as, clean);
   };
@@ -173,7 +173,7 @@ export function CameraSettings(props: Props) {
             <p className="field-help">{t("rtspPathHelp")}</p></div>}
           {found.length > 0 && <div className="camera-field-wide cam-found"><h4>{t("cs_found")}</h4>
             {found.map(path => <div key={path} className="cam-found-row"><code>{path}</code>{tagOf(path) && <span className="cam-tag">{tagOf(path)}</span>}
-              <button type="button" onClick={() => void useFound(path, "rtspPath")}>{t("cs_use_main")}</button><button type="button" onClick={() => void useFound(path, "previewPath")}>{t("cs_use_light")}</button></div>)}</div>}
+              <button type="button" onClick={() => void applyFound(path, "rtspPath")}>{t("cs_use_main")}</button><button type="button" onClick={() => void applyFound(path, "previewPath")}>{t("cs_use_light")}</button></div>)}</div>}
           <p className="field-help camera-field-wide">{t("cs_dual_hint")}</p>
           <details className="cam-sub camera-field-wide" open={!form.rtspPath || isNewMulti}><summary>{t("cs_manual")}</summary>
             <div className="cam-step-body">

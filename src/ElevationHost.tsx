@@ -8,7 +8,6 @@ import { useEffect, useState, type FormEvent } from "react";
 import { ApiError, elevateSession, setElevationAsker } from "./api";
 import { useDialogFocus } from "./components/useDialogFocus";
 import { DialogLogo } from "./menuLogos";
-$line
 
 type Translate = (key: string) => string;
 type Request = { origin: string; resolve: (proved: boolean) => void };

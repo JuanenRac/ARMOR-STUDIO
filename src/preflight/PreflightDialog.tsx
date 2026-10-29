@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import "./preflight.css";
 import { readPreflight, type Preflight, type PreflightIssue } from "../api";
 import { DialogLogo } from "../menuLogos";
-$line
 
 type Names = { cameras: ReadonlyArray<{ id: string; name?: string }>; devices: ReadonlyArray<{ id: string; name: string }> };
 
