@@ -1554,6 +1554,7 @@ const catalogue: Record<string, string> = {
 "cs_sum_no_stream": "尚无视频流",
 "cs_sum_incomplete": "未完成",
 "cs_sum_unsaved": "尚未保存",
+"site_jump": "切换到其他对象",
 "versionsButton": "版本",
 "versionsTitle": "此设计的早期版本",
 "versionsHelp": "服务器会保存更改前的设计：最多每五分钟一个，在大量删除的保存之前一定保存，并保留最近三十天中每天的一个。恢复某个版本会使其成为当前设计（现在的这个会留在列表中）。",

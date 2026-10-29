@@ -205,3 +205,7 @@
 .p-gate-track { stroke: #8d979a; stroke-width: 1.5; fill: none; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
 .p-motor { fill: #f59e0b; stroke: #7c4a03; stroke-width: 1; vector-effect: non-scaling-stroke; }
 .p-solar-heater { fill: #12294d; stroke: #c8d9e8; stroke-width: 1.2; } .p-solar-heater-tank { fill: #e8eef0; stroke: #8d9aa1; stroke-width: 1; }
+
+.object-jump { display: grid; gap: .25rem; margin: .2rem 0 .5rem; }
+.object-jump > span { font-size: .72rem; color: #79a3b0; text-transform: uppercase; letter-spacing: .08em; }
+.object-jump select { width: 100%; }

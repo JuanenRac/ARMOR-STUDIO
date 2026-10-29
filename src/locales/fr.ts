@@ -1531,6 +1531,7 @@ const catalogue: Record<string, string> = {
 "cs_sum_no_stream": "pas encore de flux",
 "cs_sum_incomplete": "incomplet",
 "cs_sum_unsaved": "pas encore enregistrée",
+"site_jump": "Aller à un autre objet",
 "versionsTitle": "Versions précédentes de ce plan",
 "versionsHelp": "Le serveur garde le plan tel qu'il était avant les changements : au plus un toutes les cinq minutes, toujours avant un enregistrement qui retire beaucoup, et un par jour des trente derniers jours. Restaurer une version la rend courante (la vôtre reste dans la liste).",
 "versionsEmpty": "Aucune version précédente n'a encore été conservée.",

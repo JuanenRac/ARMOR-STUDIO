@@ -1540,6 +1540,7 @@ const catalogue: Record<string, string> = {
 "cs_sum_no_stream": "nessun flusso ancora",
 "cs_sum_incomplete": "incompleto",
 "cs_sum_unsaved": "non ancora salvata",
+"site_jump": "Vai a un altro oggetto",
 "versionsButton": "Versioni",
 "versionsTitle": "Versioni precedenti di questo progetto",
 "versionsHelp": "Il server conserva il progetto com'era prima delle modifiche: al massimo uno ogni cinque minuti, sempre prima di un salvataggio che toglie molto, e uno per ciascuno degli ultimi trenta giorni. Ripristinarne una la rende quella attuale (quella di ora resta nell'elenco).",

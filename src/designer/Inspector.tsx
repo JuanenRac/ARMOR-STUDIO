@@ -139,6 +139,22 @@ export function Inspector(p: InspectorProps) {
     <NumberField label={t("deviceHeading")} unit="°" step={5} value={Math.round(headingOf(item, p.dimensions))} onChange={value => apply(((value % 360) + 360) % 360)} />;
   const remove = <button className="danger-button" onClick={p.onRemove}>{t("deleteObject")}</button>;
 
+  /** Every object of the site, in groups, for the list of the properties that jumps to any of them (the same names as the list of objects). */
+  const jumpGroups: Array<{ title: string; items: Array<{ selection: Selection; label: string }> }> = [
+    { title: t("terrain"), items: [{ selection: { kind: "terrain" } as Selection, label: t("terrain") }] },
+    { title: t("buildingsCount"), items: model.buildings.map(item => ({ selection: { kind: "building", id: item.id } as Selection, label: item.name })) },
+    { title: t("onBuildings"), items: [
+      ...model.roofItems.map(item => ({ selection: { kind: "roofItem", id: item.id } as Selection, label: `${t(`roofItem_${item.kind}`)} · ${item.id}` })),
+      ...model.wallLamps.map(item => ({ selection: { kind: "wallLamp", id: item.id } as Selection, label: `${t("toolWallLamp")} · ${item.id}` }))] },
+    { title: t("openings"), items: model.openings.map(item => ({ selection: { kind: "opening", id: item.id } as Selection, label: `${t(item.kind)} · ${t("floorShort")} ${item.floor + 1} · ${model.buildings.find(b => b.id === item.buildingId)?.name ?? ""}` })) },
+    { title: t("groundObjects"), items: model.features.map(item => ({ selection: { kind: "feature", id: item.id } as Selection, label: item.label ?? t(toolLabelKey(FEATURE_TOOL[item.kind])) })) },
+    { title: t("toolCamera"), items: model.cameras.map(item => ({ selection: { kind: "camera", id: item.id } as Selection, label: item.name })) },
+    { title: t("devices"), items: model.placements.map(item => ({ selection: { kind: "device", id: item.device_id } as Selection, label: deviceOf(item.device_id)?.name ?? item.device_id })) },
+    { title: t("toolSensor"), items: model.sensors.map(item => ({ selection: { kind: "sensor", id: item.id } as Selection, label: item.name })) },
+  ].filter(group => group.items.length > 0);
+  const keyOf = (value: Selection) => `${value.kind}:${"id" in value ? value.id : ""}`;
+  const jumpTo = (key: string) => { const found = jumpGroups.flatMap(group => group.items).find(item => keyOf(item.selection) === key); if (found) p.onSelect(found.selection); };
+
   const listRow = (selected: Selection, tool: Tool, label: string, sub: string) => {
     const active = p.selection.kind === selected.kind && ("id" in selected ? "id" in p.selection && p.selection.id === selected.id : true);
     return <button key={`${selected.kind}-${"id" in selected ? selected.id : ""}`} className={active ? "selected" : ""} onClick={() => p.onSelect(selected)}><span className="list-icon">{toolIcon(tool)}</span><span className="list-name">{label}</span><small>{sub}</small></button>;
@@ -151,6 +167,11 @@ export function Inspector(p: InspectorProps) {
     </div>
     {tab === "properties" && <>
     <header><h3>{title}</h3><small className="drag-hint">{t("designerHelp")}</small></header>
+    {jumpGroups.length > 0 && <label className="object-jump"><span>{t("site_jump")}</span>
+      <select value={selection.kind === "none" ? "" : keyOf(selection)} onChange={event => jumpTo(event.target.value)} aria-label={t("site_jump")}>
+        {selection.kind === "none" && <option value="">—</option>}
+        {jumpGroups.map(group => <optgroup key={group.title} label={`${group.title} · ${group.items.length}`}>{group.items.map(item => <option key={keyOf(item.selection)} value={keyOf(item.selection)}>{item.label}</option>)}</optgroup>)}
+      </select></label>}
 
     {selection.kind === "none" && <section className="object-editor">
       <h4>{t("workArea")}</h4>

@@ -1571,6 +1571,7 @@ const catalogue: Record<string, string> = {
 "cs_sum_no_stream": "no stream yet",
 "cs_sum_incomplete": "incomplete",
 "cs_sum_unsaved": "not saved yet",
+"site_jump": "Go to another object",
 "versionsButton": "Versions",
 "versionsTitle": "Earlier versions of this design",
 "versionsHelp": "The server keeps the design as it was before the changes: at most one every five minutes, always before a save that takes a lot away, and one of each of the last thirty days. Restoring one makes it the current design (the one you have now stays in the list).",

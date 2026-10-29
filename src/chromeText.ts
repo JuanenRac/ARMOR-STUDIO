@@ -119,5 +119,6 @@ const ROWS: Record<string, Row> = {
   cs_sum_no_stream: ["no stream yet", "sin stream todavía", "noch kein Stream", "pas encore de flux", "nessun flusso ancora", "ストリーム未設定", "尚无视频流"],
   cs_sum_incomplete: ["incomplete", "incompleto", "unvollständig", "incomplet", "incompleto", "未完了", "未完成"],
   cs_sum_unsaved: ["not saved yet", "sin guardar", "noch nicht gespeichert", "pas encore enregistrée", "non ancora salvata", "未保存", "尚未保存"],
+  site_jump: ["Go to another object", "Ir a otro objeto", "Zu einem anderen Objekt", "Aller à un autre objet", "Vai a un altro oggetto", "別のオブジェクトへ", "切换到其他对象"],
 };
 export const chromeCatalogues = cataloguesFromRows(ROWS);

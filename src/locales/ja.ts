@@ -1553,6 +1553,7 @@ const catalogue: Record<string, string> = {
 "cs_sum_no_stream": "ストリーム未設定",
 "cs_sum_incomplete": "未完了",
 "cs_sum_unsaved": "未保存",
+"site_jump": "別のオブジェクトへ",
 "versionsButton": "バージョン",
 "versionsTitle": "この設計の以前のバージョン",
 "versionsHelp": "サーバーは変更前の設計を保存します。5分に1回まで、多くを削除する保存の前には必ず、そして過去30日間の各日に1つです。復元するとそれが現在の設計になります（今のものは一覧に残ります）。",

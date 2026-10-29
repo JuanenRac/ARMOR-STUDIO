@@ -1522,6 +1522,7 @@ const catalogue: Record<string, string> = {
 "cs_sum_no_stream": "noch kein Stream",
 "cs_sum_incomplete": "unvollständig",
 "cs_sum_unsaved": "noch nicht gespeichert",
+"site_jump": "Zu einem anderen Objekt",
 "versionsButton": "Versionen",
 "versionsTitle": "Frühere Versionen dieses Entwurfs",
 "versionsHelp": "Der Server bewahrt den Entwurf auf, wie er vor den Änderungen war: höchstens alle fünf Minuten, immer vor einem Speichern, das viel entfernt, und eine pro Tag der letzten dreißig Tage. Beim Wiederherstellen wird sie zum aktuellen Entwurf (der jetzige bleibt in der Liste).",

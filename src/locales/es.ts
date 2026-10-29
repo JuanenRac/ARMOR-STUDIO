@@ -1550,6 +1550,7 @@ const catalogue: Record<string, string> = {
 "cs_sum_no_stream": "sin stream todavía",
 "cs_sum_incomplete": "incompleto",
 "cs_sum_unsaved": "sin guardar",
+"site_jump": "Ir a otro objeto",
 "versionsButton": "Versiones",
 "versionsTitle": "Versiones anteriores de este diseño",
 "versionsHelp": "El servidor guarda el diseño tal como estaba antes de los cambios: como mucho uno cada cinco minutos, siempre antes de un guardado que quita mucho, y uno de cada uno de los últimos treinta días. Restaurar una versión la convierte en el diseño actual (el que tienes ahora queda en la lista).",

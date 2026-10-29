@@ -3684,4 +3684,5 @@ export const PT_CATALOGUE: Record<string, string> = {
  "cs_sum_no_stream": "ainda sem fluxo",
  "cs_sum_incomplete": "incompleto",
  "cs_sum_unsaved": "ainda não guardada",
+ "site_jump": "Ir para outro objeto",
 };
