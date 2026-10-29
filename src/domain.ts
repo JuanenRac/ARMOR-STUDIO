@@ -12,6 +12,8 @@ export const GRID_SIZES: readonly GridSize[] = [1, 2, 4, 6, 8, 9, 12, 16];
 export const CAMERA_LENSES = ["fixed", "varifocal", "motorised"] as const;
 export type CameraLens = (typeof CAMERA_LENSES)[number];
 export type Camera = CameraTraits & {
+  /** A window of a camera with two lenses in one stream: which half of the picture it shows, and the real camera it belongs to (see cameraLenses.ts). */
+  lensView?: "upper" | "lower"; sourceId?: string;
   id: string; name: string; host: string; snapshotUrl: string; enabled: boolean; x: number; y: number;
   username?: string; onvifPort?: number; rtspPort?: number; rtspPath?: string; previewPath?: string; hasCredentials?: boolean; liveVideoAvailable?: boolean;
   /** Where it faces, in degrees anticlockwise from east; unset means toward the middle of the site. */

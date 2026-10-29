@@ -36,7 +36,9 @@ import { canPanTilt, canZoom, hasMovement } from "../cameraPresets";
 export type Translate = (key: string) => string;
 
 /** A stream that carries two lenses, one above the other, is shown as two windows: each one is a half of the same picture. The picture is drawn twice and each copy is cropped. */
-export function lensWindows(camera: Pick<Camera, "layout">, picture: () => ReactNode, t: Translate): ReactNode {
+export function lensWindows(camera: Pick<Camera, "layout" | "lensView">, picture: () => ReactNode, t: Translate): ReactNode {
+  // a window of its own in the grid: only its half of the picture
+  if (camera.lensView) return <div className={`split-lens one ${camera.lensView === "lower" ? "bottom" : "top"}`}>{picture()}</div>;
   if (camera.layout !== "split") return picture();
   return <div className="split-lenses">
     <div className="split-lens top" title={t("cam_lens_top")}>{picture()}</div>

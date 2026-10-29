@@ -2,10 +2,11 @@
  * The overview, camera monitor and radar views.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { CameraTile, type Translate } from "../components/camera";
 import { fitGrid } from "../cameraGrid";
 import { resolveSlots } from "../cameraLayout";
+import { forWindows, LENS_SIDES, lensId, sourceOf, withLensWindows } from "../cameraLenses";
 import { GRID_SIZES, type Camera, type GridSize, type View } from "../domain";
 import type { Reachability } from "../api";
 import type { NodeState } from "../types";
@@ -104,7 +105,23 @@ function CameraWall(props: CameraViewProps & { shown: readonly Camera[]; exit: (
   </div>;
 }
 
+/**
+ * The camera monitor. A camera that says it has two lenses in one stream appears as two windows of the grid, tied to it: they are cameras of the monitor like any other (they can be moved,
+ * chosen for a place, enlarged), but what they do is done to the real camera behind them.
+ */
 export function CameraMonitorView(props: CameraViewProps) {
+  const { t } = props;
+  const cameras = useMemo(() => withLensWindows(props.cameras, side => t(side === "upper" ? "cam_lens_top" : "cam_lens_bottom")), [props.cameras, t]);
+  const real = (camera: Camera): Camera => props.cameras.find(item => item.id === (camera.sourceId ?? camera.id)) ?? camera;
+  const splitIds = new Set(props.cameras.filter(camera => camera.layout === "split").map(camera => camera.id));
+  return <CameraMonitorGrid {...props} cameras={cameras} selectedId={splitIds.has(props.selectedId) ? lensId(props.selectedId, "upper") : props.selectedId}
+    recordingIds={props.recordingIds.flatMap(id => splitIds.has(id) ? [id, ...LENS_SIDES.map(side => lensId(id, side))] : [id])}
+    streamUrls={forWindows(props.cameras, props.streamUrls)} reachability={forWindows(props.cameras, props.reachability)}
+    select={id => props.select(sourceOf(id))} toggle={camera => props.toggle(real(camera))} snapshot={camera => props.snapshot(real(camera))} record={camera => props.record(real(camera))}
+    expand={id => props.expand(sourceOf(id))} ptz={(camera, command) => props.ptz(real(camera), command)} />;
+}
+
+function CameraMonitorGrid(props: CameraViewProps) {
   const { cameras, selectedId, gridSize, recordingIds, streamUrls, reachability, notice, t } = props;
   const frame = useElementSize<HTMLDivElement>();
   const [configuring, setConfiguring] = useState(false);

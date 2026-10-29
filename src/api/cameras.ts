@@ -40,7 +40,7 @@ export async function deleteCamera(origin: string, id: string): Promise<void> {
 }
 export async function discoverCameraStreams(origin: string, id: string): Promise<{ paths: string[]; camera: PublicCameraConnection }> {
   const response = await timedFetch(origin.replace(/\/$/, "") + "/api/v1/cameras/" + encodeURIComponent(id) + "/discover-rtsp", {
-    method: "POST", headers: { Accept: "application/json" }, ...localSession,
+    method: "POST", headers: { Accept: "application/json" }, ...localSession, signal: AbortSignal.timeout(150_000),   // trying the paths of a camera on Wi-Fi can take a minute
   });
   if (!response.ok) throw new Error("RTSP discovery returned " + response.status);
   return response.json() as Promise<{ paths: string[]; camera: PublicCameraConnection }>;

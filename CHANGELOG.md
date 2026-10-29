@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The search for the stream of a camera has time to finish:** the call waits up to two and a half minutes (a camera on Wi-Fi can take one) instead of giving up after thirty seconds with a message that said nothing.
+- **A camera with two lenses in one stream is two windows of the camera monitor:** each lens is a camera of the grid of its own (it takes a place, can be moved to another place and enlarged), tied to the real camera: the picture, the state, the snapshot, the recording and the movement are the ones of the real camera, and each window shows its half of the picture; the enlarged view shows both.
 - **The layout of the README is checked in the CI:** the validator runs the shared `tools/universal_readme_check.py` and lists, as a warning, what differs from the universal layout of the README.
 - **The Overview of the README keeps its bullets apart:** two bullets that ran together are separate again, in the eight languages.
 - **The camera editor is organised in four steps that fold:** connection (name, address, user and password, with the ports folded away), video stream, type of camera and lenses, and web page and notes; each step says in one line how it stands. One button, "Find the stream for me", saves the camera and tries the paths of its family, shows what answered as lines to use as the main or the lighter stream, and the paths can still be written by hand. The page explains the cameras that show two lenses in one picture.
