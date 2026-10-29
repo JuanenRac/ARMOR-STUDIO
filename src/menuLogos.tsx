@@ -145,6 +145,11 @@ const DRAWINGS: Record<LogoKind, React.ReactNode> = {
 export const LOGO_KINDS = Object.keys(DRAWINGS) as LogoKind[];
 
 /** A menu's title with its logo beside it. */
+/** A small logo for the title of a dialog; the title keeps its own text for readers of the screen. */
+export function DialogLogo({ kind }: { kind: LogoKind }) {
+  return <span className="dialog-logo"><MenuLogo kind={kind} size={30} /></span>;
+}
+
 export function MenuTitle({ kind, children }: { kind: LogoKind; children: React.ReactNode }) {
   return <div className="menu-title"><MenuLogo kind={kind} /><div className="menu-title-text">{children}</div></div>;
 }

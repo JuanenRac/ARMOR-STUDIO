@@ -12,3 +12,7 @@
 .versions-failed { color: #ff9b9b; }
 .confirm-dialog { text-align: center; }
 .confirm-actions { display: flex; justify-content: center; gap: .8rem; margin-top: 1.2rem; }
+
+/* The small logo before the title of a dialog. */
+.dialog-logo { display: inline-flex; vertical-align: middle; margin-inline-end: .55rem; }
+.dialog-logo svg { display: block; }

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { deleteDesignVersion, deleteDesignVersions, listDesignVersions, readDesignVersion, type DesignKind, type DesignVersion } from "./api";
 import type { Translate } from "./components/camera";
 import { useDialogFocus } from "./components/useDialogFocus";
+import { DialogLogo } from "./menuLogos";
 
 const COUNT_KEYS = ["buildings", "openings", "features", "sensors"] as const;
 
@@ -45,7 +46,7 @@ export function DesignVersionsDialog({ kind, origin, t, close, draft, restoreDra
   return <div className="modal-backdrop" role="presentation" onMouseDown={close} onKeyDown={event => { if (event.key === "Escape") close(); }}>
     <section ref={dialog.ref} onKeyDown={dialog.onKeyDown} className="about-dialog versions-dialog" role="dialog" aria-modal="true" aria-labelledby="versions-title" onMouseDown={event => event.stopPropagation()}>
       <button className="modal-close" onClick={close} aria-label={t("close")}>×</button>
-      <h2 id="versions-title">{t("versionsTitle")}</h2>
+      <h2 id="versions-title"><DialogLogo kind="history" />{t("versionsTitle")}</h2>
       <p className="muted">{t("versionsHelp")}</p>
       {done && <p className="versions-done" role="status">{done}</p>}
       {failed && <p className="versions-failed" role="alert">{t("versionsFailed")}</p>}

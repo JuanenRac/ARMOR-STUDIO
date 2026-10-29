@@ -7,6 +7,8 @@ import { useState, type FormEvent } from "react";
 import { ApiError, saveNodePanel } from "../api";
 import type { Translate } from "../components/camera";
 import { useDialogFocus } from "../components/useDialogFocus";
+import { DialogLogo } from "../menuLogos";
+$line
 
 /** An IPv4 address of the local network, as the server accepts it. */
 export const PRIVATE_IPV4 = /^(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})$/;
@@ -34,7 +36,7 @@ export function NodeAddressDialog({ t, origin, id, address, port, close, saved }
   };
   return <div className="modal-backdrop" role="presentation" onMouseDown={close} onKeyDown={event => { if (event.key === "Escape") close(); }}>
     <form ref={dialog.ref} onKeyDown={dialog.onKeyDown} className="about-dialog confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="addr-title" onMouseDown={event => event.stopPropagation()} onSubmit={event => void submit(event)}>
-      <h2 id="addr-title">{t("rn_address_title")} · {id}</h2>
+      <h2 id="addr-title"><DialogLogo kind="network" />{t("rn_address_title")} · {id}</h2>
       <p className="muted small">{t("rn_address_help")}</p>
       <label>{t("rn_address_ip")}<input value={ip} onChange={event => setIp(event.target.value)} inputMode="decimal" autoComplete="off" placeholder="192.168.0.221" autoFocus aria-invalid={ip !== "" && !validAddress(ip.trim())} /></label>
       <label>{t("rn_address_port")}<input value={portText} onChange={event => setPortText(event.target.value)} inputMode="numeric" autoComplete="off" maxLength={5} aria-invalid={portText !== "" && !validPort(portText.trim())} /></label>

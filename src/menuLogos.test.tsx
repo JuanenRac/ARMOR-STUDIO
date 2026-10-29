@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { LOGO_KINDS, MenuLogo, MenuTitle } from "./menuLogos";
+import { DialogLogo, LOGO_KINDS, MenuLogo, MenuTitle } from "./menuLogos";
 
 const read = (path: string): string => readFileSync(new URL(path, import.meta.url), "utf8");
 
@@ -15,6 +15,12 @@ describe("the animated logos of the menus", () => {
       expect(html, kind).toMatch(/class="ml-[a-z-]+/);
       expect(html, kind).toContain('aria-hidden="true"');
     }
+  });
+
+  it("the dialogs carry a small logo before their title", () => {
+    expect(renderToStaticMarkup(createElement(DialogLogo, { kind: "history" }))).toContain("dialog-logo");
+    const dialogs = { history: "./DesignVersionsDialog.tsx", network: "./views/NodeAddressDialog.tsx", devices: "./views/NodeControl.tsx", system: "./preflight/PreflightDialog.tsx", configuration: "./ElevationHost.tsx", overview: "./components/chrome.tsx" };
+    for (const [kind, file] of Object.entries(dialogs)) expect(read(file), kind).toContain(`<DialogLogo kind="${kind}" />`);
   });
 
   it("the four designers have their own logo beside the title", () => {

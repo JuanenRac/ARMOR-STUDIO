@@ -16,6 +16,7 @@ import {
 } from "../nodeControlModel";
 import { fillAll, formatBytes, formatUptime, resetText } from "../nodeHealthModel";
 import "./node-control.css";
+import { DialogLogo } from "../menuLogos";
 
 export type DialogRequest = { operation: ControlOperationName; scope: "node" | "all"; node?: NodeHealthItem; label: string; count?: number };
 
@@ -75,7 +76,7 @@ export function ControlDialog({ t, origin, request, close, started }: { t: Trans
   const title = scope === "all" ? fillAll(t("nc_title_all"), t(`nc_op_${operation}`)) : fillAll(t("nc_title_node"), node?.node_id ?? "", t(request.label));
   return <div className="modal-backdrop" role="presentation" onMouseDown={close} onKeyDown={event => { if (event.key === "Escape") close(); }}>
     <form ref={dialog.ref} onKeyDown={dialog.onKeyDown} className="about-dialog confirm-dialog nc-dialog" role="dialog" aria-modal="true" aria-labelledby="nc-title" onMouseDown={event => event.stopPropagation()} onSubmit={event => void submit(event)}>
-      <h2 id="nc-title">{title}</h2>
+      <h2 id="nc-title"><DialogLogo kind="devices" />{title}</h2>
       <p>{t(`nc_d_${operation}`)}</p>
       {scope === "all" && <p className="muted small">{fillAll(t("nc_reach"), String(request.count ?? 0))}</p>}
       {warnings.map(key => <p key={key} className="login-notice" role="note">{t(key)}</p>)}

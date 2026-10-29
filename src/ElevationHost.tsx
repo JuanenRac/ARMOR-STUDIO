@@ -7,6 +7,8 @@ import { PasswordInput } from "./components/PasswordInput";
 import { useEffect, useState, type FormEvent } from "react";
 import { ApiError, elevateSession, setElevationAsker } from "./api";
 import { useDialogFocus } from "./components/useDialogFocus";
+import { DialogLogo } from "./menuLogos";
+$line
 
 type Translate = (key: string) => string;
 type Request = { origin: string; resolve: (proved: boolean) => void };
@@ -42,7 +44,7 @@ export function ElevationDialog({ t, origin, done }: { t: Translate; origin: str
   return <div className="modal-backdrop" role="presentation" onMouseDown={() => done(false)} onKeyDown={event => { if (event.key === "Escape") done(false); }}>
     <form ref={dialog.ref} onKeyDown={dialog.onKeyDown} className="about-dialog confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="elev-title" aria-describedby="elev-text"
       onMouseDown={event => event.stopPropagation()} onSubmit={event => void submit(event)} data-testid="elevation-dialog">
-      <h2 id="elev-title">{t("sec_elev_title")}</h2>
+      <h2 id="elev-title"><DialogLogo kind="configuration" />{t("sec_elev_title")}</h2>
       <p id="elev-text">{t("sec_elev_help")}</p>
       <label>{t("sec_elev_password")}<PasswordInput t={t} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} autoFocus /></label>
       <label>{t("sec_elev_code")}<input inputMode="numeric" autoComplete="one-time-code" value={code} onChange={event => setCode(event.target.value)} /></label>

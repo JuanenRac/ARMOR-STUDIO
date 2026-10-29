@@ -6,6 +6,8 @@
 import { useEffect, useState } from "react";
 import "./preflight.css";
 import { readPreflight, type Preflight, type PreflightIssue } from "../api";
+import { DialogLogo } from "../menuLogos";
+$line
 
 type Names = { cameras: ReadonlyArray<{ id: string; name?: string }>; devices: ReadonlyArray<{ id: string; name: string }> };
 
@@ -28,7 +30,7 @@ export function PreflightDialog({ origin, names, confirm, cancel, infoOnly = fal
   const issues = result !== null && result !== "failed" ? result.issues : [];
   return <div className="modal-backdrop" role="presentation" onMouseDown={cancel} onKeyDown={event => { if (event.key === "Escape") cancel(); }}>
     <section className="about-dialog confirm-dialog preflight-dialog" role="alertdialog" aria-modal="true" aria-labelledby="pre-title" onMouseDown={event => event.stopPropagation()}>
-      <h2 id="pre-title">{t("pre_title")}</h2>
+      <h2 id="pre-title"><DialogLogo kind="system" />{t("pre_title")}</h2>
       {result === null && <p className="muted">{t("pre_checking")}</p>}
       {result === "failed" && <p className="muted">{t("pre_unavailable")}</p>}
       {ok && <p className="pre-ok">✓ {t("pre_ready")}</p>}

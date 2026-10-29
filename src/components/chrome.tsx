@@ -19,6 +19,7 @@ import { HELP_SECTIONS } from "../helpSections";
 import { HELP_TECH } from "../helpTech";
 import { TourArt, ART_OF_VIEW, type ArtId } from "../tour/TourArt";
 import "../help.css";
+import { DialogLogo } from "../menuLogos";
 
 const NAV_CLOSED_KEY = "armor-studio-nav-closed";
 
@@ -124,7 +125,7 @@ export function HelpDialog({ close, initial, t, language }: { close: () => void;
     <section ref={dialog.ref} onKeyDown={dialog.onKeyDown} className="about-dialog help-dialog" role="dialog" aria-modal="true" aria-labelledby="help-title" onMouseDown={event => event.stopPropagation()}>
       <button className="modal-close" onClick={close} aria-label={t("close")}>×</button>
       <header className="help-head">
-        <div><p className="eyebrow">A.R.M.O.R. STUDIO</p><h2 id="help-title">{t("helpTitle")}</h2></div>
+        <div><p className="eyebrow">A.R.M.O.R. STUDIO</p><h2 id="help-title"><DialogLogo kind="overview" />{t("helpTitle")}</h2></div>
         <div className="help-levels" role="radiogroup" aria-label={t("hb_level")}>
           <span>{t("hb_level")}</span>
           {HELP_LEVELS.map(item => <button key={item} type="button" role="radio" aria-checked={level === item} className={level === item ? "active" : ""} title={t(`hb_${item}_h`)} onClick={() => choose(item)}>{t(`hb_${item}`)}</button>)}
