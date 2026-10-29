@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The tabs of the configuration have their own small animated logo**, drawn from the ones of the menus, so each one is told apart at a glance.
 - **The site designer has a quick way to see the properties of any object:** above the properties of the chosen object, a list with every object of the site (terrain, buildings, things on the buildings, openings, objects on the ground, cameras, devices and sensors), the chosen one selected; choosing another one in the list selects it and shows its properties.
 - **The search for the stream of a camera has time to finish:** the call waits up to two and a half minutes (a camera on Wi-Fi can take one) instead of giving up after thirty seconds with a message that said nothing.
 - **A camera with two lenses in one stream is two windows of the camera monitor:** each lens is a camera of the grid of its own (it takes a place, can be moved to another place and enlarged), tied to the real camera: the picture, the state, the snapshot, the recording and the movement are the ones of the real camera, and each window shows its half of the picture; the enlarged view shows both.

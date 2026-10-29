@@ -14,7 +14,7 @@ import { PreferencesPanel } from "./PreferencesPanel";
 import { SecurityPanel } from "./SecurityPanel";
 import type { NetworkOverview } from "./networkModel";
 import "./configuration.css";
-import { MenuTitle } from "./menuLogos";
+import { MenuLogo, MenuTitle, type LogoKind } from "./menuLogos";
 import { BatteryMaintenance } from "./BatteryMaintenance";
 
 type Tab = "general" | "users" | "services" | "broker" | "files" | "installation" | "firmware" | "updates" | "console" | "notifications" | "capture" | "preferences" | "security" | "batteries" | "diagnostics";
@@ -29,6 +29,11 @@ type Props = {
   network?: NetworkOverview | null;
 };
 
+/** The small animated logo of each tab, drawn from the ones of the menus. */
+const TAB_LOGO: Record<Tab, LogoKind> = {
+  general: "configuration", users: "overview", services: "services", broker: "network", files: "record", installation: "system", firmware: "electrical", updates: "system", console: "system",
+  notifications: "alarms", capture: "cameras", preferences: "configuration", security: "alarmPanels", batteries: "electrical", diagnostics: "history",
+};
 const VIEWER_TABS: readonly string[] = ["general", "users", "preferences", "security"];
 /** The tabs in groups, from what is the person's own to what is the system's: the interface; people, alerts and what is recorded; the nodes' firmware and Studio's updates; the server and what it runs on. */
 const tabGroups: Tab[][] = [["general", "preferences"], ["users", "security", "notifications", "capture"], ["firmware", "batteries", "updates"], ["services", "broker", "files", "diagnostics", "installation", "console"]];
@@ -102,7 +107,7 @@ export function ConfigurationPanel(props: Props) {
   return <section className="configuration">
     <div className="panel-heading"><MenuTitle kind="configuration"><p className="eyebrow">{t("systemConfiguration")}</p><h2>{t("configuration")}</h2><p className="muted">{t("configurationHelp")}</p></MenuTitle></div>
     <div className="config-tabs" role="tablist" aria-label={t("configuration")} data-tour="config-tabs">
-      {tabGroups.map(group => group.filter(item => !props.isViewer || VIEWER_TABS.includes(item))).filter(group => group.length > 0).map((group, position) => <Fragment key={group[0]}>{position > 0 && <span className="tab-sep" aria-hidden="true" />}{group.map(item => <button key={item} data-tour={`tab-${item}`} className={tab === item ? "active" : ""} role="tab" aria-selected={tab === item} onClick={() => setTab(item)}>{tabLabel(item)}</button>)}</Fragment>)}
+      {tabGroups.map(group => group.filter(item => !props.isViewer || VIEWER_TABS.includes(item))).filter(group => group.length > 0).map((group, position) => <Fragment key={group[0]}>{position > 0 && <span className="tab-sep" aria-hidden="true" />}{group.map(item => <button key={item} data-tour={`tab-${item}`} className={tab === item ? "active" : ""} role="tab" aria-selected={tab === item} onClick={() => setTab(item)}><MenuLogo kind={TAB_LOGO[item]} size={18} /> {tabLabel(item)}</button>)}</Fragment>)}
     </div>
     {tab === "general" && <div className="config-grid">
       <article className="stack-card"><p className="eyebrow">{t("gen_browser_kicker")}</p><h3>{t("gen_browser_title")}</h3><p className="muted">{t("gen_browser_help")}</p><label>{t("serverOrigin")}<input value={draftOrigin} onChange={event => setDraftOrigin(event.target.value)} onBlur={applyDraftOrigin} onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); applyDraftOrigin(); } }} inputMode="url" /></label><OriginCheck t={t} origin={draftOrigin} setOrigin={value => { setDraftOrigin(value); applyOrigin(value); }} /><small>{props.connection}</small><p className={`operator-session ${props.operatorUnlocked ? "ready" : ""}`}>{props.operatorUnlocked ? t("studioAccessActive") : t("studioAccessWaiting")}</p><small>{t("studioAccessNotice")}</small><button onClick={props.savePreferences}>{t("savePreferences")}</button><button onClick={props.exportSite}>{t("exportSite")}</button></article>
