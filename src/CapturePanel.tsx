@@ -38,9 +38,11 @@ export function CapturePanel({ t, origin, isAdmin }: Props) {
   };
 
   return <div className="config-grid">
-    <article className="stack-card">
+    <article className="stack-card full-card">
       <h3>{t("cap_title")}</h3>
       <p className="muted">{t("cap_help")}</p>
+    </article>
+    <article className="stack-card">
       {toggle("enabled", "cap_enabled")}
       {toggle("photo", "cap_photo", !settings.enabled)}
       {number("photo_count", "cap_photo_count", undefined, !settings.enabled || !settings.photo)}

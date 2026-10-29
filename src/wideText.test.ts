@@ -61,3 +61,12 @@ describe("the card that opens a designer from a menu", () => {
     expect(linkCss).toContain("@media (max-width: 520px)");
   });
 });
+
+describe("the card that introduces a tab of the settings", () => {
+  it("takes the whole row of the grid, so that its text runs along the page and not along a third of it", () => {
+    const rule = rulesOf(configurationCss).find(item => item.selector === ".config-grid .full-card");
+    expect(rule).toBeDefined();
+    expect(rule!.body).toContain("grid-column: 1 / -1");
+    for (const file of ["./CapturePanel.tsx", "./BatteryMaintenance.tsx"]) expect(read(file), file).toContain("stack-card full-card");
+  });
+});

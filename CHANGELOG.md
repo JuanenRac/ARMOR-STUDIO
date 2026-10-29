@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The introduction of the automatic capture and of the battery maintenance takes the whole row:** under the title of those two tabs of the settings the text sat in a column of a third of the page (five to eight lines); it now runs along the page like the other tabs. Two texts that were a line too long (the address of the server in German, where the server listens in Portuguese) are shortened, and an optional browser test (`e2e/tests/headers.e2e.ts`) measures the introduction of every menu and tab at 1920x1080 and 1366x768 in three languages.
 - **The README follows the universal layout in the eight languages:** threats and defences, what Studio talks to, the settings of the static host, tests by area and troubleshooting, and the Repository Structure drawn from `docs/structure.json`; the figures come from the code (a session of 7 days, 16 themes, 13 security options, the Weather menu as the only one that reaches other services, 998 tests).
 - **The dialogs carry a small animated logo before their title:** the history of designs, the address of a node, the control of a node, the start-up check, the request for the password again and the help.
 - **The tabs of the configuration have their own small animated logo**, drawn from the ones of the menus, so each one is told apart at a glance.

@@ -85,6 +85,9 @@
 
 /* A card with long sentences takes two columns of the grid of General, so its text runs on two lines and not five in a narrow column. */
 .config-grid .wide-card { grid-column: span 2; }
+/* The card that introduces a tab takes the whole row: its text then runs along the width of the page and not along a column of a third of it. */
+.config-grid .full-card { grid-column: 1 / -1; }
+.config-grid .full-card .muted, .config-grid .full-card .eyebrow { max-width: none; }
 .config-grid .wide-card .muted, .config-grid .wide-card .eyebrow { max-width: none; }
 @media (max-width: 900px) { .config-grid .wide-card { grid-column: 1 / -1; } }
 

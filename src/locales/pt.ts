@@ -2624,7 +2624,7 @@ const catalogue: Record<string, string> = {
 "gen_server_kicker": "No servidor, para todos os dispositivos (administradores)",
 "gen_ui_kicker": "Como o Studio se vê e fala para si",
 "cs_title": "Endereço e portas do servidor",
-"cs_help": "Onde o servidor ARMOR escuta e onde o Studio é servido. O que guardar fica guardado já e entra em vigor da próxima vez que o servidor e o Studio forem iniciados.",
+"cs_help": "Onde o servidor ARMOR escuta e onde o Studio é servido. O que guardar vale a partir do próximo arranque do servidor e do Studio.",
 "cs_host": "Endereço em que o servidor escuta",
 "cs_host_help": "0.0.0.0 = todas as placas de rede, 127.0.0.1 = só esta máquina, ou o endereço de uma placa.",
 "cs_port": "Porta do servidor",

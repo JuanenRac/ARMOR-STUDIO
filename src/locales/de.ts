@@ -1771,7 +1771,7 @@ const catalogue: Record<string, string> = {
 "iz_error": "Die Zonen konnten nicht gespeichert werden.",
 "gen_browser_kicker": "Nur in diesem Browser",
 "gen_browser_title": "Wie dieser Browser den Server erreicht",
-"gen_browser_help": "Die Adresse, über die Studio mit dem ARMOR-Server spricht. Sie wird nur in diesem Browser gespeichert: ein anderer Computer oder ein Handy hat seine eigene.",
+"gen_browser_help": "Die Adresse, unter der Studio den ARMOR-Server erreicht. Nur in diesem Browser gespeichert: jedes andere Gerät hat seine eigene.",
 "gen_server_kicker": "Im Server, für alle Geräte (Administratoren)",
 "gen_ui_kicker": "Wie Studio für Sie aussieht und spricht",
 "cs_title": "Adresse und Ports des Servers",

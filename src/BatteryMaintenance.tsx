@@ -231,7 +231,7 @@ export function BatteryMaintenance({ t, origin, isAdmin }: Props) {
   };
 
   return <section className="config-grid" data-testid="battery-maintenance">
-    <article className="stack-card">
+    <article className="stack-card full-card">
       <p className="eyebrow">{t("tabBatteries")}</p>
       <h3>{t("bm_title")}</h3>
       <p className="muted">{t("bm_help")}</p>
