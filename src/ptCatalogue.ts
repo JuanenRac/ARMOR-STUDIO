@@ -3586,6 +3586,8 @@ export const PT_CATALOGUE: Record<string, string> = {
  "fw_err_panel_login_failed": "O painel do nó não aceitou o início de sessão.",
  "fw_err_upload_failed": "Não foi possível enviar a imagem ao nó.",
  "fw_err_hash_mismatch": "O nó recebeu algo diferente do que foi enviado (o seu hash difere).",
+ "fw_err_wrong_board": "Esta imagem foi feita para outra placa que não a do nó: não foi enviada. Escolha o ficheiro cujo nome termina com a placa do nó.",
+ "fw_err_wrong_node_kind": "Este nó não é do tipo a que se destina esta atualização: não lhe foi enviado nada.",
  "fw_err_did_not_come_back": "O nó não voltou com a nova versão a tempo. Verifique-o antes de tentar de novo.",
  "fw_err_node_wrong_firmware": "Esse firmware pertence a outro projeto.",
  "fw_err_node_not_firmware": "O nó diz que esse ficheiro não é uma imagem de firmware.",

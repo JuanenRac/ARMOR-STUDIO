@@ -25,6 +25,10 @@ export const adminAccounts = (origin: string) => userCall<{ accounts: BrokerAcco
 export const adminAddAccount = (origin: string, role: string, name: string) => userCall<{ ok: boolean; user: string; password: string }>(origin, "POST", "/api/v1/admin/mqtt/accounts", { role, name }, false, withSecret());
 export const adminRemoveAccount = (origin: string, user: string) => userCall<{ ok: boolean }>(origin, "DELETE", `/api/v1/admin/mqtt/accounts/${encodeURIComponent(user)}`, undefined, false, withSecret());
 export const adminProvisionNode = (origin: string, request: { node_id: string; address: string; kind?: "radar" | "solar" | "electrical" | "network" | "alarm"; broker_host: string; broker_port?: number; panel_user?: string; panel_password?: string }) => userCall<ProvisionResult>(origin, "POST", "/api/v1/admin/nodes/provision", request, false, withSecret());
+/** What the node said when its settings were read or written through its own panel: why is empty when it went well. */
+export type NodeSettingsResult = { ok: boolean; written: boolean; why: string; login_limit_per_minute?: number };
+/** Read (leave `login_limit_per_minute` out) or change the setting of a node that has a screen; the login of the node's own panel is used once and never kept. */
+export const adminNodeSettings = (origin: string, request: { node_id: string; address: string; panel_user: string; panel_password: string; login_limit_per_minute?: number }) => userCall<NodeSettingsResult>(origin, "POST", "/api/v1/admin/nodes/settings", request);
 // ---- Where the alarms are sent ----------------------------------------------------------------------------------------------------------------------
 
 export type ChannelMetrics = { delivered: number; failed: number; dropped: number; queued: number; last_delivered_at?: string; last_failure_at?: string; last_failure?: string };

@@ -101,3 +101,4 @@ button.bat-row:not(#ui):focus-visible { outline: 2px solid #4be2e9; outline-offs
 .inv-top > :first-child { max-height: 20rem; min-width: 0; } .inv-top > :first-child svg { max-height: 20rem; width: 100%; }
 @media (max-height: 820px), (max-width: 1400px) { .el-node-card.bat-detail .el-row { padding-top: .18rem; padding-bottom: .18rem; font-size: .82rem; } .inv-top > :first-child, .inv-top > :first-child svg { max-height: 14rem; } }
 .el-node-card.bat-detail .el-row b { display: inline; }
+.el-node-card .el-row.no-data > span:not(:first-child):not(:last-child) { opacity: .45; text-decoration: line-through; }

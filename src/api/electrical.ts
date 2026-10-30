@@ -17,8 +17,8 @@ export type ElectricalSwitchReading = {
   id: string; kind: "transfer"; label?: string; source_a?: string; source_b?: string; a_closed: boolean; b_closed: boolean;
   selected: "none" | "a" | "b"; wanted: "none" | "a" | "b"; closing: boolean; armed: boolean; fault: "none" | "did_not_close" | "did_not_open" | "both_closed" | "disabled";
 };
-export type ElectricalNodeReading = { node_id: string; reading: { kind: "electrical"; node_id: string; timestamp_ms: number; switching_enabled?: boolean; channels: ElectricalChannelReading[]; switches?: ElectricalSwitchReading[] }; received_at: string; stale: boolean };
-export type ElectricalReadings = { nodes: ElectricalNodeReading[]; totals: { nodes: number; channels: number; stale: number; grid_w: number | null; grid_estimated?: boolean; grid_kwh: number | null; alarms: number } };
+export type ElectricalNodeReading = { node_id: string; reading: { kind: "electrical"; node_id: string; timestamp_ms: number; switching_enabled?: boolean; channels: ElectricalChannelReading[]; switches?: ElectricalSwitchReading[] }; received_at: string; stale: boolean; /** The channels whose own reading is old (only while the server sets old readings aside). */ stale_channels?: string[] };
+export type ElectricalReadings = { nodes: ElectricalNodeReading[]; totals: { nodes: number; channels: number; stale: number; stale_readings?: number; grid_w: number | null; grid_estimated?: boolean; grid_kwh: number | null; alarms: number } };
 export async function listElectricalReadings(origin: string): Promise<ElectricalReadings> {
   const response = await timedFetch(endpoint(origin, "/api/v1/electrical/readings"), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`Electrical readings returned ${response.status}`);

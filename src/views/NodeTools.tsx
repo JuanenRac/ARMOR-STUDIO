@@ -12,6 +12,7 @@ import type { NetworkOverview } from "../networkModel";
 import { ControlDialog, OperationView, type DialogRequest } from "./NodeControl";
 import { NodeCard } from "./NodeHealth";
 import { NodeAddressDialog } from "./NodeAddressDialog";
+import { NodeSettingsDialog } from "./NodeSettingsDialog";
 import { NodeToolbar } from "./NodeToolbar";
 
 export type NodeTools = ReturnType<typeof useNodeTools>;
@@ -24,9 +25,10 @@ export function useNodeTools(origin: string, isAdmin: boolean) {
   // the panels an administrator registered: the server reaches a node's panel only at those, and they win over the address the node told (which can be an old one)
   const panels = usePolled(() => (isAdmin ? listNodePanels(origin).then(reply => reply.panels) : Promise.resolve([] as NodePanel[])), 30_000, `${origin}/${isAdmin}`);
   const [editing, setEditing] = useState<{ id: string; ip: string; port: number } | null>(null);
+  const [settingsOf, setSettingsOf] = useState<{ id: string; ip: string } | null>(null);
   const registeredOf = (id: string): NodePanel | null => panels.data?.find(item => item.id === id.toLowerCase()) ?? null;
   const healthOf = (id: string): NodeHealthItem | null => health.data?.nodes.find(item => item.node_id === id) ?? null;
-  return { origin, isAdmin, health, detailsOf, setDetailsOf, dialog, setDialog, order, setOrder, healthOf, panels, editing, setEditing, registeredOf };
+  return { origin, isAdmin, health, detailsOf, setDetailsOf, dialog, setDialog, order, setOrder, healthOf, panels, editing, setEditing, settingsOf, setSettingsOf, registeredOf };
 }
 
 /** Where the own panel of a node is, from what the network node found (a node answers to "armor-" and its id, or to its id): null when it has not found it. */
@@ -47,7 +49,7 @@ export function NodeToolsBar({ t, tools, id, panel = null, silent, forget }: { t
   const registered = tools.registeredOf(id);
   const effective = registered ? { ip: registered.address, port: registered.port } : panel;   // the registered address wins over the one the node told
   const usual = async () => { if (await askConfirm(`${t("confirmForgetNode")} ${id}`, t)) void forgetNodeHealth(tools.origin, id).then(() => tools.health.reload()); };
-  return <NodeToolbar t={t} origin={tools.origin} id={id} panel={effective} silent={silent} registered={registered !== null} editAddress={() => tools.setEditing({ id, ip: effective?.ip ?? "", port: effective?.port ?? 80 })} health={item} isAdmin={tools.isAdmin} detailsOpen={tools.detailsOf === id}
+  return <NodeToolbar t={t} origin={tools.origin} id={id} panel={effective} silent={silent} registered={registered !== null} editAddress={() => tools.setEditing({ id, ip: effective?.ip ?? "", port: effective?.port ?? 80 })} settings={effective ? () => tools.setSettingsOf({ id, ip: effective.ip }) : undefined} health={item} isAdmin={tools.isAdmin} detailsOpen={tools.detailsOf === id}
     toggleDetails={() => tools.setDetailsOf(tools.detailsOf === id ? null : id)}
     control={action => { if (item) tools.setDialog({ operation: action.operation, scope: "node", node: item, label: action.label }); }} forget={forget ?? (() => void usual())} />;
 }
@@ -60,6 +62,7 @@ export function NodeToolsFooter({ t, tools, details = true }: { t: Translate; to
       forget={() => void forgetNodeHealth(tools.origin, open.node_id).then(() => { tools.setDetailsOf(null); tools.health.reload(); })}
       control={tools.isAdmin ? action => tools.setDialog({ operation: action.operation, scope: "node", node: open, label: action.label }) : undefined} /></div>}
     {tools.isAdmin && tools.editing && <NodeAddressDialog t={t} origin={tools.origin} id={tools.editing.id} address={tools.editing.ip} port={tools.editing.port} close={() => tools.setEditing(null)} saved={() => { tools.setEditing(null); tools.panels.reload(); }} />}
+    {tools.isAdmin && tools.settingsOf && <NodeSettingsDialog t={t} origin={tools.origin} id={tools.settingsOf.id} address={tools.settingsOf.ip} close={() => tools.setSettingsOf(null)} />}
     {tools.isAdmin && tools.order && <OperationView t={t} operation={tools.order} dismiss={() => tools.setOrder(null)} />}
     {tools.isAdmin && tools.dialog && <ControlDialog t={t} origin={tools.origin} request={tools.dialog} close={() => tools.setDialog(null)}
       started={operation => { tools.setDialog(null); tools.setOrder(operation); tools.health.reload(); }} />}

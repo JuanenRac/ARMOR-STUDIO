@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The sign-in limit of a node is set from Studio:** every node of the lists (radar, inverters, batteries, electrical and wall screens) has a button that opens a dialog to read and change `system.login_limit_per_minute` (wrong passwords per minute before the node locks sign-in: 30 by default, 0 for no global limit, at most 120). The login of the node's panel is used once and never kept; the dialog and its help are in the eight languages.
+- **A channel whose meter stopped answering is shown as having no data:** an electrical channel with an old reading is greyed out and marked "no data", and the card counts them; the option is in Configuration > Security (`electrical.set_aside_old_readings`, on by default, off takes the numbers as the node sends them), in the eight languages.
+- **A firmware image for another board is refused with a clear reason:** an update whose file name says another board than the node's, or a node of another kind, now explains it in the eight languages instead of showing a code.
+
 ## [0.8.1.1] - A camera editor in four steps, a window for each lens, a quick view of any object in the designer, options for the alarm audio and animated logos
 
 - **An option for the warning about a sign-in from a new country:** Configuration > Security shows `login.country_alert` (on by default), in the eight languages, with the warning when it is lowered. It acts when the server has a country database.

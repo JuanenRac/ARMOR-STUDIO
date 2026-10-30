@@ -66,6 +66,7 @@ const rows: Row[] = [
   ["vpnAddPeer", () => api.vpnAddPeer(O, "phone", true), "POST", "/api/v1/admin/remote/wireguard/peers", { name: "phone", full_tunnel: true }],
   ["removeNodePanel", () => api.removeNodePanel(O, ODD), "DELETE", `/api/v1/admin/node-panels/${ENC}`],
   ["nodePanelFingerprint", () => api.nodePanelFingerprint(O, "n1", true), "POST", "/api/v1/admin/node-panels/n1/fingerprint", { trust: true }],
+  ["adminNodeSettings", () => api.adminNodeSettings(O, { node_id: "n1", address: "10.0.0.5", panel_user: "admin", panel_password: "pw", login_limit_per_minute: 12 }), "POST", "/api/v1/admin/nodes/settings", { node_id: "n1", address: "10.0.0.5", panel_user: "admin", panel_password: "pw", login_limit_per_minute: 12 }],
   ["listNetwork", () => api.listNetwork(O), "GET", "/api/v1/network"],
   ["listNetwork hidden", () => api.listNetwork(O, true), "GET", "/api/v1/network?hidden=1"],
   ["readNetworkHistory", () => api.readNetworkHistory(O, ODD, 60), "GET", `/api/v1/network/history?node=${ENC}&minutes=60`],

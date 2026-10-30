@@ -122,23 +122,24 @@ function NodeCard({ t, origin, node, drawn, now, tools, panel }: { t: Translate;
       <span className={`el-pill ${node.stale ? "bad" : "good"}`}>{node.stale ? t("solarNodeState_stale") : t("solarNodeState_reporting")} · {ago(node.received_at, now)}</span>
       <span className={`el-pill ${drawn ? "good" : "warn"}`}>{drawn ? t("elLiveDrawn") : t("elLiveNotDrawn")}</span>
       {switching === false && <span className="el-pill warn">{t("elLiveSwitchingOff")}</span>}
+      {(node.stale_channels?.length ?? 0) > 0 && <span className="el-pill warn" title={t("elNoDataTip")}>{t("elStaleReadings").replace("{0}", String(node.stale_channels?.length))}</span>}
       <NodeToolsBar t={t} tools={tools} id={node.node_id} panel={panel} silent={node.stale} />
     </header>
     <div className="el-channels" role="table" data-tour="el-channels">
       <div className="el-row head" role="row"><span>{t("elLiveChannel")}</span><span>V</span><span>A</span><span>W</span><span>kWh</span><span>Hz</span><span>PF</span><span>{t("elLiveState")}</span></div>
-      {channels.map(channel => <Channel key={channel.id} t={t} channel={channel} />)}
+      {channels.map(channel => <Channel key={channel.id} t={t} channel={channel} noData={node.stale_channels?.includes(channel.id) === true} />)}
     </div>
     <ChannelHistory t={t} origin={origin} node={node} now={now} />
     {switches.length > 0 && <div className="el-switches">{switches.map(item => <Switch key={item.id} t={t} item={item} />)}</div>}
   </article>;
 }
 
-function Channel({ t, channel }: { t: Translate; channel: ElectricalChannelReading }) {
-  return <div className={`el-row ${channel.alarm ? "alarm" : ""}`} role="row">
+function Channel({ t, channel, noData = false }: { t: Translate; channel: ElectricalChannelReading; noData?: boolean }) {
+  return <div className={`el-row ${channel.alarm ? "alarm" : ""} ${noData ? "no-data" : ""}`} role="row" title={noData ? t("elNoDataTip") : undefined}>
     <span><b>{channel.label ?? channel.id}</b><small>{channel.domain.toUpperCase()}{channel.reading_age_ms !== undefined ? ` · ${t("elReadingAge").replace("{0}", (channel.reading_age_ms / 1000).toFixed(1))}` : ""}{channel.errors ? ` · ${t("elReadErrors").replace("{0}", String(channel.errors))}` : ""}</small></span>
     <span>{number(channel.voltage_v, 1, "")}</span><span>{number(channel.current_a, 2, "")}</span><span title={channel.power_estimated ? t("elEstimatedTip") : undefined}>{channel.power_estimated && channel.power_w !== undefined ? "≈ " : ""}{number(channel.power_w, 0, "")}</span>
     <span>{number(channel.energy_kwh, 2, "")}</span><span>{number(channel.frequency_hz, 1, "")}</span><span>{number(channel.power_factor, 2, "")}</span>
-    <span className={channel.alarm ? "fail" : channel.state === "open" ? "warn" : "ok"}>{channel.alarm ? (channel.alarm_code ?? t("elLiveAlarm")) : channel.state ? t(`elLive_${channel.state}`) : "–"}</span>
+    <span className={noData ? "warn" : channel.alarm ? "fail" : channel.state === "open" ? "warn" : "ok"}>{noData ? t("elNoData") : channel.alarm ? (channel.alarm_code ?? t("elLiveAlarm")) : channel.state ? t(`elLive_${channel.state}`) : "–"}</span>
   </div>;
 }
 

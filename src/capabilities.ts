@@ -15,6 +15,7 @@ export type SecurityOptions = {
   "media.rtsp_proxy": boolean;
   "network.login_secure_only": boolean;
   "login.country_alert": boolean;
+  "electrical.set_aside_old_readings": boolean;
   "voice.multipart_turn": boolean;
   "panel.live_events": boolean;
   "client.device_lock": "user" | "sensitive" | "always";

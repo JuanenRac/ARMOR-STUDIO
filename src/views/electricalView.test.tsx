@@ -34,4 +34,15 @@ describe("the Electrical menu", () => {
     const quiet = renderToStaticMarkup(createElement(ElectricalView, { t: (key: string) => text("en", key), origin: "http://x", readings, unreachable: false, design, openDesigner: () => undefined, now: Date.now() }));
     expect(quiet).not.toContain("failed reads");
   });
+  it("marks a channel the server set aside as having no data, with its words in every language, and says nothing when none is", () => {
+    const old: ElectricalReadings = { ...readings, nodes: [{ ...readings.nodes[0], stale_channels: ["c1"], reading: { ...readings.nodes[0].reading, channels: [{ id: "c1", domain: "ac", voltage_v: 230.4, power_w: 1200, state: "closed", reading_age_ms: 600000, errors: 9 }] } }] };
+    for (const language of ["en", "es", "de", "fr", "it", "ja", "zh", "pt"] as const) {
+      const html = renderToStaticMarkup(createElement(ElectricalView, { t: (key: string) => text(language, key), origin: "http://x", readings: old, unreachable: false, design, openDesigner: () => undefined, now: Date.now() }));
+      expect(html, language).toContain(text(language, "elNoData"));
+      expect(html, language).toContain(text(language, "elStaleReadings").replace("{0}", "1"));
+      expect(html, language).toContain("no-data");
+    }
+    const quiet = renderToStaticMarkup(createElement(ElectricalView, { t: (key: string) => text("en", key), origin: "http://x", readings, unreachable: false, design, openDesigner: () => undefined, now: Date.now() }));
+    expect(quiet).not.toContain("no-data");
+  });
 });
