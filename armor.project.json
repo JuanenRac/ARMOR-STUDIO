@@ -13,6 +13,7 @@
   ],
   "deployment_target": "Browser console served by its own static host or by the nginx of the container image",
   "maturity": "established",
+  "evidence": "bench",
   "family": "Clients",
   "parent": "ARMOR-SERVER",
   "native_version": "0.8.1.1",
