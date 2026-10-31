@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-1011%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-1122%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.1.2-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**诚实性检查 - 今天真正能运行的部分：** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，由 1011 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、设计器的几何与检查、报警播报器、助手的词典、八种语言的每个菜单、静态主机），并有浏览器测试。它在 CM5 测试台上日常运行，配有真实的服务器、真实的 IP 摄像头和板上的雷达节点；帮助中的图片使用示例数据制作。**尚未**证明的是：所有可能摄像头的实时视频和 PTZ、使用真实设备的太阳能、电气、报警主机和触摸屏菜单（目前只有雷达节点），以及正式的无障碍或可用性评审。当无法连接服务器时，Studio 会显示演示数据，并在顶部栏说明。
+**诚实性检查 - 今天真正能运行的部分：** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，由 1122 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、设计器的几何与检查、报警播报器、助手的词典、八种语言的每个菜单、静态主机），并有浏览器测试。它在 CM5 测试台上日常运行，配有真实的服务器、真实的 IP 摄像头和板上的雷达节点；帮助中的图片使用示例数据制作。**尚未**证明的是：所有可能摄像头的实时视频和 PTZ、使用真实设备的太阳能、电气、报警主机和触摸屏菜单（目前只有雷达节点），以及正式的无障碍或可用性评审。当无法连接服务器时，Studio 会显示演示数据，并在顶部栏说明。
 
 ---
 
@@ -41,7 +41,7 @@
 | 成熟度 | 成熟 |
 | 角色 | 家族的运维与设计控制台 |
 | 技术栈 | React 19, TypeScript, Vite, Three.js, Leaflet |
-| 测试 | 1011 项（`npm test`，Vitest）和浏览器测试（Playwright） |
+| 测试 | 1122 项（`npm test`，Vitest）和浏览器测试（Playwright） |
 | 契约 | 只与 ARMOR-SERVER 通信（带 HttpOnly 会话的 HTTP `/api/v1/*`、WebSocket `/api/v1/events`） |
 | 监听地址 | `127.0.0.1:5178`（`tools/serve.mjs`） |
 | 运行位置 | 浏览器；文件由 `tools/serve.mjs` 或容器中的 nginx 提供 |
@@ -59,7 +59,7 @@
 | 领域 | 状态 | 在这里的含义 |
 |---|---|---|
 | 软件 | 🟢 | 控制台每天都对 CM5 测试台的真实服务器运行。 |
-| 测试 | 🟢 | 1011 项单元测试通过（`npm test`）并运行浏览器测试：设置、摄像头合并、光伏图表、设计器的几何与检查、报警播报、助手词典以及八种语言的每个菜单。 |
+| 测试 | 🟢 | 1122 项单元测试通过（`npm test`）并运行浏览器测试：设置、摄像头合并、光伏图表、设计器的几何与检查、报警播报、助手词典以及八种语言的每个菜单。 |
 | 界面 | 🟡 | 实时视频和云台并未对所有可能的摄像头验证过，也没有做过正式的无障碍或可用性评审，帮助中的图片使用的是示例数据。 |
 | 硬件 | 🟡 | 每天与真实服务器、真实 IP 摄像头和真实雷达节点一起使用；光伏、电气、报警面板和触摸面板菜单在等待真实节点。 |
 | 安全 | 🟡 | 会话、角色以及拒绝在地址中携带摄像头登录信息均有测试覆盖；没有经过独立审查。 |
@@ -93,6 +93,8 @@
 * **电池维护（配置，管理员）：** 四步向导——电池和操作、数值、输入电池序列号确认、结果——用于修改 Pylontech 电池保存的内容；限值以伏特和摄氏度输入并整组发送，固件文件在发送前先被读取，操作前后读取电池并显示差异和记录，输出可以恢复原状。
 * **在节点健康卡片上控制节点：** 每个节点都有一个菜单（重启、暂停或恢复、待机——停止工作，保持连接——或开机、识别、诊断、开启或关闭维护），卡片上有群组操作：全部重启（同时进行，或逐个进行并把报警主机放在最后）、全部暂停、全部待机和全部恢复。需要再次输入节点名称（对所有节点则输入单词 RESTART、PAUSE 或 STANDBY），并要求新的身份验证；标签跟踪每个节点（已发送、已确认、离线、已恢复、已应用），并显示已暂停、自何时起由谁设为待机以及维护；警告会说明报警主机或雷达处于暂停或待机时，家中将失去保护。没有恢复出厂设置、擦除或深度睡眠。
 * **实时状态：** Studio 监听服务器的实时通道（WebSocket），报警、布防或节点恢复会立即显示；通道打开时，状态仅每二十秒轮询一次作为保底，底栏显示“实时”。报警、电气和网络设计器除原有按键外，还支持 F（适应窗口）、加减号（缩放）和 Ctrl+D（复制）。
+* **节点的登录限制:** 列表中的每个节点（雷达、逆变器、电池、电气和壁挂屏幕）都有一个按钮,打开对话框读取和修改 `system.login_limit_per_minute`（节点锁定登录前每分钟允许的错误密码次数：默认 30,0 表示无全局限制,最大 120）。节点面板的登录信息只使用一次、绝不保存；对话框及其帮助提供八种语言。
+* **不再应答的电表与另一块开发板的固件镜像:** 读数过旧的电气通道会变灰并标记为“无数据”,卡片会统计它们（配置 > 安全,`electrical.set_aside_old_readings`,默认开启）；文件名所示开发板与节点开发板不同的固件更新,或另一种类型的节点,会以清楚的原因而不是代码被拒绝。
 
 ## 🧩 在 A.R.M.O.R. 中的角色
 
@@ -151,7 +153,7 @@ flowchart LR
 
 **只有天气菜单会访问其他服务。** 字体来自本地，其余部分不向第三方请求任何内容。天气菜单仅在账户保存了地点时才会加载 Open-Meteo（预报、地理编码、空气质量）、RainViewer（雷达）、EUMETSAT（云图）和 ArcGIS（地图瓦片）。静态主机发送限于所配置服务器和这些服务的 `Content-Security-Policy: default-src 'self'`、`frame-ancestors 'none'`、`nosniff` 和 `no-referrer`。
 
-**开关。** *配置 > 安全* 为 ARMOR-SERVER 允许管理员调整的 13 项保护各提供一个控件（撤防 PIN、语音静音、报警设计签名、区域推送、摄像头隧道、网络登录、壁挂面板实时事件、设备锁、节点存储加密和音频限制），默认值都很保守；调低任何一项服务器都会写入审计。详见 [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md)。没有独立的安全审查。
+**开关。** *配置 > 安全* 为 ARMOR-SERVER 允许管理员调整的 17 项保护各提供一个控件（撤防 PIN、语音静音、报警设计签名、区域推送、摄像头隧道、网络登录、来自新国家的登录提醒、搁置过旧的电气读数、壁挂面板实时事件、设备锁、节点存储加密和音频限制），默认值都很保守；调低任何一项服务器都会写入审计。详见 [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md)。没有独立的安全审查。
 
 ## 🔌 接口
 
@@ -184,7 +186,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 连接 127.0.0.1:8080 上的服务器
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # 修改文案后写出每种语言的表
-npm test                                                                       # 1011 项
+npm test                                                                       # 1122 项
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # 提供构建
 ```

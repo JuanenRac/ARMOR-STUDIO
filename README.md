@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-1011%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-1122%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.1.2-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 1011 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary, every menu rendered in the eight languages, the static host) and by browser tests. It runs in daily use against the CM5 test bench with the real server, real IP cameras and a radar node on its board; the pictures of the Help are made with example data. What has **not** been proven is live video and PTZ against every possible camera, the solar, electrical, alarm-panel and touch-panel menus with real equipment (only the radar node exists) and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
+**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 1122 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary, every menu rendered in the eight languages, the static host) and by browser tests. It runs in daily use against the CM5 test bench with the real server, real IP cameras and a radar node on its board; the pictures of the Help are made with example data. What has **not** been proven is live video and PTZ against every possible camera, the solar, electrical, alarm-panel and touch-panel menus with real equipment (only the radar node exists) and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
 
 ---
 
@@ -41,7 +41,7 @@
 | Maturity | Established |
 | Role | Operations and design console of the family |
 | Stack | React 19, TypeScript, Vite, Three.js, Leaflet |
-| Tests | 1011 (`npm test`, Vitest) and browser tests (Playwright) |
+| Tests | 1122 (`npm test`, Vitest) and browser tests (Playwright) |
 | Contract | Talks only to ARMOR-SERVER (HTTP `/api/v1/*` with an HttpOnly session, WebSocket `/api/v1/events`) |
 | Listens on | `127.0.0.1:5178` (`tools/serve.mjs`) |
 | Runs on | A browser; the files are served by `tools/serve.mjs` or by the nginx of the container |
@@ -59,7 +59,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟢 | The console runs in daily use against the real server of the CM5 test bench. |
-| Tests | 🟢 | 1011 unit tests pass (`npm test`) and the browser tests run: settings, camera merging, the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary and every menu in the eight languages. |
+| Tests | 🟢 | 1122 unit tests pass (`npm test`) and the browser tests run: settings, camera merging, the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary and every menu in the eight languages. |
 | Interface | 🟡 | Live video and PTZ are not proven against every possible camera, there has been no formal accessibility or usability review, and the pictures of the Help are made with example data. |
 | Hardware | 🟡 | It is used daily with the real server, real IP cameras and a real radar node; the solar, electrical, alarm-panel and touch-panel menus wait for real nodes. |
 | Security | 🟡 | Sessions, roles and the refusal of camera logins in addresses are covered by tests; there has been no independent review. |
@@ -93,6 +93,8 @@ Each line is one part of this repository and the light says how far it is today.
 * **Battery maintenance (Configuration, administrators):** a four-step wizard - battery and operation, values, confirmation with the battery's serial number typed, result - to change what a Pylontech battery keeps; limits in volts and degrees a whole group at a time, a firmware file read before it is sent, the battery read before and after with the difference and the transcript, and an output put back as it was.
 * **Control of the nodes from the node health card:** each node has a menu (Restart, Pause or Resume, Standby - work off, still connected - or Power on, Identify, Diagnostics, Maintenance on or off) and the card has the group actions Restart all (all at once, or one after another with the alarm panel last), Pause all, Standby all and Resume all. The node's name (or the word RESTART, PAUSE or STANDBY for all) is typed again and a fresh proof of identity is asked for; chips follow each node (sent, acknowledged, offline, back, applied) and show Paused, Standby since and by whom, and Maintenance; and the warnings say when an alarm panel or a radar paused or on standby leaves the house unprotected. There is no factory reset, no erase and no deep sleep.
 * **Live status:** Studio listens to the server's live channel (a WebSocket) and shows an alarm, an arming or a node coming back at once, asking for the status only every twenty seconds as a safety net while the channel is open; the bottom bar says *Live*. The Alarm, Electrical and Network designers answer F (fit), plus and minus (zoom) and Ctrl+D (duplicate) besides their other keys.
+* **The sign-in limit of a node:** every node of the lists (radar, inverters, batteries, electrical and wall screens) has a button that opens a dialog to read and change `system.login_limit_per_minute` (wrong passwords per minute before the node locks sign-in: 30 by default, 0 for no global limit, at most 120). The login of the node's panel is used once and never kept; the dialog and its help are in the eight languages.
+* **A meter that stopped answering, and a firmware image for another board:** an electrical channel with an old reading is greyed out and marked "no data", and the card counts them (Configuration > Security, `electrical.set_aside_old_readings`, on by default); a firmware update whose file name says another board than the node's, or a node of another kind, is refused with a clear reason instead of a code.
 
 ## 🧩 Role in A.R.M.O.R.
 
@@ -151,7 +153,7 @@ Captured at 1920×1080 on a test bench, with sample data and no real installatio
 
 **Only the Weather menu reaches other services.** Fonts are local stacks and nothing else asks a third party for anything. The Weather menu, and only for an account with a saved place, loads Open-Meteo (forecast, geocoding, air quality), RainViewer (radar), EUMETSAT (clouds) and ArcGIS (map tiles). The static host sends `Content-Security-Policy: default-src 'self'` limited to the configured server and those services, `frame-ancestors 'none'`, `nosniff` and `no-referrer`.
 
-**Switches.** *Configuration > Security* has a control for each of the 13 protections that ARMOR-SERVER lets an administrator tune (disarm PIN, silencing by voice, signature of the alarm design, zone feed, camera tunnel, network logins, wall-panel live events, device lock, node storage encryption and the audio limits), with a conservative default; the server keeps lowering one in its audit. Details in [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). There has been no independent security review.
+**Switches.** *Configuration > Security* has a control for each of the 17 protections that ARMOR-SERVER lets an administrator tune (disarm PIN, silencing by voice, signature of the alarm design, zone feed, camera tunnel, network logins, the alert of a sign-in from a new country, setting aside old electrical readings, wall-panel live events, device lock, node storage encryption and the audio limits), with a conservative default; the server keeps lowering one in its audit. Details in [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). There has been no independent security review.
 
 ## 🔌 Interfaces
 
@@ -184,7 +186,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # write the table of each language after changing a phrase
-npm test                                                                       # 1011 tests
+npm test                                                                       # 1122 tests
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # serve the build
 ```

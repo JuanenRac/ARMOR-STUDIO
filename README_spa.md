@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Lenguaje">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Idiomas">
-  <img src="https://img.shields.io/badge/Tests-1011%20passing-2ea44f.svg" alt="Pruebas">
+  <img src="https://img.shields.io/badge/Tests-1122%20passing-2ea44f.svg" alt="Pruebas">
   <img src="https://img.shields.io/badge/Version-0.8.1.2-0f6cbd.svg" alt="Versión">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Madurez">
 </p>
 
 ---
 
-**Comprobación de honestidad - qué funciona hoy:** Studio habla con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) y está cubierto por 1011 tests unitarios (lectura de ajustes, fusión de cámaras, la aritmética de las gráficas solares, la geometría y las comprobaciones de los diseñadores, el anunciador de alarmas, el diccionario del asistente, cada menú dibujado en los ocho idiomas, el servidor estático) y por pruebas en navegador. Funciona en uso diario contra el banco de pruebas de la CM5 con el servidor real, cámaras IP reales y un nodo radar en su placa; las imágenes de la Ayuda se hacen con datos de ejemplo. Lo que **no** se ha probado es el vídeo en directo y el PTZ con todas las cámaras posibles, los menús solar, eléctrico, de centrales de alarma y de panel táctil con equipos reales (solo existe el nodo radar) y una revisión formal de accesibilidad o usabilidad. Mientras no se alcanza el servidor, Studio muestra datos de demostración y lo dice en la barra superior.
+**Comprobación de honestidad - qué funciona hoy:** Studio habla con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) y está cubierto por 1122 tests unitarios (lectura de ajustes, fusión de cámaras, la aritmética de las gráficas solares, la geometría y las comprobaciones de los diseñadores, el anunciador de alarmas, el diccionario del asistente, cada menú dibujado en los ocho idiomas, el servidor estático) y por pruebas en navegador. Funciona en uso diario contra el banco de pruebas de la CM5 con el servidor real, cámaras IP reales y un nodo radar en su placa; las imágenes de la Ayuda se hacen con datos de ejemplo. Lo que **no** se ha probado es el vídeo en directo y el PTZ con todas las cámaras posibles, los menús solar, eléctrico, de centrales de alarma y de panel táctil con equipos reales (solo existe el nodo radar) y una revisión formal de accesibilidad o usabilidad. Mientras no se alcanza el servidor, Studio muestra datos de demostración y lo dice en la barra superior.
 
 ---
 
@@ -41,7 +41,7 @@
 | Madurez | Establecido |
 | Función | Consola de operación y diseño de la familia |
 | Tecnología | React 19, TypeScript, Vite, Three.js, Leaflet |
-| Pruebas | 1011 (`npm test`, Vitest) y pruebas de navegador (Playwright) |
+| Pruebas | 1122 (`npm test`, Vitest) y pruebas de navegador (Playwright) |
 | Contrato | Habla solo con ARMOR-SERVER (HTTP `/api/v1/*` con sesión HttpOnly, WebSocket `/api/v1/events`) |
 | Escucha en | `127.0.0.1:5178` (`tools/serve.mjs`) |
 | Funciona en | Un navegador; los ficheros los sirve `tools/serve.mjs` o el nginx del contenedor |
@@ -59,7 +59,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 | Área | Estado | Qué significa aquí |
 |---|---|---|
 | Software | 🟢 | La consola funciona a diario contra el servidor real del banco de pruebas CM5. |
-| Pruebas | 🟢 | Pasan 1011 pruebas unitarias (`npm test`) y se ejecutan las pruebas de navegador: ajustes, fusión de cámaras, gráficas solares, geometría y comprobaciones de los diseñadores, el anunciador de alarmas, el diccionario del asistente y cada menú en los ocho idiomas. |
+| Pruebas | 🟢 | Pasan 1122 pruebas unitarias (`npm test`) y se ejecutan las pruebas de navegador: ajustes, fusión de cámaras, gráficas solares, geometría y comprobaciones de los diseñadores, el anunciador de alarmas, el diccionario del asistente y cada menú en los ocho idiomas. |
 | Interfaz | 🟡 | El vídeo en vivo y el PTZ no están probados con todas las cámaras posibles, no ha habido una revisión formal de accesibilidad o usabilidad, y las imágenes de la Ayuda se hacen con datos de ejemplo. |
 | Hardware | 🟡 | Se usa a diario con el servidor real, cámaras IP reales y un nodo radar real; los menús solar, eléctrico, de panel de alarma y de panel táctil esperan nodos reales. |
 | Seguridad | 🟡 | Las sesiones, los roles y el rechazo de credenciales de cámara en las direcciones están cubiertos por pruebas; no ha habido una revisión independiente. |
@@ -93,6 +93,8 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 * **Mantenimiento de baterías (Configuración, administradores):** un asistente de cuatro pasos - batería y operación, valores, confirmación escribiendo el número de serie de la batería, resultado - para cambiar lo que guarda una batería Pylontech; límites en voltios y grados un grupo entero cada vez, un archivo de firmware leído antes de enviarlo, la batería leída antes y después con la diferencia y la transcripción, y una salida que se puede dejar como estaba.
 * **Control de los nodos desde la tarjeta de salud:** cada nodo tiene un menú (Reiniciar, Pausar o Reanudar, Poner en espera - trabajo apagado, sigue conectado - o Encender, Identificar, Diagnóstico, Mantenimiento activado o desactivado) y la tarjeta tiene las acciones de grupo Reiniciar todos (a la vez, o uno tras otro con la central de alarma la última), Pausar todos, Poner todos en espera y Reanudar todos. Se vuelve a escribir el nombre del nodo (o la palabra RESTART, PAUSE o STANDBY para todos) y se pide una prueba de identidad nueva; unas etiquetas siguen a cada nodo (enviada, recibida, sin conexión, de vuelta, aplicada) y muestran En pausa, En espera desde cuándo y por quién, y Mantenimiento; y los avisos dicen cuándo una central de alarma o un radar en pausa o en espera dejan la casa sin proteger. No existe restablecimiento de fábrica, borrado ni sueño profundo.
 * **Estado en vivo:** Studio escucha el canal en vivo del servidor (un WebSocket) y muestra al instante una alarma, un armado o un nodo que vuelve, y pregunta el estado solo cada veinte segundos como red de seguridad mientras el canal está abierto; la barra inferior dice *En vivo*. Los diseñadores de alarma, eléctrico y de red responden a F (encajar), más y menos (zoom) y Ctrl+D (duplicar) además de sus otras teclas.
+* **El límite de acceso de un nodo:** cada nodo de las listas (radar, inversores, baterías, eléctrico y pantallas de pared) tiene un botón que abre un diálogo para leer y cambiar `system.login_limit_per_minute` (contraseñas erróneas por minuto antes de que el nodo bloquee el acceso: 30 por defecto, 0 para ningún límite global, 120 como máximo). El acceso al panel del nodo se usa una vez y nunca se guarda; el diálogo y su ayuda están en los ocho idiomas.
+* **Un contador que dejó de responder y una imagen de firmware para otra placa:** un canal eléctrico con una lectura vieja se muestra atenuado y marcado «sin datos», y la tarjeta los cuenta (Configuración > Seguridad, `electrical.set_aside_old_readings`, activado por defecto); una actualización de firmware cuyo nombre de fichero dice otra placa distinta de la del nodo, o un nodo de otro tipo, se rechaza con una razón clara en lugar de un código.
 
 ## 🧩 Papel en A.R.M.O.R.
 
@@ -151,7 +153,7 @@ Capturadas a 1920×1080 en un banco de pruebas, con datos de ejemplo y sin ningu
 
 **Solo el menú del Tiempo llega a otros servicios.** Las fuentes son locales y nada más pide algo a un tercero. El menú del Tiempo, y solo con una cuenta que tenga un lugar guardado, carga Open-Meteo (previsión, geocodificación, calidad del aire), RainViewer (radar), EUMETSAT (nubes) y ArcGIS (teselas del mapa). El servidor estático envía `Content-Security-Policy: default-src 'self'` limitada al servidor configurado y a esos servicios, `frame-ancestors 'none'`, `nosniff` y `no-referrer`.
 
-**Interruptores.** *Configuración > Seguridad* tiene un control para cada una de las 13 protecciones que ARMOR-SERVER deja ajustar a un administrador (PIN de desarme, silenciar por voz, firma del diseño de alarma, aviso de zonas, túnel de cámaras, accesos de red, eventos en vivo del panel de pared, bloqueo de dispositivo, cifrado del almacenamiento de nodos y los límites de audio), cada una con un valor por defecto conservador; el servidor deja en su auditoría que se baje una. Detalles en [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). No ha habido revisión de seguridad independiente.
+**Interruptores.** *Configuración > Seguridad* tiene un control para cada una de las 17 protecciones que ARMOR-SERVER deja ajustar a un administrador (PIN de desarme, silenciar por voz, firma del diseño de alarma, aviso de zonas, túnel de cámaras, accesos de red, el aviso de un acceso desde un país nuevo, apartar lecturas eléctricas viejas, eventos en vivo del panel de pared, bloqueo de dispositivo, cifrado del almacenamiento de nodos y los límites de audio), cada una con un valor por defecto conservador; el servidor deja en su auditoría que se baje una. Detalles en [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). No ha habido revisión de seguridad independiente.
 
 ## 🔌 Interfaces
 
@@ -184,7 +186,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 contra un servidor en 127.0.0.1:8080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # escribe la tabla de cada idioma tras cambiar una frase
-npm test                                                                       # 1011 pruebas
+npm test                                                                       # 1122 pruebas
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # sirve la build
 ```

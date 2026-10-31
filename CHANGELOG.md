@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The documentation covers the node sign-in limit, the channels with no data and the 17 options:** the README (eight languages) describes the dialog of every node, the greyed-out electrical channels and the refusal of an image for another board, and counts all 17 options of Configuration > Security; the security model says what the dialog keeps (nothing) and the test count is 1122.
+
 ## [0.8.1.2] - The sign-in limit of a node set from Studio, a channel whose meter stopped answering shown as having no data, a firmware image for another board refused with a clear reason and phrases left in English translated
 
 - **The lights of Project status follow the evidence of the manifest:** the manifest says how far the repository has been shown to work (`evidence`: `host-test`, `simulator`, `bench` or `field`) and the validator fails when a light is above what that evidence and the maturity allow (`tools/status_lights.py`), so a green that never ran on real hardware cannot come back.
