@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ElevationDialog } from "./ElevationHost";
-import { envValue, isLowering, SecurityPanel, setEnvLines, VOICE_LIMITS, voiceLimitValue } from "./SecurityPanel";
+import { envValue, isLowering, SecurityPanel, setEnvLines, REPORT_LIMITS, reportLimitValue, VOICE_LIMITS, voiceLimitValue } from "./SecurityPanel";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
 import { SessionUserContext } from "./sessionContext";
 import { locales, requiredUiKeys, text } from "./i18n";
@@ -98,6 +98,26 @@ describe("the security screen", () => {
       expect(words, `${locale} ${id} is not the key`).not.toBe(id);
     }
     for (const locale of locales) { expect(text(locale, "sec_voice_range")).toContain("{min}"); expect(text(locale, "sec_voice_range")).toContain("{max}"); expect(text(locale, "sec_voice_seconds")).toContain("{seconds}"); }
+  });
+
+  it("holds the limits of the reports to the ranges of the server before it asks, and has every phrase of the fields in all eight languages", () => {
+    expect(reportLimitValue("reports.timeout_s", "20")).toBe(20);
+    expect(reportLimitValue("reports.timeout_s", " 5 ")).toBe(5);
+    expect(reportLimitValue("reports.timeout_s", "120")).toBe(120);
+    for (const bad of ["4", "121", "", "abc", "12.5", "-5", "1e2", "00000020"]) expect(reportLimitValue("reports.timeout_s", bad), bad).toBeUndefined();
+    expect([reportLimitValue("reports.queue_max", "1"), reportLimitValue("reports.queue_max", "10"), reportLimitValue("reports.queue_max", "0"), reportLimitValue("reports.queue_max", "11")]).toEqual([1, 10, undefined, undefined]);
+    expect([reportLimitValue("reports.requests_per_minute", "300"), reportLimitValue("reports.requests_per_minute", "301"), reportLimitValue("reports.requests_per_minute", "0")]).toEqual([300, undefined, undefined]);
+    expect(Object.values(REPORT_LIMITS).map(limit => [limit.min, limit.max])).toEqual([[5, 120], [1, 10], [1, 300]]);
+    for (const locale of locales) for (const id of ["sec_rep_title", "sec_rep_help", "sec_rep_timeout", "sec_rep_queue", "sec_rep_rate", "sec_rep_range", "sec_rep_save", "sec_rep_invalid"]) {
+      const words = text(locale, id);
+      expect(words.trim().length, `${locale} ${id}`).toBeGreaterThan(3);
+      expect(words, `${locale} ${id} is not the key`).not.toBe(id);
+    }
+    for (const locale of locales) { expect(text(locale, "sec_rep_range")).toContain("{min}"); expect(text(locale, "sec_rep_range")).toContain("{max}"); }
+    expect(text("pt", "sec_rep_save")).toBe("Guardar os limites");
+    // a server that does not announce them (an older one) shows no such fields
+    const t = (key: string) => text("en", key);
+    expect(renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }))).not.toContain("security-report-limits");
   });
 
   it("offers the text that pairs a phone with the HTTPS of the house, in every language", () => {

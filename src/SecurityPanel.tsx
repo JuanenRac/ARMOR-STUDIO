@@ -195,7 +195,7 @@ function RemoteSettings({ t, origin }: { t: (key: string) => string; origin: str
   </article>;
 }
 
-type OptionKey = Exclude<keyof SecurityOptions, "voice.turn_max_bytes" | "voice.reply_audio_max_bytes">;
+type OptionKey = Exclude<keyof SecurityOptions, "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute">;
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
 const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean; optional?: boolean }> = [
   { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN", node: true },
@@ -238,6 +238,20 @@ export function voiceLimitValue(key: VoiceLimitKey, text: string): number | unde
   const value = Number(trimmed);
   return value >= VOICE_LIMITS[key].min && value <= VOICE_LIMITS[key].max ? value : undefined;
 }
+/** The three limits of the summary of a day and the heat map: the ranges the server holds them to. They tune how much work the reports may cause; they protect nothing, so raising one asks nothing. */
+export const REPORT_LIMITS = {
+  "reports.timeout_s": { min: 5, max: 120, id: "timeout" },
+  "reports.queue_max": { min: 1, max: 10, id: "queue" },
+  "reports.requests_per_minute": { min: 1, max: 300, id: "rate" },
+} as const;
+type ReportLimitKey = keyof typeof REPORT_LIMITS;
+/** The whole number a field holds, or undefined when it is not a whole number inside the range of that limit. */
+export function reportLimitValue(key: ReportLimitKey, text: string): number | undefined {
+  const trimmed = text.trim();
+  if (!/^\d{1,4}$/.test(trimmed)) return undefined;
+  const value = Number(trimmed);
+  return value >= REPORT_LIMITS[key].min && value <= REPORT_LIMITS[key].max ? value : undefined;
+}
 const fill = (text: string, values: Record<string, string | number>) => text.replace(/\{(\w+)\}/g, (whole, name: string) => (name in values ? String(values[name]) : whole));
 
 /** The sizes of a spoken turn, as numbers an administrator types; the server refuses what is outside its ceilings and the field says so before it asks. */
@@ -274,6 +288,42 @@ function VoiceLimits({ t, state, apply, busy }: { t: (key: string) => string; st
       {invalid && <p className="notice bad" role="alert" data-testid="security-voice-invalid">{t("sec_voice_invalid")}</p>}
       <p className="muted">{t("sec_voice_warn")}</p>
       <button className="primary" disabled={busy}>{t("sec_voice_save")}</button>
+    </form>
+  </fieldset>;
+}
+
+/** The limits of the two reports, as numbers an administrator types; the field says so before it asks when one is outside the range. */
+function ReportLimits({ t, state, apply, busy }: { t: (key: string) => string; state: SecurityOptionsState; apply: (change: Partial<SecurityOptions>, raising: boolean) => Promise<boolean>; busy: boolean }) {
+  const keys = Object.keys(REPORT_LIMITS) as ReportLimitKey[];
+  const [typed, setTyped] = useState<Record<string, string>>({});
+  const [invalid, setInvalid] = useState(false);
+  const shown = (key: ReportLimitKey) => typed[key] ?? String(state.settings[key] ?? "");
+  const save = async (event: FormEvent) => {
+    event.preventDefault();
+    const change: Record<string, number> = {};
+    for (const key of keys) {
+      const value = reportLimitValue(key, shown(key));
+      if (value === undefined) { setInvalid(true); return; }
+      if (value !== state.settings[key]) change[key] = value;
+    }
+    setInvalid(false);
+    if (!Object.keys(change).length) return;
+    if (await apply(change as Partial<SecurityOptions>, false)) setTyped({});
+  };
+  const locked = state.locked.some(key => keys.includes(key as ReportLimitKey));
+  return <fieldset className="sec-option" data-testid="security-report-limits" disabled={busy || locked}>
+    <legend>{t("sec_rep_title")}</legend>
+    <p className="muted">{t("sec_rep_help")}</p>
+    <form onSubmit={event => void save(event)}>
+      {keys.map(key => {
+        const limit = REPORT_LIMITS[key], value = reportLimitValue(key, shown(key));
+        return <label key={key}>{t(`sec_rep_${limit.id}`)}
+          <input inputMode="numeric" value={shown(key)} aria-invalid={value === undefined} data-testid={`security-report-${limit.id}`} onChange={event => { setInvalid(false); setTyped(current => ({ ...current, [key]: event.target.value.replace(/\D/g, "") })); }} />
+          <span className="muted">{fill(t("sec_rep_range"), { min: limit.min, max: limit.max })}</span>
+        </label>;
+      })}
+      {invalid && <p className="notice bad" role="alert" data-testid="security-report-invalid">{t("sec_rep_invalid")}</p>}
+      <button className="primary" disabled={busy}>{t("sec_rep_save")}</button>
     </form>
   </fieldset>;
 }
@@ -320,6 +370,7 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
     })}
     {typeof state.settings["alarm_audio.custom_sounds"] === "boolean" && <AlarmSounds t={t} origin={origin} spokenOn={state.settings["alarm_audio.spoken"] === true} customOn={state.settings["alarm_audio.custom_sounds"]} />}
     {typeof state.settings["voice.turn_max_bytes"] === "number" && <VoiceLimits t={t} state={state} apply={applyLimits} busy={busy} />}
+    {typeof state.settings["reports.timeout_s"] === "number" && <ReportLimits t={t} state={state} apply={applyLimits} busy={busy} />}
     <p className="muted">{t("sec_opt_node_pending")}</p>
     <Message message={message} />
   </article>;

@@ -106,6 +106,21 @@ describe("the editor of the modes in the Alarm Designer", () => {
     for (const ref of ["device:door-1", "node:radar-1", "camera:garden"]) expect(container.querySelector(`[data-testid="arming-ref-night-${ref}"]`)).not.toBeNull();
   });
 
+  it("offers the entry delay for a device, a node and a camera once they are marked, never for a zone, and saves the list", async () => {
+    mount(createElement(ArmingModesEditor, { t, origin: "http://x", current: state({ modes: { away: {}, home: { defends: ["zone:Hall", "node:radar-1", "camera:garden", "device:door-1"] }, night: {} } }), universe, isAdmin: true, onSaved: vi.fn(), onConflict: vi.fn() }));
+    const home = container.querySelector('[data-testid="arming-mode-def-home"]') as HTMLElement;
+    const waits = (ref: string) => (container.querySelector(`[data-testid="arming-ref-home-${ref}"]`)!.closest(".am-row") as HTMLElement).querySelector(".am-entry");
+    for (const ref of ["device:door-1", "node:radar-1", "camera:garden"]) expect(waits(ref), ref).not.toBeNull();
+    expect(waits("zone:Hall"), "a zone has no entry delay of its own").toBeNull();
+    expect((container.querySelector('[data-testid="arming-ref-night-node:radar-1"]')!.closest(".am-row") as HTMLElement).querySelector(".am-entry"), "not marked in night: nothing to wait for").toBeNull();
+    await act(async () => { (waits("camera:garden")!.querySelector("input") as HTMLInputElement).click(); await Promise.resolve(); });
+    await act(async () => { (waits("node:radar-1")!.querySelector("input") as HTMLInputElement).click(); await Promise.resolve(); });
+    replies = [{ status: 200, body: state({ revision: 4 }) }];
+    await click('[data-testid="arming-modes-save"]');
+    expect(calls[0]!.body).toMatchObject({ modes: { home: { entry: ["camera:garden", "node:radar-1"] } } });
+    expect(home).not.toBeNull();
+  });
+
   it("saves the whole document with the revision read; a conflict reloads and says so", async () => {
     const onSaved = vi.fn(), onConflict = vi.fn();
     mount(createElement(ArmingModesEditor, { t, origin: "http://x", current: state(), universe, isAdmin: true, onSaved, onConflict }));

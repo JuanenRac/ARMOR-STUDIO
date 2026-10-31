@@ -70,7 +70,7 @@ export function ArmingModesEditor({ t, origin, current, universe, isAdmin, onSav
               return <div key={reference} className="am-row">
                 <label><input type="checkbox" checked={marked} data-testid={`arming-ref-${mode}-${reference}`}
                   onChange={() => patchMode(mode, { defends: toggleRef(definition.defends, reference), ...(marked ? { entry: (definition.entry ?? []).filter(other => other.toLowerCase() !== reference.toLowerCase()) } : {}) })} /> {item.label}</label>
-                {marked && group.kind === "device" && <label className="am-entry"><input type="checkbox" checked={waits} onChange={() => patchMode(mode, { entry: toggleRef(definition.entry, reference) })} /> {t("am_ed_entry")}</label>}
+                {marked && group.kind !== "zone" && <label className="am-entry"><input type="checkbox" checked={waits} onChange={() => patchMode(mode, { entry: toggleRef(definition.entry, reference) })} /> {t("am_ed_entry")}</label>}
               </div>;
             })}
           </details>)}
