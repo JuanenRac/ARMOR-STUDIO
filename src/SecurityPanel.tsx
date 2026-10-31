@@ -197,9 +197,13 @@ function RemoteSettings({ t, origin }: { t: (key: string) => string; origin: str
 
 type OptionKey = Exclude<keyof SecurityOptions, "voice.turn_max_bytes" | "voice.reply_audio_max_bytes">;
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
-const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean }> = [
+const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean; optional?: boolean }> = [
   { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN", node: true },
   { key: "voice.silence_confirmation", id: "voice", values: ["double_turn", "pin", "off"] },
+  { key: "alarm.arming_modes", id: "modes", values: [false, true], calm: true, optional: true },
+  { key: "alarm.mode_downgrade_pin", id: "modepin", values: ["required", "not_required"], optional: true },
+  { key: "alarm.mode_schedule", id: "modesched", values: [false, true], calm: true, optional: true },
+  { key: "alarm.mode_schedule_lowers", id: "modelower", values: [false, true], optional: true },
   { key: "alarm.config_hash", id: "hash", values: [true, false], node: true },
   { key: "server.zone_feed", id: "feed", values: [true, false], node: true },
   { key: "server.zone_feed_signature", id: "sign", values: [true, false], node: true },
@@ -297,7 +301,7 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
   return <article className="stack-card sec-card" data-testid="security-options">
     <h3>{t("sec_group_options")}</h3>
     <p className="muted">{t("sec_opt_help")}</p>
-    {OPTIONS.map(option => {
+    {OPTIONS.filter(option => !option.optional || state.settings[option.key] !== undefined).map(option => {
       const current = state.settings[option.key];
       const fixed = state.locked.includes(option.key);
       const lowest = option.values[option.values.length - 1];

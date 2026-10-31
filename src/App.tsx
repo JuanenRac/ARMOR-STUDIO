@@ -9,13 +9,16 @@ import { ElevationHost } from "./ElevationHost";
 import { useAlarmAnnouncer } from "./alerts/useAlarmAnnouncer";
 import { AlarmPopups } from "./alerts/AlarmPopups";
 import { PreflightDialog } from "./preflight/PreflightDialog";
+import { ArmingModeDialog } from "./views/ArmingModeDialog";
+import { ArmingModesEditor } from "./views/ArmingModesEditor";
+import { zonesOfDevices } from "./armingModesModel";
 import type { RouteContext } from "./alerts/route";
 import { getPrefs, openingView, setPrefs, usePrefs } from "./prefs";
 import { TourHost } from "./tour/TourHost";
 import { RichTooltips } from "./tour/RichTooltips";
 import { shouldAutoStart, startTour } from "./tour/tourStore";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { readNodeHealth, acknowledgeAlarm, listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
+import { readNodeHealth, acknowledgeAlarm, listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, readArmingModes, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { nodeCensus } from "./nodeCensus";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
 import { clearSessionMemory } from "./sessionMemory";
@@ -137,6 +140,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const isViewer = signedIn && !capabilities.can("operate");
   const cannotArm = signedIn && !capabilities.can("arm");
   const [pendingMode, setPendingMode] = useState<"armed" | "disarmed" | null>(null);
+  const [modeDialog, setModeDialog] = useState(false);
   const [checkOpen, setCheckOpen] = useState(false);
   const [restored, setRestored] = useState(false);
   const savedLayout = useMemo(() => loadLayout(), []);
@@ -173,6 +177,10 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const solarPoll = usePolled(() => listSolar(origin), 4000, origin, { always: true });
   const electricalPoll = usePolled(() => listElectricalReadings(origin), 4000, origin, { always: true });
   const alarmNodesPoll = usePolled(() => listAlarmNodes(origin), 3000, origin, { always: true });
+  // The arming modes (Away, Home, Night): an older server has no such route and the console then arms and disarms as it always did.
+  const armingPoll = usePolled(() => readArmingModes(origin), 4000, origin, { always: true });
+  const armingModes = armingPoll.data;
+  const modesOn = armingModes?.enabled === true;
   const knownNodes = useMemo(() => ({
     ids: [...nodes.map(node => node.node_id), ...(solarPoll.data?.devices ?? []).map(device => device.node_id), ...(solarPoll.data?.waiting ?? []).map(item => item.node_id), ...(electricalPoll.data?.nodes ?? []).map(item => item.node_id), ...(alarmNodesPoll.data?.nodes ?? []).map(item => item.node_id)],
     ips: nodes.flatMap(node => (node.panel ? [node.panel.ip] : [])),
@@ -302,7 +310,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     setNotice(t("siteExported"));
   };
   // The question is asked in the page (ConfirmDialog), not with the browser's confirm(): a browser can switch that one off, and then the button did nothing at all.
-  const toggleMode = () => setPendingMode(state.mode === "armed" ? "disarmed" : "armed");
+  const toggleMode = () => { if (modesOn) setModeDialog(true); else setPendingMode(state.mode === "armed" ? "disarmed" : "armed"); };
   const changeMode = async (next: "armed" | "disarmed", pin?: string) => {
     setPendingMode(null);
     try { applyState(await setSystemMode(origin, next, pin)); setNotice(t(next === "armed" ? "modeArmedNotice" : "modeDisarmedNotice")); }
@@ -380,7 +388,9 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     siteDesigner: <SiteDesignerInteractive openVersions={() => setVersionsOf("site")} t={t} dimensions={dimensions} setDimensions={setDimensions} model={site} applyModel={applySite} selectedCamera={selectedCamera} setSelectedCamera={setSelectedCamera} notice={notice} setNotice={setNotice} save={saveSettings} nodeIds={nodes.map(node => node.node_id)} devices={devices} wantsToPlace={wantsToPlace} clearWantsToPlace={() => setWantsToPlace("")} openDevices={() => setView("devices")} cameras={cameras} alarmNodes={alarmNodesPoll.data?.nodes ?? []} openCameras={() => setView("cameras")} openAlarmPanels={() => setView("alarmPanels")} />,
     electricalDesigner: <ElectricalDesigner t={t} design={electrical} setDesign={setElectrical} status={electricalStatus} nodeIds={nodes.map(node => node.node_id)} solarDevices={solarPoll.data?.devices ?? []} solarWaiting={solarPoll.data?.waiting ?? []} electricalNodes={electricalPoll.data?.nodes ?? []} site={{ openings, features, roofItems }} />,
     network: <Ticking>{now => <NetworkView openDesigner={() => setView("networkDesigner")} language={language} t={t} origin={origin} isAdmin={isAdmin} overview={networkPoll.data} reload={networkPoll.reload} now={now} />}</Ticking>,
-    alarmDesigner: <AlarmDesigner t={t} design={alarmDesign} setDesign={setAlarmDesign} status={alarmDesignStatus} panels={alarmNodesPoll.data ?? null} openVersions={() => setVersionsOf("alarm")} openPanels={() => setView("alarmPanels")} />,
+    alarmDesigner: <AlarmDesigner t={t} design={alarmDesign} setDesign={setAlarmDesign} status={alarmDesignStatus} panels={alarmNodesPoll.data ?? null} openVersions={() => setVersionsOf("alarm")} openPanels={() => setView("alarmPanels")}
+      modesPanel={armingModes ? <ArmingModesEditor t={t} origin={origin} current={armingModes} isAdmin={isAdmin} onSaved={() => armingPoll.reload()} onConflict={() => armingPoll.reload()}
+        universe={{ zones: zonesOfDevices(devices), devices: devices.map(device => ({ id: device.id, name: device.name, location: device.location })), nodes: nodes.map(node => node.node_id), cameras: cameras.map(camera => ({ id: camera.id, name: camera.name })) }} /> : undefined} />,
     networkDesigner: <NetworkDesigner t={t} design={networkDesign} setDesign={setNetworkDesign} status={networkStatus} overview={networkPoll.data} cameras={cameras} />,
     configuration: <ConfigurationPanel
       t={t} origin={origin} setOrigin={setOrigin} theme={theme} themes={THEMES}
@@ -397,7 +407,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   return <SessionUserContext.Provider value={sessionUser}><KnownNodesContext.Provider value={knownNodes}><StreamRenewContext.Provider value={renewStream}><div className="studio-frame"><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
     <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} alarmBadge={alarmsPending} t={t} />
     <section className="main-stage" data-tour="stage">
-      <TopBar view={view} revision={state.revision} mode={state.mode} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={cannotArm} checkPerimeter={() => setCheckOpen(true)} remote={remoteConnection} t={t} />
+      <TopBar view={view} revision={state.revision} mode={state.mode} armingMode={modesOn ? state.arming_mode : undefined} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={cannotArm} checkPerimeter={() => setCheckOpen(true)} remote={remoteConnection} t={t} />
       {viewsToDraw(VIEW_ORDER, view, visitedViews.current).map(shown => {
         // a hidden menu keeps the last thing it was given (the same element: React does not draw it again every second); it is refreshed when it is shown
         if (shown === view) shownPanels.current.set(shown, panels[shown]);
@@ -416,6 +426,10 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
       restore={design => { if (versionsOf === "site") siteSync.restoreDocument(design); else if (versionsOf === "electrical") setElectrical(current => applyElectricalDoc(design, current)); else if (versionsOf === "alarm") setAlarmDesign(current => applyAlarmDoc(design, current)); else setNetworkDesign(current => applyNetworkDoc(design, current)); }} />}
     {pendingMode === "disarmed" && <PinDialog title={t("disarmSystem")} text={t("confirmDisarm")} confirmLabel={t("disarmSystem")} confirm={pin => void changeMode("disarmed", pin)} cancel={() => setPendingMode(null)} t={t} />}
     {checkOpen && <PreflightDialog origin={origin} names={{ cameras, devices }} infoOnly confirm={() => undefined} cancel={() => setCheckOpen(false)} t={t} />}
+    {modeDialog && armingModes && <ArmingModeDialog t={t} origin={origin} modes={armingModes} armed={state.mode === "armed"}
+      onDone={(next, armed) => { setModeDialog(false); applyState(next); armingPoll.reload(); setNotice(t("am_notice_changed").replace("{0}", t(`am_mode_${armed}`))); }}
+      onDisarm={() => { setModeDialog(false); setPendingMode("disarmed"); }} cancel={() => setModeDialog(false)}
+      preflight={(confirm, cancel) => <PreflightDialog origin={origin} names={{ cameras, devices }} confirm={confirm} cancel={cancel} t={t} />} />}
     {pendingMode === "armed" && <PreflightDialog origin={origin} names={{ cameras, devices }} confirm={() => void changeMode("armed")} cancel={() => setPendingMode(null)} t={t} />}
   </main>
   <StatusBar serverName={serverName} synced={connectionState === "synced"} mode={state.mode}

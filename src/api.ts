@@ -4,6 +4,7 @@
 export * from "./api/cameras";
 export * from "./api/session";
 export * from "./api/system";
+export * from "./api/armingModes";
 export * from "./api/history";
 export * from "./api/users";
 export * from "./api/admin";

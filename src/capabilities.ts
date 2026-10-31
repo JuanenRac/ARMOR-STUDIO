@@ -9,6 +9,11 @@ export type CapabilityAction = "arm" | "disarm" | "acknowledge" | "operate" | "c
 export type SecurityOptions = {
   "alarm.disarm_pin": "never" | "if_set" | "always";
   "voice.silence_confirmation": "off" | "pin" | "double_turn";
+  /** The arming modes Home and Night, the PIN to go to a mode that defends less, and the timetable of the modes (the server announces them only when it has them). */
+  "alarm.arming_modes": boolean;
+  "alarm.mode_downgrade_pin": "required" | "not_required";
+  "alarm.mode_schedule": boolean;
+  "alarm.mode_schedule_lowers": boolean;
   "alarm.config_hash": boolean;
   "server.zone_feed": boolean;
   "server.zone_feed_signature": boolean;

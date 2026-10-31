@@ -36,6 +36,7 @@ import type { Rules as ClientRules } from "../history";
 import type { ZoneLink as ClientZoneLink } from "../alarmNodes";
 import type { AdminFile as ClientAdminFile } from "../admin";
 import type { ArmProfiles as ClientArmProfiles } from "../alarmNodes";
+import type { ArmingModesState as ClientArmingModesState } from "../armingModes";
 import type { ArmorEvent as ClientArmorEvent } from "../history";
 import type { Automation as ClientAutomation } from "../devices";
 import type { BatteryOperation as ClientBatteryOperation } from "../battery";
@@ -94,6 +95,7 @@ type Checked = {
   ZoneLink: Fits<Rest.ZoneLink, ClientZoneLink>;
   AdminFile: Fits<Rest.AdminFile, ClientAdminFile>;
   ArmProfiles: Fits<Rest.ArmProfiles, ClientArmProfiles>;
+  ArmingModesState: Fits<Rest.ArmingModesState, ClientArmingModesState>;
   Automation: Fits<Rest.Automation, ClientAutomation>;
   BatteryOperation: Fits<Rest.BatteryOperation, ClientBatteryOperation>;
   ConnectionState: Fits<Rest.ConnectionState, ClientConnectionState>;
@@ -148,6 +150,7 @@ export const checked: Checked = {
   ZoneLink: true,
   AdminFile: true,
   ArmProfiles: true,
+  ArmingModesState: true,
   Automation: true,
   BatteryOperation: true,
   ConnectionState: true,

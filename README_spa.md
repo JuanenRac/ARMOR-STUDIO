@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Lenguaje">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Idiomas">
-  <img src="https://img.shields.io/badge/Tests-1156%20passing-2ea44f.svg" alt="Pruebas">
+  <img src="https://img.shields.io/badge/Tests-1180%20passing-2ea44f.svg" alt="Pruebas">
   <img src="https://img.shields.io/badge/Version-0.8.1.2-0f6cbd.svg" alt="Versión">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Madurez">
 </p>
 
 ---
 
-**Comprobación de honestidad - qué funciona hoy:** Studio habla con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) y está cubierto por 1156 tests unitarios (lectura de ajustes, fusión de cámaras, la aritmética de las gráficas solares, la geometría y las comprobaciones de los diseñadores, el anunciador de alarmas, el diccionario del asistente, cada menú dibujado en los ocho idiomas, el servidor estático) y por pruebas en navegador. Funciona en uso diario contra el banco de pruebas de la CM5 con el servidor real, cámaras IP reales y un nodo radar en su placa; las imágenes de la Ayuda se hacen con datos de ejemplo. Lo que **no** se ha probado es el vídeo en directo y el PTZ con todas las cámaras posibles, los menús solar, eléctrico, de centrales de alarma y de panel táctil con equipos reales (solo existe el nodo radar) y una revisión formal de accesibilidad o usabilidad. Mientras no se alcanza el servidor, Studio muestra datos de demostración y lo dice en la barra superior.
+**Comprobación de honestidad - qué funciona hoy:** Studio habla con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) y está cubierto por 1180 tests unitarios (lectura de ajustes, fusión de cámaras, la aritmética de las gráficas solares, la geometría y las comprobaciones de los diseñadores, el anunciador de alarmas, el diccionario del asistente, cada menú dibujado en los ocho idiomas, el servidor estático) y por pruebas en navegador. Funciona en uso diario contra el banco de pruebas de la CM5 con el servidor real, cámaras IP reales y un nodo radar en su placa; las imágenes de la Ayuda se hacen con datos de ejemplo. Lo que **no** se ha probado es el vídeo en directo y el PTZ con todas las cámaras posibles, los menús solar, eléctrico, de centrales de alarma y de panel táctil con equipos reales (solo existe el nodo radar) y una revisión formal de accesibilidad o usabilidad. Mientras no se alcanza el servidor, Studio muestra datos de demostración y lo dice en la barra superior.
 
 ---
 
@@ -41,7 +41,7 @@
 | Madurez | Establecido |
 | Función | Consola de operación y diseño de la familia |
 | Tecnología | React 19, TypeScript, Vite, Three.js, Leaflet |
-| Pruebas | 1156 (`npm test`, Vitest) y pruebas de navegador (Playwright) |
+| Pruebas | 1180 (`npm test`, Vitest) y pruebas de navegador (Playwright) |
 | Contrato | Habla solo con ARMOR-SERVER (HTTP `/api/v1/*` con sesión HttpOnly, WebSocket `/api/v1/events`) |
 | Escucha en | `127.0.0.1:5178` (`tools/serve.mjs`) |
 | Funciona en | Un navegador; los ficheros los sirve `tools/serve.mjs` o el nginx del contenedor |
@@ -59,7 +59,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 | Área | Estado | Qué significa aquí |
 |---|---|---|
 | Software | 🟢 | La consola funciona a diario contra el servidor real del banco de pruebas CM5. |
-| Pruebas | 🟢 | Pasan 1156 pruebas unitarias (`npm test`) y se ejecutan las pruebas de navegador: ajustes, fusión de cámaras, gráficas solares, geometría y comprobaciones de los diseñadores, el anunciador de alarmas, el diccionario del asistente y cada menú en los ocho idiomas. |
+| Pruebas | 🟢 | Pasan 1180 pruebas unitarias (`npm test`) y se ejecutan las pruebas de navegador: ajustes, fusión de cámaras, gráficas solares, geometría y comprobaciones de los diseñadores, el anunciador de alarmas, el diccionario del asistente y cada menú en los ocho idiomas. |
 | Interfaz | 🟡 | El vídeo en vivo y el PTZ no están probados con todas las cámaras posibles, no ha habido una revisión formal de accesibilidad o usabilidad, y las imágenes de la Ayuda se hacen con datos de ejemplo. |
 | Hardware | 🟡 | Se usa a diario con el servidor real, cámaras IP reales y un nodo radar real; los menús solar, eléctrico, de panel de alarma y de panel táctil esperan nodos reales. |
 | Seguridad | 🟡 | Las sesiones, los roles y el rechazo de credenciales de cámara en las direcciones están cubiertos por pruebas; no ha habido una revisión independiente. |
@@ -96,6 +96,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 * **El límite de acceso de un nodo:** cada nodo de las listas (radar, inversores, baterías, eléctrico y pantallas de pared) tiene un botón que abre un diálogo para leer y cambiar `system.login_limit_per_minute` (contraseñas erróneas por minuto antes de que el nodo bloquee el acceso: 30 por defecto, 0 para ningún límite global, 120 como máximo). El acceso al panel del nodo se usa una vez y nunca se guarda; el diálogo y su ayuda están en los ocho idiomas.
 * **Un contador que dejó de responder y una imagen de firmware para otra placa:** un canal eléctrico con una lectura vieja se muestra atenuado y marcado «sin datos», y la tarjeta los cuenta (Configuración > Seguridad, `electrical.set_aside_old_readings`, activado por defecto); una actualización de firmware cuyo nombre de fichero dice otra placa distinta de la del nodo, o un nodo de otro tipo, se rechaza con una razón clara en lugar de un código.
 * **Ayudas de diseño, desactivadas por defecto:** al activar *Ayudas de diseño* en Configuración > Preferencias, el Diseñador de alarma ofrece tres puntos de partida (un piso, un local comercial y una nave con perímetro, cada uno un fichero de datos validado con un esquema) y el plano del sitio una revisión de *Cobertura*: las partes de los edificios que ningún radar ve, las puertas y ventanas que nada vigila, los sitios que dos radares vigilan a la vez, cada uno con una posición para un radar, los puntos ciegos dibujados en el plano y el informe en JSON o CSV. Es una guía plana que cuenta solo lo que se ve con seguridad (las paredes tapan la vista y cada radar se reduce con un margen que tú fijas), no una prueba de que un edificio esté protegido; véase [docs/DESIGN_AIDS.md](docs/DESIGN_AIDS.md).
+* **Modos de armado del sistema (Fuera, En casa, Noche):** cuando un administrador activa *Modos de armado En casa y Noche* en Configuración > Seguridad, el botón de armar abre un diálogo para armar en un modo, cambiar de uno a otro o desarmar; un modo que no defiende nada pide confirmación y un cambio a un modo que defiende menos pide el PIN, como desarmar. El Diseñador de alarma gana una pestaña *Modos* para marcar, en En casa y Noche, zonas enteras (los lugares de los dispositivos), sensores, nodos radar y cámaras (empiezan sin nada), los retardos de salida y entrada y un horario. Otras tres opciones (el PIN para pasar a un modo que defiende menos, el horario y si este puede bajar la defensa) están en Configuración > Seguridad. Desactivado por defecto: con la opción apagada la consola arma y desarma exactamente como antes.
 
 ## 🧩 Papel en A.R.M.O.R.
 
@@ -187,7 +188,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 contra un servidor en 127.0.0.1:8080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # escribe la tabla de cada idioma tras cambiar una frase
-npm test                                                                       # 1156 pruebas
+npm test                                                                       # 1180 pruebas
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # sirve la build
 ```

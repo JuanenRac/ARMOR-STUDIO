@@ -7,7 +7,8 @@ import { useState } from "react";
 import { useDialogFocus } from "./useDialogFocus";
 import { setAlerts, useAlerts } from "../alerts/settings";
 import { stopSound } from "../alerts/sounds";
-import type { ServerInfo } from "../api";
+import type { ArmingMode, ServerInfo } from "../api";
+import { armedLabel } from "../armingModesModel";
 import { NAV_GROUPS, type View } from "../domain";
 import { getPrefs as getPrefsForHelp } from "../prefs";
 import { startTour } from "../tour/tourStore";
@@ -61,8 +62,9 @@ function MuteButton({ t }: { t: Translate }) {
     onClick={() => { setAlerts({ muted: !muted }); if (!muted) stopSound(); }}>{muted ? "🔇" : "🔊"}</button>;
 }
 
-export function TopBar({ view, revision, mode, demo, siteStatus, fullScreen, isFullScreen, openAbout, openHelp, toggleMode, readOnly = false, checkPerimeter, remote = null, t }: {
+export function TopBar({ view, revision, mode, armingMode, demo, siteStatus, fullScreen, isFullScreen, openAbout, openHelp, toggleMode, readOnly = false, checkPerimeter, remote = null, t }: {
   /** Set when the server counts this session as coming from outside the house (with the second-factor policy). */ remote?: { policy: string } | null;
+  /** The arming mode in force while the server has the arming modes on (Away, Home, Night). */ armingMode?: ArmingMode;
   view: View; revision: number; mode: "armed" | "disarmed"; demo: boolean; /** Whether the design is kept on the server. */ siteStatus: "idle" | "saved" | "saving" | "offline"; fullScreen: () => void; /** True while the page is fullscreen: the same button then leaves it. */ isFullScreen: boolean; openAbout: () => void; openHelp: () => void; /** Arm when disarmed, disarm when armed (after asking). */ toggleMode: () => void; /** A viewer only looks: the arm button is off. */ readOnly?: boolean; /** Look at what would stop the perimeter from being ready, without arming. */ checkPerimeter?: () => void; t: Translate;
 }) {
   return <header className="topbar">
@@ -77,7 +79,7 @@ export function TopBar({ view, revision, mode, demo, siteStatus, fullScreen, isF
       <button className="icon-button about-button" title={t("about")} onClick={openAbout}>i</button>
       {siteStatus !== "idle" && <span className={`site-sync ${siteStatus}`} title={t(`siteSync_${siteStatus}`)}>{siteStatus === "saved" ? "☁✓" : siteStatus === "saving" ? "☁…" : "☁!"}</span>}
       <span>REV {revision}</span>
-      <button data-tour="arm" className={`mode-button ${mode}`} onClick={toggleMode} disabled={demo || readOnly} title={mode === "armed" ? t("disarmSystem") : t("armSystem")} aria-label={mode === "armed" ? t("disarmSystem") : t("armSystem")}>{mode === "armed" ? t("armed") : t("disarmed")}</button>
+      <button data-tour="arm" className={`mode-button ${mode}`} onClick={toggleMode} disabled={demo || readOnly} title={mode === "armed" ? t("disarmSystem") : t("armSystem")} aria-label={mode === "armed" ? t("disarmSystem") : t("armSystem")}>{mode === "armed" ? armedLabel(mode, armingMode, t) : t("disarmed")}</button>
     </div>
   </header>;
 }

@@ -39,6 +39,8 @@ type Props = {
   openVersions?: () => void;
   /** The Alarm panels menu: from a tied panel the person can go and see (and command) the real one. */
   openPanels?: () => void;
+  /** The editor of the arming modes (Away, Home, Night); offered as a tab of the side panel when the console has it. */
+  modesPanel?: ReactNode;
 };
 type Selection = { kind: "element" | "wire" | "frame"; id: string } | null;
 type Tool = "select" | "wire";
@@ -48,7 +50,7 @@ type Point = { x: number; y: number };
 const HISTORY_LIMIT = 100, COALESCE_MS = 800, MIN_ZOOM = 0.15, MAX_ZOOM = 3;
 const format = (template: string, args: ReadonlyArray<string | number>): string => template.replace(/\{(\d+)\}/g, (_match, index: string) => String(args[Number(index)] ?? ""));
 
-export function AlarmDesigner({ t, design, setDesign, status, panels, openVersions, openPanels }: Props) {
+export function AlarmDesigner({ t, design, setDesign, status, panels, openVersions, openPanels, modesPanel }: Props) {
   const aids = usePrefs().designAids;
   const [tool, setTool] = useState<Tool>("select");
   const [place, setPlace] = useState<string | null>(null);
@@ -57,7 +59,7 @@ export function AlarmDesigner({ t, design, setDesign, status, panels, openVersio
   const [hoverPort, setHoverPort] = useState<PortRef | null>(null);
   const [pointer, setPointer] = useState<Point | null>(null);
   const [view, setView] = useState<View>({ x: 40, y: 40, k: 1 });
-  const [panel, setPanel] = useState<"properties" | "checks">("properties");
+  const [panel, setPanel] = useState<"properties" | "checks" | "modes">("properties");
   const [notice, setNotice] = useState("");
   const [, setVersion] = useState(0);
   const canvas = useRef<HTMLDivElement>(null), svgRef = useRef<SVGSVGElement>(null), fileInput = useRef<HTMLInputElement>(null);
@@ -585,8 +587,9 @@ export function AlarmDesigner({ t, design, setDesign, status, panels, openVersio
         <div className="ed-tabs" role="tablist">
           <button role="tab" aria-selected={panel === "properties"} className={panel === "properties" ? "on" : ""} onClick={() => setPanel("properties")}>{t("elInspector")}</button>
           <button role="tab" aria-selected={panel === "checks"} className={panel === "checks" ? "on" : ""} onClick={() => setPanel("checks")}>{t("elChecks")} <b className={errors ? "bad" : warnings ? "warn" : ""}>{analysis.issues.length}</b></button>
+          {modesPanel && <button role="tab" aria-selected={panel === "modes"} className={panel === "modes" ? "on" : ""} data-testid="ad-tab-modes" onClick={() => setPanel("modes")}>{t("am_ed_tab")}</button>}
         </div>
-        {panel === "properties" ? (selectedElement ? elementPanel(selectedElement) : selectedWire ? wirePanel(selectedWire) : selectedFrame ? framePanel(selectedFrame) : totalsPanel())
+        {panel === "modes" && modesPanel ? modesPanel : panel === "properties" ? (selectedElement ? elementPanel(selectedElement) : selectedWire ? wirePanel(selectedWire) : selectedFrame ? framePanel(selectedFrame) : totalsPanel())
           : <div className="ed-issues">{analysis.issues.length === 0 ? <p className="ed-note">{t("elNoIssues")}</p> : analysis.issues.map((issue, index) => <button key={`${issue.code}-${index}`} className={`ed-issue ${issue.level}`} onClick={() => focusIssue(issue)}><i />{issueText(issue)}</button>)}<p className="ed-note">{t("ad_disclaimer")}</p></div>}
       </aside>
     </div>
