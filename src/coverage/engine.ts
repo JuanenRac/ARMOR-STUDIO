@@ -7,15 +7,18 @@
  */
 import config from "./coverage.config.json";
 import type { SiteModel } from "../designer/ops";
-import { cameraView, headingOf, radarView, toMetres } from "../designer/model";
+import { cameraView, headingOf, radarView, toMetres, SENSOR_HEIGHT_M, CAMERA_HEIGHT_M } from "../designer/model";
 import type { Dimensions } from "../domain";
+import { floorBottom } from "../designer/geometry";
+import { levelOf } from "./levels";
 import { blockedBy, inSectorOf, insidePolygon, polygonArea, type P } from "./geometry";
 
 export const COVERAGE_CONFIG = config;
 export const COVERAGE_SCHEMA = "armor-studio/coverage/1";
 
-export type CoverageOptions = { marginPercent: number; cellM: number; maxCells: number; minBlindAreaM2: number; overlapWarnRatio: number; openingFloor: number; guardedOpenings: readonly string[]; suggestionInsetM: number; openingReachM: number };
+export type CoverageOptions = { /** Check every floor of the buildings on its own (off: the old flat check of the ground floor). */ floors: boolean; /** Take the mounting height and the tilt of the radars into account (off: flat). */ threeD: boolean; /** Draw only the unseen part of the blind squares next to a radar (the figures never change). */ refine: boolean; marginPercent: number; cellM: number; maxCells: number; minBlindAreaM2: number; overlapWarnRatio: number; openingFloor: number; guardedOpenings: readonly string[]; suggestionInsetM: number; openingReachM: number };
 export const DEFAULT_OPTIONS: CoverageOptions = {
+  floors: false, threeD: false, refine: false,
   marginPercent: config.marginPercent.default, cellM: config.cellM, maxCells: config.maxCells, minBlindAreaM2: config.minBlindAreaM2, overlapWarnRatio: config.overlapWarnRatio,
   openingFloor: config.openingFloor, guardedOpenings: config.guardedOpenings, suggestionInsetM: config.suggestionInsetM, openingReachM: config.openingReachM,
 };
@@ -24,9 +27,10 @@ export const clampMargin = (value: number): number => Number.isFinite(value) ? M
 export type OpeningState = "contact" | "presence" | "video" | "none";
 export type Level = "warn" | "info";
 export type Suggestion = { x: number; y: number; headingDeg: number };
-export type CoverageWarning = { code: string; level: Level; args: Array<string | number>; target?: string; suggestion?: Suggestion };
+export type CoverageWarning = { code: string; level: Level; args: Array<string | number>; target?: string; suggestion?: Suggestion; /** Only when floors are checked one by one: the floor (0 = ground) the warning is about. */ floor?: number };
 export type BlindSpot = { areaM2: number; centre: P; bounds: { minX: number; minY: number; maxX: number; maxY: number }; suggestion: Suggestion };
-export type ZoneCoverage = { buildingId: string; name: string; areaM2: number; coveredM2: number; blindM2: number; overlapM2: number; coveredRatio: number; overlapRatio: number; blindSpots: BlindSpot[]; blindCells: Array<{ x: number; y: number; size: number }> };
+export type Cell = { x: number; y: number; size: number };
+export type ZoneCoverage = { /** Only when floors are checked one by one. */ floor?: number; /** Only when `refine` is on: what to paint for the blind squares (a square next to a radar may be painted only in its unseen part). */ blindDraw?: Cell[]; buildingId: string; name: string; areaM2: number; coveredM2: number; blindM2: number; overlapM2: number; coveredRatio: number; overlapRatio: number; blindSpots: BlindSpot[]; blindCells: Array<{ x: number; y: number; size: number }> };
 export type OpeningCoverage = { id: string; buildingId: string; kind: string; at: P; state: OpeningState; by: string[] };
 export type SensorCoverage = { id: string; name: string; coveredM2: number; redundant: boolean };
 export type CoverageReport = {
@@ -41,30 +45,37 @@ export type CoverageReport = {
   warnings: CoverageWarning[];
 };
 
-type Source = { id: string; name: string; apex: P; heading: number; halfAngleDeg: number; rangeM: number };
+type Source = { id: string; name: string; apex: P; heading: number; halfAngleDeg: number; rangeM: number; floor: number; z: number; tiltDown: number; vHalfDeg: number; assumed: boolean };
 const round = (value: number, digits = 2): number => Number(value.toFixed(digits));
 const byText = (left: string, right: string): number => left < right ? -1 : left > right ? 1 : 0;
 
 /** The sector a source really counts for: smaller than the one it declares, by the margin (never larger). */
 function shrunk(source: Source, marginPercent: number): Source {
   const keep = 1 - clampMargin(marginPercent) / 100;
-  return { ...source, halfAngleDeg: source.halfAngleDeg * keep, rangeM: source.rangeM * keep };
+  return { ...source, halfAngleDeg: source.halfAngleDeg * keep, rangeM: source.rangeM * keep, vHalfDeg: source.vHalfDeg * keep };
 }
 
 export function analyseCoverage(model: SiteModel, dimensions: Dimensions, given: Partial<CoverageOptions> = {}): CoverageReport {
   const options: CoverageOptions = { ...DEFAULT_OPTIONS, ...given, marginPercent: clampMargin(given.marginPercent ?? DEFAULT_OPTIONS.marginPercent) };
   const presence: Source[] = model.sensors.map(sensor => {
-    const view = radarView(sensor);
-    return shrunk({ id: sensor.id, name: sensor.name || sensor.id, apex: toMetres(sensor, dimensions), heading: headingOf(sensor, dimensions), halfAngleDeg: view.halfAngleDeg, rangeM: view.rangeM }, options.marginPercent);
+    const view = radarView(sensor), level = levelOf(model, sensor, dimensions, SENSOR_HEIGHT_M);
+    return shrunk({ id: sensor.id, name: sensor.name || sensor.id, apex: toMetres(sensor, dimensions), heading: headingOf(sensor, dimensions), halfAngleDeg: view.halfAngleDeg, rangeM: view.rangeM, floor: level.floor, z: level.z, tiltDown: sensor.tilt ?? 0, vHalfDeg: config.verticalHalfAngleDeg, assumed: level.assumed }, options.marginPercent);
   }).sort((a, b) => byText(a.id, b.id));
   const video: Source[] = model.cameras.filter(camera => camera.enabled !== false).map(camera => {
-    const view = cameraView(camera);
-    return shrunk({ id: camera.id, name: camera.name || camera.id, apex: toMetres(camera, dimensions), heading: headingOf(camera, dimensions), halfAngleDeg: view.halfAngleDeg, rangeM: view.rangeM }, options.marginPercent);
+    const view = cameraView(camera), level = levelOf(model, camera, dimensions, CAMERA_HEIGHT_M);
+    return shrunk({ id: camera.id, name: camera.name || camera.id, apex: toMetres(camera, dimensions), heading: headingOf(camera, dimensions), halfAngleDeg: view.halfAngleDeg, rangeM: view.rangeM, floor: level.floor, z: level.z, tiltDown: camera.tilt ?? 0, vHalfDeg: config.verticalHalfAngleDeg, assumed: false }, options.marginPercent);
   }).sort((a, b) => byText(a.id, b.id));
 
   const walls: Array<[P, P]> = [];
   for (const building of model.buildings) for (let i = 0; i < building.points.length; i += 1) walls.push([building.points[i], building.points[(i + 1) % building.points.length]]);
-  const sees = (source: Source, target: P): boolean => inSectorOf(target, source.apex, source.heading, source.halfAngleDeg, source.rangeM) && !walls.some(([a, b]) => blockedBy(source.apex, target, a, b));
+  /** The 3D test: the target plane `planeZ` must be within the slant range and the vertical field of the radar (centred on its tilt). Only asked for when `threeD` is on. */
+  const inVerticalField = (source: Source, target: P, planeZ: number): boolean => {
+    const horizontal = Math.hypot(target.x - source.apex.x, target.y - source.apex.y), dz = planeZ - source.z;
+    if (Math.hypot(horizontal, dz) > source.rangeM) return false;
+    if (horizontal < 1e-6) return Math.abs(dz) < 1e-6;
+    return Math.abs(Math.atan2(dz, horizontal) * 180 / Math.PI + source.tiltDown) <= source.vHalfDeg;
+  };
+  const sees = (source: Source, target: P, planeZ?: number): boolean => inSectorOf(target, source.apex, source.heading, source.halfAngleDeg, source.rangeM) && (planeZ === undefined || inVerticalField(source, target, planeZ)) && !walls.some(([a, b]) => blockedBy(source.apex, target, a, b));
 
   const warnings: CoverageWarning[] = [];
   const buildings = [...model.buildings].sort((a, b) => byText(a.id, b.id));
@@ -75,9 +86,13 @@ export function analyseCoverage(model: SiteModel, dimensions: Dimensions, given:
   if (rough / (cellM * cellM) > options.maxCells) { cellM = round(Math.sqrt(rough / options.maxCells), 3); warnings.push({ code: "cell_coarsened", level: "info", args: [cellM] }); }
   const cellArea = cellM * cellM;
 
+  const onFloor = (level: number | undefined): { floor?: number } => level === undefined ? {} : { floor: level };
   const perSensorCells = new Map<string, Set<string>>(presence.map(source => [source.id, new Set<string>()]));
   const zones: ZoneCoverage[] = [];
-  for (const building of buildings) {
+  for (const building of buildings) for (const level of options.floors ? building.floors.map((_, index) => index) : [undefined]) {
+    const here = level === undefined ? presence : presence.filter(source => source.floor === level);
+    const planeZ = options.threeD ? building.base + floorBottom(building.floors, level ?? 0) + config.targetHeightM : undefined;
+    const zoneKey = `${building.id}:${level ?? ""}`;
     const xs = building.points.map(point => point.x), ys = building.points.map(point => point.y);
     const minX = Math.min(...xs), minY = Math.min(...ys), columns = Math.ceil((Math.max(...xs) - minX) / cellM), rows = Math.ceil((Math.max(...ys) - minY) / cellM);
     const state = new Map<string, number>();   // cell key -> how many presence radars see all of it
@@ -88,7 +103,7 @@ export function analyseCoverage(model: SiteModel, dimensions: Dimensions, given:
       const samples = [centre, ...[{ x, y }, { x: x + cellM, y }, { x, y: y + cellM }, { x: x + cellM, y: y + cellM }].filter(corner => insidePolygon(corner, building.points))];
       const key = `${column}:${row}`;
       let count = 0;
-      for (const source of presence) if (samples.every(sample => sees(source, sample))) { count += 1; perSensorCells.get(source.id)!.add(`${building.id}:${key}`); }
+      for (const source of here) if (samples.every(sample => sees(source, sample, planeZ))) { count += 1; perSensorCells.get(source.id)!.add(`${zoneKey}:${key}`); }
       state.set(key, count); cells.push({ key, x, y });
     }
     const blind = cells.filter(cell => state.get(cell.key) === 0);
@@ -121,15 +136,31 @@ export function analyseCoverage(model: SiteModel, dimensions: Dimensions, given:
       });
     }
     spots.sort((a, b) => b.areaM2 - a.areaM2 || a.centre.x - b.centre.x || a.centre.y - b.centre.y);
+    // the squares next to a radar, painted only where nothing sees them (the figures above stay as they are)
+    let blindDraw: Cell[] | undefined;
+    if (options.refine) {
+      const divisions = config.refineDivisions, part = cellM / divisions, reach = config.refineRadiusM + cellM;
+      blindDraw = [];
+      for (const cell of blind) {
+        const centre = { x: cell.x + cellM / 2, y: cell.y + cellM / 2 };
+        if (!here.some(source => Math.hypot(centre.x - source.apex.x, centre.y - source.apex.y) <= reach)) { blindDraw.push({ x: round(cell.x), y: round(cell.y), size: cellM }); continue; }
+        for (let row = 0; row < divisions; row += 1) for (let column = 0; column < divisions; column += 1) {
+          const x = cell.x + column * part, y = cell.y + row * part, middle = { x: x + part / 2, y: y + part / 2 };
+          if (!insidePolygon(middle, building.points)) continue;
+          const samples = [middle, ...[{ x, y }, { x: x + part, y }, { x, y: y + part }, { x: x + part, y: y + part }].filter(corner => insidePolygon(corner, building.points))];
+          if (!here.some(source => samples.every(sample => sees(source, sample, planeZ)))) blindDraw.push({ x: round(x, 4), y: round(y, 4), size: round(part, 4) });
+        }
+      }
+    }
     zones.push({
-      buildingId: building.id, name: building.name || building.id, areaM2: round(cells.length * cellArea), coveredM2: round(covered * cellArea), blindM2: round(blind.length * cellArea), overlapM2: round(overlap * cellArea),
+      ...(level === undefined ? {} : { floor: level }), ...(blindDraw ? { blindDraw } : {}), buildingId: building.id, name: building.name || building.id, areaM2: round(cells.length * cellArea), coveredM2: round(covered * cellArea), blindM2: round(blind.length * cellArea), overlapM2: round(overlap * cellArea),
       coveredRatio: cells.length ? round(covered / cells.length, 3) : 0, overlapRatio: cells.length ? round(overlap / cells.length, 3) : 0, blindSpots: spots,
       blindCells: blind.map(cell => ({ x: round(cell.x), y: round(cell.y), size: cellM })),
     });
     const label = building.name || building.id;
-    if (cells.length > 0 && covered === 0) warnings.push({ code: "zone_unwatched", level: "warn", args: [label], target: building.id, suggestion: spots[0]?.suggestion });
-    else for (const spot of spots) warnings.push({ code: "blind_spot", level: "warn", args: [label, spot.areaM2, spot.centre.x, spot.centre.y], target: building.id, suggestion: spot.suggestion });
-    if (cells.length > 0 && overlap / cells.length > options.overlapWarnRatio) warnings.push({ code: "zone_overlap", level: "info", args: [label, Math.round(overlap / cells.length * 100)], target: building.id });
+    if (cells.length > 0 && covered === 0) warnings.push({ code: "zone_unwatched", level: "warn", args: [label], target: building.id, suggestion: spots[0]?.suggestion, ...onFloor(level) });
+    else for (const spot of spots) warnings.push({ code: "blind_spot", level: "warn", args: [label, spot.areaM2, spot.centre.x, spot.centre.y], target: building.id, suggestion: spot.suggestion, ...onFloor(level) });
+    if (cells.length > 0 && overlap / cells.length > options.overlapWarnRatio) warnings.push({ code: "zone_overlap", level: "info", args: [label, Math.round(overlap / cells.length * 100)], target: building.id, ...onFloor(level) });
   }
 
   // doors and windows
@@ -139,16 +170,17 @@ export function analyseCoverage(model: SiteModel, dimensions: Dimensions, given:
   for (const opening of [...model.openings].sort((a, b) => byText(a.id, b.id))) {
     const building = buildingById.get(opening.buildingId);
     if (!building || !options.guardedOpenings.includes(opening.kind) || opening.edge >= building.points.length) continue;
-    if (opening.floor !== options.openingFloor) { notChecked += 1; continue; }
+    if (!options.floors && opening.floor !== options.openingFloor) { notChecked += 1; continue; }
     const a = building.points[opening.edge], b = building.points[(opening.edge + 1) % building.points.length], length = Math.hypot(b.x - a.x, b.y - a.y) || 1;
     const middle = opening.offset + opening.width / 2, at = { x: a.x + (b.x - a.x) / length * middle, y: a.y + (b.y - a.y) / length * middle };
     // the sight line stops a hair short of the wall the opening is cut in
-    const reach = (source: Source): boolean => {
+    const planeZ = options.threeD && options.floors ? building.base + floorBottom(building.floors, opening.floor) + opening.sill + opening.height / 2 : undefined;
+    const reach = (source: Source, vertical = false): boolean => {
       const distance = Math.hypot(at.x - source.apex.x, at.y - source.apex.y) || 1, back = Math.min(0.05, distance / 2);
       const short = { x: at.x + (source.apex.x - at.x) / distance * back, y: at.y + (source.apex.y - at.y) / distance * back };
-      return inSectorOf(at, source.apex, source.heading, source.halfAngleDeg, source.rangeM) && !walls.some(([p, q]) => blockedBy(source.apex, short, p, q));
+      return (!options.floors || source.floor === opening.floor) && inSectorOf(at, source.apex, source.heading, source.halfAngleDeg, source.rangeM) && (!vertical || planeZ === undefined || inVerticalField(source, at, planeZ)) && !walls.some(([p, q]) => blockedBy(source.apex, short, p, q));
     };
-    const seenBy = presence.filter(reach).map(source => source.id), videoBy = video.filter(reach).map(source => source.id);
+    const seenBy = presence.filter(source => reach(source, true)).map(source => source.id), videoBy = video.filter(source => reach(source)).map(source => source.id);
     const status: OpeningState = opening.contact === true ? "contact" : seenBy.length ? "presence" : videoBy.length ? "video" : "none";
     openings.push({ id: opening.id, buildingId: building.id, kind: opening.kind, at: { x: round(at.x), y: round(at.y) }, state: status, by: status === "presence" ? seenBy : status === "video" ? videoBy : [] });
     if (status === "none") {
@@ -171,7 +203,8 @@ export function analyseCoverage(model: SiteModel, dimensions: Dimensions, given:
     return { id: source.id, name: source.name, coveredM2: round(mine.size * cellArea), redundant };
   });
   if (buildings.length === 0) warnings.push({ code: "no_buildings", level: "info", args: [] });
-  if (model.buildings.some(building => building.floors.length > 1)) warnings.push({ code: "upper_floors", level: "info", args: [] });
+  if (!options.floors && model.buildings.some(building => building.floors.length > 1)) warnings.push({ code: "upper_floors", level: "info", args: [] });
+  if (options.floors) for (const source of presence) if (source.assumed) warnings.push({ code: "sensor_floor_assumed", level: "info", args: [source.name], target: source.id });
 
   return { schema: COVERAGE_SCHEMA, options, cellM, zones, openings, sensors, notChecked: { openings: notChecked }, warnings };
 }

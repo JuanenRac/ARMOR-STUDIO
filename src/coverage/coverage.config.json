@@ -8,5 +8,9 @@
   "openingFloor": 0,
   "guardedOpenings": ["door", "window", "garage"],
   "suggestionInsetM": 0.3,
-  "openingReachM": 3
+  "openingReachM": 3,
+  "targetHeightM": 1,
+  "verticalHalfAngleDeg": 35,
+  "refineRadiusM": 1,
+  "refineDivisions": 4
 }

@@ -75,6 +75,7 @@ function readSensor(raw: unknown): Sensor | null {
   if (typeof raw.node === "string" && /^[a-z0-9][a-z0-9_-]{0,63}$/.test(raw.node)) sensor.node = raw.node;
   if (finite(raw.channel) && Number.isInteger(raw.channel) && raw.channel >= 0 && raw.channel <= 255) sensor.channel = raw.channel;
   if (raw.mirror === true) sensor.mirror = true;
+  if (finite(raw.floor) && Number.isInteger(raw.floor) && raw.floor >= 0 && raw.floor < LIMITS.floors) sensor.floor = raw.floor;
   return sensor;
 }
 

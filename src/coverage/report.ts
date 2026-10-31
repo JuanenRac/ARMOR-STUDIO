@@ -6,7 +6,7 @@ import type { CoverageReport, CoverageWarning } from "./engine";
 
 /** The report as JSON, without the cells (they are only for drawing). */
 export function reportToJson(report: CoverageReport): string {
-  const slim = { ...report, zones: report.zones.map(({ blindCells: _cells, ...zone }) => zone) };
+  const slim = { ...report, zones: report.zones.map(({ blindCells: _cells, blindDraw: _draw, ...zone }) => zone) };
   return JSON.stringify(slim, null, 2);
 }
 
@@ -19,7 +19,7 @@ export function csvCell(value: string | number | undefined): string {
 
 export function reportToCsv(report: CoverageReport): string {
   const rows: Array<Array<string | number | undefined>> = [["type", "id", "level", "code", "x_m", "y_m", "value", "suggestion_x_m", "suggestion_y_m", "suggestion_heading_deg"]];
-  for (const zone of report.zones) rows.push(["zone", zone.buildingId, "", "", "", "", `${zone.coveredM2}/${zone.areaM2} m2 seen`, "", "", ""]);
+  for (const zone of report.zones) rows.push(["zone", zone.floor === undefined ? zone.buildingId : `${zone.buildingId}#${zone.floor}`, "", "", "", "", `${zone.coveredM2}/${zone.areaM2} m2 seen`, "", "", ""]);
   for (const opening of report.openings) rows.push(["opening", opening.id, "", opening.state, opening.at.x, opening.at.y, opening.kind, "", "", ""]);
   for (const sensor of report.sensors) rows.push(["sensor", sensor.id, "", sensor.redundant ? "redundant" : "", "", "", `${sensor.coveredM2} m2`, "", "", ""]);
   for (const warning of report.warnings) rows.push(["warning", warning.target ?? "", warning.level, warning.code, "", "", warning.args.join(" "), warning.suggestion?.x, warning.suggestion?.y, warning.suggestion?.headingDeg]);
@@ -31,9 +31,10 @@ const fill = (template: string, args: ReadonlyArray<string | number>): string =>
 /** The sentence of a warning and, when it has one, the sentence of what to do. `t` is the translator of the console. */
 export function describeWarning(warning: CoverageWarning, t: (key: string) => string): { message: string; advice?: string } {
   const args = warning.code === "opening_unguarded" || warning.code === "opening_video_only" ? [t(`cov_kind_${String(warning.args[0])}`), warning.args[1]] : warning.args;
-  const message = fill(t(`cov_w_${warning.code}`), args);
+  const where = warning.floor === undefined ? "" : ` (${fill(t("cov_floor_n"), [warning.floor + 1])})`;
+  const message = fill(t(`cov_w_${warning.code}`), args) + where;
   const suggestion = warning.suggestion;
-  const withoutPlace = new Set(["zone_overlap", "sensor_redundant", "opening_video_only"]);
+  const withoutPlace = new Set(["zone_overlap", "sensor_redundant", "opening_video_only", "sensor_floor_assumed"]);
   const advice = suggestion ? fill(t(`cov_s_${warning.code}`), [suggestion.x, suggestion.y, suggestion.headingDeg]) : withoutPlace.has(warning.code) ? t(`cov_s_${warning.code}`) : undefined;
   return { message, advice };
 }

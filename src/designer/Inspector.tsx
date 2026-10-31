@@ -434,6 +434,10 @@ export function Inspector(p: InspectorProps) {
         {positionFields(sensor, patch => setSensor(sensor.id, patch, "position"))}
         <NumberField label={t("tiltDown")} unit="°" min={-90} max={90} step={5} value={sensor.tilt ?? 0} onChange={value => setSensor(sensor.id, { tilt: clamp(value, -90, 90) || undefined }, "tilt")} />
         <NumberField label={t("mountHeight")} unit="m" min={0} max={100} step={0.1} value={sensor.z ?? SENSOR_HEIGHT_M} onChange={value => setSensor(sensor.id, { z: round2(clamp(value, 0, 100)) }, "z")} />
+        <label>{t("sensorFloor")}<select value={sensor.floor ?? ""} onChange={event => setSensor(sensor.id, { floor: event.target.value === "" ? undefined : Number(event.target.value) }, "floor")}>
+          <option value="">{t("sensorFloorAuto")}</option>
+          {Array.from({ length: Math.max(1, sensor.floor !== undefined ? sensor.floor + 1 : 1, ...model.buildings.map(item => item.floors.length)) }, (_, index) => <option key={index} value={index}>{t("sensorFloorN").replace("{0}", String(index + 1))}</option>)}
+        </select></label>
         <label title={t("sensorNodeHelp")}>{t("sensorNode")}<input list="armor-node-ids" value={sensor.node ?? ""} placeholder={t("noNodeChosen")} maxLength={64} onChange={event => { const value = event.target.value.trim().toLowerCase(); setSensor(sensor.id, { node: value === "" ? undefined : value }, "node"); }} /></label>
         <datalist id="armor-node-ids">{(p.nodeIds ?? []).map(id => <option key={id} value={id} />)}</datalist>
         <NumberField label={t("sensorChannel")} min={0} max={255} step={1} value={sensor.channel ?? 0} onChange={value => setSensor(sensor.id, { channel: Math.round(clamp(value, 0, 255)) || undefined }, "channel")} />

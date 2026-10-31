@@ -48,6 +48,8 @@ export type Sensor = {
   node?: string; channel?: number;
   /** The radar's sideways axis is taken to point to the right of where it faces; set this when a real radar shows it the other way round. */
   mirror?: boolean;
+  /** The floor of the building the radar is on (0 = ground floor). Unset: the floor follows from the mounting height. */
+  floor?: number;
 };
 export type Dimensions = { width: number; depth: number; height: number };
 export type Point = { x: number; y: number };
