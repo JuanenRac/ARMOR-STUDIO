@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Lenguaje">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Idiomas">
-  <img src="https://img.shields.io/badge/Tests-1122%20passing-2ea44f.svg" alt="Pruebas">
+  <img src="https://img.shields.io/badge/Tests-1156%20passing-2ea44f.svg" alt="Pruebas">
   <img src="https://img.shields.io/badge/Version-0.8.1.2-0f6cbd.svg" alt="Versión">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Madurez">
 </p>
 
 ---
 
-**Comprobación de honestidad - qué funciona hoy:** Studio habla con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) y está cubierto por 1122 tests unitarios (lectura de ajustes, fusión de cámaras, la aritmética de las gráficas solares, la geometría y las comprobaciones de los diseñadores, el anunciador de alarmas, el diccionario del asistente, cada menú dibujado en los ocho idiomas, el servidor estático) y por pruebas en navegador. Funciona en uso diario contra el banco de pruebas de la CM5 con el servidor real, cámaras IP reales y un nodo radar en su placa; las imágenes de la Ayuda se hacen con datos de ejemplo. Lo que **no** se ha probado es el vídeo en directo y el PTZ con todas las cámaras posibles, los menús solar, eléctrico, de centrales de alarma y de panel táctil con equipos reales (solo existe el nodo radar) y una revisión formal de accesibilidad o usabilidad. Mientras no se alcanza el servidor, Studio muestra datos de demostración y lo dice en la barra superior.
+**Comprobación de honestidad - qué funciona hoy:** Studio habla con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) y está cubierto por 1156 tests unitarios (lectura de ajustes, fusión de cámaras, la aritmética de las gráficas solares, la geometría y las comprobaciones de los diseñadores, el anunciador de alarmas, el diccionario del asistente, cada menú dibujado en los ocho idiomas, el servidor estático) y por pruebas en navegador. Funciona en uso diario contra el banco de pruebas de la CM5 con el servidor real, cámaras IP reales y un nodo radar en su placa; las imágenes de la Ayuda se hacen con datos de ejemplo. Lo que **no** se ha probado es el vídeo en directo y el PTZ con todas las cámaras posibles, los menús solar, eléctrico, de centrales de alarma y de panel táctil con equipos reales (solo existe el nodo radar) y una revisión formal de accesibilidad o usabilidad. Mientras no se alcanza el servidor, Studio muestra datos de demostración y lo dice en la barra superior.
 
 ---
 
@@ -41,7 +41,7 @@
 | Madurez | Establecido |
 | Función | Consola de operación y diseño de la familia |
 | Tecnología | React 19, TypeScript, Vite, Three.js, Leaflet |
-| Pruebas | 1122 (`npm test`, Vitest) y pruebas de navegador (Playwright) |
+| Pruebas | 1156 (`npm test`, Vitest) y pruebas de navegador (Playwright) |
 | Contrato | Habla solo con ARMOR-SERVER (HTTP `/api/v1/*` con sesión HttpOnly, WebSocket `/api/v1/events`) |
 | Escucha en | `127.0.0.1:5178` (`tools/serve.mjs`) |
 | Funciona en | Un navegador; los ficheros los sirve `tools/serve.mjs` o el nginx del contenedor |
@@ -59,7 +59,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 | Área | Estado | Qué significa aquí |
 |---|---|---|
 | Software | 🟢 | La consola funciona a diario contra el servidor real del banco de pruebas CM5. |
-| Pruebas | 🟢 | Pasan 1122 pruebas unitarias (`npm test`) y se ejecutan las pruebas de navegador: ajustes, fusión de cámaras, gráficas solares, geometría y comprobaciones de los diseñadores, el anunciador de alarmas, el diccionario del asistente y cada menú en los ocho idiomas. |
+| Pruebas | 🟢 | Pasan 1156 pruebas unitarias (`npm test`) y se ejecutan las pruebas de navegador: ajustes, fusión de cámaras, gráficas solares, geometría y comprobaciones de los diseñadores, el anunciador de alarmas, el diccionario del asistente y cada menú en los ocho idiomas. |
 | Interfaz | 🟡 | El vídeo en vivo y el PTZ no están probados con todas las cámaras posibles, no ha habido una revisión formal de accesibilidad o usabilidad, y las imágenes de la Ayuda se hacen con datos de ejemplo. |
 | Hardware | 🟡 | Se usa a diario con el servidor real, cámaras IP reales y un nodo radar real; los menús solar, eléctrico, de panel de alarma y de panel táctil esperan nodos reales. |
 | Seguridad | 🟡 | Las sesiones, los roles y el rechazo de credenciales de cámara en las direcciones están cubiertos por pruebas; no ha habido una revisión independiente. |
@@ -95,6 +95,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 * **Estado en vivo:** Studio escucha el canal en vivo del servidor (un WebSocket) y muestra al instante una alarma, un armado o un nodo que vuelve, y pregunta el estado solo cada veinte segundos como red de seguridad mientras el canal está abierto; la barra inferior dice *En vivo*. Los diseñadores de alarma, eléctrico y de red responden a F (encajar), más y menos (zoom) y Ctrl+D (duplicar) además de sus otras teclas.
 * **El límite de acceso de un nodo:** cada nodo de las listas (radar, inversores, baterías, eléctrico y pantallas de pared) tiene un botón que abre un diálogo para leer y cambiar `system.login_limit_per_minute` (contraseñas erróneas por minuto antes de que el nodo bloquee el acceso: 30 por defecto, 0 para ningún límite global, 120 como máximo). El acceso al panel del nodo se usa una vez y nunca se guarda; el diálogo y su ayuda están en los ocho idiomas.
 * **Un contador que dejó de responder y una imagen de firmware para otra placa:** un canal eléctrico con una lectura vieja se muestra atenuado y marcado «sin datos», y la tarjeta los cuenta (Configuración > Seguridad, `electrical.set_aside_old_readings`, activado por defecto); una actualización de firmware cuyo nombre de fichero dice otra placa distinta de la del nodo, o un nodo de otro tipo, se rechaza con una razón clara en lugar de un código.
+* **Ayudas de diseño, desactivadas por defecto:** al activar *Ayudas de diseño* en Configuración > Preferencias, el Diseñador de alarma ofrece tres puntos de partida (un piso, un local comercial y una nave con perímetro, cada uno un fichero de datos validado con un esquema) y el plano del sitio una revisión de *Cobertura*: las partes de los edificios que ningún radar ve, las puertas y ventanas que nada vigila, los sitios que dos radares vigilan a la vez, cada uno con una posición para un radar, los puntos ciegos dibujados en el plano y el informe en JSON o CSV. Es una guía plana que cuenta solo lo que se ve con seguridad (las paredes tapan la vista y cada radar se reduce con un margen que tú fijas), no una prueba de que un edificio esté protegido; véase [docs/DESIGN_AIDS.md](docs/DESIGN_AIDS.md).
 
 ## 🧩 Papel en A.R.M.O.R.
 
@@ -186,7 +187,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 contra un servidor en 127.0.0.1:8080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # escribe la tabla de cada idioma tras cambiar una frase
-npm test                                                                       # 1122 pruebas
+npm test                                                                       # 1156 pruebas
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # sirve la build
 ```
@@ -314,6 +315,7 @@ El README y los textos existen en inglés, español, francés, italiano, alemán
 
 ## 📚 Documentación
 
+* [Ayudas de diseño](docs/DESIGN_AIDS.md): las plantillas de alarma y la revisión de cobertura del plano del sitio
 * [Modelo de seguridad](docs/SECURITY_MODEL.md): qué guarda el navegador, las cabeceras y las órdenes a los nodos
 * [Pruebas de navegador](e2e/README.md): cómo ejecutarlas contra una pila
 * [Matriz de capacidades: qué está demostrado y qué no](https://github.com/JuanenRac/ARMOR-DOCS/blob/main/docs/CAPABILITY_MATRIX.md)

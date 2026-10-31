@@ -58,14 +58,18 @@ export type Prefs = {
   alertSound: boolean;
   /** A new critical alarm is shown as a notification of the browser. */
   alertNotifications: boolean;
+  /** The design aids are shown: the starting points of the alarm drawing and the coverage check of the site plan (off by default). */
+  designAids: boolean;
+  /** How much the coverage check shrinks every radar's range and angle, in percent. */
+  coverageMargin: number;
 };
 
 export const DEFAULT_PREFS: Prefs = {
   tutorial: true, tourAutoStart: true, toursDone: [], tooltips: "rich", tooltipDelay: 450, motion: "full", density: "comfortable", textScale: 100,
-  startView: "overview", lastView: "overview", assistant: true, assistantPinned: false, assistantSize: "normal", assistantAutoOpen: true, assistantSpeak: false, tourMascot: true, tourSpeak: false, assistantX: null, assistantY: null, alertSound: true, alertNotifications: true,
+  startView: "overview", lastView: "overview", assistant: true, assistantPinned: false, assistantSize: "normal", assistantAutoOpen: true, assistantSpeak: false, tourMascot: true, tourSpeak: false, assistantX: null, assistantY: null, alertSound: true, alertNotifications: true, designAids: false, coverageMargin: 10,
 };
 
-export const LIMITS = { tooltipDelay: [150, 1500], textScale: [85, 130], tours: 40 } as const;
+export const LIMITS = { tooltipDelay: [150, 1500], textScale: [85, 130], coverageMargin: [0, 30], tours: 40 } as const;
 const clamp = (value: number, low: number, high: number): number => Math.min(high, Math.max(low, value));
 const oneOf = <T extends string>(list: readonly T[], value: unknown, fallback: T): T => (typeof value === "string" && (list as readonly string[]).includes(value) ? (value as T) : fallback);
 
@@ -87,7 +91,7 @@ export function parsePrefs(raw: string | null): Prefs {
     tooltips: oneOf(TOOLTIP_MODES, source.tooltips, DEFAULT_PREFS.tooltips), tooltipDelay: number("tooltipDelay", DEFAULT_PREFS.tooltipDelay, LIMITS.tooltipDelay),
     motion: oneOf(MOTION_MODES, source.motion, DEFAULT_PREFS.motion), density: oneOf(DENSITIES, source.density, DEFAULT_PREFS.density), textScale: number("textScale", DEFAULT_PREFS.textScale, LIMITS.textScale),
     startView: start, lastView: oneOf(VIEWS, source.lastView, DEFAULT_PREFS.lastView), assistant: bool("assistant", DEFAULT_PREFS.assistant), assistantPinned: bool("assistantPinned", DEFAULT_PREFS.assistantPinned), assistantSize: oneOf(ASSISTANT_SIZES, source.assistantSize, DEFAULT_PREFS.assistantSize),
-    assistantAutoOpen: bool("assistantAutoOpen", DEFAULT_PREFS.assistantAutoOpen), assistantSpeak: bool("assistantSpeak", DEFAULT_PREFS.assistantSpeak), tourMascot: bool("tourMascot", DEFAULT_PREFS.tourMascot), tourSpeak: bool("tourSpeak", DEFAULT_PREFS.tourSpeak), ...fraction(source.assistantX, source.assistantY), alertSound: bool("alertSound", DEFAULT_PREFS.alertSound), alertNotifications: bool("alertNotifications", DEFAULT_PREFS.alertNotifications),
+    assistantAutoOpen: bool("assistantAutoOpen", DEFAULT_PREFS.assistantAutoOpen), assistantSpeak: bool("assistantSpeak", DEFAULT_PREFS.assistantSpeak), tourMascot: bool("tourMascot", DEFAULT_PREFS.tourMascot), tourSpeak: bool("tourSpeak", DEFAULT_PREFS.tourSpeak), ...fraction(source.assistantX, source.assistantY), alertSound: bool("alertSound", DEFAULT_PREFS.alertSound), alertNotifications: bool("alertNotifications", DEFAULT_PREFS.alertNotifications), designAids: bool("designAids", DEFAULT_PREFS.designAids), coverageMargin: number("coverageMargin", DEFAULT_PREFS.coverageMargin, LIMITS.coverageMargin),
   };
 }
 

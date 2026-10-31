@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Design aids, off by default (Configuration > Preferences > Design aids):** the Alarm Designer gets three starting points (a flat, a shop and a warehouse with a perimeter), each a data file under `src/alarm/templates/` checked against a schema and read through the same reader as any stored design; and the site plan gets a *Coverage* check that lists the parts of the buildings no radar sees, the doors and windows nothing guards (an alarm contact, a radar, or only a camera), the places two radars watch at once and a radar that adds nothing, each with a suggested position and heading, draws the blind spots on the plan and exports the report as JSON or CSV. The calculation is flat, deterministic and conservative (walls block the view, every radar is shrunk by a safety margin set in Preferences, a square counts as seen only when one radar sees all of it) and its parameters are in `src/coverage/coverage.config.json`. With the option off nothing changes. The texts are in the eight languages; see `docs/DESIGN_AIDS.md`.
+
 - **The documentation covers the node sign-in limit, the channels with no data and the 17 options:** the README (eight languages) describes the dialog of every node, the greyed-out electrical channels and the refusal of an image for another board, and counts all 17 options of Configuration > Security; the security model says what the dialog keeps (nothing) and the test count is 1122.
 
 ## [0.8.1.2] - The sign-in limit of a node set from Studio, a channel whose meter stopped answering shown as having no data, a firmware image for another board refused with a clear reason and phrases left in English translated

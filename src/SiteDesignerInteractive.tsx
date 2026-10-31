@@ -20,6 +20,8 @@ import {
 } from "./designer/ops";
 import { Plan2D, type DragTarget, type PlaceHit } from "./designer/Plan2D";
 import type { Target3D } from "./designer/Viewport3D";
+import { CoveragePanel, useCoverage } from "./coverage/CoveragePanel";
+import { usePrefs } from "./prefs";
 import "./designer/designer.css";
 import { MenuTitle } from "./menuLogos";
 
@@ -56,6 +58,9 @@ export function SiteDesignerInteractive(props: Props) {
   const [activeFloor, setActiveFloor] = useState(-1);
   const [fitSignal, setFitSignal] = useState(0);
   const [pending, setPending] = useState("");
+  const prefs = usePrefs();
+  const [coverageOpen, setCoverageOpen] = useState(false), [showBlind, setShowBlind] = useState(true);
+  const coverage = useCoverage(model, dimensions, prefs.coverageMargin, prefs.designAids && coverageOpen);
   const [, setHistoryVersion] = useState(0);
   const canvas = useRef<HTMLDivElement>(null);
   const modelRef = useRef(model), dimsRef = useRef(dimensions);
@@ -397,6 +402,7 @@ export function SiteDesignerInteractive(props: Props) {
           <div className="designer-view-toggle" role="tablist" data-tour="sd-view"><button className={view === "2d" ? "active" : ""} onClick={() => switchView("2d")}>{t("view2d")}</button><button className={view === "3d" ? "active" : ""} onClick={() => switchView("3d")}>{t("view3d")}</button></div>
           <button className="designer-icon-button" onClick={undo} disabled={past.current.length === 0} title={`${t("undo")} (Ctrl+Z)`} aria-label={t("undo")}>{ICON.undo}</button>
           <button className="designer-icon-button" onClick={redo} disabled={future.current.length === 0} title={`${t("redo")} (Ctrl+Y)`} aria-label={t("redo")}>{ICON.redo}</button>
+          {prefs.designAids && <button className={coverageOpen ? "active" : ""} onClick={() => setCoverageOpen(open => !open)} title={t("cov_title")} aria-pressed={coverageOpen}>{t("cov_button")}</button>}
           <button onClick={props.openVersions} title={t("versionsTitle")}>{t("versionsButton")}</button>
           <button className="designer-save" onClick={props.save}>{t("savePreferences")}</button>
         </div>
@@ -409,7 +415,7 @@ export function SiteDesignerInteractive(props: Props) {
           ? <>
               <Plan2D t={t} devices={props.devices} dimensions={dimensions} model={model} selection={selection} tool={tool} activeFloor={floorsChosen} floorCount={floorCount} fitSignal={fitSignal}
                 onSelect={select} onDragStart={beginGesture} onDrag={dragPlan} onPlace={place} onFinishPolygon={finishPolygon} onFinishRect={finishRect} onPlaceLine={placeFence}
-                onInsertVertex={insertVertex} onFloor={setActiveFloor} onNotice={props.setNotice} />
+                onInsertVertex={insertVertex} onFloor={setActiveFloor} onNotice={props.setNotice} blindCells={coverage && showBlind ? coverage.zones.flatMap(zone => zone.blindCells) : undefined} />
               <FloatingToolbox storageKey="armor-studio-toolbox-2d-v1" title={t("toolboxTitle2d")} sections={planSections} containerRef={canvas} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 32, y: 32 }} />
               {planTools.branches.map((branch, index) => <FloatingToolbox key={branch.id} storageKey={`armor-studio-toolbox-2d-${branch.id}-v1`} title={branch.title} sections={branch.sections} containerRef={canvas} labels={{ drag: t("toolboxDrag"), collapse: t("toolboxCollapse"), expand: t("toolboxExpand") }} initial={{ x: 170 + index * 140, y: 32 }} />)}
             </>
@@ -417,6 +423,7 @@ export function SiteDesignerInteractive(props: Props) {
               <Viewport3D t={t} devices={props.devices} dimensions={dimensions} model={model} selection={selection} tool={tool} onTool={setTool} activeFloor={floorsChosen} floorCount={floorCount} onFloor={setActiveFloor}
                 onSelect={select} onDragStart={beginGesture} onMove={drag3d} onElevate={elevate3d} onPlace={place} onNotice={props.setNotice} sharedSections={shared} />
             </Suspense>}
+        {coverage && <CoveragePanel t={t} report={coverage} margin={prefs.coverageMargin} showBlind={showBlind} setShowBlind={setShowBlind} onClose={() => setCoverageOpen(false)} onNotice={props.setNotice} />}
         {props.notice && props.notice !== t("configuration") && <p className="notice canvas-notice">{props.notice}</p>}
       </div>
       <Inspector t={t} showFloor={setActiveFloor} dimensions={dimensions} setDimensions={setWorkArea} model={model} selection={selection} edit={edit} onSelect={select} onRemove={removeCurrent} onDuplicate={duplicateCurrent} onRectTerrain={setRectTerrain} nodeIds={props.nodeIds} onTool={setTool} devices={props.devices} pendingDevice={pending} onPickDevice={id => { setPending(id); setTool("device"); props.setNotice(`${t("clickToPlaceDevice")}: ${props.devices.find(item => item.id === id)?.name ?? id}`); }} onOpenDevices={props.openDevices} links={{ cameras: props.cameras ?? [], alarmNodes: props.alarmNodes ?? [], openCameras: props.openCameras, openAlarmPanels: props.openAlarmPanels }} />

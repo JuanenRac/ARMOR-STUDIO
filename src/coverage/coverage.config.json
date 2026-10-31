@@ -1,0 +1,12 @@
+{
+  "schema": "armor-studio/coverage-config/1",
+  "marginPercent": { "default": 10, "min": 0, "max": 30 },
+  "cellM": 0.25,
+  "maxCells": 40000,
+  "minBlindAreaM2": 1,
+  "overlapWarnRatio": 0.5,
+  "openingFloor": 0,
+  "guardedOpenings": ["door", "window", "garage"],
+  "suggestionInsetM": 0.3,
+  "openingReachM": 3
+}

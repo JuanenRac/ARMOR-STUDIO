@@ -1,0 +1,295 @@
+{
+  "schema": "armor-studio/alarm-template/1",
+  "id": "flat",
+  "version": 1,
+  "titleKey": "tpl_flat",
+  "descriptionKey": "tpl_flat_d",
+  "design": {
+    "elements": [
+      {
+        "id": "central",
+        "kind": "central",
+        "x": 360,
+        "y": 120,
+        "nameKey": "adx_central",
+        "props": {
+          "zones": 8
+        }
+      },
+      {
+        "id": "front-door",
+        "kind": "door-contact",
+        "x": 100,
+        "y": 60,
+        "nameKey": "adx_front_door",
+        "locationKey": "adx_hall",
+        "props": {
+          "zone_kind": "entry"
+        }
+      },
+      {
+        "id": "balcony-door",
+        "kind": "door-contact",
+        "x": 100,
+        "y": 140,
+        "nameKey": "tpl_n_balcony_door",
+        "locationKey": "adx_living",
+        "props": {
+          "zone_kind": "entry"
+        }
+      },
+      {
+        "id": "living-window",
+        "kind": "window-contact",
+        "x": 100,
+        "y": 220,
+        "nameKey": "adx_living_window",
+        "locationKey": "adx_living",
+        "props": {
+          "zone_kind": "instant"
+        }
+      },
+      {
+        "id": "bedroom-window",
+        "kind": "window-contact",
+        "x": 100,
+        "y": 300,
+        "nameKey": "tpl_n_bedroom_window",
+        "locationKey": "tpl_r_bedroom",
+        "props": {
+          "zone_kind": "instant"
+        }
+      },
+      {
+        "id": "hall-motion",
+        "kind": "motion-pir",
+        "x": 100,
+        "y": 380,
+        "nameKey": "adx_hall_motion",
+        "locationKey": "adx_hall",
+        "props": {
+          "zone_kind": "interior"
+        }
+      },
+      {
+        "id": "living-motion",
+        "kind": "motion-pir",
+        "x": 100,
+        "y": 460,
+        "nameKey": "tpl_n_living_motion",
+        "locationKey": "adx_living",
+        "props": {
+          "zone_kind": "interior"
+        }
+      },
+      {
+        "id": "smoke",
+        "kind": "smoke",
+        "x": 360,
+        "y": -60,
+        "nameKey": "adx_smoke",
+        "locationKey": "adx_corridor",
+        "props": {
+          "zone_kind": "always",
+          "battery": "CR123"
+        }
+      },
+      {
+        "id": "leak",
+        "kind": "water-leak",
+        "x": 560,
+        "y": -60,
+        "nameKey": "tpl_n_leak",
+        "locationKey": "adx_kitchen",
+        "props": {
+          "zone_kind": "always",
+          "battery": "AA"
+        }
+      },
+      {
+        "id": "siren",
+        "kind": "siren-indoor",
+        "x": 640,
+        "y": 100,
+        "nameKey": "adx_siren",
+        "locationKey": "adx_corridor"
+      },
+      {
+        "id": "keypad",
+        "kind": "keypad",
+        "x": 640,
+        "y": 220,
+        "nameKey": "adx_keypad",
+        "locationKey": "adx_hall"
+      },
+      {
+        "id": "supply",
+        "kind": "power-supply",
+        "x": 330,
+        "y": 420
+      },
+      {
+        "id": "battery",
+        "kind": "battery",
+        "x": 500,
+        "y": 420
+      }
+    ],
+    "wires": [
+      {
+        "id": "w01",
+        "from": {
+          "element": "front-door",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop1"
+        }
+      },
+      {
+        "id": "w02",
+        "from": {
+          "element": "balcony-door",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop2"
+        }
+      },
+      {
+        "id": "w03",
+        "from": {
+          "element": "living-window",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop3"
+        }
+      },
+      {
+        "id": "w04",
+        "from": {
+          "element": "bedroom-window",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop4"
+        }
+      },
+      {
+        "id": "w05",
+        "from": {
+          "element": "hall-motion",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop5"
+        }
+      },
+      {
+        "id": "w06",
+        "from": {
+          "element": "living-motion",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop6"
+        }
+      },
+      {
+        "id": "w07",
+        "from": {
+          "element": "smoke",
+          "port": "radio"
+        },
+        "to": {
+          "element": "central",
+          "port": "radio"
+        }
+      },
+      {
+        "id": "w08",
+        "from": {
+          "element": "leak",
+          "port": "radio"
+        },
+        "to": {
+          "element": "central",
+          "port": "radio"
+        }
+      },
+      {
+        "id": "w09",
+        "from": {
+          "element": "siren",
+          "port": "out"
+        },
+        "to": {
+          "element": "central",
+          "port": "siren"
+        }
+      },
+      {
+        "id": "w10",
+        "from": {
+          "element": "keypad",
+          "port": "bus"
+        },
+        "to": {
+          "element": "central",
+          "port": "bus"
+        }
+      },
+      {
+        "id": "w11",
+        "from": {
+          "element": "supply",
+          "port": "out"
+        },
+        "to": {
+          "element": "central",
+          "port": "power"
+        }
+      },
+      {
+        "id": "w12",
+        "from": {
+          "element": "battery",
+          "port": "out"
+        },
+        "to": {
+          "element": "supply",
+          "port": "out"
+        }
+      },
+      {
+        "id": "w13",
+        "from": {
+          "element": "siren",
+          "port": "power"
+        },
+        "to": {
+          "element": "supply",
+          "port": "out"
+        }
+      }
+    ],
+    "frames": [
+      {
+        "id": "flat",
+        "nameKey": "tpl_r_flat",
+        "x": 60,
+        "y": -100,
+        "w": 840,
+        "h": 640,
+        "colour": "violet"
+      }
+    ]
+  }
+}

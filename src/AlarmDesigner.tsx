@@ -19,6 +19,8 @@ import {
   replaceKind, rotateElement, setBinding, setProp, updateFrame, updateWire, type ConnectError,
 } from "./alarm/ops";
 import { drawPanels, emptyDesign, housePreset } from "./alarm/presets";
+import { TEMPLATES, designFromTemplate } from "./alarm/templates";
+import { usePrefs } from "./prefs";
 import { buildAlarmDoc, parseAlarmDoc } from "./alarm/sync";
 import { ElementBody, KindSwatch } from "./alarm/symbols";
 import type { SyncStatus } from "./alarm/useAlarmDesignSync";
@@ -47,6 +49,7 @@ const HISTORY_LIMIT = 100, COALESCE_MS = 800, MIN_ZOOM = 0.15, MAX_ZOOM = 3;
 const format = (template: string, args: ReadonlyArray<string | number>): string => template.replace(/\{(\d+)\}/g, (_match, index: string) => String(args[Number(index)] ?? ""));
 
 export function AlarmDesigner({ t, design, setDesign, status, panels, openVersions, openPanels }: Props) {
+  const aids = usePrefs().designAids;
   const [tool, setTool] = useState<Tool>("select");
   const [place, setPlace] = useState<string | null>(null);
   const [selection, setSelection] = useState<Selection>(null);
@@ -315,6 +318,15 @@ export function AlarmDesigner({ t, design, setDesign, status, panels, openVersio
     commit(example ? housePreset(t) : emptyDesign()); setSelection(null); setWireFrom(null);
     window.setTimeout(fit, 0);
   };
+  const applyTemplate = async (id: string) => {
+    const template = TEMPLATES.find(item => item.id === id);
+    const made = template && designFromTemplate(template, t);
+    if (!template || !made) return;
+    if (designRef.current.elements.length && !(await askConfirm(t("elClearConfirm"), t))) return;
+    commit(made); setSelection(null); setWireFrom(null);
+    window.setTimeout(fit, 0);
+    say(t("tpl_applied").replace("{0}", t(template.titleKey)));
+  };
   const drawWhatWasFound = () => {
     if (nodes.length === 0) return;
     const result = drawPanels(designRef.current, nodes);
@@ -529,6 +541,10 @@ export function AlarmDesigner({ t, design, setDesign, status, panels, openVersio
           <div className="ed-group" role="group" aria-label={t("ad_group_design")}>
             <button onClick={() => startNew(false)} title={t("elNew")} aria-label={t("elNew")}>▢</button>
             <button onClick={() => startNew(true)} title={t("ad_example")} aria-label={t("ad_example")}>⌂</button>
+            {aids && <select className="ed-templates" value="" onChange={event => { void applyTemplate(event.target.value); }} title={t("tpl_help")} aria-label={t("tpl_button")}>
+              <option value="">{t("tpl_pick")}</option>
+              {TEMPLATES.map(template => <option key={template.id} value={template.id} title={t(template.descriptionKey)}>{t(template.titleKey)}</option>)}
+            </select>}
             <button className="ed-found" onClick={drawWhatWasFound} disabled={nodes.length === 0} title={t("ad_draw_found")} aria-label={t("ad_draw_found")}>⌕</button>
             {openVersions && <button onClick={openVersions} title={t("versionsTitle")} aria-label={t("versionsTitle")}>⟲</button>}
           </div>

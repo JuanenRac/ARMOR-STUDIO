@@ -1,0 +1,463 @@
+{
+  "schema": "armor-studio/alarm-template/1",
+  "id": "warehouse",
+  "version": 1,
+  "titleKey": "tpl_warehouse",
+  "descriptionKey": "tpl_warehouse_d",
+  "design": {
+    "elements": [
+      {
+        "id": "central",
+        "kind": "central",
+        "x": 460,
+        "y": 160,
+        "nameKey": "adx_central",
+        "props": {
+          "zones": 8
+        }
+      },
+      {
+        "id": "expander",
+        "kind": "expander",
+        "x": 460,
+        "y": 400,
+        "nameKey": "tpl_n_expander",
+        "props": {
+          "address": 1
+        }
+      },
+      {
+        "id": "main-door",
+        "kind": "door-contact",
+        "x": 100,
+        "y": 40,
+        "nameKey": "tpl_n_main_door",
+        "locationKey": "tpl_r_warehouse",
+        "props": {
+          "zone_kind": "entry"
+        }
+      },
+      {
+        "id": "dock-door",
+        "kind": "door-contact",
+        "x": 100,
+        "y": 120,
+        "nameKey": "tpl_n_dock_door",
+        "locationKey": "tpl_r_dock",
+        "props": {
+          "zone_kind": "instant",
+          "mounting": "roller shutter"
+        }
+      },
+      {
+        "id": "floor-motion-1",
+        "kind": "motion-dual",
+        "x": 100,
+        "y": 200,
+        "nameKey": "tpl_n_floor_motion_1",
+        "locationKey": "tpl_r_warehouse",
+        "props": {
+          "zone_kind": "interior",
+          "range_m": 20
+        }
+      },
+      {
+        "id": "floor-motion-2",
+        "kind": "motion-dual",
+        "x": 100,
+        "y": 280,
+        "nameKey": "tpl_n_floor_motion_2",
+        "locationKey": "tpl_r_warehouse",
+        "props": {
+          "zone_kind": "interior",
+          "range_m": 20
+        }
+      },
+      {
+        "id": "skylight",
+        "kind": "vibration",
+        "x": 100,
+        "y": 360,
+        "nameKey": "tpl_n_skylight",
+        "locationKey": "tpl_r_warehouse",
+        "props": {
+          "zone_kind": "instant"
+        }
+      },
+      {
+        "id": "beam-north",
+        "kind": "outdoor-beam",
+        "x": 1020,
+        "y": 40,
+        "nameKey": "tpl_n_beam_north",
+        "locationKey": "tpl_r_perimeter",
+        "props": {
+          "zone_kind": "instant",
+          "range_m": 40
+        }
+      },
+      {
+        "id": "beam-east",
+        "kind": "outdoor-beam",
+        "x": 1020,
+        "y": 120,
+        "nameKey": "tpl_n_beam_east",
+        "locationKey": "tpl_r_perimeter",
+        "props": {
+          "zone_kind": "instant",
+          "range_m": 40
+        }
+      },
+      {
+        "id": "beam-south",
+        "kind": "outdoor-beam",
+        "x": 1020,
+        "y": 200,
+        "nameKey": "tpl_n_beam_south",
+        "locationKey": "tpl_r_perimeter",
+        "props": {
+          "zone_kind": "instant",
+          "range_m": 40
+        }
+      },
+      {
+        "id": "beam-west",
+        "kind": "outdoor-beam",
+        "x": 1020,
+        "y": 280,
+        "nameKey": "tpl_n_beam_west",
+        "locationKey": "tpl_r_perimeter",
+        "props": {
+          "zone_kind": "instant",
+          "range_m": 40
+        }
+      },
+      {
+        "id": "smoke-1",
+        "kind": "smoke",
+        "x": 300,
+        "y": -60,
+        "nameKey": "tpl_n_smoke_1",
+        "locationKey": "tpl_r_warehouse",
+        "props": {
+          "zone_kind": "always",
+          "battery": "CR123"
+        }
+      },
+      {
+        "id": "smoke-2",
+        "kind": "smoke",
+        "x": 500,
+        "y": -60,
+        "nameKey": "tpl_n_smoke_2",
+        "locationKey": "tpl_r_dock",
+        "props": {
+          "zone_kind": "always",
+          "battery": "CR123"
+        }
+      },
+      {
+        "id": "siren-out",
+        "kind": "siren-outdoor",
+        "x": 760,
+        "y": 120,
+        "nameKey": "tpl_n_siren_outdoor",
+        "locationKey": "tpl_r_perimeter"
+      },
+      {
+        "id": "lights",
+        "kind": "relay-output",
+        "x": 760,
+        "y": 320,
+        "nameKey": "tpl_n_lights",
+        "locationKey": "tpl_r_perimeter",
+        "props": {
+          "does": "lights"
+        }
+      },
+      {
+        "id": "keypad",
+        "kind": "keypad",
+        "x": 760,
+        "y": 420,
+        "nameKey": "adx_keypad",
+        "locationKey": "tpl_r_warehouse"
+      },
+      {
+        "id": "comm",
+        "kind": "communicator",
+        "x": 640,
+        "y": 400,
+        "nameKey": "tpl_n_communicator",
+        "props": {
+          "channel": "GSM + IP"
+        }
+      },
+      {
+        "id": "supply",
+        "kind": "power-supply",
+        "x": 340,
+        "y": 560
+      },
+      {
+        "id": "battery",
+        "kind": "battery",
+        "x": 500,
+        "y": 560
+      }
+    ],
+    "wires": [
+      {
+        "id": "w01",
+        "from": {
+          "element": "main-door",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop1"
+        }
+      },
+      {
+        "id": "w02",
+        "from": {
+          "element": "dock-door",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop2"
+        }
+      },
+      {
+        "id": "w03",
+        "from": {
+          "element": "floor-motion-1",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop3"
+        }
+      },
+      {
+        "id": "w04",
+        "from": {
+          "element": "floor-motion-2",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop4"
+        }
+      },
+      {
+        "id": "w05",
+        "from": {
+          "element": "skylight",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop5"
+        }
+      },
+      {
+        "id": "w06",
+        "from": {
+          "element": "beam-north",
+          "port": "loop"
+        },
+        "to": {
+          "element": "expander",
+          "port": "loop1"
+        }
+      },
+      {
+        "id": "w07",
+        "from": {
+          "element": "beam-east",
+          "port": "loop"
+        },
+        "to": {
+          "element": "expander",
+          "port": "loop2"
+        }
+      },
+      {
+        "id": "w08",
+        "from": {
+          "element": "beam-south",
+          "port": "loop"
+        },
+        "to": {
+          "element": "expander",
+          "port": "loop3"
+        }
+      },
+      {
+        "id": "w09",
+        "from": {
+          "element": "beam-west",
+          "port": "loop"
+        },
+        "to": {
+          "element": "expander",
+          "port": "loop4"
+        }
+      },
+      {
+        "id": "w10",
+        "from": {
+          "element": "expander",
+          "port": "bus"
+        },
+        "to": {
+          "element": "central",
+          "port": "bus"
+        }
+      },
+      {
+        "id": "w11",
+        "from": {
+          "element": "keypad",
+          "port": "bus"
+        },
+        "to": {
+          "element": "central",
+          "port": "bus"
+        }
+      },
+      {
+        "id": "w12",
+        "from": {
+          "element": "comm",
+          "port": "bus"
+        },
+        "to": {
+          "element": "central",
+          "port": "bus"
+        }
+      },
+      {
+        "id": "w13",
+        "from": {
+          "element": "smoke-1",
+          "port": "radio"
+        },
+        "to": {
+          "element": "central",
+          "port": "radio"
+        }
+      },
+      {
+        "id": "w14",
+        "from": {
+          "element": "smoke-2",
+          "port": "radio"
+        },
+        "to": {
+          "element": "central",
+          "port": "radio"
+        }
+      },
+      {
+        "id": "w15",
+        "from": {
+          "element": "siren-out",
+          "port": "out"
+        },
+        "to": {
+          "element": "central",
+          "port": "siren"
+        }
+      },
+      {
+        "id": "w16",
+        "from": {
+          "element": "lights",
+          "port": "out"
+        },
+        "to": {
+          "element": "central",
+          "port": "siren"
+        }
+      },
+      {
+        "id": "w17",
+        "from": {
+          "element": "supply",
+          "port": "out"
+        },
+        "to": {
+          "element": "central",
+          "port": "power"
+        }
+      },
+      {
+        "id": "w18",
+        "from": {
+          "element": "battery",
+          "port": "out"
+        },
+        "to": {
+          "element": "supply",
+          "port": "out"
+        }
+      },
+      {
+        "id": "w19",
+        "from": {
+          "element": "expander",
+          "port": "power"
+        },
+        "to": {
+          "element": "supply",
+          "port": "out"
+        }
+      },
+      {
+        "id": "w20",
+        "from": {
+          "element": "siren-out",
+          "port": "power"
+        },
+        "to": {
+          "element": "supply",
+          "port": "out"
+        }
+      },
+      {
+        "id": "w21",
+        "from": {
+          "element": "comm",
+          "port": "power"
+        },
+        "to": {
+          "element": "supply",
+          "port": "out"
+        }
+      }
+    ],
+    "frames": [
+      {
+        "id": "building",
+        "nameKey": "tpl_r_warehouse",
+        "x": 60,
+        "y": -100,
+        "w": 640,
+        "h": 740,
+        "colour": "amber"
+      },
+      {
+        "id": "perimeter",
+        "nameKey": "tpl_r_perimeter",
+        "x": 960,
+        "y": -20,
+        "w": 200,
+        "h": 360,
+        "colour": "green"
+      }
+    ]
+  }
+}

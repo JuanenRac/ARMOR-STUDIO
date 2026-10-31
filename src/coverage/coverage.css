@@ -1,0 +1,15 @@
+.cov-panel { position: absolute; right: 12px; bottom: 12px; z-index: 5; width: min(360px, calc(100% - 24px)); max-height: 70%; overflow: auto; padding: 12px 14px; border-radius: 10px; background: var(--panel, #10161d); color: var(--text, #e6edf3); border: 1px solid var(--border, #2a3642); box-shadow: 0 8px 28px rgba(0, 0, 0, .35); font-size: .86rem; }
+.cov-panel header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.cov-panel h3 { margin: 0; font-size: 1rem; }
+.cov-panel ul { margin: .5rem 0; padding-left: 1.1rem; }
+.cov-panel li { margin: .25rem 0; }
+.cov-panel small { display: block; opacity: .8; }
+.cov-margin, .cov-layer { display: block; margin: .6rem 0; }
+.cov-margin input { width: 100%; }
+.cov-warn strong { color: #fb7185; }
+.cov-info strong { color: #fbbf24; }
+.cov-state-none { color: #fb7185; }
+.cov-state-video { color: #fbbf24; }
+.cov-ok { color: #34d399; }
+.cov-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: .6rem; }
+.cov-disclaimer { font-size: .78rem; }

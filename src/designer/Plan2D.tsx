@@ -44,6 +44,8 @@ export type PlanProps = {
   onInsertVertex: (owner: { kind: "terrain" } | { kind: "building"; id: string }, edge: number, at: Point) => void;
   onFloor: (floor: number) => void;
   onNotice: (text: string) => void;
+  /** The squares the coverage check found blind (metres, the corner of each and its side), drawn over the buildings when the check is shown. */
+  blindCells?: ReadonlyArray<{ x: number; y: number; size: number }>;
 };
 
 type View = { scale: number; x: number; y: number };
@@ -624,6 +626,7 @@ export function Plan2D(props: PlanProps) {
         {[...model.features].filter(feature => feature.kind !== "road" && feature.kind !== "path" && feature.kind !== "sidewalk" && feature.kind !== "floor").map(featureShape)}
         {model.buildings.map(buildingShape)}
         {model.buildings.map(buildingOpenings)}
+        {props.blindCells && <g className="p-blind" pointerEvents="none">{props.blindCells.map(cell => <rect key={`${cell.x}:${cell.y}`} x={cell.x} y={Y(cell.y + cell.size)} width={cell.size} height={cell.size} />)}</g>}
         {model.sensors.map(sensorShape)}
         {model.placements.map(deviceShape)}
         {model.cameras.map(cameraShape)}

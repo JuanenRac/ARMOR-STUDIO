@@ -66,6 +66,10 @@ export function PreferencesPanel({ t, language = "en" }: { t: (key: string) => s
         <h3 className="pf-sub">{t("pf_section_alerts")}</h3>
         {toggle("pf_sound", null, prefs.alertSound, alertSound => setPrefs({ alertSound }))}
         {toggle("pf_notify", null, prefs.alertNotifications, alertNotifications => setPrefs({ alertNotifications }))}
+        <h3 className="pf-sub">{t("pf_section_design")}</h3>
+        {toggle("pf_design_aids", "pf_design_aids_h", prefs.designAids, designAids => setPrefs({ designAids }))}
+        <label className="pf-range">{t("pf_coverage_margin")}: <b>{prefs.coverageMargin} %</b>
+          <input type="range" min={LIMITS.coverageMargin[0]} max={LIMITS.coverageMargin[1]} step={1} value={prefs.coverageMargin} disabled={!prefs.designAids} onChange={event => setPrefs({ coverageMargin: Number(event.target.value) })} /></label>
         <div className="pf-actions"><button className="danger" onClick={() => void reset()}>{t("pf_reset")}</button></div>
       </article>
     </div>

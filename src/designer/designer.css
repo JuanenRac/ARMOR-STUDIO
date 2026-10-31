@@ -209,3 +209,5 @@
 .object-jump { display: grid; gap: .25rem; margin: .2rem 0 .5rem; }
 .object-jump > span { font-size: .72rem; color: #79a3b0; text-transform: uppercase; letter-spacing: .08em; }
 .object-jump select { width: 100%; }
+
+.p-blind rect { fill: rgba(251, 113, 133, .38); stroke: none; }

@@ -1,0 +1,360 @@
+{
+  "schema": "armor-studio/alarm-template/1",
+  "id": "shop",
+  "version": 1,
+  "titleKey": "tpl_shop",
+  "descriptionKey": "tpl_shop_d",
+  "design": {
+    "elements": [
+      {
+        "id": "central",
+        "kind": "central",
+        "x": 420,
+        "y": 160,
+        "nameKey": "adx_central",
+        "props": {
+          "zones": 8
+        }
+      },
+      {
+        "id": "shop-door",
+        "kind": "door-contact",
+        "x": 100,
+        "y": 40,
+        "nameKey": "tpl_n_shop_door",
+        "locationKey": "tpl_r_sales",
+        "props": {
+          "zone_kind": "entry"
+        }
+      },
+      {
+        "id": "shutter",
+        "kind": "door-contact",
+        "x": 100,
+        "y": 120,
+        "nameKey": "tpl_n_shutter",
+        "locationKey": "tpl_r_sales",
+        "props": {
+          "zone_kind": "instant",
+          "mounting": "roller shutter"
+        }
+      },
+      {
+        "id": "glass-1",
+        "kind": "glass-break",
+        "x": 100,
+        "y": 200,
+        "nameKey": "tpl_n_shopfront_glass",
+        "locationKey": "tpl_r_sales",
+        "props": {
+          "zone_kind": "instant"
+        }
+      },
+      {
+        "id": "sales-motion",
+        "kind": "motion-dual",
+        "x": 100,
+        "y": 280,
+        "nameKey": "tpl_n_sales_motion",
+        "locationKey": "tpl_r_sales",
+        "props": {
+          "zone_kind": "interior",
+          "range_m": 12
+        }
+      },
+      {
+        "id": "back-door",
+        "kind": "door-contact",
+        "x": 100,
+        "y": 360,
+        "nameKey": "adx_back_door",
+        "locationKey": "tpl_r_storage",
+        "props": {
+          "zone_kind": "entry"
+        }
+      },
+      {
+        "id": "storage-motion",
+        "kind": "motion-pir",
+        "x": 100,
+        "y": 440,
+        "nameKey": "tpl_n_storage_motion",
+        "locationKey": "tpl_r_storage",
+        "props": {
+          "zone_kind": "interior",
+          "range_m": 8
+        }
+      },
+      {
+        "id": "smoke",
+        "kind": "smoke",
+        "x": 420,
+        "y": -60,
+        "nameKey": "adx_smoke",
+        "locationKey": "tpl_r_storage",
+        "props": {
+          "zone_kind": "always",
+          "battery": "CR123"
+        }
+      },
+      {
+        "id": "panic",
+        "kind": "panic-button",
+        "x": 620,
+        "y": -60,
+        "nameKey": "tpl_n_panic",
+        "locationKey": "tpl_r_sales",
+        "props": {
+          "zone_kind": "always",
+          "battery": "CR2032"
+        }
+      },
+      {
+        "id": "siren-in",
+        "kind": "siren-indoor",
+        "x": 700,
+        "y": 120,
+        "nameKey": "adx_siren",
+        "locationKey": "tpl_r_sales"
+      },
+      {
+        "id": "siren-out",
+        "kind": "siren-outdoor",
+        "x": 700,
+        "y": 220,
+        "nameKey": "tpl_n_siren_outdoor",
+        "locationKey": "tpl_r_shop"
+      },
+      {
+        "id": "keypad",
+        "kind": "keypad",
+        "x": 700,
+        "y": 320,
+        "nameKey": "adx_keypad",
+        "locationKey": "tpl_r_sales"
+      },
+      {
+        "id": "comm",
+        "kind": "communicator",
+        "x": 420,
+        "y": 380,
+        "nameKey": "tpl_n_communicator",
+        "props": {
+          "channel": "GSM + IP"
+        }
+      },
+      {
+        "id": "supply",
+        "kind": "power-supply",
+        "x": 360,
+        "y": 520
+      },
+      {
+        "id": "battery",
+        "kind": "battery",
+        "x": 520,
+        "y": 520
+      }
+    ],
+    "wires": [
+      {
+        "id": "w01",
+        "from": {
+          "element": "shop-door",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop1"
+        }
+      },
+      {
+        "id": "w02",
+        "from": {
+          "element": "shutter",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop2"
+        }
+      },
+      {
+        "id": "w03",
+        "from": {
+          "element": "glass-1",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop3"
+        }
+      },
+      {
+        "id": "w04",
+        "from": {
+          "element": "sales-motion",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop4"
+        }
+      },
+      {
+        "id": "w05",
+        "from": {
+          "element": "back-door",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop5"
+        }
+      },
+      {
+        "id": "w06",
+        "from": {
+          "element": "storage-motion",
+          "port": "loop"
+        },
+        "to": {
+          "element": "central",
+          "port": "loop6"
+        }
+      },
+      {
+        "id": "w07",
+        "from": {
+          "element": "smoke",
+          "port": "radio"
+        },
+        "to": {
+          "element": "central",
+          "port": "radio"
+        }
+      },
+      {
+        "id": "w08",
+        "from": {
+          "element": "panic",
+          "port": "radio"
+        },
+        "to": {
+          "element": "central",
+          "port": "radio"
+        }
+      },
+      {
+        "id": "w09",
+        "from": {
+          "element": "siren-in",
+          "port": "out"
+        },
+        "to": {
+          "element": "central",
+          "port": "siren"
+        }
+      },
+      {
+        "id": "w10",
+        "from": {
+          "element": "siren-out",
+          "port": "out"
+        },
+        "to": {
+          "element": "central",
+          "port": "siren"
+        }
+      },
+      {
+        "id": "w11",
+        "from": {
+          "element": "keypad",
+          "port": "bus"
+        },
+        "to": {
+          "element": "central",
+          "port": "bus"
+        }
+      },
+      {
+        "id": "w12",
+        "from": {
+          "element": "comm",
+          "port": "bus"
+        },
+        "to": {
+          "element": "central",
+          "port": "bus"
+        }
+      },
+      {
+        "id": "w13",
+        "from": {
+          "element": "supply",
+          "port": "out"
+        },
+        "to": {
+          "element": "central",
+          "port": "power"
+        }
+      },
+      {
+        "id": "w14",
+        "from": {
+          "element": "battery",
+          "port": "out"
+        },
+        "to": {
+          "element": "supply",
+          "port": "out"
+        }
+      },
+      {
+        "id": "w15",
+        "from": {
+          "element": "siren-in",
+          "port": "power"
+        },
+        "to": {
+          "element": "supply",
+          "port": "out"
+        }
+      },
+      {
+        "id": "w16",
+        "from": {
+          "element": "siren-out",
+          "port": "power"
+        },
+        "to": {
+          "element": "supply",
+          "port": "out"
+        }
+      },
+      {
+        "id": "w17",
+        "from": {
+          "element": "comm",
+          "port": "power"
+        },
+        "to": {
+          "element": "supply",
+          "port": "out"
+        }
+      }
+    ],
+    "frames": [
+      {
+        "id": "shop",
+        "nameKey": "tpl_r_shop",
+        "x": 60,
+        "y": -100,
+        "w": 840,
+        "h": 720,
+        "colour": "cyan"
+      }
+    ]
+  }
+}

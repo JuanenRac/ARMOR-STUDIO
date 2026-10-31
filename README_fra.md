@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Langage">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Langues">
-  <img src="https://img.shields.io/badge/Tests-1122%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-1156%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.1.2-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturité">
 </p>
 
 ---
 
-**Vérification d'honnêteté - ce qui fonctionne aujourd'hui :** Studio dialogue avec [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) et est couvert par 1122 tests unitaires (lecture des réglages, fusion des caméras, arithmétique des graphiques solaires, géométrie et vérifications des concepteurs, annonceur d'alarmes, dictionnaire de l'assistant, chaque menu rendu dans les huit langues, hôte statique) et par des tests dans un navigateur. Il fonctionne en usage quotidien contre le banc de test CM5 avec le vrai serveur, de vraies caméras IP et un nœud radar sur sa carte ; les images de l'Aide sont faites avec des données d'exemple. Ce qui n'a **pas** été prouvé : la vidéo en direct et le PTZ avec toutes les caméras possibles, les menus solaire, électrique, centrales d'alarme et panneau tactile avec du vrai matériel (seul le nœud radar existe) et une revue formelle d'accessibilité ou d'utilisabilité. Tant que le serveur est injoignable, Studio affiche des données de démonstration et le dit dans la barre supérieure.
+**Vérification d'honnêteté - ce qui fonctionne aujourd'hui :** Studio dialogue avec [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) et est couvert par 1156 tests unitaires (lecture des réglages, fusion des caméras, arithmétique des graphiques solaires, géométrie et vérifications des concepteurs, annonceur d'alarmes, dictionnaire de l'assistant, chaque menu rendu dans les huit langues, hôte statique) et par des tests dans un navigateur. Il fonctionne en usage quotidien contre le banc de test CM5 avec le vrai serveur, de vraies caméras IP et un nœud radar sur sa carte ; les images de l'Aide sont faites avec des données d'exemple. Ce qui n'a **pas** été prouvé : la vidéo en direct et le PTZ avec toutes les caméras possibles, les menus solaire, électrique, centrales d'alarme et panneau tactile avec du vrai matériel (seul le nœud radar existe) et une revue formelle d'accessibilité ou d'utilisabilité. Tant que le serveur est injoignable, Studio affiche des données de démonstration et le dit dans la barre supérieure.
 
 ---
 
@@ -41,7 +41,7 @@
 | Maturité | Établi |
 | Rôle | Console d'exploitation et de conception de la famille |
 | Technologie | React 19, TypeScript, Vite, Three.js, Leaflet |
-| Tests | 1122 (`npm test`, Vitest) et tests navigateur (Playwright) |
+| Tests | 1156 (`npm test`, Vitest) et tests navigateur (Playwright) |
 | Contrat | Ne parle qu'à ARMOR-SERVER (HTTP `/api/v1/*` avec session HttpOnly, WebSocket `/api/v1/events`) |
 | Écoute sur | `127.0.0.1:5178` (`tools/serve.mjs`) |
 | Fonctionne sur | Un navigateur ; les fichiers sont servis par `tools/serve.mjs` ou par le nginx du conteneur |
@@ -59,7 +59,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Logiciel | 🟢 | La console tourne au quotidien contre le vrai serveur du banc d'essai CM5. |
-| Tests | 🟢 | 1122 tests unitaires réussissent (`npm test`) et les tests de navigateur s'exécutent : réglages, fusion des caméras, graphiques solaires, géométrie et contrôles des concepteurs, annonceur d'alarmes, dictionnaire de l'assistant et chaque menu dans les huit langues. |
+| Tests | 🟢 | 1156 tests unitaires réussissent (`npm test`) et les tests de navigateur s'exécutent : réglages, fusion des caméras, graphiques solaires, géométrie et contrôles des concepteurs, annonceur d'alarmes, dictionnaire de l'assistant et chaque menu dans les huit langues. |
 | Interface | 🟡 | La vidéo en direct et le PTZ ne sont pas prouvés avec toutes les caméras possibles, il n'y a pas eu de revue formelle d'accessibilité ou d'utilisabilité, et les images de l'aide sont faites avec des données d'exemple. |
 | Matériel | 🟡 | Il est utilisé chaque jour avec le vrai serveur, de vraies caméras IP et un vrai nœud radar ; les menus solaire, électrique, de centrale d'alarme et de panneau tactile attendent de vrais nœuds. |
 | Sécurité | 🟡 | Les sessions, les rôles et le refus des identifiants de caméra dans les adresses sont couverts par des tests ; il n'y a pas eu de revue indépendante. |
@@ -95,6 +95,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 * **État en direct :** Studio écoute le canal en direct du serveur (un WebSocket) et affiche aussitôt une alarme, un armement ou un nœud qui revient, et ne demande l'état que toutes les vingt secondes comme filet de sécurité tant que le canal est ouvert ; la barre du bas indique *En direct*. Les concepteurs d'alarme, d'électricité et de réseau répondent aussi à F (ajuster), plus et moins (zoom) et Ctrl+D (dupliquer).
 * **La limite de connexion d'un nœud :** chaque nœud des listes (radar, onduleurs, batteries, électrique et écrans muraux) a un bouton qui ouvre une boîte de dialogue pour lire et changer `system.login_limit_per_minute` (mots de passe erronés par minute avant que le nœud verrouille la connexion : 30 par défaut, 0 pour aucune limite globale, 120 au plus). L'identifiant du panneau du nœud est utilisé une fois et jamais conservé ; la boîte de dialogue et son aide existent en huit langues.
 * **Un compteur qui ne répond plus et une image de firmware pour une autre carte :** un canal électrique à lecture ancienne est grisé et marqué « sans données », et la carte les compte (Configuration > Sécurité, `electrical.set_aside_old_readings`, activé par défaut) ; une mise à jour de firmware dont le nom de fichier indique une autre carte que celle du nœud, ou un nœud d'un autre type, est refusée avec une raison claire au lieu d'un code.
+* **Aides à la conception, désactivées par défaut :** activer *Aides à la conception* dans Configuration > Préférences donne au Concepteur d'alarme trois points de départ (un appartement, un commerce et un entrepôt avec périmètre, chacun un fichier de données validé par un schéma) et au plan du site un contrôle de *Couverture* : les parties des bâtiments qu'aucun radar ne voit, les portes et fenêtres que rien ne surveille, les endroits surveillés par deux radars à la fois, chacun avec une position pour un radar, les angles morts dessinés sur le plan et le rapport en JSON ou CSV. C'est un guide à plat qui ne compte que ce qui est sûrement vu (les murs bloquent la vue et chaque radar est réduit d'une marge que vous fixez), pas une preuve qu'un bâtiment est protégé ; voir [docs/DESIGN_AIDS.md](docs/DESIGN_AIDS.md).
 
 ## 🧩 Rôle dans A.R.M.O.R.
 
@@ -186,7 +187,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 face à un serveur sur 127.0.0.1:8080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # écrit la table de chaque langue après un changement de phrase
-npm test                                                                       # 1122 tests
+npm test                                                                       # 1156 tests
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # sert le build
 ```
@@ -314,6 +315,7 @@ Le README et les textes existent en anglais, espagnol, français, italien, allem
 
 ## 📚 Documentation
 
+* [Aides à la conception](docs/DESIGN_AIDS.md) : les modèles d'alarme et le contrôle de couverture du plan du site
 * [Modèle de sécurité](docs/SECURITY_MODEL.md) : ce que garde le navigateur, les en-têtes et les ordres aux nœuds
 * [Tests navigateur](e2e/README.md) : comment les lancer contre une pile
 * [Matrice des capacités : ce qui est prouvé et ce qui ne l'est pas](https://github.com/JuanenRac/ARMOR-DOCS/blob/main/docs/CAPABILITY_MATRIX.md)

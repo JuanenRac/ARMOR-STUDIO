@@ -5,6 +5,7 @@ import { AlarmDesigner } from "../AlarmDesigner";
 import type { AlarmNodes } from "../api";
 import { locales, text, type Locale } from "../i18n";
 import { emptyDesign, housePreset } from "./presets";
+import { DEFAULT_PREFS, setPrefs } from "../prefs";
 
 const panels: AlarmNodes = {
   nodes: [{
@@ -33,5 +34,16 @@ describe("the Alarm Designer", () => {
     const html = render("es", emptyDesign(), null);
     expect(html).toContain("Diseñador de alarma");
     expect(html).not.toMatch(/\bad_[a-z_]+/);
+  });
+  it("offers no templates until the design aids are turned on, and the same drawing otherwise", () => {
+    const before = render("en");
+    expect(before).not.toContain("Start from a template");
+    setPrefs({ designAids: true });
+    try {
+      const html = render("en");
+      for (const word of ["Start from a template", "Flat or home", "Shop or commercial unit", "Warehouse with a perimeter"]) expect(html, word).toContain(word);
+      for (const language of locales) expect(render(language), language).not.toMatch(/(?:tpl|cov)_[a-z_]+/);
+    } finally { setPrefs({ designAids: DEFAULT_PREFS.designAids }); }
+    expect(render("en")).toBe(before);
   });
 });

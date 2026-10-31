@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "A starting point for the alarm drawing",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "version", "titleKey", "descriptionKey", "design"],
+  "properties": {
+    "schema": { "const": "armor-studio/alarm-template/1" },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,31}$" },
+    "version": { "type": "integer", "minimum": 1 },
+    "titleKey": { "type": "string", "pattern": "^tpl_[a-z0-9_]+$" },
+    "descriptionKey": { "type": "string", "pattern": "^tpl_[a-z0-9_]+$" },
+    "design": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["elements", "wires", "frames"],
+      "properties": {
+        "elements": {
+          "type": "array", "minItems": 1, "maxItems": 60,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "kind", "x", "y"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$" },
+              "kind": { "type": "string", "minLength": 1 },
+              "x": { "type": "number", "minimum": -10000, "maximum": 10000 },
+              "y": { "type": "number", "minimum": -10000, "maximum": 10000 },
+              "nameKey": { "type": "string", "pattern": "^(tpl|adx)_[a-z0-9_]+$" },
+              "locationKey": { "type": "string", "pattern": "^(tpl|adx)_[a-z0-9_]+$" },
+              "props": { "type": "object" }
+            }
+          }
+        },
+        "wires": {
+          "type": "array", "maxItems": 120,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "from", "to"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$" },
+              "from": { "$ref": "#/$defs/end" },
+              "to": { "$ref": "#/$defs/end" }
+            }
+          }
+        },
+        "frames": {
+          "type": "array", "maxItems": 12,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "nameKey", "x", "y", "w", "h", "colour"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$" },
+              "nameKey": { "type": "string", "pattern": "^(tpl|adx)_[a-z0-9_]+$" },
+              "x": { "type": "number", "minimum": -10000, "maximum": 10000 },
+              "y": { "type": "number", "minimum": -10000, "maximum": 10000 },
+              "w": { "type": "number", "minimum": 40, "maximum": 20000 },
+              "h": { "type": "number", "minimum": 40, "maximum": 20000 },
+              "colour": { "enum": ["cyan", "amber", "green", "violet", "rose", "slate"] }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "end": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["element", "port"],
+      "properties": { "element": { "type": "string", "minLength": 1 }, "port": { "type": "string", "minLength": 1 } }
+    }
+  }
+}
