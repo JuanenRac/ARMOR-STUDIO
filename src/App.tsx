@@ -178,7 +178,10 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const electricalPoll = usePolled(() => listElectricalReadings(origin), 4000, origin, { always: true });
   const alarmNodesPoll = usePolled(() => listAlarmNodes(origin), 3000, origin, { always: true });
   // The arming modes (Away, Home, Night): an older server has no such route and the console then arms and disarms as it always did.
-  const armingPoll = usePolled(() => readArmingModes(origin), 4000, origin, { always: true });
+  const armingPoll = usePolled(() => readArmingModes(origin), liveChannel ? 20_000 : 4000, origin, { always: true });
+  // The live channel already carries the mode in force: when it changes the document of the modes (its revision, what each mode defends) is read again at once instead of waiting for the next ask.
+  const reloadArming = armingPoll.reload;
+  useEffect(() => { reloadArming(); }, [state.arming_mode, state.mode]);   // eslint-disable-line react-hooks/exhaustive-deps
   const armingModes = armingPoll.data;
   const modesOn = armingModes?.enabled === true;
   const knownNodes = useMemo(() => ({

@@ -10,6 +10,8 @@ O menu da esquerda tem os ecrãs em grupos: Monitorização (o resumo, a meteoro
 
 O botão grande do canto superior direito arma ou desarma todo o sistema. Desarmar pede o seu PIN (Configuração > Utilizadores); um PIN de coação também desarma, mas dispara em silêncio um alarme crítico. Com o sistema armado, uma intrusão, uma porta aberta ou uma câmara que deixa de responder dispara um alarme; desarmar fecha os que dependem do modo.
 
+Quando o administrador ativou os modos de armar (Configuração > Segurança), o botão grande abre antes uma janela. Diz o modo em vigor e oferece Armar: Ausente, Armar: Em casa e Armar: Noite (cada um indica quanto defende: tudo, um número de elementos marcados ou ainda nada atribuído), Mudar para outro modo e Desarmar. Um modo sem nada atribuído pede confirmação («Armar na mesma»). Passar a um modo que defende menos do que o que está em vigor pede o seu PIN, tal como desarmar. A barra superior indica o modo em vigor e acompanha o servidor de imediato, também quando um telemóvel ou o horário o muda.
+
 Deixar o ponteiro sobre qualquer botão, campo ou entrada do menu mostra uma breve explicação do que faz. O idioma e o aspeto da consola estão em Configuração.
 
 Pergunte ao assistente: a mascote tem uma caixa de texto. Escreva o que quer fazer por palavras suas ("como armo o alarme", "um nó não responde", "atualizar o servidor") e responde com os passos, pode levá-lo ao menu certo, mostrá-lo passo a passo ou abrir a Ajuda. Entende os oito idiomas, os acentos e as maiúsculas não importam, e quando não sabe diz e oferece exemplos. Funciona no seu próprio ecrã, sem servidor nem serviço externo.`],

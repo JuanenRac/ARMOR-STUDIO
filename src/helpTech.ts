@@ -21,7 +21,7 @@ export const HELP_TECH: Record<string, HelpTech> = {
   automations: { routes: ["/api/v1/automations", "/api/v1/automations/{id}"] },
   network: { routes: ["/api/v1/network/design", "/api/v1/network/commands"], every: "5 s" },
   siteDesigner: { routes: ["/api/v1/site"] },
-  alarmDesigner: { routes: ["/api/v1/alarm/design"] },
+  alarmDesigner: { routes: ["/api/v1/alarm/design", "/api/v1/alarm/modes"] },
   electricalDesigner: { routes: ["/api/v1/electrical/design"] },
   networkDesigner: { routes: ["/api/v1/network/design"] },
   system: { routes: ["/api/v1/system", "/api/v1/system/metrics", "/api/v1/system/ingest", "/api/v1/node-health", "/api/v1/audit"], every: "5 s" },

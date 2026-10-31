@@ -332,6 +332,10 @@ export const MENU_STEP_LAYOUT: Readonly<Record<string, readonly StepLayout[]>> =
    "placement": "bottom"
   },
   {
+   "target": "ad-modes",
+   "placement": "left"
+  },
+  {
    "target": "ad-side",
    "placement": "left"
   }

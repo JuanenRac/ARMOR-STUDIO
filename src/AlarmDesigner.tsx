@@ -587,7 +587,7 @@ export function AlarmDesigner({ t, design, setDesign, status, panels, openVersio
         <div className="ed-tabs" role="tablist">
           <button role="tab" aria-selected={panel === "properties"} className={panel === "properties" ? "on" : ""} onClick={() => setPanel("properties")}>{t("elInspector")}</button>
           <button role="tab" aria-selected={panel === "checks"} className={panel === "checks" ? "on" : ""} onClick={() => setPanel("checks")}>{t("elChecks")} <b className={errors ? "bad" : warnings ? "warn" : ""}>{analysis.issues.length}</b></button>
-          {modesPanel && <button role="tab" aria-selected={panel === "modes"} className={panel === "modes" ? "on" : ""} data-testid="ad-tab-modes" onClick={() => setPanel("modes")}>{t("am_ed_tab")}</button>}
+          {modesPanel && <button role="tab" aria-selected={panel === "modes"} className={panel === "modes" ? "on" : ""} data-testid="ad-tab-modes" data-tour="ad-modes" onClick={() => setPanel("modes")}>{t("am_ed_tab")}</button>}
         </div>
         {panel === "modes" && modesPanel ? modesPanel : panel === "properties" ? (selectedElement ? elementPanel(selectedElement) : selectedWire ? wirePanel(selectedWire) : selectedFrame ? framePanel(selectedFrame) : totalsPanel())
           : <div className="ed-issues">{analysis.issues.length === 0 ? <p className="ed-note">{t("elNoIssues")}</p> : analysis.issues.map((issue, index) => <button key={`${issue.code}-${index}`} className={`ed-issue ${issue.level}`} onClick={() => focusIssue(issue)}><i />{issueText(issue)}</button>)}<p className="ed-note">{t("ad_disclaimer")}</p></div>}

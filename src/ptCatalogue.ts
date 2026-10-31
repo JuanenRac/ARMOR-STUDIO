@@ -3075,7 +3075,7 @@ export const PT_CATALOGUE: Record<string, string> = {
  "tour_welcome_6_t": "Configuração",
  "tour_welcome_6_b": "Utilizadores, serviços, o broker, ficheiros, notificações, firmware, atualizações desta máquina, a consola de manutenção e as suas próprias preferências.",
  "tour_welcome_7_t": "Armar e desarmar",
- "tour_welcome_7_b": "O botão do canto superior direito mostra se o sistema está armado. Armar pede confirmação; desarmar pede o seu PIN.",
+ "tour_welcome_7_b": "O botão do canto superior direito mostra se o sistema está armado. Armar pede confirmação; desarmar pede o seu PIN. Com os modos de armar ativados, abre uma janela para armar Ausente, Em casa ou Noite, mudar de modo ou desarmar.",
  "tour_welcome_10_t": "A ajuda está a um clique",
  "tour_welcome_10_b": "O ponto de interrogação abre a Ajuda, com uma secção para cada menu; a partir daí pode voltar a iniciar esta visita ou qualquer das outras. Deixar o ponteiro sobre qualquer controlo explica-o.",
  "tour_welcome_11_t": "A barra de baixo",
