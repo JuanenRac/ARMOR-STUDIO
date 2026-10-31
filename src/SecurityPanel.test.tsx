@@ -50,6 +50,27 @@ describe("the security screen", () => {
     expect(text("en", "sec_opt_node_pending")).not.toContain("will act on them");
   });
 
+  it("offers the summary of a day and the heat map in every language, with their warnings, and turning either on is a loss", () => {
+    for (const id of ["sec_opt_dailysummary", "sec_opt_heatmap"]) for (const suffix of ["", "_help", "_warn"]) {
+      const words = new Set<string>();
+      for (const locale of locales) {
+        const phrase = text(locale, id + suffix);
+        expect(phrase.trim().length, `${locale} ${id}${suffix}`).toBeGreaterThan(4);
+        expect(phrase, `${locale} ${id}${suffix} is not the key`).not.toBe(id + suffix);
+        words.add(phrase);
+      }
+      expect(words.size, `${id}${suffix} is translated, not repeated`).toBe(8);
+    }
+    expect(text("pt", "sec_opt_heatmap_help")).toContain("câmara");
+    expect(text("pt", "sec_opt_dailysummary_help")).toContain("palavras-passe");
+    // off first, on last: the last value is the one that carries the warning and asks first
+    expect(isLowering([false, true], false, true)).toBe(true);
+    expect(isLowering([false, true], true, false)).toBe(false);
+    // a server that does not announce them (an older one) shows no such option; the types know both
+    const t = (key: string) => text("en", key);
+    expect(renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }))).not.toContain("security-option-heatmap");
+  });
+
   it("draws the cards of the account, and the dialog that asks for the password again", () => {
     const t = (key: string) => text("en", key);
     const panel = renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }));

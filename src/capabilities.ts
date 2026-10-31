@@ -33,6 +33,9 @@ export type SecurityOptions = {
   /** The alarm said out loud and the sounds of your own for the wall panel (both off by default). */
   "alarm_audio.spoken": boolean;
   "alarm_audio.custom_sounds": boolean;
+  /** The summary of a day and the activity heat map for administrators and operators (both off by default). */
+  "summary.daily": boolean;
+  "vision.heatmap": boolean;
 };
 /** As the server sends it. */
 export type AnnouncedCapabilities = {

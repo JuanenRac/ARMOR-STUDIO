@@ -216,6 +216,8 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "panel.live_events", id: "panellive", values: [false, true] },
   { key: "alarm_audio.spoken", id: "alspoken", values: [false, true], calm: true },
   { key: "alarm_audio.custom_sounds", id: "alsounds", values: [false, true], calm: true },
+  { key: "summary.daily", id: "dailysummary", values: [false, true], optional: true },
+  { key: "vision.heatmap", id: "heatmap", values: [false, true], optional: true },
   { key: "client.device_lock", id: "lock", values: ["always", "sensitive", "user"], calm: true },
   { key: "nodes.nvs_encryption", id: "nvs", values: ["secrets", "off"], node: true, calm: true },
 ];

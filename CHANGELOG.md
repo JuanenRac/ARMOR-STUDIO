@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The summary of a day and the activity heat map can be switched on in Configuration > Security:** two new options, `summary.daily` and `vision.heatmap`, both off by default, in the eight languages (Portuguese of Portugal included). Each shows what happens in the house to administrators and operators, so turning it on asks for a confirmation with its warning, like the other options that lower protection. They appear only when the server announces them. The contract types are regenerated.
+
 ## [0.8.1.4] - The panel sync of the arming modes with its switch, its notice and its alarm in the alarm centre, in the eight languages
 
 - **A panel that does not confirm the arming mode is an alarm in the alarm centre:** the code `mode_panel_sync_failed` has its text in the eight languages (Portuguese of Portugal included), its facts (mode chosen, profile asked, panels that did not confirm and what each answered) are labelled, and the alarm opens the alarm panels view like the other panel alarms. It ends by itself when the mode is asked again and confirmed, on a disarm or when the option is turned off.

@@ -1,5 +1,11 @@
 // Written by tools/build_locales.mjs from the tables of phrases; do not edit by hand (run `npm run locales`).
 const catalogue: Record<string, string> = {
+"sec_opt_dailysummary": "Resumo de um dia para administradores e operadores",
+"sec_opt_dailysummary_help": "Os administradores e operadores podem pedir ao servidor o resumo de um dia: contagens, alarmes graves, padrões e um texto no idioma da instalação, feito pelo ARMOR-SERVER-AI a partir dos alarmes que o servidor guardou. Não dispara nenhum alarme e não mostra palavras-passe nem chaves. Desligado, a rota responde 404.",
+"sec_opt_dailysummary_warn": "Ligá-lo permite que qualquer administrador ou operador leia o que aconteceu em casa durante um dia: que alarmes, onde e quando. É apenas um relatório e não altera nada.",
+"sec_opt_heatmap": "Mapa de calor da atividade de uma câmara",
+"sec_opt_heatmap_help": "Os administradores e operadores podem pedir ao servidor o mapa de calor de uma câmara: quanta atividade houve em cada parte da cena, feito pelo ARMOR-VISION a partir de deteções gravadas. Contam-se apenas posições, nunca imagens. Desligado, a rota responde 404.",
+"sec_opt_heatmap_warn": "Ligá-lo permite que qualquer administrador ou operador veja por onde as pessoas se moveram à frente de uma câmara. Não contém nenhuma imagem, mas é informação sobre pessoas: deixe-o desligado, a não ser que precise dele.",
 "tabInstallation": "Instalação",
 "in_title": "Toda a instalação num só ficheiro",
 "in_help": "Guarde uma cópia da instalação ou mova-a para outra máquina: câmaras, desenhos, regras, automatizações, dispositivos, equipamentos solares e níveis de alarme. O ficheiro não tem palavras-passe, tokens nem chaves: as câmaras importadas pedem de novo utilizador e palavra-passe.",
