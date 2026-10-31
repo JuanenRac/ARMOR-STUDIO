@@ -156,6 +156,27 @@ const ROWS: Record<string, Row> = {
     "关闭：时间表会跳过切换到比当前保护范围更小的模式（保持或提高防护）。开启：也可以降低防护。"],
   sec_opt_modelower_warn: ["With this, the timetable can lower the defence of the house without a PIN.", "Con esto, el horario puede bajar la defensa de la casa sin PIN.", "Damit kann der Zeitplan den Schutz des Hauses ohne PIN verringern.", "Avec cela, la programmation peut réduire la protection de la maison sans PIN.",
     "Con questo, la programmazione può ridurre la difesa della casa senza PIN.", "これにより、スケジュールがPINなしで家の保護を下げられます。", "这样，时间表可以不输入 PIN 就降低住宅的防护。"],
+  // ---- the alarm panels follow the mode (alarm.mode_panel_sync) ----
+  sec_opt_panelsync: ["Alarm panels follow the arming mode", "Los paneles de alarma siguen el modo de armado", "Alarmzentralen folgen dem Scharfschaltmodus", "Les centrales d'alarme suivent le mode d'armement", "Le centrali d'allarme seguono la modalità di inserimento", "アラームパネルが警戒モードに従う", "报警面板跟随布防模式"],
+  sec_opt_panelsync_help: ["When you arm Away, Home or Night, the alarm panels are also asked to arm with the matching profile (Away, Home, Night). A panel that does not confirm is reported and never shown as armed. Off: the modes only decide what the server defends. It needs the arming modes and the alarm commands of the server.",
+    "Al armar Fuera, En casa o Noche, también se pide a los paneles de alarma que armen con el perfil correspondiente (Fuera, En casa, Noche). Un panel que no confirma se avisa y nunca se muestra como armado. Desactivado: los modos solo deciden lo que defiende el servidor. Necesita los modos de armado y los comandos de alarma del servidor.",
+    "Beim Scharfschalten von Abwesend, Zuhause oder Nacht werden auch die Alarmzentralen gebeten, mit dem passenden Profil scharf zu schalten (Abwesend, Zuhause, Nacht). Eine Zentrale, die nicht bestätigt, wird gemeldet und nie als scharf angezeigt. Aus: Die Modi bestimmen nur, was der Server schützt. Erfordert die Scharfschaltmodi und die Alarmbefehle des Servers.",
+    "Quand vous armez Absent, À la maison ou Nuit, les centrales d'alarme sont aussi invitées à armer avec le profil correspondant (Absent, À la maison, Nuit). Une centrale qui ne confirme pas est signalée et jamais affichée comme armée. Désactivé : les modes décident seulement de ce que le serveur protège. Nécessite les modes d'armement et les commandes d'alarme du serveur.",
+    "Quando inserisci Fuori casa, In casa o Notte, alle centrali d'allarme viene chiesto di inserirsi anche con il profilo corrispondente (Fuori casa, In casa, Notte). Una centrale che non conferma viene segnalata e mai mostrata come inserita. Disattivato: le modalità decidono solo ciò che il server difende. Richiede le modalità di inserimento e i comandi d'allarme del server.",
+    "外出・在宅・夜間を警戒すると、アラームパネルにも対応するプロファイル（外出・在宅・夜間）で警戒するよう要求します。確認が取れないパネルは通知され、警戒中とは表示されません。オフ: モードはサーバーが守る範囲だけを決めます。サーバーの警戒モードとアラームコマンドが必要です。",
+    "布防离家、在家或夜间时，也会要求报警面板用对应的配置（离家、在家、夜间）布防。未确认的面板会被提示，绝不显示为已布防。关闭：模式只决定服务器保护的范围。需要服务器启用布防模式和报警命令。"],
+  sec_opt_panelsync_warn: ["The server will send arm commands to the alarm panels when a mode is chosen. A disarm is never sent.", "El servidor enviará órdenes de armado a los paneles de alarma al elegir un modo. Nunca envía un desarmado.", "Der Server sendet beim Wählen eines Modus Scharfschaltbefehle an die Alarmzentralen. Ein Unscharfschalten wird nie gesendet.", "Le serveur enverra des ordres d'armement aux centrales d'alarme au choix d'un mode. Il n'envoie jamais de désarmement.", "Il server invierà comandi di inserimento alle centrali d'allarme quando si sceglie una modalità. Non invia mai un disinserimento.", "モードを選ぶと、サーバーがアラームパネルに警戒コマンドを送ります。解除は送信されません。", "选择模式时，服务器会向报警面板发送布防命令。绝不发送撤防命令。"],
+  ps_title: ["Alarm panels", "Paneles de alarma", "Alarmzentralen", "Centrales d'alarme", "Centrali d'allarme", "アラームパネル", "报警面板"],
+  ps_pending: ["Waiting for the panels to confirm the profile {0}.", "Esperando que los paneles confirmen el perfil {0}.", "Warten, bis die Zentralen das Profil {0} bestätigen.", "En attente de la confirmation du profil {0} par les centrales.", "In attesa che le centrali confermino il profilo {0}.", "パネルがプロファイル{0}を確認するのを待っています。", "正在等待面板确认配置{0}。"],
+  ps_confirmed: ["The panels confirmed the profile {0}.", "Los paneles confirmaron el perfil {0}.", "Die Zentralen haben das Profil {0} bestätigt.", "Les centrales ont confirmé le profil {0}.", "Le centrali hanno confermato il profilo {0}.", "パネルがプロファイル{0}を確認しました。", "面板已确认配置{0}。"],
+  ps_failed: ["The panels did not confirm the profile {0}. The server defends the mode, but check the panels, or choose the mode again to retry.", "Los paneles no confirmaron el perfil {0}. El servidor defiende el modo, pero revisa los paneles o elige el modo otra vez para reintentar.", "Die Zentralen haben das Profil {0} nicht bestätigt. Der Server schützt den Modus, aber prüfen Sie die Zentralen oder wählen Sie den Modus erneut, um es nochmals zu versuchen.", "Les centrales n'ont pas confirmé le profil {0}. Le serveur protège le mode, mais vérifiez les centrales ou choisissez à nouveau le mode pour réessayer.", "Le centrali non hanno confermato il profilo {0}. Il server difende la modalità, ma controlla le centrali o scegli di nuovo la modalità per riprovare.", "パネルがプロファイル{0}を確認しませんでした。サーバーはモードを守っていますが、パネルを確認するか、モードをもう一度選んで再試行してください。", "面板未确认配置{0}。服务器仍在保护该模式，但请检查面板，或再次选择该模式重试。"],
+  ps_none: ["No alarm panel is known, so none was asked.", "No se conoce ningún panel de alarma, así que no se pidió a ninguno.", "Es ist keine Alarmzentrale bekannt, daher wurde keine gefragt.", "Aucune centrale d'alarme n'est connue : aucune n'a été sollicitée.", "Non è nota alcuna centrale d'allarme, quindi non ne è stata interpellata nessuna.", "既知のアラームパネルがないため、どのパネルにも要求していません。", "未发现任何报警面板，因此没有向任何面板发出请求。"],
+  ps_node: ["{0}: {1}", "{0}: {1}", "{0}: {1}", "{0} : {1}", "{0}: {1}", "{0}: {1}", "{0}：{1}"],
+  ps_st_pending: ["waiting", "esperando", "wartet", "en attente", "in attesa", "待機中", "等待中"],
+  ps_st_confirmed: ["confirmed", "confirmado", "bestätigt", "confirmé", "confermato", "確認済み", "已确认"],
+  ps_st_refused: ["refused", "rechazado", "abgelehnt", "refusé", "rifiutato", "拒否", "已拒绝"],
+  ps_st_timeout: ["no answer", "sin respuesta", "keine Antwort", "sans réponse", "nessuna risposta", "応答なし", "无响应"],
+  ps_st_unavailable: ["could not be asked", "no se pudo preguntar", "konnte nicht gefragt werden", "n'a pas pu être sollicité", "non è stato possibile interpellarlo", "要求できませんでした", "无法发出请求"],
 };
 
 const PT: Record<string, string> = {
@@ -203,6 +224,16 @@ const PT: Record<string, string> = {
   sec_opt_modelower: "O horário pode baixar a defesa",
   sec_opt_modelower_help: "Desativado: o horário ignora uma mudança para um modo que defende menos do que o atual (mantém ou sobe a defesa). Ativado: também a pode baixar.",
   sec_opt_modelower_warn: "Com isto, o horário pode baixar a defesa da casa sem PIN.",
+  sec_opt_panelsync: "Os painéis de alarme seguem o modo de armar",
+  sec_opt_panelsync_help: "Ao armar Ausente, Em casa ou Noite, pede-se também aos painéis de alarme que armem com o perfil correspondente (Ausente, Em casa, Noite). Um painel que não confirma é assinalado e nunca é mostrado como armado. Desativado: os modos só decidem o que o servidor defende. Precisa dos modos de armar e dos comandos de alarme do servidor.",
+  sec_opt_panelsync_warn: "O servidor vai enviar ordens de armar aos painéis de alarme ao escolher um modo. Nunca envia um desarmar.",
+  ps_title: "Painéis de alarme",
+  ps_pending: "A aguardar que os painéis confirmem o perfil {0}.",
+  ps_confirmed: "Os painéis confirmaram o perfil {0}.",
+  ps_failed: "Os painéis não confirmaram o perfil {0}. O servidor defende o modo, mas verifique os painéis ou escolha o modo outra vez para repetir.",
+  ps_none: "Não se conhece nenhum painel de alarme, por isso nenhum foi consultado.",
+  ps_node: "{0}: {1}",
+  ps_st_pending: "a aguardar", ps_st_confirmed: "confirmado", ps_st_refused: "recusado", ps_st_timeout: "sem resposta", ps_st_unavailable: "não foi possível consultar",
 };
 
 export const armingModesCatalogues: RowCatalogues = { ...cataloguesFromRows(ROWS), pt: PT };

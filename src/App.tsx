@@ -10,6 +10,7 @@ import { useAlarmAnnouncer } from "./alerts/useAlarmAnnouncer";
 import { AlarmPopups } from "./alerts/AlarmPopups";
 import { PreflightDialog } from "./preflight/PreflightDialog";
 import { ArmingModeDialog } from "./views/ArmingModeDialog";
+import { PanelSyncNote } from "./views/PanelSyncNote";
 import { ArmingModesEditor } from "./views/ArmingModesEditor";
 import { zonesOfDevices } from "./armingModesModel";
 import type { RouteContext } from "./alerts/route";
@@ -411,6 +412,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} alarmBadge={alarmsPending} t={t} />
     <section className="main-stage" data-tour="stage">
       <TopBar view={view} revision={state.revision} mode={state.mode} armingMode={modesOn ? state.arming_mode : undefined} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={cannotArm} checkPerimeter={() => setCheckOpen(true)} remote={remoteConnection} t={t} />
+      {modesOn && state.panel_sync && <PanelSyncNote t={t} sync={state.panel_sync} />}
       {viewsToDraw(VIEW_ORDER, view, visitedViews.current).map(shown => {
         // a hidden menu keeps the last thing it was given (the same element: React does not draw it again every second); it is refreshed when it is shown
         if (shown === view) shownPanels.current.set(shown, panels[shown]);

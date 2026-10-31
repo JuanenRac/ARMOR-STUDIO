@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The alarm panels follow the arming mode (option `alarm.mode_panel_sync`, off by default):** Configuration > Security has a new option, in the eight languages, that makes the server ask the alarm panels to arm with the profile that goes with the mode (Away, Home, Night); when it is on, the main screen shows what the panels did under the top bar: waiting for them, confirmed by all of them, or not confirmed with the state and reason of each panel that did not (an alert), and never "confirmed" before the server says so. The contract types are regenerated and the note and its texts are covered by tests.
+
 ## [0.8.1.3] - Arming modes Away, Home and Night with a Modes tab in the alarm designer, Help and tours that explain them, the mode in force following the live channel, design aids and the documentation of the 17 options
 
 - **The Help and the tours explain the arming modes, and the mode in force follows the live channel:** the Help (eight languages) describes the dialog of the arm button, the Modes tab of the Alarm Designer (what Home and Night defend, their delays, the timetable) and the four options of Configuration > Security; the tour of the Alarm Designer gets a step for the Modes tab and the arm button step of the welcome tour mentions the dialog. The modes document is read again as soon as the live state changes the mode in force, and asked only every 20 seconds while the live channel is open.

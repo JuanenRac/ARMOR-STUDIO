@@ -64,7 +64,7 @@ describe("the arming modes: the document the editor builds", () => {
 
   it("has every phrase of the modes in the eight languages, with Portuguese of Portugal and the same placeholders", () => {
     const keys = ["am_mode_away", "am_mode_home", "am_mode_night", "am_dialog_title", "am_dialog_now", "am_arm_in", "am_pin_text", "am_confirm_text", "am_ed_title", "am_ed_save", "am_problem_clash", "am_day_1", "am_day_7",
-      "sec_opt_modes", "sec_opt_modes_help", "sec_opt_modes_warn", "sec_opt_modepin", "sec_opt_modepin_required", "sec_opt_modepin_not_required", "sec_opt_modepin_warn", "sec_opt_modesched", "sec_opt_modelower_warn"];
+      "sec_opt_modes", "sec_opt_modes_help", "sec_opt_modes_warn", "sec_opt_modepin", "sec_opt_modepin_required", "sec_opt_modepin_not_required", "sec_opt_modepin_warn", "sec_opt_modesched", "sec_opt_modelower_warn", "sec_opt_panelsync", "sec_opt_panelsync_warn"];
     for (const language of locales) for (const key of keys) {
       const value = text(language, key);
       expect(value, `${language}:${key}`).not.toBe(key);

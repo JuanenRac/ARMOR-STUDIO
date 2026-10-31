@@ -204,6 +204,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "alarm.mode_downgrade_pin", id: "modepin", values: ["required", "not_required"], optional: true },
   { key: "alarm.mode_schedule", id: "modesched", values: [false, true], calm: true, optional: true },
   { key: "alarm.mode_schedule_lowers", id: "modelower", values: [false, true], optional: true },
+  { key: "alarm.mode_panel_sync", id: "panelsync", values: [false, true], calm: true, optional: true },
   { key: "alarm.config_hash", id: "hash", values: [true, false], node: true },
   { key: "server.zone_feed", id: "feed", values: [true, false], node: true },
   { key: "server.zone_feed_signature", id: "sign", values: [true, false], node: true },

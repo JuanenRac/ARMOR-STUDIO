@@ -10,7 +10,7 @@ import { ArmingModesEditor } from "./ArmingModesEditor";
 
 const t = (key: string) => text("en", key);
 const state = (extra: Partial<ArmingModesState> = {}): ArmingModesState => ({
-  enabled: true, current: "disarmed", available: ["disarmed", "away", "home", "night"], unassigned: ["night"], downgrade_pin_required: true, schedule_enabled: false, schedule_may_lower: false, max_schedule: 16,
+  enabled: true, current: "disarmed", available: ["disarmed", "away", "home", "night"], unassigned: ["night"], panel_sync_enabled: false, downgrade_pin_required: true, schedule_enabled: false, schedule_may_lower: false, max_schedule: 16,
   revision: 3, updated_at: "2026-01-01T00:00:00.000Z", updated_by: "admin", modes: { away: {}, home: { defends: ["zone:Hall"] }, night: {} }, schedule: [], ...extra,
 });
 const universe = { zones: ["Hall", "Kitchen"], devices: [{ id: "door-1", name: "Front door", location: "Hall" }], nodes: ["radar-1"], cameras: [{ id: "garden", name: "Garden" }] };

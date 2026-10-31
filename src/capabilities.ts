@@ -14,6 +14,8 @@ export type SecurityOptions = {
   "alarm.mode_downgrade_pin": "required" | "not_required";
   "alarm.mode_schedule": boolean;
   "alarm.mode_schedule_lowers": boolean;
+  /** Choosing a mode also arms the alarm panels with the matching profile (away, stay, night). */
+  "alarm.mode_panel_sync": boolean;
   "alarm.config_hash": boolean;
   "server.zone_feed": boolean;
   "server.zone_feed_signature": boolean;
