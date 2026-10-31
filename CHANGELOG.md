@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A panel that does not confirm the arming mode is an alarm in the alarm centre:** the code `mode_panel_sync_failed` has its text in the eight languages (Portuguese of Portugal included), its facts (mode chosen, profile asked, panels that did not confirm and what each answered) are labelled, and the alarm opens the alarm panels view like the other panel alarms. It ends by itself when the mode is asked again and confirmed, on a disarm or when the option is turned off.
 - **The alarm panels follow the arming mode (option `alarm.mode_panel_sync`, off by default):** Configuration > Security has a new option, in the eight languages, that makes the server ask the alarm panels to arm with the profile that goes with the mode (Away, Home, Night); when it is on, the main screen shows what the panels did under the top bar: waiting for them, confirmed by all of them, or not confirmed with the state and reason of each panel that did not (an alert), and never "confirmed" before the server says so. The contract types are regenerated and the note and its texts are covered by tests.
 
 ## [0.8.1.3] - Arming modes Away, Home and Night with a Modes tab in the alarm designer, Help and tours that explain them, the mode in force following the live channel, design aids and the documentation of the 17 options

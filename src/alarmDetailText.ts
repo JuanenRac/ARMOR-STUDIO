@@ -53,6 +53,11 @@ const ROWS: Record<string, Row> = {
   fact_opened_at: ["Opened at", "Abierto a las", "Geöffnet um", "Ouvert à", "Aperto alle", "開いた時刻", "开放时间"],
   fact_mac_now: ["MAC that answers now", "MAC que responde ahora", "MAC, die jetzt antwortet", "MAC qui répond maintenant", "MAC che risponde ora", "現在応答している MAC", "现在应答的 MAC"],
   fact_mac_before: ["MAC that answered before", "MAC que respondía antes", "MAC, die zuvor antwortete", "MAC qui répondait avant", "MAC che rispondeva prima", "以前応答していた MAC", "此前应答的 MAC"],
+  fact_arming_mode: ["Arming mode chosen", "Modo de armado elegido", "Gewählter Scharfschaltmodus", "Mode d'armement choisi", "Modalità di inserimento scelta", "選択された警戒モード", "所选布防模式"],
+  fact_panel_profile: ["Profile asked of the panels", "Perfil pedido a las centrales", "An die Zentralen gesendetes Profil", "Profil demandé aux centrales", "Profilo richiesto alle centrali", "パネルに要求したプロファイル", "向主机请求的配置"],
+  fact_panels: ["Panels that did not confirm", "Centrales que no confirmaron", "Zentralen ohne Bestätigung", "Centrales sans confirmation", "Centrali senza conferma", "確認しなかったパネル", "未确认的主机"],
+  fact_panel_answers: ["What each panel answered", "Qué respondió cada central", "Was jede Zentrale geantwortet hat", "Ce que chaque centrale a répondu", "Cosa ha risposto ogni centrale", "各パネルの応答", "每台主机的回应"],
+  fact_by: ["Chosen by", "Elegido por", "Gewählt von", "Choisi par", "Scelto da", "選択した人", "选择者"],
   fact_what_happened: ["What happened", "Qué pasó", "Was geschah", "Ce qui s'est passé", "Cos'è successo", "発生した内容", "发生了什么"],
 };
 export const alarmDetailCatalogues = cataloguesFromRows(ROWS);
