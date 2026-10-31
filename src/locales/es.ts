@@ -134,6 +134,7 @@ const catalogue: Record<string, string> = {
 "rtspDiscoverFailed": "No se pudo contactar la camara para buscar RTSP.",
 "credentialsStored": "Las credenciales estan guardadas de forma segura por el servidor local.",
 "rtspDiscovering": "Probando rutas RTSP conocidas. Puede tardar hasta 25 segundos.",
+"mediaLibrary": "Grabaciones",
 "mediaLibraryHelp": "Revisa las fotos y grabaciones de camara capturadas localmente.",
 "allMedia": "Todo",
 "snapshots": "Fotos",

@@ -132,6 +132,7 @@ const catalogue: Record<string, string> = {
 "rtspDiscoverFailed": "Die Kamera war fuer die RTSP-Erkennung nicht erreichbar.",
 "credentialsStored": "Die Zugangsdaten sind sicher im lokalen Server gespeichert.",
 "rtspDiscovering": "Bekannte RTSP-Pfade werden getestet. Dies kann bis zu 25 Sekunden dauern.",
+"mediaLibrary": "Aufnahmen",
 "mediaLibraryHelp": "Lokal aufgenommene Kamerafotos und Aufzeichnungen pruefen.",
 "allMedia": "Alle Medien",
 "snapshots": "Fotos",
