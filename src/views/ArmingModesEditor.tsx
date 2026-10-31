@@ -53,6 +53,14 @@ export function ArmingModesEditor({ t, origin, current, universe, isAdmin, onSav
       <fieldset className="am-mode" data-testid="arming-mode-def-away">
         <legend>{modeName("away", t)}</legend>
         <p className="ed-note">{t("am_ed_away_all")}</p>
+        {groups.filter(group => group.kind !== "zone" && group.items.length > 0).map(group => <details key={group.kind}>
+          <summary>{group.title} - {t("am_ed_away_entry")}</summary>
+          {group.items.map(item => {
+            const reference = refOf(group.kind, item.id);
+            return <div key={reference} className="am-row"><label className="am-entry"><input type="checkbox" checked={defendsRef(definitionOf("away").entry, reference)} data-testid={`arming-entry-away-${reference}`}
+              onChange={() => patchMode("away", { entry: toggleRef(definitionOf("away").entry, reference) })} /> {item.label}</label></div>;
+          })}
+        </details>)}
         <DelayFields t={t} definition={definitionOf("away")} onChange={patch => patchMode("away", patch)} />
       </fieldset>
       {ASSIGNABLE.map(mode => {

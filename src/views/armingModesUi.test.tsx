@@ -98,7 +98,9 @@ describe("the dialog that arms in a mode", () => {
 describe("the editor of the modes in the Alarm Designer", () => {
   it("shows what Home and Night defend and the places, sensors, nodes and cameras to mark; Away only has delays", () => {
     mount(createElement(ArmingModesEditor, { t, origin: "http://x", current: state(), universe, isAdmin: true, onSaved: vi.fn(), onConflict: vi.fn() }));
-    expect(container.querySelector('[data-testid="arming-mode-def-away"]')!.querySelectorAll('input[type="checkbox"]').length).toBe(0);
+    const away = container.querySelector('[data-testid="arming-mode-def-away"]')!;
+    expect(away.querySelectorAll('[data-testid^="arming-ref-"]').length, "away defends everything: nothing to mark").toBe(0);
+    expect([...away.querySelectorAll('input[type="checkbox"]')].map(box => box.getAttribute("data-testid"))).toEqual(["arming-entry-away-device:door-1", "arming-entry-away-node:radar-1", "arming-entry-away-camera:garden"]);
     const hall = container.querySelector('[data-testid="arming-ref-home-zone:Hall"]') as HTMLInputElement;
     expect(hall.checked).toBe(true);
     expect((container.querySelector('[data-testid="arming-ref-night-zone:Hall"]') as HTMLInputElement).checked).toBe(false);
@@ -119,6 +121,17 @@ describe("the editor of the modes in the Alarm Designer", () => {
     await click('[data-testid="arming-modes-save"]');
     expect(calls[0]!.body).toMatchObject({ modes: { home: { entry: ["camera:garden", "node:radar-1"] } } });
     expect(home).not.toBeNull();
+  });
+
+  it("lets away mark the devices, nodes and cameras that wait for the entry delay, and saves the list", async () => {
+    mount(createElement(ArmingModesEditor, { t, origin: "http://x", current: state({ modes: { away: { entry_delay_s: 20, entry: ["device:door-1"] }, home: {}, night: {} } }), universe, isAdmin: true, onSaved: vi.fn(), onConflict: vi.fn() }));
+    expect((container.querySelector('[data-testid="arming-entry-away-device:door-1"]') as HTMLInputElement).checked).toBe(true);
+    expect((container.querySelector('[data-testid="arming-entry-away-node:radar-1"]') as HTMLInputElement).checked).toBe(false);
+    await click('[data-testid="arming-entry-away-node:radar-1"]');
+    await click('[data-testid="arming-entry-away-device:door-1"]');
+    replies = [{ status: 200, body: state({ revision: 4 }) }];
+    await click('[data-testid="arming-modes-save"]');
+    expect(calls[0]!.body).toMatchObject({ modes: { away: { entry: ["node:radar-1"], entry_delay_s: 20 } } });
   });
 
   it("saves the whole document with the revision read; a conflict reloads and says so", async () => {
