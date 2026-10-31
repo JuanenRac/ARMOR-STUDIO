@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Idiomas">
   <img src="https://img.shields.io/badge/Tests-1180%20passing-2ea44f.svg" alt="Pruebas">
-  <img src="https://img.shields.io/badge/Version-0.8.1.2-0f6cbd.svg" alt="Versión">
+  <img src="https://img.shields.io/badge/Version-0.8.1.3-0f6cbd.svg" alt="Versión">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Madurez">
 </p>
 
@@ -37,7 +37,7 @@
 
 | | |
 |---|---|
-| Versión | `0.8.1.2` |
+| Versión | `0.8.1.3` |
 | Madurez | Establecido |
 | Función | Consola de operación y diseño de la familia |
 | Tecnología | React 19, TypeScript, Vite, Three.js, Leaflet |
