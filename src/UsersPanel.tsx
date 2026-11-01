@@ -9,6 +9,7 @@ import { useCallback, useContext, useEffect, useState, type FormEvent } from "re
 import { changeAccount, clearUserPin, createUser, deleteUser, listUsers, setMyPin, setUserPin, updateUser, type ListedUser, type Role } from "./api";
 import { SessionUserContext } from "./sessionContext";
 import { errorText } from "./apiErrorText";
+import { issueMessage, passwordIssues, pinIssues, type CredentialIssue } from "./ux/credentialRules";
 
 type Props = { t: (key: string) => string; origin: string };
 const ROLES: readonly Role[] = ["admin", "operator", "viewer", "panel"];
@@ -34,9 +35,10 @@ export function UsersPanel({ t, origin }: Props) {
   // ---- my account ----
   const [account, setAccount] = useState({ username: "", current: "", next: "", repeat: "" });
   useEffect(() => { if (me) setAccount(current => ({ ...current, username: me.username })); }, [me?.id, me?.username]);   // eslint-disable-line react-hooks/exhaustive-deps
+  const accountIssues = passwordIssues(account.next, { minimum, username: account.username, repeat: account.repeat });
   const saveAccount = async (event: FormEvent) => {
     event.preventDefault();
-    if (account.next && account.next !== account.repeat) { say(t("passwordsDontMatch"), true); return; }
+    if (accountIssues.length) { say(issueMessage(t, accountIssues[0], minimum), true); return; }
     const change: { currentPassword: string; username?: string; newPassword?: string } = { currentPassword: account.current };
     if (me && account.username.trim() !== me.username) change.username = account.username.trim();
     if (account.next) change.newPassword = account.next;
@@ -51,6 +53,7 @@ export function UsersPanel({ t, origin }: Props) {
   // ---- my PIN ----
   const [mine, setMine] = useState({ pin: "", duress: "" });
   const digits = (value: string) => value.replace(/[^0-9]/g, "");
+  const myPinIssues = pinIssues(mine.pin, mine.duress);
   const saveMyPin = async (clear = false) => {
     try {
       await setMyPin(origin, clear ? { currentPassword: account.current, clear: true } : { currentPassword: account.current, pin: mine.pin, ...(mine.duress ? { duress_pin: mine.duress } : {}) });
@@ -63,14 +66,18 @@ export function UsersPanel({ t, origin }: Props) {
 
   // ---- administration ----
   const [fresh, setFresh] = useState<{ username: string; password: string; role: Role }>({ username: "", password: "", role: "operator" });
+  const freshIssues = passwordIssues(fresh.password, { minimum, username: fresh.username });
   const add = async (event: FormEvent) => {
     event.preventDefault();
+    if (freshIssues.length) { say(issueMessage(t, freshIssues[0], minimum), true); return; }
     try { await createUser(origin, { ...fresh, username: fresh.username.trim() }); setFresh({ username: "", password: "", role: "operator" }); say(t("userCreated")); await reload(); }
     catch (error) { explain(error); }
   };
   const [draft, setDraft] = useState<{ username: string; password: string; role: Role; pin: string; duress: string }>({ username: "", password: "", role: "operator", pin: "", duress: "" });
   const startEdit = (user: ListedUser) => { setEditing(user.id); setDraft({ username: user.username, password: "", role: user.role, pin: "", duress: "" }); };
+  const draftIssues = [...passwordIssues(draft.password, { minimum, username: draft.username }), ...pinIssues(draft.pin, draft.duress)];
   const saveEdit = async (user: ListedUser) => {
+    if (draftIssues.length) { say(issueMessage(t, draftIssues[0], minimum), true); return; }
     const change: { username?: string; password?: string; role?: Role } = {};
     if (draft.username.trim() !== user.username) change.username = draft.username.trim();
     if (draft.password) change.password = draft.password;
@@ -88,6 +95,7 @@ export function UsersPanel({ t, origin }: Props) {
   };
   const roleName = (role: Role) => t(role === "admin" ? "roleAdmin" : role === "panel" ? "rolePanel" : role === "viewer" ? "roleViewer" : "roleOperator");
   const day = (iso: string) => { const date = new Date(iso); return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString(); };
+  const issuesNote = (list: CredentialIssue[]) => list.length === 0 ? null : <p className="users-issues muted small" role="status" data-testid="users-issues">{list.map(issue => issueMessage(t, issue, minimum)).join(" ")}</p>;
   const rule = `${t("passwordMinimum")} ${minimum} ${t("charactersWord")}.`;
 
   return <div className="users-panel">
@@ -99,14 +107,16 @@ export function UsersPanel({ t, origin }: Props) {
         <label>{t("currentPassword")}<PasswordInput t={t} autoComplete="current-password" value={account.current} onChange={event => setAccount({ ...account, current: event.target.value })} /></label>
         <label>{t("newPassword")}<PasswordInput t={t} autoComplete="new-password" placeholder={t("keepPassword")} value={account.next} onChange={event => setAccount({ ...account, next: event.target.value })} /></label>
         <label>{t("confirmPassword")}<PasswordInput t={t} autoComplete="new-password" value={account.repeat} onChange={event => setAccount({ ...account, repeat: event.target.value })} /></label>
-        <div className="users-actions"><button className="primary" type="submit" disabled={!me || !account.current}>{t("saveAccount")}</button></div>
+        {issuesNote(accountIssues.filter(issue => issue !== "pw_mismatch" || account.repeat !== ""))}
+        <div className="users-actions"><button className="primary" type="submit" disabled={!me || !account.current || accountIssues.length > 0}>{t("saveAccount")}</button></div>
       </form>
       <h4>{t("pinTitle")}</h4>
       <p className="muted small">{t("pinHelp")} {t("currentPassword")}</p>
       <div className="users-form">
         <label>{t("pinValue")}<PasswordInput t={t} inputMode="numeric" autoComplete="off" maxLength={10} value={mine.pin} onChange={event => setMine({ ...mine, pin: digits(event.target.value) })} /></label>
         <label>{t("duressValue")}<PasswordInput t={t} inputMode="numeric" autoComplete="off" maxLength={10} value={mine.duress} onChange={event => setMine({ ...mine, duress: digits(event.target.value) })} /></label>
-        <div className="users-actions"><button className="primary" disabled={!me || !account.current || mine.pin.length < 4} onClick={() => void saveMyPin()}>{t("pinSave")}</button><button disabled={!me || !account.current} onClick={() => void saveMyPin(true)}>{t("pinClear")}</button></div>
+        {issuesNote(myPinIssues)}
+        <div className="users-actions"><button className="primary" disabled={!me || !account.current || mine.pin.length === 0 || myPinIssues.length > 0} onClick={() => void saveMyPin()}>{t("pinSave")}</button><button disabled={!me || !account.current} onClick={() => void saveMyPin(true)}>{t("pinClear")}</button></div>
       </div>
     </article>
 
@@ -128,7 +138,8 @@ export function UsersPanel({ t, origin }: Props) {
                       <p className="muted small">{t(`roleHelp_${draft.role}`)}</p>
                       <label>{t("pinValue")}<PasswordInput t={t} inputMode="numeric" autoComplete="off" maxLength={10} placeholder={user.hasPin ? t("keepPassword") : ""} value={draft.pin} onChange={event => setDraft({ ...draft, pin: digits(event.target.value) })} /></label>
                       <label>{t("duressValue")}<PasswordInput t={t} inputMode="numeric" autoComplete="off" maxLength={10} value={draft.duress} onChange={event => setDraft({ ...draft, duress: digits(event.target.value) })} /></label>
-                      <div className="users-actions"><button className="primary" onClick={() => void saveEdit(user)}>{t("saveUser")}</button><button onClick={() => setEditing("")}>{t("cancel")}</button></div>
+                      {issuesNote(draftIssues)}
+                      <div className="users-actions"><button className="primary" disabled={draftIssues.length > 0} onClick={() => void saveEdit(user)}>{t("saveUser")}</button><button onClick={() => setEditing("")}>{t("cancel")}</button></div>
                     </div>
                   : <>
                       <div className="user-main"><strong>{user.username}</strong>{user.current && <small className="user-chip">{t("youLabel")}</small>}<span className={`role-badge ${user.role}`}>{roleName(user.role)}</span><small className="user-chip">{user.hasPin ? t("userHasPin") : t("userNoPin")}</small></div>
@@ -145,7 +156,8 @@ export function UsersPanel({ t, origin }: Props) {
               <label>{t("newPassword")}<PasswordInput t={t} autoComplete="new-password" value={fresh.password} onChange={event => setFresh({ ...fresh, password: event.target.value })} /></label>
               <label>{t("role")}<select value={fresh.role} onChange={event => setFresh({ ...fresh, role: event.target.value as Role })}>{ROLES.map(role => <option key={role} value={role}>{roleName(role)}</option>)}</select></label>
               <p className="muted small">{t("userName")}: {t("userNameRule")} · {rule}</p>
-              <div className="users-actions"><button className="primary" type="submit" disabled={!fresh.username.trim() || !fresh.password}>{t("createUser")}</button></div>
+              {issuesNote(freshIssues)}
+              <div className="users-actions"><button className="primary" type="submit" disabled={!fresh.username.trim() || !fresh.password || freshIssues.length > 0}>{t("createUser")}</button></div>
             </form>
           </article>
         </>}

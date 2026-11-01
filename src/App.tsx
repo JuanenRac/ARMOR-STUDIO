@@ -82,6 +82,10 @@ import { RadarView } from "./views/RadarView";
 import { InvertersView } from "./views/InvertersView";
 import { BatteriesView } from "./views/BatteriesView";
 import manifest from "../armor.project.json";
+import { useShortcuts, type ShortcutAction } from "./ux/shortcuts";
+import { usePageTitle } from "./ux/pageTitle";
+import { hasUnsavedWork, useUnloadGuard } from "./ux/unloadGuard";
+import "./ux/ux.css";
 import "./index.css";
 import "./camera-layout.css";
 import "./nav.css";
@@ -283,6 +287,11 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const electricalStatus = useElectricalSync({ origin, enabled: restored && operatorUnlocked && signedIn, persist: restored && signedIn, design: electrical, apply: setElectrical, onConflict: () => setNotice(t("elConflict")) });
   const networkStatus = useNetworkSync({ origin, enabled: restored && operatorUnlocked && signedIn, persist: restored && signedIn, design: networkDesign, apply: setNetworkDesign, onConflict: () => setNotice(t("elConflict")) });
   const alarmDesignStatus = useAlarmDesignSync({ origin, enabled: restored && operatorUnlocked && signedIn, persist: restored && signedIn, design: alarmDesign, apply: setAlarmDesign, onConflict: () => setNotice(t("elConflict")) });
+  // Comforts of the keyboard and of the screen reader: the title of the tab follows the menu, one-key shortcuts (they can be turned off in Preferences) and a warning when the tab is closed with a drawing not yet on the server.
+  usePageTitle(t(view));
+  useShortcuts(prefs.shortcuts, useCallback((action: ShortcutAction) => { if (action === "help") setHelpOpen(true); else setSidebarOpen(value => !value); }, []));
+  useUnloadGuard(hasUnsavedWork([siteSync.status, electricalStatus, networkStatus, alarmDesignStatus]));
+
   const applySite = (next: SiteModel) => {
     if (next.terrain !== site.terrain) setTerrain(next.terrain);
     if (next.buildings !== site.buildings) setBuildings(next.buildings);
@@ -409,9 +418,10 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const serverName = (() => { try { return new URL(origin).host; } catch { return origin; } })();
   // A wall-panel account is for the panels (ARMOR-NODE-ALARM, ARMOR-NODE-HMI), not for Studio: every menu would answer it with a refusal.
   if (sessionUser.user?.role === "panel") return <main className="studio-login-shell"><div className="studio-login-card"><h1>A.R.M.O.R. Studio</h1><p role="alert">{t("panel_account_notice")}</p><button className="primary" onClick={onSignOut}>{t("signOut")}</button></div></main>;
-  return <SessionUserContext.Provider value={sessionUser}><KnownNodesContext.Provider value={knownNodes}><StreamRenewContext.Provider value={renewStream}><div className="studio-frame"><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
+  return <SessionUserContext.Provider value={sessionUser}><KnownNodesContext.Provider value={knownNodes}><StreamRenewContext.Provider value={renewStream}><div className="studio-frame"><a className="skip-link" href="#studio-main" onClick={event => { event.preventDefault(); document.getElementById("studio-main")?.focus(); }}>{t("ux_skip")}</a><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
     <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} alarmBadge={alarmsPending} t={t} />
-    <section className="main-stage" data-tour="stage">
+    <section className="main-stage" data-tour="stage" id="studio-main" tabIndex={-1}>
+      <p className="ux-sr" role="status" aria-live="polite" data-testid="view-announcement">{t("ux_now_showing").replace("{0}", t(view))}</p>
       <TopBar view={view} revision={state.revision} mode={state.mode} armingMode={modesOn ? state.arming_mode : undefined} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={cannotArm} checkPerimeter={() => setCheckOpen(true)} remote={remoteConnection} t={t} />
       {modesOn && state.panel_sync && <PanelSyncNote t={t} sync={state.panel_sync} />}
       {viewsToDraw(VIEW_ORDER, view, visitedViews.current).map(shown => {

@@ -74,6 +74,9 @@ export function PreferencesPanel({ t, language = "en" }: { t: (key: string) => s
         {toggle("pf_cov_3d", "pf_cov_3d_h", prefs.coverage3d, coverage3d => setPrefs({ coverage3d }), !prefs.designAids)}
         {toggle("pf_cov_refine", "pf_cov_refine_h", prefs.coverageRefine, coverageRefine => setPrefs({ coverageRefine }), !prefs.designAids)}
         {toggle("pf_cov_cones", "pf_cov_cones_h", prefs.coverageCones, coverageCones => setPrefs({ coverageCones }))}
+        <h3 className="pf-sub">{t("pf_section_signin")}</h3>
+        {toggle("pf_refuse_http", "pf_refuse_http_h", prefs.refuseRemoteHttp, refuseRemoteHttp => setPrefs({ refuseRemoteHttp }))}
+        {toggle("pf_shortcuts", "pf_shortcuts_h", prefs.shortcuts, shortcuts => setPrefs({ shortcuts }))}
         <div className="pf-actions"><button className="danger" onClick={() => void reset()}>{t("pf_reset")}</button></div>
       </article>
     </div>

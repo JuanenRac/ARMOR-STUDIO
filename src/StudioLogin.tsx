@@ -4,6 +4,9 @@ import { ApiError, completeStudioSession, openStudioSession } from "./api";
 import { LANGUAGES, type LanguageCode } from "./domain";
 import { ensureLocale, isLocaleLoaded, text } from "./i18n";
 import { parseStudioSettings, SETTINGS_KEY } from "./settings";
+import { getPrefs } from "./prefs";
+import { addressProblemKey, checkServerAddress } from "./ux/signInAddress";
+import { classifySignInFailure, signInFailureKey } from "./ux/signInFailure";
 
 type Props = { origin: string; onAuthenticated: (origin: string) => void };
 
@@ -53,10 +56,13 @@ export function StudioLogin({ origin: initialOrigin, onAuthenticated }: Props) {
   const [, setLoadedLocale] = useState(0);
   useEffect(() => { const language = loginLanguage(); if (isLocaleLoaded(language)) return undefined; let live = true; void ensureLocale(language).then(() => { if (live) setLoadedLocale(count => count + 1); }); return () => { live = false; }; }, []);
   const t = (key: string) => text(loginLanguage(), key);
+  const plainRemote = (() => { const checked = checkServerAddress(origin); return checked.ok && checked.plainRemote; })();
   const submit = async (event: FormEvent) => {
     event.preventDefault(); setBusy(true); setNotice("");
     try {
-      const normalized = new URL(origin).origin;
+      const checked = checkServerAddress(origin, getPrefs().refuseRemoteHttp);
+      if (!checked.ok) { setNotice(t(addressProblemKey(checked.problem))); setBusy(false); return; }
+      const normalized = checked.origin;
       if (challenge) await completeStudioSession(normalized, challenge, code.trim());
       else {
         const step = await openStudioSession(normalized, username.trim(), password);
@@ -72,7 +78,7 @@ export function StudioLogin({ origin: initialOrigin, onAuthenticated }: Props) {
       if (error instanceof ApiError && error.code === "totp_setup_required") setNotice(t("login_totp_setup_required"));
       else if (error instanceof ApiError && error.code === "challenge_expired") { setChallenge(""); setNotice(t("sec_err_challenge_expired")); }
       else if (known && t(known) !== known) setNotice(t(known));
-      else setNotice(t("login_failed"));
+      else setNotice(t(signInFailureKey(classifySignInFailure(error))));
     }
     finally { setBusy(false); }
   };
@@ -87,6 +93,7 @@ export function StudioLogin({ origin: initialOrigin, onAuthenticated }: Props) {
       {notice && <p className="login-notice" role="alert">{notice}</p>}
     </> : <>
     <label>{t("login_server")}<input name="server" id="studio-login-server" value={origin} onChange={event => setOrigin(event.target.value)} inputMode="url" autoComplete="url" required /></label>
+    {plainRemote && <small className="login-notice" role="note" data-testid="login-plain-warn">{t("ux_addr_plain_warn")}</small>}
     <label>{t("login_user")}<input data-testid="login-user" name="username" id="studio-login-user" value={username} onChange={event => setUsername(event.target.value)} autoComplete="username" required /></label>
     <label>{t("login_password")}<PasswordInput t={t} data-testid="login-password" name="password" id="studio-login-password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password" required /></label>
     <label className="login-remember"><input type="checkbox" name="remember" id="studio-login-remember" data-testid="login-remember" checked={remember} onChange={event => { setRemember(event.target.checked); if (!event.target.checked) storeRememberedUser(false, ""); }} />{t("login_remember")}</label>

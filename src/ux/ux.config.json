@@ -1,0 +1,25 @@
+{
+  "schema": "armor-studio/ux-config/1",
+  "signIn": {
+    "refuseRemoteHttpDefault": false,
+    "localSuffixes": [".local", ".lan", ".home.arpa", ".internal"]
+  },
+  "credentials": {
+    "passwordMinimumFallback": 12,
+    "passwordMinimumFloor": 8,
+    "pinMinDigits": 4,
+    "pinMaxDigits": 10
+  },
+  "shortcuts": {
+    "enabledDefault": true,
+    "help": "?",
+    "sidebar": "b"
+  },
+  "pageTitle": {
+    "suffix": "A.R.M.O.R. Studio",
+    "separator": " · "
+  },
+  "unloadGuard": {
+    "statuses": ["saving", "offline"]
+  }
+}

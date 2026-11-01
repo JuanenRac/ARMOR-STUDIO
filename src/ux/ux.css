@@ -1,0 +1,5 @@
+/* The skip link, the hidden announcement of the open menu and the warning under the password field (src/ux). */
+.skip-link { position: absolute; left: .5rem; top: -4rem; z-index: 1000; padding: .55rem .9rem; border-radius: 8px; background: #0e2632; color: #e9ffff; border: 2px solid #51e6d0; text-decoration: none; font-weight: 600; }
+.skip-link:focus, .skip-link:focus-visible { top: .5rem; outline: none; }
+.ux-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.main-stage:focus { outline: none; }

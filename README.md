@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-1310%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-1363%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.1.7-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 1310 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary, every menu rendered in the eight languages, the static host) and by browser tests. It runs in daily use against the CM5 test bench with the real server, real IP cameras and a radar node on its board; the pictures of the Help are made with example data. What has **not** been proven is live video and PTZ against every possible camera, the solar, electrical, alarm-panel and touch-panel menus with real equipment (only the radar node exists) and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
+**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 1363 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary, every menu rendered in the eight languages, the static host) and by browser tests. It runs in daily use against the CM5 test bench with the real server, real IP cameras and a radar node on its board; the pictures of the Help are made with example data. What has **not** been proven is live video and PTZ against every possible camera, the solar, electrical, alarm-panel and touch-panel menus with real equipment (only the radar node exists) and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
 
 ---
 
@@ -41,7 +41,7 @@
 | Maturity | Established |
 | Role | Operations and design console of the family |
 | Stack | React 19, TypeScript, Vite, Three.js, Leaflet |
-| Tests | 1310 (`npm test`, Vitest) and browser tests (Playwright) |
+| Tests | 1363 (`npm test`, Vitest) and browser tests (Playwright) |
 | Contract | Talks only to ARMOR-SERVER (HTTP `/api/v1/*` with an HttpOnly session, WebSocket `/api/v1/events`) |
 | Listens on | `127.0.0.1:5178` (`tools/serve.mjs`) |
 | Runs on | A browser; the files are served by `tools/serve.mjs` or by the nginx of the container |
@@ -59,7 +59,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟢 | The console runs in daily use against the real server of the CM5 test bench. |
-| Tests | 🟢 | 1310 unit tests pass (`npm test`) and the browser tests run: settings, camera merging, the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary and every menu in the eight languages. |
+| Tests | 🟢 | 1363 unit tests pass (`npm test`) and the browser tests run: settings, camera merging, the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary and every menu in the eight languages. |
 | Interface | 🟡 | Live video and PTZ are not proven against every possible camera, there has been no formal accessibility or usability review, and the pictures of the Help are made with example data. |
 | Hardware | 🟡 | It is used daily with the real server, real IP cameras and a real radar node; the solar, electrical, alarm-panel and touch-panel menus wait for real nodes. |
 | Security | 🟡 | Sessions, roles and the refusal of camera logins in addresses are covered by tests; there has been no independent review. |
@@ -98,6 +98,7 @@ Each line is one part of this repository and the light says how far it is today.
 * **Design aids, off by default:** turning on *Design aids* in Configuration > Preferences gives the Alarm Designer three starting points (a flat, a shop and a warehouse with a perimeter, each a data file checked against a schema) and the site plan a *Coverage* check: the parts of the buildings no radar sees, the doors and windows nothing guards, the places two radars watch at once, each with a position for a radar, the blind spots drawn on the plan and the report as JSON or CSV. It is a flat guide that counts only what is certainly seen (walls block the view and every radar is shrunk by a margin you set), not proof that a building is protected; see [docs/DESIGN_AIDS.md](docs/DESIGN_AIDS.md).
 * **Coverage check by floor, by height and with floor-plan templates (three options in Preferences > Design aids, off by default):** a radar has an optional floor, the check can look at each floor of a building on its own and take the height and tilt of the radars into account, the blind squares next to a radar can be painted only where nothing sees them (the figures stay as cautious as before), and the coverage card adds a building with its own floor plan and its radars set on their floors. See `docs/DESIGN_AIDS.md`.
 * **Arming modes of the system (Away, Home, Night):** when an administrator turns *Arming modes Home and Night* on in Configuration > Security, the arm button opens a dialog to arm in a mode, switch between them or disarm; a mode that defends nothing asks to be confirmed and a change to a mode that defends less asks for the PIN, like a disarm. The Alarm Designer gets a *Modes* tab to mark, for Home and Night, whole zones (the places of the devices), sensors, radar nodes and cameras (they start with nothing), the exit and entry delays and a timetable. Three more options (the PIN to go to a mode that defends less, the timetable and whether it may lower the defence) are in Configuration > Security. Off by default: with the option off the console arms and disarms exactly as before.
+* **Safer sign-in and gentler forms and keyboard:** the sign-in checks the server address before sending anything, warns (or, with a switch in Preferences, refuses) plain http outside the local network and says whether the password was wrong, there were too many attempts, the server failed or it could not be reached; every password field warns when Caps Lock is on; new passwords and PINs are checked while typing; there is a skip link, the one-key shortcuts `?` (Help) and `B` (menu) with a switch, a tab title and a screen-reader announcement that follow the open menu, and a confirmation when closing the tab with a drawing not yet on the server. The limits are in a configuration file (`src/ux/ux.config.json`). Eight languages, Portuguese of Portugal included.
 
 ## 🧩 Role in A.R.M.O.R.
 
@@ -192,7 +193,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # write the table of each language after changing a phrase
-npm test                                                                       # 1310 tests
+npm test                                                                       # 1363 tests
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # serve the build
 ```

@@ -123,7 +123,7 @@ describe("creating and editing users", () => {
     await show({ user: admin });
     const add = container.querySelector(".users-card:last-of-type")!;
     await type(field(t("userName"), add), "bob");
-    await type(field(t("newPassword"), add), "x");
+    await type(field(t("newPassword"), add), "a-long-password-1");
     api.createUser.mockRejectedValueOnce(new ApiError(422, "weak_password")).mockRejectedValueOnce(new ApiError(409, "username_taken")).mockRejectedValueOnce(new ApiError(500, "brand_new_code")).mockRejectedValueOnce(new Error("network"));
     const sentences: string[] = [];
     for (let index = 0; index < 4; index += 1) { await submit(add.querySelector("form")!); sentences.push(notice()); }
@@ -209,7 +209,7 @@ describe("your own account", () => {
     await type(field(t("confirmPassword"), form), "new-password-124");
     await submit(form);
     expect(api.changeAccount).not.toHaveBeenCalled();
-    expect(notice()).toBe(t("passwordsDontMatch"));
+    expect(notice()).toBe(t("ux_pw_mismatch"));
   });
 
   it("sends the new name only when it changed and the new password only when typed, then empties the password fields", async () => {

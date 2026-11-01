@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Every password field warns when Caps Lock is on:** a short note under the field, announced by a screen reader and tied to the field, that goes away when the key is off or the field loses the focus; it covers the sign-in, the account, the users and the PINs. Eight languages, Portuguese of Portugal included.
+- **The sign-in checks the server address before sending anything:** an empty or malformed address, a scheme that is not http or https and an address that carries a user name or a password (`user:password@`) are refused with a sentence of their own, and the address is cut down to its origin. Eight languages.
+- **Plain http outside the house network is warned about at the sign-in, and can be refused:** an address that is not on the local network (private ranges, loopback, single-label and `.local` names are) and starts with http shows a warning under the address; Preferences > Sign-in and keyboard has a switch that refuses it before the password leaves (off by default, so the local network and an existing installation keep working). Eight languages.
+- **The sign-in says what went wrong:** the user or password is not right, too many attempts (wait a minute), the server failed, or it could not be reached (check the address, the server and the network) instead of one sentence for everything. Eight languages.
+- **Passwords are checked while typing in Users:** the new password of the account, of a new user and of an edited user must reach the minimum the server announced (never below 8), must not equal the user name, and the repeat must match; the reason is shown under the field and the button stays off until it is fixed. Eight languages.
+- **PINs are checked while typing too:** at least 4 and at most 10 digits, and the duress PIN must differ from the PIN, for your own PIN and for the PIN of a user; the button says why it is off. Eight languages.
+- **A skip link for the keyboard:** the first Tab on the page offers "Skip to the content", which moves the focus to the main area past the menu. Eight languages.
+- **One-key shortcuts, with a switch:** `?` opens the Help and `B` folds or opens the menu; they do nothing while typing in a field, on a button or a link, inside a dialog or with Ctrl, Alt or the system key held, and Preferences > Sign-in and keyboard turns them off (on by default). Eight languages.
+- **The title of the browser tab names the open menu** ("Alarms · A.R.M.O.R. Studio"), keeping the blinking alarm count in front of it.
+- **A screen reader is told which menu is now open:** a polite, visually hidden announcement ("Now showing: Alarms") follows every change of menu. Eight languages.
+- **Closing or reloading the tab with a drawing that has not reached the server asks the browser to confirm:** while the site, electrical, network or alarm drawing is still saving or the server is not answering; it stops asking as soon as everything is saved.
+- **The small checks keep their values in one configuration file** (`src/ux/ux.config.json`: password and PIN limits, the local-network suffixes, the shortcut keys, the title and the statuses that count as unsaved), read through bounds that cannot be edited below the safe floor, with a test.
+- **Tests for modules that had none:** the address of a node's web panel, the shared contexts, the tour ids and the three drawing adapters, plus 40 tests for the new checks (address, failure, rules, shortcuts, title, warning on closing, Caps Lock, the sign-in form, the users form and the wiring of the console).
+
 ## [0.8.1.7] - Taking back a false-alarm mark asks first, the cones of the fields of view are a layer of the 3D view, the profile of each mode is checked before saving and every alarm code has its help text
 
 - **Taking back the false-alarm mark asks first** ("Not a false alarm"): any administrator or operator can do it, the server records who did, and the question says that the daily summary will count the alarm as real again. Putting the mark on stays one click.
