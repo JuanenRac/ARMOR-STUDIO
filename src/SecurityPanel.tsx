@@ -268,6 +268,15 @@ export function visionServiceUrlValue(text: string): string | undefined {
   } catch { return undefined; }
   return trimmed;
 }
+/** Whether the token for the vision service would go in clear to another machine: the service may be remote, the server holds a token for it and the address is plain http on a host that is not this one (the server refuses to save it; this says so before). */
+export function visionTokenInClear(remote: boolean, tokenHeld: boolean, text: string): boolean {
+  if (!remote || !tokenHeld) return false;
+  const value = visionServiceUrlValue(text);
+  if (!value) return false;
+  const url = new URL(value);
+  const host = url.hostname.replace(/^\[|\]$/g, "");
+  return url.protocol === "http:" && !(host === "localhost" || host === "::1" || /^127(\.\d{1,3}){3}$/.test(host));
+}
 const fill = (text: string, values: Record<string, string | number>) => text.replace(/\{(\w+)\}/g, (whole, name: string) => (name in values ? String(values[name]) : whole));
 
 /** The sizes of a spoken turn, as numbers an administrator types; the server refuses what is outside its ceilings and the field says so before it asks. */
@@ -355,6 +364,7 @@ function VisionService({ t, state, apply, busy }: { t: (key: string) => string; 
     if (value === undefined) { setInvalid(true); return; }
     setInvalid(false);
     if (value === state.settings["vision.service_url"]) return;
+    if (visionTokenInClear(state.settings["vision.service_remote"] === true, state.settings["vision.service_token_set"] === true, value)) return;   // the warning is on the screen; the server would refuse it too
     if (await apply({ "vision.service_url": value } as Partial<SecurityOptions>, false)) setTyped(null);
   };
   const locked = state.locked.includes("vision.service_url");
@@ -367,6 +377,7 @@ function VisionService({ t, state, apply, busy }: { t: (key: string) => string; 
       </label>
       {typeof state.settings["vision.service_token_set"] === "boolean" && <p className="muted" data-testid="security-vision-token">{t(state.settings["vision.service_token_set"] ? "sec_vis_token_yes" : "sec_vis_token_no")}</p>}
       {invalid && <p className="notice bad" role="alert" data-testid="security-vision-invalid">{t("sec_vis_invalid")}</p>}
+      {visionTokenInClear(state.settings["vision.service_remote"] === true, state.settings["vision.service_token_set"] === true, shown) && <p className="notice bad" role="alert" data-testid="security-vision-https">{t("sec_vis_https")}</p>}
       <button className="primary" disabled={busy}>{t("sec_vis_save")}</button>
     </form>
   </fieldset>;

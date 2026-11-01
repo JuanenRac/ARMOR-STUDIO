@@ -34,6 +34,9 @@ export function ArmingModesEditor({ t, origin, current, universe, panels = [], p
   const schedule = draft.schedule ?? [];
   const patchEntry = (index: number, patch: Partial<(typeof schedule)[number]>) => edit({ ...draft, schedule: schedule.map((entry, at) => at === index ? { ...entry, ...patch } : entry) });
   const save = async () => {
+    // the profile each mode arms must exist: the server refuses to save a name that is not there, and says so here before asking (when the list of profiles could be read)
+    const missing = profiles.length === 0 ? [] : (["away", "home", "night"] as const).map(mode => draft.panel_map?.profiles?.[mode]).filter((id): id is string => !!id && !profiles.some(profile => profile.id === id));
+    if (missing.length > 0) { setMessage({ text: t("am_pm_profile_missing").replace("{0}", [...new Set(missing)].join(", ")), bad: true }); return; }
     setBusy(true); setMessage(null);
     try { const saved = await saveArmingModes(origin, cleanedDocument(draft), current.revision); onSaved(saved); setMessage({ text: t("am_ed_saved"), bad: false }); }
     catch (error) {

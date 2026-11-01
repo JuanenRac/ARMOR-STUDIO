@@ -62,9 +62,10 @@ const PLACING: ReadonlySet<Tool> = new Set(TOOL_GROUPS.flat().filter(spec => spe
 const ELEVATABLE: ReadonlySet<Target3D["kind"]> = new Set(["building", "opening", "wallLamp", "feature", "camera", "sensor", "device"]);
 const MOVABLE: ReadonlySet<Target3D["kind"]> = new Set(["building", "roofItem", "feature", "camera", "sensor", "device"]);
 
-type Layers = { terrain: boolean; buildings: boolean; roofs: boolean; features: boolean; cameras: boolean; sensors: boolean; fields: boolean; grid: boolean };
-const ALL_LAYERS: Layers = { terrain: true, buildings: true, roofs: true, features: true, cameras: true, sensors: true, fields: true, grid: true };
-const LAYER_KEYS: ReadonlyArray<keyof Layers> = ["terrain", "buildings", "roofs", "features", "cameras", "sensors", "fields", "grid"];
+type Layers = { terrain: boolean; buildings: boolean; roofs: boolean; features: boolean; cameras: boolean; sensors: boolean; fields: boolean; cones: boolean; grid: boolean };
+/** Everything is shown except the 3D cones of the fields of view: a layer of its own, off until it is switched on (Preferences and the coverage check can still ask for them). */
+export const ALL_LAYERS: Layers = { terrain: true, buildings: true, roofs: true, features: true, cameras: true, sensors: true, fields: true, cones: false, grid: true };
+export const LAYER_KEYS: ReadonlyArray<keyof Layers> = ["terrain", "buildings", "roofs", "features", "cameras", "sensors", "fields", "cones", "grid"];
 type ViewName = "iso" | "top" | "south" | "east" | "north" | "west";
 const ELEVATIONS: ViewName[] = ["south", "east", "north", "west"];
 
@@ -599,8 +600,8 @@ function Scene(props: ViewportProps & { shadows: boolean; xray: boolean; turntab
       return device ? <PlacedDevice key={placement.device_id} device={device} selected={isSelected("device", placement.device_id)} hover={hoverKey === `device:${placement.device_id}`} hooks={hooks("device", placement.device_id)}
         x={placement.x} y={placement.y} z={placement.z} rotation={placement.rotation} pitch={placement.pitch ?? 0} roll={placement.roll ?? 0} /> : null;
     })}
-    {layers.cameras && model.cameras.map(camera => <DeviceView key={camera.id} kind="camera" item={camera} dimensions={dimensions} selected={isSelected("camera", camera.id)} hover={hoverKey === `camera:${camera.id}`} showField={layers.fields} cones={props.cones} hooks={hooks} />)}
-    {layers.sensors && model.sensors.map(sensor => <DeviceView key={sensor.id} kind="sensor" item={sensor} dimensions={dimensions} selected={isSelected("sensor", sensor.id)} hover={hoverKey === `sensor:${sensor.id}`} showField={layers.fields} cones={props.cones} hooks={hooks} />)}
+    {layers.cameras && model.cameras.map(camera => <DeviceView key={camera.id} kind="camera" item={camera} dimensions={dimensions} selected={isSelected("camera", camera.id)} hover={hoverKey === `camera:${camera.id}`} showField={layers.fields} cones={props.cones === true || layers.cones} hooks={hooks} />)}
+    {layers.sensors && model.sensors.map(sensor => <DeviceView key={sensor.id} kind="sensor" item={sensor} dimensions={dimensions} selected={isSelected("sensor", sensor.id)} hover={hoverKey === `sensor:${sensor.id}`} showField={layers.fields} cones={props.cones === true || layers.cones} hooks={hooks} />)}
   {props.live?.targets.map(target => <LiveTarget key={target.key} target={target} />)}
   </>;
 }

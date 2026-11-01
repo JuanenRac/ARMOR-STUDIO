@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Taking back the false-alarm mark asks first** ("Not a false alarm"): any administrator or operator can do it, the server records who did, and the question says that the daily summary will count the alarm as real again. Putting the mark on stays one click.
+- **A warning when the token for the vision service would travel in clear:** Security says so, and does not send, when the service may be remote, the server holds a token and the address is plain http on another machine; the server refuses it too.
+- **The profile of each mode is checked before saving:** the modes editor says which profile does not exist and sends nothing.
+- **The cones of the fields of view are a layer of the 3D view** (Layers > 3D cones of the fields), off until it is switched on; the coverage check and Preferences can still ask for them.
+- **Every alarm code has its help text** (what it means and what to check, in the eight languages), read from the shared table; before, only the eleven solar codes had it.
+
 ## [0.8.1.6] - Reports of the day and the heat map for administrators and operators, coverage of the cameras by floor with cones in 3D and floor plans read from a file, the profile and panels of each arming mode and the false-alarm mark of an alarm
 
 - **The summary of a day and the activity heat map can be read in History (administrators and operators only):** a Reports tab with the summary of the day and the language chosen (counts, patterns, the text and the note of the AI when there is one) and the heat map of a camera as a picture (PNG or SVG) with its caption. The tab is not offered to a viewer or a wall panel, and what the server answers when a report is off, not set up, busy, failing or asked too often is told in words that say what to do (404, 403, 502, 503, 429). Eight languages, Portuguese of Portugal included.

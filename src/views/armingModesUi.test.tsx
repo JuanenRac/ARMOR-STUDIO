@@ -156,6 +156,14 @@ describe("the editor of the modes in the Alarm Designer", () => {
     expect("panel_map" in calls[2]!.body, "back to the defaults: nothing is sent").toBe(false);
   });
 
+  it("does not even ask the server to save a mode that arms a profile that does not exist, and says which one", async () => {
+    const profiles = [{ id: "away", name: "Away" }, { id: "stay", name: "Stay" }, { id: "night", name: "Night" }];
+    mount(createElement(ArmingModesEditor, { t, origin: "http://x", current: state({ panel_map: { profiles: { night: "gone" } } }), universe, panels: ["alarm-1"], profiles, isAdmin: true, onSaved: vi.fn(), onConflict: vi.fn() }));
+    await click('[data-testid="arming-modes-save"]');
+    expect(calls.length, "nothing was sent").toBe(0);
+    expect(container.textContent).toContain("The profile gone does not exist, so nothing was saved");
+  });
+
   it("warns when the list of panels is empty (no panel will be asked) and keeps the empty list", async () => {
     mount(createElement(ArmingModesEditor, { t, origin: "http://x", current: state({ panel_map: { only: [] } }), universe, panels: ["alarm-1"], profiles: [], isAdmin: true, onSaved: vi.fn(), onConflict: vi.fn() }));
     expect(container.textContent).toContain("No panel is selected");

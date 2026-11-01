@@ -75,6 +75,7 @@ export const rows_3: Record<string, Row> = {
   layer_cameras: ["Cameras", "Cámaras", "Kameras", "Caméras", "Telecamere", "カメラ", "摄像头"],
   layer_sensors: ["Radars", "Radares", "Radare", "Radars", "Radar", "レーダー", "雷达"],
   layer_fields: ["Coverage areas", "Áreas de cobertura", "Abdeckungsbereiche", "Zones de couverture", "Aree di copertura", "カバー範囲", "覆盖范围"],
+  layer_cones: ["3D cones of the fields", "Conos 3D de los campos", "3D-Kegel der Sichtfelder", "Cônes 3D des champs", "Coni 3D dei campi", "視野の3Dコーン", "视场3D锥体"],
   layer_grid: ["Grid", "Cuadrícula", "Raster", "Grille", "Griglia", "グリッド", "网格"],
   // plan controls and prompts
   allFloors: ["All floors", "Todas las plantas", "Alle Etagen", "Tous les étages", "Tutti i piani", "全階", "所有楼层"],

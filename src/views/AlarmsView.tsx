@@ -54,7 +54,7 @@ export function AlarmFacts({ alarm, t }: { alarm: Alarm; t: Translate }) {
 /** One line that says what it is about, without opening it: the device and its address. */
 const summaryOf = (alarm: Alarm): string => [alarm.detail?.device, alarm.detail?.ip, alarm.detail?.port !== undefined ? `:${alarm.detail.port}` : ""].filter(part => part !== undefined && part !== "").join(" · ").replace(" · :", ":");
 
-type Confirming = { kind: "delete"; alarm: Alarm } | { kind: "clear" } | null;
+type Confirming = { kind: "delete"; alarm: Alarm } | { kind: "clear" } | { kind: "unmark"; alarm: Alarm } | null;
 
 export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mode, toggleMode, now, readOnly = false }: Props) {
   const [message, setMessage] = useState<{ text: string; bad: boolean }>({ text: "", bad: false });
@@ -101,7 +101,7 @@ export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mo
   const controls = (alarm: Alarm, compact = false) => <div className={`alarm-actions ${compact ? "compact" : ""}`}>
     {!alarm.acknowledged_at && <button className="primary" disabled={readOnly} onClick={() => void act(() => acknowledgeAlarm(origin, alarm.id))}>{t("acknowledge")}</button>}
     {alarm.code === "network_new_device" && !alarm.cleared_at && <button disabled={readOnly} onClick={() => markKnown(alarm)}>{t("alarmMarkKnown")}</button>}
-    <button disabled={readOnly} onClick={() => void act(() => markFalseAlarm(origin, alarm.id, alarm.false_alarm === true ? null : true), () => t(alarm.false_alarm === true ? "alarmFalseUndone" : "alarmFalseDone"))} title={t("alarmFalseTitle")}>{t(alarm.false_alarm === true ? "alarmFalseUndo" : "alarmFalse")}</button>
+    <button disabled={readOnly} onClick={() => alarm.false_alarm === true ? setConfirming({ kind: "unmark", alarm }) : void act(() => markFalseAlarm(origin, alarm.id, true), () => t("alarmFalseDone"))} title={t("alarmFalseTitle")}>{t(alarm.false_alarm === true ? "alarmFalseUndo" : "alarmFalse")}</button>
     <button onClick={() => toggle(alarm.id)} aria-expanded={open.has(alarm.id)}>{open.has(alarm.id) ? t("alarmHideDetails") : t("alarmDetails")}</button>
     <button className="danger-button" disabled={readOnly} onClick={() => setConfirming({ kind: "delete", alarm })} title={t("alarmDeleteTitle")} aria-label={t("alarmDeleteTitle")}>×</button>
   </div>;
@@ -158,15 +158,16 @@ export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mo
       {recent.length > 0 && <div className="users-actions"><button className="danger-button" onClick={() => setConfirming({ kind: "clear" })}>{t("clearRecord")}</button></div>}
     </article>
 
-    {confirming && <ConfirmDialog t={t} danger
-      title={confirming.kind === "clear" ? t("clearRecord") : t("alarmDeleteTitle")}
-      text={confirming.kind === "clear" ? t("alarmClearQuestion") : `${t(`alarm_${confirming.alarm.code}`)} - ${t("alarmDeleteQuestion")}`}
-      confirmLabel={confirming.kind === "clear" ? t("clearRecord") : t("alarmDelete")}
+    {confirming && <ConfirmDialog t={t} danger={confirming.kind !== "unmark"}
+      title={confirming.kind === "clear" ? t("clearRecord") : confirming.kind === "unmark" ? t("alarmFalseUndo") : t("alarmDeleteTitle")}
+      text={confirming.kind === "clear" ? t("alarmClearQuestion") : confirming.kind === "unmark" ? `${t(`alarm_${confirming.alarm.code}`)} - ${t("alarmFalseUndoQuestion")}` : `${t(`alarm_${confirming.alarm.code}`)} - ${t("alarmDeleteQuestion")}`}
+      confirmLabel={confirming.kind === "clear" ? t("clearRecord") : confirming.kind === "unmark" ? t("alarmFalseUndo") : t("alarmDelete")}
       cancel={() => setConfirming(null)}
       confirm={() => {
         const what = confirming;
         setConfirming(null);
         if (what.kind === "clear") void act(() => clearAlarmRecord(origin), result => `${(result as { deleted: number }).deleted} ${t("alarmCleared")}`);
+        else if (what.kind === "unmark") void act(() => markFalseAlarm(origin, what.alarm.id, null), () => t("alarmFalseUndone"));
         else void act(() => deleteAlarm(origin, what.alarm.id));
       }} />}
   </section>;
