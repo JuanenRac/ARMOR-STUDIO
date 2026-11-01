@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.1.5] - Coverage by floor and by height with floor-plan templates, the heat map and summary settings, the entry delay marked per unit in the away mode and the limits of the reports in Configuration
+
 - **Configuration > Security sets where the heat map is asked:** the address of the live vision service (`vision.service_url`, empty when there is none, checked in the field before it is sent) and a switch for letting it be on another machine (`vision.service_remote`, off by default, with the warning and the confirmation of the other options that lower the security). Eight languages, Portuguese of Portugal included.
 - **The alarm designer lets the Away mode mark which devices, nodes and cameras wait for the entry delay:** until now only Home and Night had the box; Away defends everything, so it lists nothing to defend, but it can name what waits. The help of Away says so, in the eight languages (Portuguese of Portugal included).
 - **The limits of the summary of a day and the heat map are edited in Configuration > Security, and the entry delay is offered for nodes and cameras:** three whole-number fields (`reports.timeout_s` 5 to 120, `reports.queue_max` 1 to 10, `reports.requests_per_minute` 1 to 300) appear when the server announces them, are checked against their range before anything is sent, count at once and ask for no confirmation because they tune the work and protect nothing; and in the alarm designer every marked node and camera, not only every device, has the box "Waits for the entry delay". Eight languages, Portuguese of Portugal included.
