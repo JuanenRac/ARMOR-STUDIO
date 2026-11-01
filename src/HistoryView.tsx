@@ -5,6 +5,7 @@
  */
 import { downloadText } from "./download";
 import { ViewTabs } from "./components/ViewTabs";
+import { ReportsPanel } from "./views/ReportsPanel";
 import { useViewActive } from "./viewSlots";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { deleteHistory, listConnections, listHistory, readHistorySummary, readRules, saveRules, type ArmorEvent, type ConnectionClient, type EventType, type HistorySummary, type Rules, type Zone } from "./api";
@@ -318,11 +319,11 @@ function RulesEditor({ origin, t }: { origin: string; t: Translate }) {
   </div>;
 }
 
-export function HistoryView({ origin, t }: { origin: string; t: Translate }) {
+export function HistoryView({ origin, t, reports }: { origin: string; t: Translate; /** The reports of the server (the summary of a day and the heat map): given only to administrators and operators. */ reports?: { language: string; cameras: Array<{ id: string; name: string }> } }) {
   // The event log and the alert rules are two jobs: one at a time, each with the whole screen.
-  const [tab, setTab] = useState<"events" | "rules">("events");
+  const [tab, setTab] = useState<"events" | "rules" | "reports">("events");
   return <section className="history-workspace">
-    <ViewTabs tabs={[["events", t("history")], ["rules", t("rules")]]} active={tab} onChange={setTab} />
-    {tab === "events" ? <EventPanel origin={origin} t={t} /> : <RulesEditor origin={origin} t={t} />}
+    <ViewTabs tabs={[["events", t("history")], ["rules", t("rules")], ...(reports ? [["reports", t("rep_tab")] as const] : [])]} active={tab} onChange={setTab} />
+    {tab === "events" ? <EventPanel origin={origin} t={t} /> : tab === "reports" && reports ? <ReportsPanel t={t} origin={origin} language={reports.language} cameras={reports.cameras} /> : <RulesEditor origin={origin} t={t} />}
   </section>;
 }

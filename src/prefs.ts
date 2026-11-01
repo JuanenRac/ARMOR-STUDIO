@@ -68,11 +68,13 @@ export type Prefs = {
   coverage3d: boolean;
   /** The coverage check paints only the unseen part of the blind squares next to a radar (off: whole squares). */
   coverageRefine: boolean;
+  /** The 3D view draws the field of each radar and camera as a cone (off by default). */
+  coverageCones: boolean;
 };
 
 export const DEFAULT_PREFS: Prefs = {
   tutorial: true, tourAutoStart: true, toursDone: [], tooltips: "rich", tooltipDelay: 450, motion: "full", density: "comfortable", textScale: 100,
-  startView: "overview", lastView: "overview", assistant: true, assistantPinned: false, assistantSize: "normal", assistantAutoOpen: true, assistantSpeak: false, tourMascot: true, tourSpeak: false, assistantX: null, assistantY: null, alertSound: true, alertNotifications: true, designAids: false, coverageMargin: 10, coverageFloors: false, coverage3d: false, coverageRefine: false,
+  startView: "overview", lastView: "overview", assistant: true, assistantPinned: false, assistantSize: "normal", assistantAutoOpen: true, assistantSpeak: false, tourMascot: true, tourSpeak: false, assistantX: null, assistantY: null, alertSound: true, alertNotifications: true, designAids: false, coverageMargin: 10, coverageFloors: false, coverage3d: false, coverageRefine: false, coverageCones: false,
 };
 
 export const LIMITS = { tooltipDelay: [150, 1500], textScale: [85, 130], coverageMargin: [0, 30], tours: 40 } as const;
@@ -97,7 +99,7 @@ export function parsePrefs(raw: string | null): Prefs {
     tooltips: oneOf(TOOLTIP_MODES, source.tooltips, DEFAULT_PREFS.tooltips), tooltipDelay: number("tooltipDelay", DEFAULT_PREFS.tooltipDelay, LIMITS.tooltipDelay),
     motion: oneOf(MOTION_MODES, source.motion, DEFAULT_PREFS.motion), density: oneOf(DENSITIES, source.density, DEFAULT_PREFS.density), textScale: number("textScale", DEFAULT_PREFS.textScale, LIMITS.textScale),
     startView: start, lastView: oneOf(VIEWS, source.lastView, DEFAULT_PREFS.lastView), assistant: bool("assistant", DEFAULT_PREFS.assistant), assistantPinned: bool("assistantPinned", DEFAULT_PREFS.assistantPinned), assistantSize: oneOf(ASSISTANT_SIZES, source.assistantSize, DEFAULT_PREFS.assistantSize),
-    assistantAutoOpen: bool("assistantAutoOpen", DEFAULT_PREFS.assistantAutoOpen), assistantSpeak: bool("assistantSpeak", DEFAULT_PREFS.assistantSpeak), tourMascot: bool("tourMascot", DEFAULT_PREFS.tourMascot), tourSpeak: bool("tourSpeak", DEFAULT_PREFS.tourSpeak), ...fraction(source.assistantX, source.assistantY), alertSound: bool("alertSound", DEFAULT_PREFS.alertSound), alertNotifications: bool("alertNotifications", DEFAULT_PREFS.alertNotifications), designAids: bool("designAids", DEFAULT_PREFS.designAids), coverageMargin: number("coverageMargin", DEFAULT_PREFS.coverageMargin, LIMITS.coverageMargin), coverageFloors: bool("coverageFloors", DEFAULT_PREFS.coverageFloors), coverage3d: bool("coverage3d", DEFAULT_PREFS.coverage3d), coverageRefine: bool("coverageRefine", DEFAULT_PREFS.coverageRefine),
+    assistantAutoOpen: bool("assistantAutoOpen", DEFAULT_PREFS.assistantAutoOpen), assistantSpeak: bool("assistantSpeak", DEFAULT_PREFS.assistantSpeak), tourMascot: bool("tourMascot", DEFAULT_PREFS.tourMascot), tourSpeak: bool("tourSpeak", DEFAULT_PREFS.tourSpeak), ...fraction(source.assistantX, source.assistantY), alertSound: bool("alertSound", DEFAULT_PREFS.alertSound), alertNotifications: bool("alertNotifications", DEFAULT_PREFS.alertNotifications), designAids: bool("designAids", DEFAULT_PREFS.designAids), coverageMargin: number("coverageMargin", DEFAULT_PREFS.coverageMargin, LIMITS.coverageMargin), coverageFloors: bool("coverageFloors", DEFAULT_PREFS.coverageFloors), coverage3d: bool("coverage3d", DEFAULT_PREFS.coverage3d), coverageRefine: bool("coverageRefine", DEFAULT_PREFS.coverageRefine), coverageCones: bool("coverageCones", DEFAULT_PREFS.coverageCones),
   };
 }
 

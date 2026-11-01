@@ -17,6 +17,7 @@ import type { StudioDevice } from "../api";
 import { DeviceView as PlacedDevice } from "./DeviceMeshes";
 import { bounds, edgeOf, floorBottom, nearestOnOutline, pointInPolygon, roofFrame, roofHeight, roofPieces, totalHeight } from "./geometry";
 import { ICON } from "./icons";
+import { verticalHalfDeg } from "../coverage/engine";
 import { CAMERA_HEIGHT_M, cameraLensDeg, cameraView, clamp, isMotorised, formatMetres, headingOf, radarView, SENSOR_HEIGHT_M, TOOL_GROUPS, toMetres, type Point, type Selection, type Tool } from "./model";
 import { FeatureBody, NEW_FEATURE_KINDS } from "./FeatureMeshes";
 import { floorTexture } from "./floorLooks";
@@ -30,6 +31,8 @@ import type { PlacedTarget } from "./radarMap";
 
 export type Target3D = { kind: "building" | "opening" | "roofItem" | "wallLamp" | "feature" | "camera" | "sensor" | "device"; id: string };
 export type ViewportProps = {
+  /** Draw the field of each radar and camera as a cone besides the flat fan (off by default). */
+  cones?: boolean;
   t: (key: string) => string;
   dimensions: Dimensions; model: SiteModel; selection: Selection; tool: Tool; onTool: (tool: Tool) => void;
   /** The devices of the system, with their live state. */
@@ -382,7 +385,16 @@ function Fan({ range, half, color, opacity, height }: { range: number; half: num
   </group>;
 }
 
-function DeviceView({ kind, item, dimensions, selected, hover, showField, hooks }: { kind: "camera" | "sensor"; item: Camera | Sensor; dimensions: Dimensions; selected: boolean; hover: boolean; showField: boolean; hooks: Hooks }) {
+/** The field of a device as a translucent cone: apex at the origin, opening along +X, as wide as the horizontal half angle and as tall as the vertical one (the figures of the coverage check). */
+function FieldCone({ range, horizontalHalf, verticalHalf, color, opacity }: { range: number; horizontalHalf: number; verticalHalf: number; color: string; opacity: number }) {
+  // a field wider than a half plane is not a cone: it is not drawn (the flat fan shows it)
+  if (horizontalHalf >= 85 || verticalHalf >= 85 || range <= 0) return null;
+  return <mesh position={[range / 2, 0, 0]} rotation={[0, 0, Math.PI / 2]} scale={[Math.tan(verticalHalf * Math.PI / 180) * range, 1, Math.tan(horizontalHalf * Math.PI / 180) * range]} data-testid="field-cone">
+    <coneGeometry args={[1, range, 28, 1, true]} /><meshBasicMaterial color={color} transparent opacity={opacity} side={THREE.DoubleSide} depthWrite={false} wireframe={false} />
+  </mesh>;
+}
+
+function DeviceView({ kind, item, dimensions, selected, hover, showField, cones = false, hooks }: { kind: "camera" | "sensor"; item: Camera | Sensor; dimensions: Dimensions; selected: boolean; hover: boolean; showField: boolean; /** Draw the field as a cone too (Preferences > Design aids; off by default). */ cones?: boolean; hooks: Hooks }) {
   const at = toMetres(item, dimensions), heading = headingOf(item, dimensions) * Math.PI / 180, height = item.z ?? (kind === "camera" ? CAMERA_HEIGHT_M : SENSOR_HEIGHT_M);
   const enabled = kind === "sensor" || (item as Camera).enabled, glow = glowOf(selected, hover);
   const view = kind === "camera" ? cameraView(item as Camera) : radarView(item as Sensor), range = view.rangeM, half = view.halfAngleDeg;
@@ -397,6 +409,7 @@ function DeviceView({ kind, item, dimensions, selected, hover, showField, hooks 
             <mesh position={[0.224, 0, 0]}><sphereGeometry args={[0.035, 12, 12]} /><meshStandardMaterial color="#ffb020" emissive="#ffb020" emissiveIntensity={enabled ? 1.2 : 0} /></mesh></>
         : <><mesh castShadow><boxGeometry args={[0.16, 0.12, 0.05]} /><meshStandardMaterial color="#12303a" roughness={0.4} {...glow} /></mesh>
             <mesh position={[0.03, 0, 0]}><boxGeometry args={[0.02, 0.08, 0.12]} /><meshStandardMaterial color={SELECT} emissive={SELECT} emissiveIntensity={0.8} /></mesh></>}
+      {showField && cones && enabled && <FieldCone range={range} horizontalHalf={half} verticalHalf={verticalHalfDeg(kind === "camera" ? "camera" : "radar", item)} color={kind === "camera" ? "#ffb020" : "#00e5ff"} opacity={selected ? 0.16 : 0.07} />}
     </group>
     {showField && <group rotation={[0, heading, 0]}>
       {kind === "sensor"
@@ -586,8 +599,8 @@ function Scene(props: ViewportProps & { shadows: boolean; xray: boolean; turntab
       return device ? <PlacedDevice key={placement.device_id} device={device} selected={isSelected("device", placement.device_id)} hover={hoverKey === `device:${placement.device_id}`} hooks={hooks("device", placement.device_id)}
         x={placement.x} y={placement.y} z={placement.z} rotation={placement.rotation} pitch={placement.pitch ?? 0} roll={placement.roll ?? 0} /> : null;
     })}
-    {layers.cameras && model.cameras.map(camera => <DeviceView key={camera.id} kind="camera" item={camera} dimensions={dimensions} selected={isSelected("camera", camera.id)} hover={hoverKey === `camera:${camera.id}`} showField={layers.fields} hooks={hooks} />)}
-    {layers.sensors && model.sensors.map(sensor => <DeviceView key={sensor.id} kind="sensor" item={sensor} dimensions={dimensions} selected={isSelected("sensor", sensor.id)} hover={hoverKey === `sensor:${sensor.id}`} showField={layers.fields} hooks={hooks} />)}
+    {layers.cameras && model.cameras.map(camera => <DeviceView key={camera.id} kind="camera" item={camera} dimensions={dimensions} selected={isSelected("camera", camera.id)} hover={hoverKey === `camera:${camera.id}`} showField={layers.fields} cones={props.cones} hooks={hooks} />)}
+    {layers.sensors && model.sensors.map(sensor => <DeviceView key={sensor.id} kind="sensor" item={sensor} dimensions={dimensions} selected={isSelected("sensor", sensor.id)} hover={hoverKey === `sensor:${sensor.id}`} showField={layers.fields} cones={props.cones} hooks={hooks} />)}
   {props.live?.targets.map(target => <LiveTarget key={target.key} target={target} />)}
   </>;
 }

@@ -34,7 +34,7 @@ export function describeWarning(warning: CoverageWarning, t: (key: string) => st
   const where = warning.floor === undefined ? "" : ` (${fill(t("cov_floor_n"), [warning.floor + 1])})`;
   const message = fill(t(`cov_w_${warning.code}`), args) + where;
   const suggestion = warning.suggestion;
-  const withoutPlace = new Set(["zone_overlap", "sensor_redundant", "opening_video_only", "sensor_floor_assumed"]);
+  const withoutPlace = new Set(["zone_overlap", "sensor_redundant", "opening_video_only", "sensor_floor_assumed", "camera_floor_assumed"]);
   const advice = suggestion ? fill(t(`cov_s_${warning.code}`), [suggestion.x, suggestion.y, suggestion.headingDeg]) : withoutPlace.has(warning.code) ? t(`cov_s_${warning.code}`) : undefined;
   return { message, advice };
 }

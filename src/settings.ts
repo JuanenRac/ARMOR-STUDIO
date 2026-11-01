@@ -51,6 +51,7 @@ function readCamera(raw: unknown): Camera | null {
   if (finite(raw.heading)) camera.heading = ((raw.heading % 360) + 360) % 360;
   if (finite(raw.tilt)) camera.tilt = clamp(raw.tilt, -90, 90);
   if (finite(raw.z)) camera.z = clamp(raw.z, 0, 100);
+  if (finite(raw.floor) && Number.isInteger(raw.floor) && raw.floor >= 0 && raw.floor < LIMITS.floors) camera.floor = raw.floor;
   if (finite(raw.fov)) camera.fov = clamp(raw.fov, 20, 180);
   if (finite(raw.range)) camera.range = clamp(raw.range, 2, 60);
   if (raw.kind === "ptz") camera.kind = "ptz";

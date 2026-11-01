@@ -83,7 +83,18 @@ export function cleanedDocument(document: ArmingModesDocument): ArmingModesDocum
     }
     return out as T;
   };
-  return { modes: { away: clean(document.modes.away), home: clean(document.modes.home), night: clean(document.modes.night) }, schedule: (document.schedule ?? []).map(entry => ({ ...entry, days: [...entry.days].sort((a, b) => a - b) })) };
+  const map = cleanedPanelMap(document.panel_map);
+  return { modes: { away: clean(document.modes.away), home: clean(document.modes.home), night: clean(document.modes.night) }, ...(map ? { panel_map: map } : {}), schedule: (document.schedule ?? []).map(entry => ({ ...entry, days: [...entry.days].sort((a, b) => a - b) })) };
+}
+
+/** How the modes reach the panels without the empty pieces: no mapping entry that says nothing, no `profiles` object left empty. A list of panels is kept even when it is empty (that means no panel). Undefined when nothing is set (the defaults). */
+export function cleanedPanelMap(map: ArmingModesDocument["panel_map"]): ArmingModesDocument["panel_map"] | undefined {
+  if (!map) return undefined;
+  const profiles = Object.fromEntries(Object.entries(map.profiles ?? {}).filter(([, id]) => typeof id === "string" && id !== ""));
+  const out: NonNullable<ArmingModesDocument["panel_map"]> = {};
+  if (Object.keys(profiles).length) out.profiles = profiles;
+  if (map.only !== undefined) out.only = [...map.only];
+  return Object.keys(out).length ? out : undefined;
 }
 
 /** The key of the words for a mode (`am_mode_<mode>`). */

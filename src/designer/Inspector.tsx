@@ -408,6 +408,10 @@ export function Inspector(p: InspectorProps) {
         {heading(camera, value => setCamera(camera.id, { heading: value }, "heading"))}
         {positionFields(camera, patch => setCamera(camera.id, patch, "position"))}
         <NumberField label={t("tiltDown")} unit="°" min={-90} max={90} step={5} value={camera.tilt ?? 0} onChange={value => setCamera(camera.id, { tilt: clamp(value, -90, 90) || undefined }, "tilt")} />
+        <label>{t("cameraFloor")}<select value={camera.floor ?? ""} data-testid="camera-floor" onChange={event => setCamera(camera.id, { floor: event.target.value === "" ? undefined : Number(event.target.value) }, "floor")}>
+          <option value="">{t("sensorFloorAuto")}</option>
+          {Array.from({ length: Math.max(1, camera.floor !== undefined ? camera.floor + 1 : 1, ...model.buildings.map(item => item.floors.length)) }, (_, index) => <option key={index} value={index}>{t("sensorFloorN").replace("{0}", String(index + 1))}</option>)}
+        </select></label>
         <NumberField label={t("mountHeight")} unit="m" min={0} max={100} step={0.1} value={camera.z ?? CAMERA_HEIGHT_M} onChange={value => setCamera(camera.id, { z: round2(clamp(value, 0, 100)) }, "z")} />
         <label>{t("cameraKind")}<select value={camera.kind === "ptz" ? "ptz" : "fixed"} onChange={event => setCamera(camera.id, event.target.value === "ptz" ? { kind: "ptz" } : { kind: undefined, pan: undefined, tiltSweep: undefined }, "kind")}><option value="fixed">{t("cameraKindFixed")}</option><option value="ptz">{t("cameraKindPtz")}</option></select></label>
         <label>{t("cameraMount")}<select value={camera.mount ?? "wall"} onChange={event => setCamera(camera.id, { mount: event.target.value === "wall" ? undefined : event.target.value as "ceiling" | "pole" | "ground" }, "mount")}>{(["wall", "ceiling", "pole", "ground"] as const).map(mount => <option key={mount} value={mount}>{t("cameraMount_" + mount)}</option>)}</select></label>

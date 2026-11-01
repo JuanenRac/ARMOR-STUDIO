@@ -24,6 +24,16 @@ export const DEFAULT_OPTIONS: CoverageOptions = {
 };
 export const clampMargin = (value: number): number => Number.isFinite(value) ? Math.min(config.marginPercent.max, Math.max(config.marginPercent.min, value)) : config.marginPercent.default;
 
+/**
+ * The half of the vertical field of a device, in degrees, for the 3D check. A radar has the one of the settings. A fixed camera sees a picture wider than tall: a fraction of its horizontal half
+ * angle (never more than a radar, never less than a few degrees), and a motorised one half of the sweep it can tilt through, within a limit: figures that err on the small side.
+ */
+export function verticalHalfDeg(kind: "radar" | "camera", item: { fov?: number; kind?: string; tiltSweep?: number; pan?: number }): number {
+  if (kind === "radar") return config.verticalHalfAngleDeg;
+  if (item.kind === "ptz") return Math.min(config.ptzVerticalMaxDeg, Math.max(config.cameraVerticalMinDeg, (item.tiltSweep ?? 90) / 2));
+  return Math.min(config.verticalHalfAngleDeg, Math.max(config.cameraVerticalMinDeg, cameraView(item).halfAngleDeg * config.cameraVerticalRatio));
+}
+
 export type OpeningState = "contact" | "presence" | "video" | "none";
 export type Level = "warn" | "info";
 export type Suggestion = { x: number; y: number; headingDeg: number };
@@ -63,7 +73,7 @@ export function analyseCoverage(model: SiteModel, dimensions: Dimensions, given:
   }).sort((a, b) => byText(a.id, b.id));
   const video: Source[] = model.cameras.filter(camera => camera.enabled !== false).map(camera => {
     const view = cameraView(camera), level = levelOf(model, camera, dimensions, CAMERA_HEIGHT_M);
-    return shrunk({ id: camera.id, name: camera.name || camera.id, apex: toMetres(camera, dimensions), heading: headingOf(camera, dimensions), halfAngleDeg: view.halfAngleDeg, rangeM: view.rangeM, floor: level.floor, z: level.z, tiltDown: camera.tilt ?? 0, vHalfDeg: config.verticalHalfAngleDeg, assumed: false }, options.marginPercent);
+    return shrunk({ id: camera.id, name: camera.name || camera.id, apex: toMetres(camera, dimensions), heading: headingOf(camera, dimensions), halfAngleDeg: view.halfAngleDeg, rangeM: view.rangeM, floor: level.floor, z: level.z, tiltDown: camera.tilt ?? 0, vHalfDeg: verticalHalfDeg("camera", camera), assumed: level.assumed }, options.marginPercent);
   }).sort((a, b) => byText(a.id, b.id));
 
   const walls: Array<[P, P]> = [];
@@ -180,7 +190,7 @@ export function analyseCoverage(model: SiteModel, dimensions: Dimensions, given:
       const short = { x: at.x + (source.apex.x - at.x) / distance * back, y: at.y + (source.apex.y - at.y) / distance * back };
       return (!options.floors || source.floor === opening.floor) && inSectorOf(at, source.apex, source.heading, source.halfAngleDeg, source.rangeM) && (!vertical || planeZ === undefined || inVerticalField(source, at, planeZ)) && !walls.some(([p, q]) => blockedBy(source.apex, short, p, q));
     };
-    const seenBy = presence.filter(source => reach(source, true)).map(source => source.id), videoBy = video.filter(source => reach(source)).map(source => source.id);
+    const seenBy = presence.filter(source => reach(source, true)).map(source => source.id), videoBy = video.filter(source => reach(source, true)).map(source => source.id);
     const status: OpeningState = opening.contact === true ? "contact" : seenBy.length ? "presence" : videoBy.length ? "video" : "none";
     openings.push({ id: opening.id, buildingId: building.id, kind: opening.kind, at: { x: round(at.x), y: round(at.y) }, state: status, by: status === "presence" ? seenBy : status === "video" ? videoBy : [] });
     if (status === "none") {
@@ -205,6 +215,7 @@ export function analyseCoverage(model: SiteModel, dimensions: Dimensions, given:
   if (buildings.length === 0) warnings.push({ code: "no_buildings", level: "info", args: [] });
   if (!options.floors && model.buildings.some(building => building.floors.length > 1)) warnings.push({ code: "upper_floors", level: "info", args: [] });
   if (options.floors) for (const source of presence) if (source.assumed) warnings.push({ code: "sensor_floor_assumed", level: "info", args: [source.name], target: source.id });
+  if (options.floors) for (const source of video) if (source.assumed) warnings.push({ code: "camera_floor_assumed", level: "info", args: [source.name], target: source.id });
 
   return { schema: COVERAGE_SCHEMA, options, cellM, zones, openings, sensors, notChecked: { openings: notChecked }, warnings };
 }

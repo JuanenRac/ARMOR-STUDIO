@@ -134,6 +134,36 @@ describe("the editor of the modes in the Alarm Designer", () => {
     expect(calls[0]!.body).toMatchObject({ modes: { away: { entry: ["node:radar-1"], entry_delay_s: 20 } } });
   });
 
+  it("edits how the modes reach the panels: the profile of each mode, all the panels or only some, and sends nothing when it is left as it was", async () => {
+    const profiles = [{ id: "away", name: "Away" }, { id: "stay", name: "Stay" }, { id: "night", name: "Night" }, { id: "sleep", name: "Sleeping" }];
+    mount(createElement(ArmingModesEditor, { t, origin: "http://x", current: state({ panel_sync_enabled: false }), universe, panels: ["alarm-1", "alarm-2"], profiles, isAdmin: true, onSaved: vi.fn(), onConflict: vi.fn() }));
+    expect(container.textContent).toContain("the panels now: that setting is off");
+    replies = [{ status: 200, body: state({ revision: 4 }) }];
+    await click('[data-testid="arming-modes-save"]');
+    expect("panel_map" in calls[0]!.body, "left as it was: nothing is sent").toBe(false);
+    const set = async (testid: string, value: string) => { await act(async () => { const select = container.querySelector(`[data-testid="${testid}"]`) as HTMLSelectElement; const setter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value")!.set!; setter.call(select, value); select.dispatchEvent(new Event("change", { bubbles: true })); await Promise.resolve(); }); };
+    await set("arming-panel-profile-night", "sleep");
+    await click('[data-testid="arming-panels-only"]');
+    expect((container.querySelector('[data-testid="arming-panel-alarm-1"]') as HTMLInputElement).checked, "starts with every known panel marked").toBe(true);
+    await click('[data-testid="arming-panel-alarm-1"]');
+    replies = [{ status: 200, body: state({ revision: 5 }) }];
+    await click('[data-testid="arming-modes-save"]');
+    expect(calls[1]!.body.panel_map).toEqual({ profiles: { night: "sleep" }, only: ["alarm-2"] });
+    await click('[data-testid="arming-panels-all"]');
+    await set("arming-panel-profile-night", "");
+    replies = [{ status: 200, body: state({ revision: 6 }) }];
+    await click('[data-testid="arming-modes-save"]');
+    expect("panel_map" in calls[2]!.body, "back to the defaults: nothing is sent").toBe(false);
+  });
+
+  it("warns when the list of panels is empty (no panel will be asked) and keeps the empty list", async () => {
+    mount(createElement(ArmingModesEditor, { t, origin: "http://x", current: state({ panel_map: { only: [] } }), universe, panels: ["alarm-1"], profiles: [], isAdmin: true, onSaved: vi.fn(), onConflict: vi.fn() }));
+    expect(container.textContent).toContain("No panel is selected");
+    replies = [{ status: 200, body: state({ revision: 4 }) }];
+    await click('[data-testid="arming-modes-save"]');
+    expect(calls[0]!.body.panel_map).toEqual({ only: [] });
+  });
+
   it("saves the whole document with the revision read; a conflict reloads and says so", async () => {
     const onSaved = vi.fn(), onConflict = vi.fn();
     mount(createElement(ArmingModesEditor, { t, origin: "http://x", current: state(), universe, isAdmin: true, onSaved, onConflict }));

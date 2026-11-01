@@ -19,7 +19,7 @@ import { TourHost } from "./tour/TourHost";
 import { RichTooltips } from "./tour/RichTooltips";
 import { shouldAutoStart, startTour } from "./tour/tourStore";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { readNodeHealth, acknowledgeAlarm, listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listNetwork, ApiError, setSystemMode, readArmingModes, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
+import { readNodeHealth, acknowledgeAlarm, listMedia, listAlarms, listAutomations, listDevices, listSolar, listElectricalReadings, listAlarmNodes, listArmProfiles, listNetwork, ApiError, setSystemMode, readArmingModes, captureSnapshot, closeStudioSession, discoverCameras, forgetNode, getPreferences, savePreferences, sendPtz, startCameraRecording, stopCameraRecording, studioSessionState, type DiscoveredCamera } from "./api";
 import { nodeCensus } from "./nodeCensus";
 import { selectionAfterRemoval, upsertCamera } from "./cameras";
 import { clearSessionMemory } from "./sessionMemory";
@@ -178,6 +178,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const solarPoll = usePolled(() => listSolar(origin), 4000, origin, { always: true });
   const electricalPoll = usePolled(() => listElectricalReadings(origin), 4000, origin, { always: true });
   const alarmNodesPoll = usePolled(() => listAlarmNodes(origin), 3000, origin, { always: true });
+  const armProfilesPoll = usePolled(() => listArmProfiles(origin), 15000, origin, { always: true });
   // The arming modes (Away, Home, Night): an older server has no such route and the console then arms and disarms as it always did.
   const armingPoll = usePolled(() => readArmingModes(origin), liveChannel ? 20_000 : 4000, origin, { always: true });
   // The live channel already carries the mode in force: when it changes the document of the modes (its revision, what each mode defends) is read again at once instead of waiting for the next ask.
@@ -387,13 +388,13 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
         onCameraDeleted={id => setCameras(current => { const next = current.filter(camera => camera.id !== id); persist(next); setSelectedCamera(selectionAfterRemoval(next, selectedCamera, id)); return next; })}
         discovered={discovered} discover={() => void discoverLocalCameras()} />} />,
     record: <MediaLibrary origin={origin} cameras={cameras} t={t} />,
-    history: <HistoryView origin={origin} t={t} />,
+    history: <HistoryView origin={origin} t={t} reports={sessionUser.user?.role === "admin" || sessionUser.user?.role === "operator" ? { language, cameras: cameras.map(camera => ({ id: camera.id, name: camera.name })) } : undefined} />,
     radar: <RadarView isAdmin={isAdmin} devices={devices} network={networkPoll.data} nodes={nodes} model={site} dimensions={dimensions} origin={origin} openDesigner={() => setView("siteDesigner")} openZones={() => setView("history")} setSensors={setSensors} forget={id => void forgetNode(origin, id).then(() => setNotice(t("nodeForgotten"))).catch(() => setNotice(t("recordingFailed")))} t={t} />,
     siteDesigner: <SiteDesignerInteractive openVersions={() => setVersionsOf("site")} t={t} dimensions={dimensions} setDimensions={setDimensions} model={site} applyModel={applySite} selectedCamera={selectedCamera} setSelectedCamera={setSelectedCamera} notice={notice} setNotice={setNotice} save={saveSettings} nodeIds={nodes.map(node => node.node_id)} devices={devices} wantsToPlace={wantsToPlace} clearWantsToPlace={() => setWantsToPlace("")} openDevices={() => setView("devices")} cameras={cameras} alarmNodes={alarmNodesPoll.data?.nodes ?? []} openCameras={() => setView("cameras")} openAlarmPanels={() => setView("alarmPanels")} />,
     electricalDesigner: <ElectricalDesigner t={t} design={electrical} setDesign={setElectrical} status={electricalStatus} nodeIds={nodes.map(node => node.node_id)} solarDevices={solarPoll.data?.devices ?? []} solarWaiting={solarPoll.data?.waiting ?? []} electricalNodes={electricalPoll.data?.nodes ?? []} site={{ openings, features, roofItems }} />,
     network: <Ticking>{now => <NetworkView openDesigner={() => setView("networkDesigner")} language={language} t={t} origin={origin} isAdmin={isAdmin} overview={networkPoll.data} reload={networkPoll.reload} now={now} />}</Ticking>,
     alarmDesigner: <AlarmDesigner t={t} design={alarmDesign} setDesign={setAlarmDesign} status={alarmDesignStatus} panels={alarmNodesPoll.data ?? null} openVersions={() => setVersionsOf("alarm")} openPanels={() => setView("alarmPanels")}
-      modesPanel={armingModes ? <ArmingModesEditor t={t} origin={origin} current={armingModes} isAdmin={isAdmin} onSaved={() => armingPoll.reload()} onConflict={() => armingPoll.reload()}
+      modesPanel={armingModes ? <ArmingModesEditor t={t} origin={origin} current={armingModes} isAdmin={isAdmin} panels={(alarmNodesPoll.data?.nodes ?? []).map(node => node.node_id)} profiles={(armProfilesPoll.data?.profiles ?? []).map(profile => ({ id: profile.id, name: profile.name }))} onSaved={() => armingPoll.reload()} onConflict={() => armingPoll.reload()}
         universe={{ zones: zonesOfDevices(devices), devices: devices.map(device => ({ id: device.id, name: device.name, location: device.location })), nodes: nodes.map(node => node.node_id), cameras: cameras.map(camera => ({ id: camera.id, name: camera.name })) }} /> : undefined} />,
     networkDesigner: <NetworkDesigner t={t} design={networkDesign} setDesign={setNetworkDesign} status={networkStatus} overview={networkPoll.data} cameras={cameras} />,
     configuration: <ConfigurationPanel

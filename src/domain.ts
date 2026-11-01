@@ -20,6 +20,8 @@ export type Camera = CameraTraits & {
   heading?: number;
   /** Degrees it looks down from the horizontal (0 = level). */
   tilt?: number;
+  /** The floor of the building the camera is on (0 = ground floor). Unset: the floor follows from the mounting height, like a radar. */
+  floor?: number;
   /** Mounting height above the ground in metres; unset means 2.4 m for a camera. */
   z?: number;
   /** Field of view in degrees (the whole angle) and how far it sees in metres; unset means the defaults of the designer (90 degrees, 12 m). */

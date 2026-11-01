@@ -11,6 +11,9 @@
   "openingReachM": 3,
   "targetHeightM": 1,
   "verticalHalfAngleDeg": 35,
+  "cameraVerticalRatio": 0.6,
+  "cameraVerticalMinDeg": 8,
+  "ptzVerticalMaxDeg": 60,
   "refineRadiusM": 1,
   "refineDivisions": 4
 }

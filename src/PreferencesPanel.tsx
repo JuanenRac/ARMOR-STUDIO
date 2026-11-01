@@ -73,6 +73,7 @@ export function PreferencesPanel({ t, language = "en" }: { t: (key: string) => s
         {toggle("pf_cov_floors", "pf_cov_floors_h", prefs.coverageFloors, coverageFloors => setPrefs({ coverageFloors }), !prefs.designAids)}
         {toggle("pf_cov_3d", "pf_cov_3d_h", prefs.coverage3d, coverage3d => setPrefs({ coverage3d }), !prefs.designAids)}
         {toggle("pf_cov_refine", "pf_cov_refine_h", prefs.coverageRefine, coverageRefine => setPrefs({ coverageRefine }), !prefs.designAids)}
+        {toggle("pf_cov_cones", "pf_cov_cones_h", prefs.coverageCones, coverageCones => setPrefs({ coverageCones }))}
         <div className="pf-actions"><button className="danger" onClick={() => void reset()}>{t("pf_reset")}</button></div>
       </article>
     </div>

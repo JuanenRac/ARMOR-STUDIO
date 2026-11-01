@@ -8,7 +8,7 @@ import type { SiteModel } from "../designer/ops";
 import type { Dimensions } from "../domain";
 import { LIMITS, setPrefs } from "../prefs";
 import { analyseCoverage, type Cell, type CoverageReport } from "./engine";
-import { SITE_TEMPLATES, type SiteTemplate } from "./siteTemplates";
+import { parseSiteTemplate, SITE_TEMPLATES, TEMPLATE_LIMITS, type SiteTemplate } from "./siteTemplates";
 import { describeWarning, reportToCsv, reportToJson } from "./report";
 import "./coverage.css";
 
@@ -39,8 +39,8 @@ export function blindToDraw(report: CoverageReport, activeFloor: number): Cell[]
   return squares;
 }
 
-export function CoveragePanel({ t, report, margin, showBlind, setShowBlind, onClose, onNotice, onAddTemplate }: {
-  t: (key: string) => string; report: CoverageReport; margin: number; showBlind: boolean; setShowBlind: (next: boolean) => void; onClose: () => void; onNotice: (text: string) => void;
+export function CoveragePanel({ t, report, margin, modes, showBlind, setShowBlind, onClose, onNotice, onAddTemplate }: {
+  t: (key: string) => string; report: CoverageReport; margin: number; /** The way the check looks: the same choices as Preferences > Design aids, here at hand. */ modes?: { floors: boolean; threeD: boolean; refine: boolean; cones: boolean }; showBlind: boolean; setShowBlind: (next: boolean) => void; onClose: () => void; onNotice: (text: string) => void;
   /** Adds a building with its own floor plan (a template of the site plan) to the plan; the card offers the templates only when given. */
   onAddTemplate?: (template: SiteTemplate) => void;
 }) {
@@ -52,6 +52,13 @@ export function CoveragePanel({ t, report, margin, showBlind, setShowBlind, onCl
     <label className="cov-margin">{fill(t("cov_margin"), [margin])}
       <input type="range" min={LIMITS.coverageMargin[0]} max={LIMITS.coverageMargin[1]} step={1} value={margin} onChange={event => setPrefs({ coverageMargin: Number(event.target.value) })} />
       <small className="muted">{t("cov_margin_h")}</small></label>
+    {modes && <fieldset className="cov-modes" data-testid="cov-modes">
+      <legend>{t("cov_modes_title")}</legend>
+      <label><input type="checkbox" checked={modes.floors} data-testid="cov-mode-floors" onChange={event => setPrefs({ coverageFloors: event.target.checked })} /> {t("pf_cov_floors")}</label>
+      <label><input type="checkbox" checked={modes.threeD} data-testid="cov-mode-3d" onChange={event => setPrefs({ coverage3d: event.target.checked })} /> {t("pf_cov_3d")}</label>
+      <label><input type="checkbox" checked={modes.refine} data-testid="cov-mode-refine" onChange={event => setPrefs({ coverageRefine: event.target.checked })} /> {t("pf_cov_refine")}</label>
+      <label><input type="checkbox" checked={modes.cones} data-testid="cov-mode-cones" onChange={event => setPrefs({ coverageCones: event.target.checked })} /> {t("pf_cov_cones")}</label>
+    </fieldset>}
     <label className="cov-layer"><input type="checkbox" checked={showBlind} onChange={event => setShowBlind(event.target.checked)} /> {t("cov_layer")}</label>
     {area > 0 && <p className="cov-summary">{fill(t("cov_summary"), [Math.round(seen * 10) / 10, Math.round(area * 10) / 10])}</p>}
     <ul className="cov-zones">{report.zones.map(zone => <li key={`${zone.buildingId}:${zone.floor ?? ""}`}>{fill(t("cov_zone_line"), [zone.floor === undefined ? zone.name : `${zone.name} (${fill(t("cov_floor_n"), [zone.floor + 1])})`, zone.coveredM2, zone.blindM2])}</li>)}</ul>
@@ -68,6 +75,18 @@ export function CoveragePanel({ t, report, margin, showBlind, setShowBlind, onCl
       <label>{t("cov_site_tpl_title")}
         <select value={templateId} onChange={event => setTemplateId(event.target.value)} aria-label={t("cov_site_tpl_pick")}>{SITE_TEMPLATES.map(item => <option key={item.id} value={item.id}>{t(item.titleKey)}</option>)}</select></label>
       <button type="button" onClick={() => onAddTemplate(SITE_TEMPLATES.find(item => item.id === templateId) ?? SITE_TEMPLATES[0])}>{t("cov_site_tpl_add")}</button>
+      <label className="cov-import" title={t("cov_import_help")}>{t("cov_import")}
+        <input type="file" accept="application/json,.json" data-testid="cov-import" onChange={event => {
+          const file = event.target.files?.[0];
+          event.target.value = "";
+          if (!file) return;
+          if (file.size > TEMPLATE_LIMITS.bytes) { onNotice(t("cov_import_bad_too_big")); return; }
+          void file.text().then(text => {
+            const read = parseSiteTemplate(text);
+            if (read.ok) onAddTemplate(read.template);
+            else onNotice(`${t(`cov_import_bad_${read.problem}`)}${read.where ? ` (${read.where})` : ""}`);
+          }, () => onNotice(t("cov_import_bad_not_json")));
+        }} /></label>
     </div>}
     <div className="cov-actions">
       <button type="button" onClick={() => { save("coverage.json", "application/json", reportToJson(report)); onNotice(t("cov_exported")); }}>{t("cov_export_json")}</button>

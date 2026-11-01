@@ -10,13 +10,14 @@ import { ApiError, saveArmingModes, type ArmedMode, type ArmingModesDocument, ty
 import type { Translate } from "../components/camera";
 import { ASSIGNABLE, MAX_SCHEDULE, cleanedDocument, defendsRef, modeName, problemsOf, refOf, toggleRef, unknownRefs, type RefKind, type Universe } from "../armingModesModel";
 
-type Props = { t: Translate; origin: string; current: ArmingModesState; universe: Universe; isAdmin: boolean; onSaved: (saved: ArmingModesState) => void; onConflict: () => void };
+type Props = { t: Translate; origin: string; current: ArmingModesState; universe: Universe; /** The alarm panels the server knows and the arming profiles it has (for the part that says how the modes reach the panels). */ panels?: string[]; profiles?: Array<{ id: string; name: string }>; isAdmin: boolean; onSaved: (saved: ArmingModesState) => void; onConflict: () => void };
 type Definition = { defends?: string[]; entry?: string[]; exit_delay_s?: number; entry_delay_s?: number };
 
 const numberOrUndefined = (text: string): number | undefined => (text.trim() === "" ? undefined : Number(text));
-const documentOf = (state: ArmingModesState): ArmingModesDocument => ({ modes: state.modes, schedule: state.schedule });
+const documentOf = (state: ArmingModesState): ArmingModesDocument => ({ modes: state.modes, schedule: state.schedule, ...(state.panel_map && Object.keys(state.panel_map).length ? { panel_map: state.panel_map as ArmingModesDocument["panel_map"] } : {}) });
+const DEFAULT_PROFILE = { away: "away", home: "stay", night: "night" } as const;
 
-export function ArmingModesEditor({ t, origin, current, universe, isAdmin, onSaved, onConflict }: Props) {
+export function ArmingModesEditor({ t, origin, current, universe, panels = [], profiles = [], isAdmin, onSaved, onConflict }: Props) {
   const [draft, setDraft] = useState<ArmingModesDocument>(documentOf(current));
   const [message, setMessage] = useState<{ text: string; bad: boolean } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -25,6 +26,11 @@ export function ArmingModesEditor({ t, origin, current, universe, isAdmin, onSav
   const edit = (next: ArmingModesDocument) => { setMessage(null); setDraft(next); };
   const definitionOf = (mode: ArmedMode): Definition => draft.modes[mode] as Definition;
   const patchMode = (mode: ArmedMode, patch: Definition) => edit({ ...draft, modes: { ...draft.modes, [mode]: { ...definitionOf(mode), ...patch } } });
+  const setPanelMap = (patch: { profiles?: Partial<Record<ArmedMode, string>>; only?: string[] | undefined }) => {
+    const next = { ...draft.panel_map, ...patch };
+    if (!("only" in patch) || patch.only !== undefined) edit({ ...draft, panel_map: next });
+    else { const { only: _gone, ...rest } = next; edit({ ...draft, panel_map: rest }); }
+  };
   const schedule = draft.schedule ?? [];
   const patchEntry = (index: number, patch: Partial<(typeof schedule)[number]>) => edit({ ...draft, schedule: schedule.map((entry, at) => at === index ? { ...entry, ...patch } : entry) });
   const save = async () => {
@@ -88,6 +94,30 @@ export function ArmingModesEditor({ t, origin, current, universe, isAdmin, onSav
           <DelayFields t={t} definition={definition} onChange={patch => patchMode(mode, patch)} />
         </fieldset>;
       })}
+      <fieldset className="am-mode" data-testid="arming-panel-map">
+        <legend>{t("am_pm_title")}</legend>
+        <p className="ed-note">{t("am_pm_help")}</p>
+        {!current.panel_sync_enabled && <p className="ed-note warn" role="status">{t("am_pm_off")}</p>}
+        {(["away", "home", "night"] as const).map(mode => {
+          const chosen = draft.panel_map?.profiles?.[mode] ?? "";
+          const known = profiles.some(profile => profile.id === chosen);
+          return <label key={mode} className="am-pm-row">{t("am_pm_profile").replace("{0}", modeName(mode, t))}
+            <select value={chosen} data-testid={`arming-panel-profile-${mode}`} onChange={event => setPanelMap({ profiles: { ...draft.panel_map?.profiles, [mode]: event.target.value } })}>
+              <option value="">{t("am_pm_default").replace("{0}", DEFAULT_PROFILE[mode])}</option>
+              {profiles.map(profile => <option key={profile.id} value={profile.id}>{profile.name} ({profile.id})</option>)}
+              {chosen && !known && <option value={chosen}>{chosen} - {t("am_pm_unknown")}</option>}
+            </select>
+          </label>;
+        })}
+        <label className="am-pm-row"><input type="radio" name="am-pm-who" checked={draft.panel_map?.only === undefined} data-testid="arming-panels-all" onChange={() => setPanelMap({ only: undefined })} /> {t("am_pm_all")}</label>
+        <label className="am-pm-row"><input type="radio" name="am-pm-who" checked={draft.panel_map?.only !== undefined} data-testid="arming-panels-only" onChange={() => setPanelMap({ only: draft.panel_map?.only ?? [...panels] })} /> {t("am_pm_only")}</label>
+        {draft.panel_map?.only !== undefined && <div className="am-pm-panels">
+          {[...new Set([...panels, ...draft.panel_map.only])].map(panel => <label key={panel} className="am-entry"><input type="checkbox" checked={draft.panel_map!.only!.includes(panel)} data-testid={`arming-panel-${panel}`}
+            onChange={() => setPanelMap({ only: draft.panel_map!.only!.includes(panel) ? draft.panel_map!.only!.filter(item => item !== panel) : [...draft.panel_map!.only!, panel] })} /> {panel}{panels.includes(panel) ? "" : ` - ${t("am_pm_unknown")}`}</label>)}
+          {panels.length === 0 && draft.panel_map.only.length === 0 && <p className="ed-note">{t("am_pm_none_known")}</p>}
+          {draft.panel_map.only.length === 0 && <p className="ed-note warn" role="status">{t("am_pm_none")}</p>}
+        </div>}
+      </fieldset>
       <fieldset className="am-mode" data-testid="arming-mode-schedule">
         <legend>{t("am_ed_schedule")}</legend>
         <p className="ed-note">{t("am_ed_schedule_help")}</p>
