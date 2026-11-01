@@ -5,7 +5,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useMemo, useState } from "react";
-import { acknowledgeAlarm, acknowledgeAllAlarms, ApiError, clearAlarmRecord, deleteAlarm, saveDeviceNote, type Alarm, type StudioDevice } from "../api";
+import { acknowledgeAlarm, acknowledgeAllAlarms, ApiError, clearAlarmRecord, deleteAlarm, markFalseAlarm, saveDeviceNote, type Alarm, type StudioDevice } from "../api";
 import { ago, KindIcon } from "../deviceKinds";
 import type { Translate } from "../components/camera";
 import { ConfirmDialog } from "../components/chrome";
@@ -101,6 +101,7 @@ export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mo
   const controls = (alarm: Alarm, compact = false) => <div className={`alarm-actions ${compact ? "compact" : ""}`}>
     {!alarm.acknowledged_at && <button className="primary" disabled={readOnly} onClick={() => void act(() => acknowledgeAlarm(origin, alarm.id))}>{t("acknowledge")}</button>}
     {alarm.code === "network_new_device" && !alarm.cleared_at && <button disabled={readOnly} onClick={() => markKnown(alarm)}>{t("alarmMarkKnown")}</button>}
+    <button disabled={readOnly} onClick={() => void act(() => markFalseAlarm(origin, alarm.id, alarm.false_alarm === true ? null : true), () => t(alarm.false_alarm === true ? "alarmFalseUndone" : "alarmFalseDone"))} title={t("alarmFalseTitle")}>{t(alarm.false_alarm === true ? "alarmFalseUndo" : "alarmFalse")}</button>
     <button onClick={() => toggle(alarm.id)} aria-expanded={open.has(alarm.id)}>{open.has(alarm.id) ? t("alarmHideDetails") : t("alarmDetails")}</button>
     <button className="danger-button" disabled={readOnly} onClick={() => setConfirming({ kind: "delete", alarm })} title={t("alarmDeleteTitle")} aria-label={t("alarmDeleteTitle")}>×</button>
   </div>;
@@ -136,7 +137,7 @@ export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mo
           <strong>{t(`alarm_${alarm.code}`)}</strong>
           <span className="alarm-source"><AlarmSource alarm={alarm} devices={devices} cameraNames={cameraNames} t={t} /></span>
           {summaryOf(alarm) && <span className="alarm-summary">{summaryOf(alarm)}</span>}
-          <small>{t(`alarmState_${stateOf(alarm)}`)} · {t("raisedAgo")} {ago(alarm.raised_at, now, t)}{alarm.acknowledged_by ? ` · ${t("ackBy")} ${alarm.acknowledged_by}` : ""}</small>
+          <small>{t(`alarmState_${stateOf(alarm)}`)} · {t("raisedAgo")} {ago(alarm.raised_at, now, t)}{alarm.acknowledged_by ? ` · ${t("ackBy")} ${alarm.acknowledged_by}` : ""}{alarm.false_alarm === true ? ` · ${t("alarmFalseMarked")}` : ""}</small>
           {open.has(alarm.id) && <AlarmFacts alarm={alarm} t={t} />}
         </div>
         {controls(alarm)}

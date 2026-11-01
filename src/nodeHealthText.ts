@@ -95,21 +95,6 @@ const ROWS: Record<string, Row> = {
   alarm_node_frequent_resets: ["A node restarts too often or has crashed", "Un nodo se reinicia demasiado o se ha colgado", "Ein Knoten startet zu oft neu oder ist abgestürzt", "Un nœud redémarre trop souvent ou a planté", "Un nodo si riavvia troppo spesso o si è bloccato", "ノードの再起動が多すぎる、またはクラッシュしました", "有节点重启过于频繁或已崩溃"],
   alarm_node_link_flapping: ["A node keeps losing the broker", "Un nodo pierde el broker una y otra vez", "Ein Knoten verliert den Broker immer wieder", "Un nœud perd le broker à répétition", "Un nodo perde di continuo il broker", "ノードがブローカーを何度も失っています", "有节点反复丢失代理"],
   alarm_node_weak_signal: ["A node has a weak Wi-Fi signal", "Un nodo tiene poca señal Wi-Fi", "Ein Knoten hat ein schwaches WLAN-Signal", "Un nœud a un signal Wi-Fi faible", "Un nodo ha un segnale Wi-Fi debole", "ノードの Wi-Fi 信号が弱いです", "有节点 Wi-Fi 信号弱"],
-  fact_family: ["Kind of node", "Tipo de nodo", "Knotenart", "Type de nœud", "Tipo di nodo", "ノードの種類", "节点类型"],
-  fact_heap_free: ["Free memory (bytes)", "Memoria libre (bytes)", "Freier Speicher (Bytes)", "Mémoire libre (octets)", "Memoria libera (byte)", "空きメモリ（バイト）", "可用内存（字节）"],
-  fact_heap_internal_free: ["Free internal memory (bytes)", "Memoria interna libre (bytes)", "Freier interner Speicher (Bytes)", "Mémoire interne libre (octets)", "Memoria interna libera (byte)", "内部メモリの空き（バイト）", "可用内部内存（字节）"],
-  fact_heap_internal_min: ["Least free internal memory (bytes)", "Mínimo de memoria interna libre (bytes)", "Geringster freier interner Speicher (Bytes)", "Mémoire interne libre minimale (octets)", "Minimo di memoria interna libera (byte)", "内部メモリの最小の空き（バイト）", "最低可用内部内存（字节）"],
-  fact_heap_internal_largest: ["Biggest free block of internal memory (bytes)", "Mayor bloque libre de memoria interna (bytes)", "Größter freier Block des internen Speichers (Bytes)", "Plus grand bloc libre de mémoire interne (octets)", "Blocco libero più grande di memoria interna (byte)", "内部メモリの最大の空きブロック（バイト）", "内部内存最大可用块（字节）"],
-  fact_heap_min: ["Least free memory (bytes)", "Mínimo de memoria libre (bytes)", "Geringster freier Speicher (Bytes)", "Mémoire libre minimale (octets)", "Minimo di memoria libera (byte)", "最小の空きメモリ（バイト）", "最低可用内存（字节）"],
-  fact_low_stack_tasks: ["Tasks short of stack", "Tareas cortas de pila", "Aufgaben mit knappem Stack", "Tâches à court de pile", "Task a corto di stack", "スタック不足のタスク", "栈空间不足的任务"],
-  fact_restarts_24h: ["Restarts in 24 h", "Reinicios en 24 h", "Neustarts in 24 h", "Redémarrages en 24 h", "Riavvii in 24 h", "24 時間の再起動", "24 小时内重启"],
-  fact_last_reason: ["Last reason", "Último motivo", "Letzter Grund", "Dernier motif", "Ultimo motivo", "直近の理由", "最近原因"],
-  fact_reconnects: ["Broker connections lost", "Conexiones al broker perdidas", "Verlorene Brokerverbindungen", "Connexions au broker perdues", "Connessioni al broker perse", "切れたブローカー接続", "丢失的代理连接"],
-  fact_minutes: ["Minutes", "Minutos", "Minuten", "Minutes", "Minuti", "分", "分钟"],
-  fact_link_down_reports: ["Reports with the link down", "Informes con el enlace caído", "Berichte mit ausgefallener Verbindung", "Rapports avec la liaison coupée", "Rapporti con il collegamento interrotto", "回線切断中の報告", "连接断开时的报告"],
-  fact_rssi_dbm: ["Wi-Fi signal (dBm)", "Señal Wi-Fi (dBm)", "WLAN-Signal (dBm)", "Signal Wi-Fi (dBm)", "Segnale Wi-Fi (dBm)", "Wi-Fi 信号 (dBm)", "Wi-Fi 信号 (dBm)"],
-  fact_limit_dbm: ["Warning level (dBm)", "Nivel de aviso (dBm)", "Warnschwelle (dBm)", "Seuil d'avertissement (dBm)", "Soglia di avviso (dBm)", "警告しきい値 (dBm)", "警告阈值 (dBm)"],
-  fact_profile: ["Arming mode", "Modo de armado", "Scharfschaltmodus", "Mode d'armement", "Modalità di inserimento", "警戒モード", "布防模式"],
 };
 
 const PT: Record<string, string> = {
@@ -138,9 +123,6 @@ const PT: Record<string, string> = {
   nh_levels: "O servidor avisa quando um nó tem menos de {0} KB de memória livre, reinicia {1} vezes num dia (ou falha), perde o broker {2} vezes em {3} minutos ou mantém um sinal Wi-Fi de {4} dBm ou pior.",
   nh_warn_node_low_memory: "Falta de memória", nh_warn_node_frequent_resets: "Reinicia demasiado", nh_warn_node_link_flapping: "Perde o broker repetidamente", nh_warn_node_weak_signal: "Sinal Wi-Fi fraco",
   alarm_node_low_memory: "Um nó anda curto de memória", alarm_node_frequent_resets: "Um nó reinicia demasiado ou falhou", alarm_node_link_flapping: "Um nó perde o broker repetidamente", alarm_node_weak_signal: "Um nó tem sinal Wi-Fi fraco",
-  fact_family: "Tipo de nó", fact_heap_free: "Memória livre (bytes)", fact_heap_min: "Mínimo de memória livre (bytes)", fact_heap_internal_free: "Memória interna livre (bytes)", fact_heap_internal_min: "Mínimo de memória interna livre (bytes)", fact_heap_internal_largest: "Maior bloco livre de memória interna (bytes)", fact_low_stack_tasks: "Tarefas com pouca pilha", fact_restarts_24h: "Reinícios em 24 h",
-  fact_last_reason: "Último motivo", fact_reconnects: "Ligações ao broker perdidas", fact_minutes: "Minutos", fact_link_down_reports: "Relatórios com a ligação em baixo", fact_rssi_dbm: "Sinal Wi-Fi (dBm)",
-  fact_limit_dbm: "Nível de aviso (dBm)", fact_profile: "Modo de armar",
 };
 
 export const nodeHealthCatalogues: RowCatalogues = { ...cataloguesFromRows(ROWS), pt: PT };

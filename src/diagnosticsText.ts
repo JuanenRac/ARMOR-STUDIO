@@ -81,9 +81,6 @@ const ROWS: Record<string, Row> = {
   alarm_node_sensor_bluetooth_open: ["A radar sensor has its Bluetooth open", "Un sensor del radar tiene el Bluetooth abierto", "Ein Radarsensor hat sein Bluetooth offen", "Un capteur du radar a son Bluetooth ouvert", "Un sensore del radar ha il Bluetooth aperto", "レーダーのセンサーの Bluetooth が開いています", "雷达的某个传感器蓝牙处于开启状态"],
   alarm_node_radar_masked: ["The sensors of a radar node are covered", "Los sensores de un nodo radar están tapados", "Die Sensoren eines Radarknotens sind verdeckt", "Les capteurs d'un nœud radar sont masqués", "I sensori di un nodo radar sono coperti", "レーダーノードのセンサーが覆われています", "某个雷达节点的传感器被遮挡"],
   alarm_node_wifi_jam: ["A radar node suspects Wi-Fi jamming", "Un nodo radar sospecha de un inhibidor de Wi-Fi", "Ein Radarknoten vermutet einen WLAN-Störsender", "Un nœud radar soupçonne un brouillage Wi-Fi", "Un nodo radar sospetta un disturbo del Wi-Fi", "レーダーノードが Wi-Fi 妨害を疑っています", "某个雷达节点怀疑存在 Wi-Fi 干扰"],
-  fact_sensors: ["Sensors", "Sensores", "Sensoren", "Capteurs", "Sensori", "センサー", "传感器"],
-  fact_models: ["Models", "Modelos", "Modelle", "Modèles", "Modelli", "型番", "型号"],
-  fact_events_buffered: ["Events waiting", "Eventos en espera", "Ereignisse in der Warteschlange", "Événements en attente", "Eventi in attesa", "待機中のイベント", "等待中的事件"],
 
   // ---- Configuration > Diagnostics ---------------------------------------------------------------------------------------------------------------
   tabDiagnostics: ["Diagnostics", "Diagnóstico", "Diagnose", "Diagnostic", "Diagnostica", "診断", "诊断"],
@@ -237,7 +234,6 @@ const PT: Record<string, string> = {
   nh_warn_node_wifi_jam: "Suspeita de bloqueio do Wi-Fi",
   nh_warn_node_wifi_jam_d: "O nó acha que alguém está a bloquear o Wi-Fi (sinal {0} dBm). Verifique o ponto de acesso e percorra a zona à volta do nó; trate-o como uma possível tentativa de intrusão e, se o nó tiver porta Ethernet, use o cabo.",
   alarm_node_sensor_bluetooth_open: "Um sensor do radar tem o Bluetooth aberto", alarm_node_radar_masked: "Os sensores de um nó radar estão tapados", alarm_node_wifi_jam: "Um nó radar suspeita de bloqueio do Wi-Fi",
-  fact_sensors: "Sensores", fact_models: "Modelos", fact_events_buffered: "Eventos à espera",
   tabDiagnostics: "Diagnóstico", dg_title: "Diagnóstico dos nós",
   dg_help: "Peça a um nó o seu pacote de diagnóstico ou o seu registo, leia o que ele entregou e dê a outra pessoa um acesso temporário só de leitura para ver alguns nós. Só para administradores.",
   dg_rules_title: "O que um token pode e não pode fazer",

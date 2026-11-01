@@ -195,7 +195,7 @@ function RemoteSettings({ t, origin }: { t: (key: string) => string; origin: str
   </article>;
 }
 
-type OptionKey = Exclude<keyof SecurityOptions, "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute">;
+type OptionKey = Exclude<keyof SecurityOptions, "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute">;
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
 const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean; optional?: boolean }> = [
   { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN", node: true },
@@ -365,6 +365,7 @@ function VisionService({ t, state, apply, busy }: { t: (key: string) => string; 
       <label>{t("sec_vis_url")}
         <input value={shown} placeholder="http://127.0.0.1:8765" maxLength={100} aria-invalid={visionServiceUrlValue(shown) === undefined} data-testid="security-vision-url" onChange={event => { setInvalid(false); setTyped(event.target.value); }} />
       </label>
+      {typeof state.settings["vision.service_token_set"] === "boolean" && <p className="muted" data-testid="security-vision-token">{t(state.settings["vision.service_token_set"] ? "sec_vis_token_yes" : "sec_vis_token_no")}</p>}
       {invalid && <p className="notice bad" role="alert" data-testid="security-vision-invalid">{t("sec_vis_invalid")}</p>}
       <button className="primary" disabled={busy}>{t("sec_vis_save")}</button>
     </form>

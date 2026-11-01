@@ -201,6 +201,16 @@ describe("the types of the HTTP contract", () => {
     });
   }
 
+  it("alarm_facts.json is what ARMOR-COMMON holds now (the labels of the facts and the help of the alarm codes, one table for every client)", () => {
+    const shared = path.join(process.cwd(), "..", "ARMOR-COMMON", "src", "armor_common", "alarm_facts.json");
+    if (!fs.existsSync(shared)) {
+      expect(required, "ARMOR-COMMON must be next to this repository when ARMOR_REQUIRE_SIBLINGS is set").toBe(false);
+      return;
+    }
+    const norm = (text: string) => text.split(String.fromCharCode(13, 10)).join(String.fromCharCode(10));
+    expect(norm(fs.readFileSync(path.join(__dirname, "alarm_facts.json"), "utf8"))).toBe(norm(fs.readFileSync(shared, "utf8")));
+  });
+
   it("compares every type of the console that has the name of a schema of the contract, or says why it does not", () => {
     const schemas = new Set([...fs.readFileSync(path.join(__dirname, "armor-rest.ts"), "utf8").matchAll(/^export type (\w+) =/gm)].map(match => match[1]));
     const compared = new Set([...Object.keys(checked).map(name => UNDER_ANOTHER_NAME[name] ?? name), ...Object.keys(NOT_THE_SAME_THING)]);

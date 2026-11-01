@@ -40,6 +40,8 @@ export type SecurityOptions = {
   /** Where the live ARMOR-VISION service listens (empty: not set up) and whether it may be on another machine (off: only this machine). */
   "vision.service_url": string;
   "vision.service_remote": boolean;
+  /** Read only: whether the server holds a token for the vision service (the token itself is never sent). */
+  "vision.service_token_set": boolean;
   /** What the summary of a day is made from: the days of readings kept, how often a sensor and the house power are logged, and the seconds within which a disarm makes an intrusion a false alarm. */
   "summary.log_days": number;
   "summary.reading_every_s": number;
