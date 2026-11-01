@@ -63,6 +63,8 @@ export function parseSiteTemplate(text: string): TemplateRead {
   const extra = exactly(raw, ["schema", "name", "width", "depth", "floors", "openings", "radars"]);
   if (extra) return { ok: false, problem: "unknown_field", where: extra.slice(0, 30) };
   const name = typeof raw.name === "string" ? raw.name.trim() : "";
+  // control characters are refused on purpose: a template name is shown as text and written back to a file
+  // eslint-disable-next-line no-control-regex
   if (!name || name.length > TEMPLATE_LIMITS.name || /[\u0000-\u001f<>]/.test(name)) return { ok: false, problem: "name" };
   const width = num(raw.width, TEMPLATE_LIMITS.size[0], TEMPLATE_LIMITS.size[1]), depth = num(raw.depth, TEMPLATE_LIMITS.size[0], TEMPLATE_LIMITS.size[1]);
   if (width === null || depth === null) return { ok: false, problem: "size" };
