@@ -107,14 +107,15 @@ describe("the security screen", () => {
     for (const bad of ["4", "121", "", "abc", "12.5", "-5", "1e2", "00000020"]) expect(reportLimitValue("reports.timeout_s", bad), bad).toBeUndefined();
     expect([reportLimitValue("reports.queue_max", "1"), reportLimitValue("reports.queue_max", "10"), reportLimitValue("reports.queue_max", "0"), reportLimitValue("reports.queue_max", "11")]).toEqual([1, 10, undefined, undefined]);
     expect([reportLimitValue("reports.requests_per_minute", "300"), reportLimitValue("reports.requests_per_minute", "301"), reportLimitValue("reports.requests_per_minute", "0")]).toEqual([300, undefined, undefined]);
-    expect(Object.values(REPORT_LIMITS).map(limit => [limit.min, limit.max])).toEqual([[5, 120], [1, 10], [1, 300]]);
-    for (const locale of locales) for (const id of ["sec_rep_title", "sec_rep_help", "sec_rep_timeout", "sec_rep_queue", "sec_rep_rate", "sec_rep_range", "sec_rep_save", "sec_rep_invalid"]) {
+    expect(Object.values(REPORT_LIMITS).map(limit => [limit.min, limit.max])).toEqual([[5, 120], [1, 10], [1, 300], [1, 90], [10, 3600], [5, 3600], [0, 600]]);
+    for (const locale of locales) for (const id of ["sec_rep_title", "sec_rep_help", "sec_rep_timeout", "sec_rep_queue", "sec_rep_rate", "sec_rep_logdays", "sec_rep_readingevery", "sec_rep_powerevery", "sec_rep_falsealarm", "sec_rep_range", "sec_rep_save", "sec_rep_invalid"]) {
       const words = text(locale, id);
       expect(words.trim().length, `${locale} ${id}`).toBeGreaterThan(3);
       expect(words, `${locale} ${id} is not the key`).not.toBe(id);
     }
     for (const locale of locales) { expect(text(locale, "sec_rep_range")).toContain("{min}"); expect(text(locale, "sec_rep_range")).toContain("{max}"); }
     expect(text("pt", "sec_rep_save")).toBe("Guardar os limites");
+    expect([reportLimitValue("summary.false_alarm_s", "0"), reportLimitValue("summary.false_alarm_s", "601"), reportLimitValue("summary.log_days", "0"), reportLimitValue("summary.log_days", "90"), reportLimitValue("summary.reading_every_s", "9"), reportLimitValue("summary.power_every_s", "5")]).toEqual([0, undefined, undefined, 90, undefined, 5]);
     // a server that does not announce them (an older one) shows no such fields
     const t = (key: string) => text("en", key);
     expect(renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }))).not.toContain("security-report-limits");

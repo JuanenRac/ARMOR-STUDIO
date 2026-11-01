@@ -40,6 +40,11 @@ export type SecurityOptions = {
   /** Where the live ARMOR-VISION service listens (empty: not set up) and whether it may be on another machine (off: only this machine). */
   "vision.service_url": string;
   "vision.service_remote": boolean;
+  /** What the summary of a day is made from: the days of readings kept, how often a sensor and the house power are logged, and the seconds within which a disarm makes an intrusion a false alarm. */
+  "summary.log_days": number;
+  "summary.reading_every_s": number;
+  "summary.power_every_s": number;
+  "summary.false_alarm_s": number;
   "reports.timeout_s": number;
   "reports.queue_max": number;
   "reports.requests_per_minute": number;

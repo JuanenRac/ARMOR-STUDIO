@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The settings the summary of a day is made from are edited in Configuration > Security, next to the limits of the reports:** the days of readings and house power kept (`summary.log_days`), how often a sensor and the house power are logged (`summary.reading_every_s`, `summary.power_every_s`) and the seconds within which a disarm makes an intrusion alarm a false alarm (`summary.false_alarm_s`, 0 for never), each checked against its range before anything is sent and shown only when the server announces it. Eight languages, Portuguese of Portugal included.
 ## [0.8.1.5] - Coverage by floor and by height with floor-plan templates, the heat map and summary settings, the entry delay marked per unit in the away mode and the limits of the reports in Configuration
 
 - **Configuration > Security sets where the heat map is asked:** the address of the live vision service (`vision.service_url`, empty when there is none, checked in the field before it is sent) and a switch for letting it be on another machine (`vision.service_remote`, off by default, with the warning and the confirmation of the other options that lower the security). Eight languages, Portuguese of Portugal included.
