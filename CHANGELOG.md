@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.1.7] - Taking back a false-alarm mark asks first, the cones of the fields of view are a layer of the 3D view, the profile of each mode is checked before saving and every alarm code has its help text
+
 - **Taking back the false-alarm mark asks first** ("Not a false alarm"): any administrator or operator can do it, the server records who did, and the question says that the daily summary will count the alarm as real again. Putting the mark on stays one click.
 - **A warning when the token for the vision service would travel in clear:** Security says so, and does not send, when the service may be remote, the server holds a token and the address is plain http on another machine; the server refuses it too.
 - **The profile of each mode is checked before saving:** the modes editor says which profile does not exist and sends nothing.
