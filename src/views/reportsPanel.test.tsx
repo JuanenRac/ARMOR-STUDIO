@@ -36,7 +36,7 @@ beforeEach(() => {
 afterEach(() => { act(() => root?.unmount()); root = null; container.remove(); vi.unstubAllGlobals(); });
 
 const mount = (element: ReturnType<typeof createElement>) => { root = createRoot(container); act(() => root!.render(element)); };
-const click = async (testid: string) => { await act(async () => { (container.querySelector(`[data-testid="${testid}"]`) as HTMLElement).click(); await new Promise(resolve => setTimeout(resolve, 0)); await Promise.resolve(); }); };
+const click = async (testid: string) => { await act(async () => { (container.querySelector(`[data-testid="${testid}"]`) as HTMLElement).click(); for (let turn = 0; turn < 40; turn += 1) { await new Promise(resolve => setTimeout(resolve, 5)); if (container.querySelector('[data-testid$="-result"], [data-testid$="-refusal"]')) break; } }); };
 const panel = () => createElement(ReportsPanel, { t, origin: "http://x", language: "es", cameras: [{ id: "cam-front", name: "Front" }] });
 
 describe("the summary of a day", () => {
