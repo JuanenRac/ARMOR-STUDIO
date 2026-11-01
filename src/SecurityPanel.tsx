@@ -195,7 +195,7 @@ function RemoteSettings({ t, origin }: { t: (key: string) => string; origin: str
   </article>;
 }
 
-type OptionKey = Exclude<keyof SecurityOptions, "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute">;
+type OptionKey = Exclude<keyof SecurityOptions, "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute">;
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
 const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean; optional?: boolean }> = [
   { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN", node: true },
@@ -218,6 +218,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "alarm_audio.custom_sounds", id: "alsounds", values: [false, true], calm: true },
   { key: "summary.daily", id: "dailysummary", values: [false, true], optional: true },
   { key: "vision.heatmap", id: "heatmap", values: [false, true], optional: true },
+  { key: "vision.service_remote", id: "visionremote", values: [false, true], optional: true },
   { key: "client.device_lock", id: "lock", values: ["always", "sensitive", "user"], calm: true },
   { key: "nodes.nvs_encryption", id: "nvs", values: ["secrets", "off"], node: true, calm: true },
 ];
@@ -251,6 +252,17 @@ export function reportLimitValue(key: ReportLimitKey, text: string): number | un
   if (!/^\d{1,4}$/.test(trimmed)) return undefined;
   const value = Number(trimmed);
   return value >= REPORT_LIMITS[key].min && value <= REPORT_LIMITS[key].max ? value : undefined;
+}
+/** The address of the live vision service as the server accepts it: empty (not set up) or an http or https origin with no sign-in, path or query in it, at most 100 characters. Undefined when it is not. */
+export function visionServiceUrlValue(text: string): string | undefined {
+  const trimmed = text.trim();
+  if (trimmed === "") return "";
+  if (trimmed.length > 100 || /\s/.test(trimmed)) return undefined;
+  try {
+    const url = new URL(trimmed);
+    if ((url.protocol !== "http:" && url.protocol !== "https:") || url.username || url.password || url.search || url.hash || (url.pathname !== "/" && url.pathname !== "") || !url.hostname || /[?#]$/.test(trimmed)) return undefined;
+  } catch { return undefined; }
+  return trimmed;
 }
 const fill = (text: string, values: Record<string, string | number>) => text.replace(/\{(\w+)\}/g, (whole, name: string) => (name in values ? String(values[name]) : whole));
 
@@ -328,6 +340,33 @@ function ReportLimits({ t, state, apply, busy }: { t: (key: string) => string; s
   </fieldset>;
 }
 
+/** Where the heat map is asked: the address of the live vision service. Pointing at a machine that is not this one needs the switch below it, and the server says so when it is not on. */
+function VisionService({ t, state, apply, busy }: { t: (key: string) => string; state: SecurityOptionsState; apply: (change: Partial<SecurityOptions>, raising: boolean) => Promise<boolean>; busy: boolean }) {
+  const [typed, setTyped] = useState<string | null>(null);
+  const [invalid, setInvalid] = useState(false);
+  const shown = typed ?? String(state.settings["vision.service_url"] ?? "");
+  const save = async (event: FormEvent) => {
+    event.preventDefault();
+    const value = visionServiceUrlValue(shown);
+    if (value === undefined) { setInvalid(true); return; }
+    setInvalid(false);
+    if (value === state.settings["vision.service_url"]) return;
+    if (await apply({ "vision.service_url": value } as Partial<SecurityOptions>, false)) setTyped(null);
+  };
+  const locked = state.locked.includes("vision.service_url");
+  return <fieldset className="sec-option" data-testid="security-vision-service" disabled={busy || locked}>
+    <legend>{t("sec_vis_title")}</legend>
+    <p className="muted">{t("sec_vis_help")}</p>
+    <form onSubmit={event => void save(event)}>
+      <label>{t("sec_vis_url")}
+        <input value={shown} placeholder="http://127.0.0.1:8765" maxLength={100} aria-invalid={visionServiceUrlValue(shown) === undefined} data-testid="security-vision-url" onChange={event => { setInvalid(false); setTyped(event.target.value); }} />
+      </label>
+      {invalid && <p className="notice bad" role="alert" data-testid="security-vision-invalid">{t("sec_vis_invalid")}</p>}
+      <button className="primary" disabled={busy}>{t("sec_vis_save")}</button>
+    </form>
+  </fieldset>;
+}
+
 function ServerOptions({ t, origin }: { t: (key: string) => string; origin: string }) {
   const [state, setState] = useState<SecurityOptionsState | null>(null);
   const [message, setMessage] = useState({ text: "", bad: false });
@@ -370,6 +409,7 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
     })}
     {typeof state.settings["alarm_audio.custom_sounds"] === "boolean" && <AlarmSounds t={t} origin={origin} spokenOn={state.settings["alarm_audio.spoken"] === true} customOn={state.settings["alarm_audio.custom_sounds"]} />}
     {typeof state.settings["voice.turn_max_bytes"] === "number" && <VoiceLimits t={t} state={state} apply={applyLimits} busy={busy} />}
+    {typeof state.settings["vision.service_url"] === "string" && <VisionService t={t} state={state} apply={applyLimits} busy={busy} />}
     {typeof state.settings["reports.timeout_s"] === "number" && <ReportLimits t={t} state={state} apply={applyLimits} busy={busy} />}
     <p className="muted">{t("sec_opt_node_pending")}</p>
     <Message message={message} />

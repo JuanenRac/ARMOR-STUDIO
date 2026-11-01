@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ElevationDialog } from "./ElevationHost";
-import { envValue, isLowering, SecurityPanel, setEnvLines, REPORT_LIMITS, reportLimitValue, VOICE_LIMITS, voiceLimitValue } from "./SecurityPanel";
+import { envValue, isLowering, SecurityPanel, setEnvLines, REPORT_LIMITS, reportLimitValue, VOICE_LIMITS, visionServiceUrlValue, voiceLimitValue } from "./SecurityPanel";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
 import { SessionUserContext } from "./sessionContext";
 import { locales, requiredUiKeys, text } from "./i18n";
@@ -118,6 +118,21 @@ describe("the security screen", () => {
     // a server that does not announce them (an older one) shows no such fields
     const t = (key: string) => text("en", key);
     expect(renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }))).not.toContain("security-report-limits");
+  });
+
+  it("checks the address of the live vision service like the server does, and has every phrase of it in all eight languages", () => {
+    expect(visionServiceUrlValue("")).toBe("");
+    expect(visionServiceUrlValue("  ")).toBe("");
+    for (const good of ["http://127.0.0.1:8765", " http://localhost:9000 ", "https://127.0.0.1", "http://[::1]:8765", "http://vision.local:8765/"]) expect(visionServiceUrlValue(good), good).toBe(good.trim());
+    for (const bad of ["ftp://127.0.0.1", "http://user:pass@127.0.0.1", "http://127.0.0.1/heatmap", "http://127.0.0.1?x=1", "http://127.0.0.1#x", "127.0.0.1:8765", "http://", "http://" + "a".repeat(100), "http://127.0.0.1 :8765"]) expect(visionServiceUrlValue(bad), bad).toBeUndefined();
+    for (const locale of locales) for (const id of ["sec_opt_visionremote", "sec_opt_visionremote_help", "sec_opt_visionremote_warn", "sec_vis_title", "sec_vis_help", "sec_vis_url", "sec_vis_save", "sec_vis_invalid"]) {
+      const words = text(locale, id);
+      expect(words.trim().length, `${locale} ${id}`).toBeGreaterThan(3);
+      expect(words, `${locale} ${id} is not the key`).not.toBe(id);
+    }
+    expect(text("pt", "sec_vis_save")).toBe("Guardar o endereço");
+    const t = (key: string) => text("en", key);
+    expect(renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }))).not.toContain("security-vision-service");
   });
 
   it("offers the text that pairs a phone with the HTTPS of the house, in every language", () => {

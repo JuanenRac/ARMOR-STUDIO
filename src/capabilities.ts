@@ -37,6 +37,9 @@ export type SecurityOptions = {
   "summary.daily": boolean;
   "vision.heatmap": boolean;
   /** How the two reports are tuned: the seconds one may run, how many may wait, how many requests a minute (an older server does not announce them). */
+  /** Where the live ARMOR-VISION service listens (empty: not set up) and whether it may be on another machine (off: only this machine). */
+  "vision.service_url": string;
+  "vision.service_remote": boolean;
   "reports.timeout_s": number;
   "reports.queue_max": number;
   "reports.requests_per_minute": number;
