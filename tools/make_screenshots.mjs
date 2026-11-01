@@ -71,19 +71,35 @@ const SITE = {
 
 const serverPort = await freePort();
 const studioPort = await freePort();
+const visionPort = await freePort();
 const ingest = secret();
 const password = secret();
+const visionToken = secret();
+const visionDir = process.env.ARMOR_VISION_DIR ?? path.join(root, "ARMOR-VISION");
+const summaryAiDir = process.env.ARMOR_SERVER_AI_DIR ?? path.join(root, "ARMOR-SERVER-AI");
 let browser;
 try {
   const origin = `http://127.0.0.1:${studioPort}`;
   const base = `http://127.0.0.1:${serverPort}`;
   const data = path.join(work, "data");
   fs.mkdirSync(data);
+  const python = process.env.PYTHON ?? (process.platform === "win32" ? "python" : "python3");
+  // the live vision service (ARMOR-VISION) on a made-up camera: it plays its own scene, so the activity heat map has something to show
+  const visionFiles = path.join(work, "vision");
+  fs.mkdirSync(visionFiles);
+  fs.writeFileSync(path.join(visionFiles, "zones.json"), JSON.stringify({ cameras: { "cam-front": { motion_threshold: 25, motion_min_cells: 2, zones: [{ id: "drive", name: "Driveway", kind: "alert", labels: ["person"], min_frames: 3, min_seconds: 1.0, points: [[0.3, 0.6], [0.9, 0.6], [0.9, 1.0], [0.3, 1.0]] }], masks: [] } }, profiles: { away: ["drive"], home: [] } }));
+  fs.writeFileSync(path.join(visionFiles, "activity.json"), JSON.stringify({ enabled: true, heatmap: { cols: 32, rows: 18, window_seconds: 300, half_life_seconds: null, slices: 60, max_cells: 4096, position: "foot", labels: [] }, events: { dwell_seconds: 3.0, loiter_seconds: 6.0, loiter_radius: 0.05, lost_seconds: 2.0, labels: [], lines: [{ id: "gate", a: [0.3, 0.7], b: [0.9, 0.7] }] } }));
+  fs.writeFileSync(path.join(visionFiles, "service.json"), JSON.stringify({ host: "127.0.0.1", port: visionPort, allow_remote: false, max_body_bytes: 65536, max_detections: 64, max_query_bytes: 512, token_file: null, simulate: { camera_id: "cam-front" } }));
+  start(python, ["-m", "armor_vision", "serve", "--activity-config", path.join(visionFiles, "activity.json"), "--config", path.join(visionFiles, "zones.json"), "--service-config", path.join(visionFiles, "service.json")], { cwd: visionDir, env: { ...process.env, PYTHONPATH: "src", ARMOR_VISION_SERVICE_TOKEN: visionToken } });
+  // the settings of the summary of a day (ARMOR-SERVER-AI) with the switch on; the server also has to be told to allow it (below)
+  const summaryConfig = path.join(work, "daily_summary.json");
+  fs.writeFileSync(summaryConfig, JSON.stringify({ ...JSON.parse(fs.readFileSync(path.join(summaryAiDir, "docs", "daily_summary.example.json"), "utf8")), enabled: true }));
   start(process.execPath, ["dist/server.mjs"], {
     cwd: serverDir,
     env: {
       ...process.env, ARMOR_HOST: "127.0.0.1", ARMOR_PORT: String(serverPort), ARMOR_DATA_DIR: data, ARMOR_TZ: "UTC", ARMOR_INGEST_TOKEN: ingest, ARMOR_CONTROL_TOKEN: secret(), ARMOR_OPERATOR_TOKEN: secret(),
       ARMOR_STUDIO_USERNAME: "admin", ARMOR_STUDIO_PASSWORD: password, ARMOR_STUDIO_ORIGIN: origin,
+      ARMOR_VISION_SERVICE_URL: `http://127.0.0.1:${visionPort}`, ARMOR_VISION_SERVICE_TOKEN: visionToken, ARMOR_PYTHON: python, ARMOR_DAILY_SUMMARY_AI_DIR: summaryAiDir, ARMOR_DAILY_SUMMARY_CONFIG: summaryConfig,
     },
   });
   start(process.execPath, ["tools/serve.mjs"], { cwd: studio, env: { ...process.env, ARMOR_STUDIO_HOST: "127.0.0.1", ARMOR_STUDIO_PORT: String(studioPort), ARMOR_SERVER_ORIGIN: base } });
@@ -100,7 +116,6 @@ try {
   if (!saved.ok) throw new Error(`the site was refused: ${saved.status} ${await saved.text()}`);
 
   // the nodes: two radar nodes, a solar system and an electrical node, played by the simulator (it keeps sending while the screenshots are taken)
-  const python = process.env.PYTHON ?? (process.platform === "win32" ? "python" : "python3");
   const play = (node, scenario, extra = []) => start(python, ["-m", "armor_simulator",
     "--node-id", node, "--scenario", scenario, "--count", "1200", "--interval-ms", "300", "--health-every", "5", "--light", "cycle", "--server-url", base, "--ingest-token", ingest, "--start-ms", String(Date.now()), ...extra], { cwd: simulatorDir, env: { ...process.env, PYTHONPATH: "src" } });
   play("north-1", "patrol", ["--solar", "--electrical"]);
@@ -122,7 +137,7 @@ try {
   browser = await chromium.launch({ channel: "msedge", headless: true });
   const context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1, locale: "en-US" });
   const page = await context.newPage();
-  await page.addInitScript(() => { try { window.localStorage.setItem("armor-studio-prefs-v1", JSON.stringify({ tutorial: false, tourAutoStart: false, assistant: false, assistantAutoOpen: false })); window.localStorage.setItem("armor-studio-settings-v1", JSON.stringify({ language: "en" })); } catch { /* storage blocked */ } });
+  await page.addInitScript(() => { try { window.localStorage.setItem("armor-studio-prefs-v1", JSON.stringify({ tutorial: false, tourAutoStart: false, assistant: false, assistantAutoOpen: false, ...(window.localStorage.getItem("armor-shots-aids") === "1" ? { designAids: true } : {}) })); window.localStorage.setItem("armor-studio-settings-v1", JSON.stringify({ language: "en" })); } catch { /* storage blocked */ } });
   await page.goto(origin + "/");
   await page.getByTestId("login-user").fill("admin");
   await page.getByTestId("login-password").fill(password);
@@ -144,6 +159,50 @@ try {
   await page.mouse.move(1000, 600); await page.keyboard.press("f"); await page.mouse.move(1750, 900); await page.waitForTimeout(1500); await hideDate();   // fit the drawing, and take the pointer off the buttons so no tip covers it
   await page.screenshot({ path: path.join(out, "electrical-designer.png") }); console.log("wrote", path.join(out, "electrical-designer.png"));
   await shot("alarm-panels", "Alarm panels");
+
+  // ---- the newer windows: the summary of a day and the heat map, the coverage check with floor-plan templates, the arming modes and a false alarm
+  const turnOn = await api("PUT", "/api/v1/security/settings", { "summary.daily": true, "vision.heatmap": true, "alarm.arming_modes": true });
+  if (!turnOn.ok) throw new Error(`the options were refused: ${turnOn.status} ${await turnOn.text()}`);
+  const camera = await api("POST", "/api/v1/cameras/configure", { id: "cam-front", name: "Front camera", host: "192.0.2.10" });
+  if (!camera.ok) throw new Error(`the camera was refused: ${camera.status} ${await camera.text()}`);
+  // one alarm is said to have been a false one, so the summary has something to count
+  let firstAlarm;
+  for (let tries = 0; tries < 24 && !firstAlarm; tries += 1) { const list = await (await api("GET", "/api/v1/alarms")).json(); firstAlarm = (list.alarms ?? list)[0]; if (!firstAlarm) await sleep(5000); }
+  await sleep(8000);   // the vision service plays its scene meanwhile
+  await page.evaluate(() => { try { window.localStorage.setItem("armor-shots-aids", "1"); } catch { /* storage blocked */ } });
+  await page.reload();
+  await page.locator(".sidebar").waitFor();
+  await page.addStyleTag({ content: "input[type=date]::-webkit-datetime-edit { color: transparent; }" });
+  const take = async name => { await page.mouse.move(1000, 1040); await page.waitForTimeout(600); await hideDate(); await page.screenshot({ path: path.join(out, name + ".png") }); console.log("wrote", path.join(out, name + ".png")); };
+
+  await keepPanel(); await open("Alarms");
+  await page.getByRole("button", { name: /^false alarm$/i }).first().click();
+  await page.waitForTimeout(1500);
+  await take("false-alarm");
+
+  await keepPanel(); await open("History");
+  await page.getByRole("tab", { name: /reports/i }).or(page.getByRole("button", { name: /^reports$/i })).first().click();
+  await page.getByTestId("rep-summary-show").click();
+  await page.getByTestId("rep-summary-result").waitFor({ timeout: 30000 });
+  await take("history-summary");
+  await page.getByTestId("rep-heatmap-show").click();
+  await page.getByTestId("rep-heatmap-result").waitFor({ timeout: 30000 });
+  await page.getByTestId("rep-heatmap-result").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(800);
+  await take("history-heatmap");
+
+  await keepPanel(); await open("Site designer");
+  await page.getByRole("button", { name: /^coverage$/i }).first().click();
+  await page.waitForTimeout(2500);
+  const templatePick = page.getByLabel(/floor-plan templates/i).first();
+  if (await templatePick.count()) { await templatePick.selectOption({ index: 0 }); await page.getByRole("button", { name: /add to the plan/i }).first().click(); await page.waitForTimeout(2500); }
+  await take("coverage-floors");
+
+  await keepPanel(); await open("Alarm Designer");
+  await page.getByTestId("ad-tab-modes").click();
+  await page.waitForTimeout(1500);
+  await take("arming-modes");
+
 } finally {
   await browser?.close();
   for (const child of children) try { child.kill(); } catch { /* already gone */ }
