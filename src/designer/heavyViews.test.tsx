@@ -74,7 +74,7 @@ describe("a device in the 3D scene", () => {
   const device = (state: Record<string, unknown>, online = true): StudioDevice => ({
     id: "d1", name: "Smoke", kind: "smoke", protocol: "mqtt", location: "hall", category: "sensor", source: "manual", commands: {} as StudioDevice["commands"], can_command: false,
     expected_interval_s: 60, risk: "low", state: state as StudioDevice["state"], online, last_seen: null, created_at: "2026-01-01T00:00:00Z",
-  } as StudioDevice);
+  } as unknown as StudioDevice);
   const draw = (d: StudioDevice, selected = false) => renderToStaticMarkup(<DeviceView device={d} selected={selected} hover={false} hooks={{}} x={0} y={0} z={0} rotation={0} pitch={0} roll={0} />);
 
   it("glows red in alarm and cyan when selected, and not otherwise", () => {
