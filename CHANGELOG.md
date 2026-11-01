@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.1.8] - The sign-in warns about Caps Lock and checks the server address, passwords and PINs are checked while typing, there are one-key shortcuts and a skip link, and closing the tab with an unsaved drawing asks first
+
 - **Every password field warns when Caps Lock is on:** a short note under the field, announced by a screen reader and tied to the field, that goes away when the key is off or the field loses the focus; it covers the sign-in, the account, the users and the PINs. Eight languages, Portuguese of Portugal included.
 - **The sign-in checks the server address before sending anything:** an empty or malformed address, a scheme that is not http or https and an address that carries a user name or a password (`user:password@`) are refused with a sentence of their own, and the address is cut down to its origin. Eight languages.
 - **Plain http outside the house network is warned about at the sign-in, and can be refused:** an address that is not on the local network (private ranges, loopback, single-label and `.local` names are) and starts with http shows a warning under the address; Preferences > Sign-in and keyboard has a switch that refuses it before the password leaves (off by default, so the local network and an existing installation keep working). Eight languages.
