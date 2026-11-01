@@ -28,8 +28,9 @@ beforeEach(() => {
   vi.stubGlobal("fetch", vi.fn(async (url: string) => {
     calls.push(String(url));
     const reply = replies.shift() ?? { status: 500, body: {} };
-    const body = reply.type ? new Blob(["x"], { type: reply.type }) : JSON.stringify(reply.body);
-    return new Response(body, { status: reply.status, headers: { "Content-Type": reply.type ?? "application/json" } });
+    // a plain object, not a Response: the console only reads status, ok, json() and blob(), and a Response of one runtime does not always take the Blob of another
+    const ok = reply.status >= 200 && reply.status < 300;
+    return { status: reply.status, ok, json: async () => reply.body, blob: async () => new Blob(["x"], { type: reply.type ?? "application/octet-stream" }) } as unknown as Response;
   }));
   vi.stubGlobal("URL", Object.assign(URL, { createObjectURL: vi.fn(() => "blob:heat"), revokeObjectURL: vi.fn() }));
 });
