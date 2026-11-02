@@ -131,16 +131,55 @@ flowchart LR
 
 ## 🖼️ Capturas de ecrã
 
-Capturadas a 1920×1080 numa bancada de testes, com dados de exemplo e sem qualquer instalação real por trás.
+Capturadas numa bancada de testes com dados de exemplo inventados e sem qualquer instalação real por trás.
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="Resumo: o estado do perímetro, os alarmes, os nós de radar, a energia e o mapa em direto do local num só ecrã." width="100%"><br><sub>Resumo: o estado do perímetro, os alarmes, os nós de radar, a energia e o mapa em direto do local num só ecrã.</sub></td><td width="50%" valign="top"><img src="images/screenshots/radar.png" alt="Radar: os alvos que cada radar vê, colocados na planta do local, com a zona que cada sensor cobre." width="100%"><br><sub>Radar: os alvos que cada radar vê, colocados na planta do local, com a zona que cada sensor cobre.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/inverters.png" alt="Inversores: o fluxo de energia entre os painéis solares, a rede, a casa e as baterias, só de leitura." width="100%"><br><sub>Inversores: o fluxo de energia entre os painéis solares, a rede, a casa e as baterias, só de leitura.</sub></td><td width="50%" valign="top"><img src="images/screenshots/site-designer.png" alt="Desenhador do local: terreno, edifícios, câmaras e radares desenhados na planta que o resto do Studio usa." width="100%"><br><sub>Desenhador do local: terreno, edifícios, câmaras e radares desenhados na planta que o resto do Studio usa.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/electrical-designer.png" alt="Desenhador elétrico: o esquema AC e DC da casa, com as suas verificações, a partir de um exemplo pronto." width="100%"><br><sub>Desenhador elétrico: o esquema AC e DC da casa, com as suas verificações, a partir de um exemplo pronto.</sub></td><td width="50%" valign="top"><img src="images/screenshots/alarm-panels.png" alt="Painéis de alarme: se cada painel está a vigiar, as suas zonas e o que aconteceu por último." width="100%"><br><sub>Painéis de alarme: se cada painel está a vigiar, as suas zonas e o que aconteceu por último.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/false-alarm.png" alt="Alarmes: um alarme pode ser marcado como falso alarme, e o resumo do dia conta-o." width="100%"><br><sub>Alarmes: um alarme pode ser marcado como falso alarme, e o resumo do dia conta-o.</sub></td><td width="50%" valign="top"><img src="images/screenshots/history-summary.png" alt="Histórico > Relatórios: o resumo de um dia, com as suas contagens, os seus padrões e o seu texto." width="100%"><br><sub>Histórico > Relatórios: o resumo de um dia, com as suas contagens, os seus padrões e o seu texto.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/history-heatmap.png" alt="Histórico > Relatórios: o mapa de calor da atividade de uma câmara, só posições contadas, nunca a imagem de alguém." width="100%"><br><sub>Histórico > Relatórios: o mapa de calor da atividade de uma câmara, só posições contadas, nunca a imagem de alguém.</sub></td><td width="50%" valign="top"><img src="images/screenshots/coverage-floors.png" alt="Desenhador do local > Cobertura: o que os radares veem, com os modelos de planta que acrescentam um edifício com os seus pisos." width="100%"><br><sub>Desenhador do local > Cobertura: o que os radares veem, com os modelos de planta que acrescentam um edifício com os seus pisos.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/arming-modes.png" alt="Desenhador de alarme > Modos: o que cada modo de armação (ausente, em casa, noite) defende, com os seus atrasos e perfis de painel." width="100%"><br><sub>Desenhador de alarme > Modos: o que cada modo de armação (ausente, em casa, noite) defende, com os seus atrasos e perfis de painel.</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="Resumo" width="100%">
+</p>
+
+<p align="center"><em>Resumo: o estado do perímetro, os alarmes, os nós de radar, a energia e o mapa em direto do local num só ecrã.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/radar.png" alt="Radar" width="100%">
+</p>
+
+<p align="center"><em>Radar: os alvos que cada radar vê, colocados na planta do local, com a zona que cada sensor cobre.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/inverters.png" alt="Inversores" width="100%">
+</p>
+
+<p align="center"><em>Inversores: o fluxo de energia entre os painéis solares, a rede, a casa e as baterias, só de leitura.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/site-designer.png" alt="Desenhador do local" width="100%">
+</p>
+
+<p align="center"><em>Desenhador do local: terreno, edifícios, câmaras e radares desenhados na planta que o resto do Studio usa.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/electrical-designer.png" alt="Desenhador elétrico" width="100%">
+</p>
+
+<p align="center"><em>Desenhador elétrico: o esquema AC e DC da casa, com as suas verificações, a partir de um exemplo pronto.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/alarm-panels.png" alt="Painéis de alarme" width="100%">
+</p>
+
+<p align="center"><em>Painéis de alarme: se cada painel está a vigiar, as suas zonas e o que aconteceu por último.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/history-heatmap.png" alt="Histórico > Relatórios" width="100%">
+</p>
+
+<p align="center"><em>Histórico > Relatórios: o mapa de calor da atividade de uma câmara, só posições contadas, nunca a imagem de alguém.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/arming-modes.png" alt="Desenhador de alarme > Modos" width="100%">
+</p>
+
+<p align="center"><em>Desenhador de alarme > Modos: o que cada modo de armação (ausente, em casa, noite) defende, com os seus atrasos e perfis de painel.</em></p>
 
 ## 🔒 Segurança e proteção
 

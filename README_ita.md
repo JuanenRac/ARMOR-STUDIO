@@ -131,16 +131,55 @@ flowchart LR
 
 ## 🖼️ Schermate
 
-Catturate a 1920×1080 su un banco di prova, con dati di esempio e senza alcuna installazione reale dietro.
+Catturate su un banco di prova con dati di esempio inventati e senza alcuna installazione reale dietro.
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="Riepilogo: lo stato del perimetro, gli allarmi, i nodi radar, l'energia e la mappa dal vivo del sito in una sola schermata." width="100%"><br><sub>Riepilogo: lo stato del perimetro, gli allarmi, i nodi radar, l'energia e la mappa dal vivo del sito in una sola schermata.</sub></td><td width="50%" valign="top"><img src="images/screenshots/radar.png" alt="Radar: i bersagli che vede ogni radar, posizionati sulla planimetria del sito, con l'area coperta da ogni sensore." width="100%"><br><sub>Radar: i bersagli che vede ogni radar, posizionati sulla planimetria del sito, con l'area coperta da ogni sensore.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/inverters.png" alt="Inverter: il flusso di energia tra i pannelli solari, la rete, la casa e le batterie, in sola lettura." width="100%"><br><sub>Inverter: il flusso di energia tra i pannelli solari, la rete, la casa e le batterie, in sola lettura.</sub></td><td width="50%" valign="top"><img src="images/screenshots/site-designer.png" alt="Progettista del sito: terreno, edifici, telecamere e radar disegnati sulla planimetria usata dal resto di Studio." width="100%"><br><sub>Progettista del sito: terreno, edifici, telecamere e radar disegnati sulla planimetria usata dal resto di Studio.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/electrical-designer.png" alt="Progettista elettrico: lo schema CA e CC della casa, con i suoi controlli, partendo da un esempio pronto." width="100%"><br><sub>Progettista elettrico: lo schema CA e CC della casa, con i suoi controlli, partendo da un esempio pronto.</sub></td><td width="50%" valign="top"><img src="images/screenshots/alarm-panels.png" alt="Centrali d'allarme: se ognuna sorveglia, le sue zone e l'ultimo evento accaduto." width="100%"><br><sub>Centrali d'allarme: se ognuna sorveglia, le sue zone e l'ultimo evento accaduto.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/false-alarm.png" alt="Allarmi: un allarme si può segnare come falso allarme e il riepilogo del giorno lo conta." width="100%"><br><sub>Allarmi: un allarme si può segnare come falso allarme e il riepilogo del giorno lo conta.</sub></td><td width="50%" valign="top"><img src="images/screenshots/history-summary.png" alt="Cronologia > Rapporti: il riepilogo di un giorno, con i conteggi, gli schemi e il testo." width="100%"><br><sub>Cronologia > Rapporti: il riepilogo di un giorno, con i conteggi, gli schemi e il testo.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/history-heatmap.png" alt="Cronologia > Rapporti: la mappa di calore dell'attività di una telecamera, solo posizioni contate, mai l'immagine di qualcuno." width="100%"><br><sub>Cronologia > Rapporti: la mappa di calore dell'attività di una telecamera, solo posizioni contate, mai l'immagine di qualcuno.</sub></td><td width="50%" valign="top"><img src="images/screenshots/coverage-floors.png" alt="Progettista del sito > Copertura: ciò che vedono i radar, con i modelli di pianta che aggiungono un edificio con i suoi piani." width="100%"><br><sub>Progettista del sito > Copertura: ciò che vedono i radar, con i modelli di pianta che aggiungono un edificio con i suoi piani.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/arming-modes.png" alt="Progettista d'allarme > Modalità: ciò che difende ogni modalità di inserimento (fuori, in casa, notte), con ritardi e profili di centrale." width="100%"><br><sub>Progettista d'allarme > Modalità: ciò che difende ogni modalità di inserimento (fuori, in casa, notte), con ritardi e profili di centrale.</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="Riepilogo" width="100%">
+</p>
+
+<p align="center"><em>Riepilogo: lo stato del perimetro, gli allarmi, i nodi radar, l'energia e la mappa dal vivo del sito in una sola schermata.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/radar.png" alt="Radar" width="100%">
+</p>
+
+<p align="center"><em>Radar: i bersagli che vede ogni radar, posizionati sulla planimetria del sito, con l'area coperta da ogni sensore.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/inverters.png" alt="Inverter" width="100%">
+</p>
+
+<p align="center"><em>Inverter: il flusso di energia tra i pannelli solari, la rete, la casa e le batterie, in sola lettura.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/site-designer.png" alt="Progettista del sito" width="100%">
+</p>
+
+<p align="center"><em>Progettista del sito: terreno, edifici, telecamere e radar disegnati sulla planimetria usata dal resto di Studio.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/electrical-designer.png" alt="Progettista elettrico" width="100%">
+</p>
+
+<p align="center"><em>Progettista elettrico: lo schema CA e CC della casa, con i suoi controlli, partendo da un esempio pronto.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/alarm-panels.png" alt="Centrali d'allarme" width="100%">
+</p>
+
+<p align="center"><em>Centrali d'allarme: se ognuna sorveglia, le sue zone e l'ultimo evento accaduto.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/history-heatmap.png" alt="Cronologia > Rapporti" width="100%">
+</p>
+
+<p align="center"><em>Cronologia > Rapporti: la mappa di calore dell'attività di una telecamera, solo posizioni contate, mai l'immagine di qualcuno.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/arming-modes.png" alt="Progettista d'allarme > Modalità" width="100%">
+</p>
+
+<p align="center"><em>Progettista d'allarme > Modalità: ciò che difende ogni modalità di inserimento (fuori, in casa, notte), con ritardi e profili di centrale.</em></p>
 
 ## 🔒 Sicurezza e protezione
 

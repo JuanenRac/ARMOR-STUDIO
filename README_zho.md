@@ -131,16 +131,55 @@ flowchart LR
 
 ## 🖼️ 屏幕截图
 
-在测试台上以 1920×1080 截取，使用示例数据，背后没有真实的安装。
+在测试台上使用虚构的示例数据截取，背后没有真实的安装。
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="概览：周界状态、警报、雷达节点、能源和现场实时地图，一屏尽览。" width="100%"><br><sub>概览：周界状态、警报、雷达节点、能源和现场实时地图，一屏尽览。</sub></td><td width="50%" valign="top"><img src="images/screenshots/radar.png" alt="雷达：每个雷达看到的目标，显示在现场平面图上，并标出每个传感器的覆盖范围。" width="100%"><br><sub>雷达：每个雷达看到的目标，显示在现场平面图上，并标出每个传感器的覆盖范围。</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/inverters.png" alt="逆变器：太阳能板、电网、住宅和电池之间的能量流向，只读。" width="100%"><br><sub>逆变器：太阳能板、电网、住宅和电池之间的能量流向，只读。</sub></td><td width="50%" valign="top"><img src="images/screenshots/site-designer.png" alt="现场设计器：在 Studio 其余部分共用的平面图上绘制地形、建筑、摄像头和雷达。" width="100%"><br><sub>现场设计器：在 Studio 其余部分共用的平面图上绘制地形、建筑、摄像头和雷达。</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/electrical-designer.png" alt="电气设计器：住宅的交流和直流图纸及其检查，来自现成的示例。" width="100%"><br><sub>电气设计器：住宅的交流和直流图纸及其检查，来自现成的示例。</sub></td><td width="50%" valign="top"><img src="images/screenshots/alarm-panels.png" alt="报警主机：每台是否在布防、其防区以及最近发生的事件。" width="100%"><br><sub>报警主机：每台是否在布防、其防区以及最近发生的事件。</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/false-alarm.png" alt="警报：可以把一条警报标为误报，当天的摘要会计入。" width="100%"><br><sub>警报：可以把一条警报标为误报，当天的摘要会计入。</sub></td><td width="50%" valign="top"><img src="images/screenshots/history-summary.png" alt="历史 > 报告：某一天的摘要，含计数、规律和文字。" width="100%"><br><sub>历史 > 报告：某一天的摘要，含计数、规律和文字。</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/history-heatmap.png" alt="历史 > 报告：摄像头的活动热力图，只统计位置，从不显示任何人的画面。" width="100%"><br><sub>历史 > 报告：摄像头的活动热力图，只统计位置，从不显示任何人的画面。</sub></td><td width="50%" valign="top"><img src="images/screenshots/coverage-floors.png" alt="场地设计器 > 覆盖：雷达看到的范围，以及可添加带分层楼宇的平面模板。" width="100%"><br><sub>场地设计器 > 覆盖：雷达看到的范围，以及可添加带分层楼宇的平面模板。</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/arming-modes.png" alt="报警设计器 > 模式：每种布防模式（离家、在家、夜间）所守护的内容，以及延时和主机配置。" width="100%"><br><sub>报警设计器 > 模式：每种布防模式（离家、在家、夜间）所守护的内容，以及延时和主机配置。</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="概览" width="100%">
+</p>
+
+<p align="center"><em>概览：周界状态、警报、雷达节点、能源和现场实时地图，一屏尽览。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/radar.png" alt="雷达" width="100%">
+</p>
+
+<p align="center"><em>雷达：每个雷达看到的目标，显示在现场平面图上，并标出每个传感器的覆盖范围。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/inverters.png" alt="逆变器" width="100%">
+</p>
+
+<p align="center"><em>逆变器：太阳能板、电网、住宅和电池之间的能量流向，只读。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/site-designer.png" alt="现场设计器" width="100%">
+</p>
+
+<p align="center"><em>现场设计器：在 Studio 其余部分共用的平面图上绘制地形、建筑、摄像头和雷达。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/electrical-designer.png" alt="电气设计器" width="100%">
+</p>
+
+<p align="center"><em>电气设计器：住宅的交流和直流图纸及其检查，来自现成的示例。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/alarm-panels.png" alt="报警主机" width="100%">
+</p>
+
+<p align="center"><em>报警主机：每台是否在布防、其防区以及最近发生的事件。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/history-heatmap.png" alt="历史 > 报告" width="100%">
+</p>
+
+<p align="center"><em>历史 > 报告：摄像头的活动热力图，只统计位置，从不显示任何人的画面。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/arming-modes.png" alt="报警设计器 > 模式" width="100%">
+</p>
+
+<p align="center"><em>报警设计器 > 模式：每种布防模式（离家、在家、夜间）所守护的内容，以及延时和主机配置。</em></p>
 
 ## 🔒 安全与防护
 

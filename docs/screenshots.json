@@ -1,0 +1,188 @@
+{
+  "screens": [
+    {
+      "file": "overview.png",
+      "alt": {
+        "en": "Overview",
+        "es": "Resumen",
+        "fr": "Résumé",
+        "it": "Riepilogo",
+        "de": "Übersicht",
+        "zh": "概览",
+        "ja": "概要",
+        "pt": "Resumo"
+      },
+      "caption": {
+        "en": "Overview: the state of the perimeter, the alarms, the radar nodes, the energy and the live map of the site on one screen.",
+        "es": "Resumen: el estado del perímetro, las alarmas, los nodos radar, la energía y el mapa en vivo del sitio en una sola pantalla.",
+        "fr": "Résumé : l'état du périmètre, les alarmes, les nœuds radar, l'énergie et la carte en direct du site sur un seul écran.",
+        "it": "Riepilogo: lo stato del perimetro, gli allarmi, i nodi radar, l'energia e la mappa dal vivo del sito in una sola schermata.",
+        "de": "Übersicht: Zustand des Perimeters, Alarme, Radarknoten, Energie und die Live-Karte des Geländes auf einem Bildschirm.",
+        "zh": "概览：周界状态、警报、雷达节点、能源和现场实时地图，一屏尽览。",
+        "ja": "概要：境界の状態、警報、レーダーノード、エネルギー、現場のライブマップを 1 画面に表示します。",
+        "pt": "Resumo: o estado do perímetro, os alarmes, os nós de radar, a energia e o mapa em direto do local num só ecrã."
+      }
+    },
+    {
+      "file": "radar.png",
+      "alt": {
+        "en": "Radar",
+        "es": "Radar",
+        "fr": "Radar",
+        "it": "Radar",
+        "de": "Radar",
+        "zh": "雷达",
+        "ja": "レーダー",
+        "pt": "Radar"
+      },
+      "caption": {
+        "en": "Radar: the targets each radar sees, placed on the plan of the site, with the area every sensor covers.",
+        "es": "Radar: los blancos que ve cada radar, colocados sobre el plano del sitio, con la zona que cubre cada sensor.",
+        "fr": "Radar : les cibles que voit chaque radar, placées sur le plan du site, avec la zone couverte par chaque capteur.",
+        "it": "Radar: i bersagli che vede ogni radar, posizionati sulla planimetria del sito, con l'area coperta da ogni sensore.",
+        "de": "Radar: die Ziele, die jedes Radar sieht, auf dem Plan des Geländes, mit dem Bereich, den jeder Sensor abdeckt.",
+        "zh": "雷达：每个雷达看到的目标，显示在现场平面图上，并标出每个传感器的覆盖范围。",
+        "ja": "レーダー：各レーダーが捉えた目標を現場の図面上に表示し、各センサーのカバー範囲も示します。",
+        "pt": "Radar: os alvos que cada radar vê, colocados na planta do local, com a zona que cada sensor cobre."
+      }
+    },
+    {
+      "file": "inverters.png",
+      "alt": {
+        "en": "Inverters",
+        "es": "Inversores",
+        "fr": "Onduleurs",
+        "it": "Inverter",
+        "de": "Wechselrichter",
+        "zh": "逆变器",
+        "ja": "インバーター",
+        "pt": "Inversores"
+      },
+      "caption": {
+        "en": "Inverters: the energy flow between the solar panels, the grid, the house and the batteries, read-only.",
+        "es": "Inversores: el flujo de energía entre los paneles solares, la red, la casa y las baterías, solo lectura.",
+        "fr": "Onduleurs : le flux d'énergie entre les panneaux solaires, le réseau, la maison et les batteries, en lecture seule.",
+        "it": "Inverter: il flusso di energia tra i pannelli solari, la rete, la casa e le batterie, in sola lettura.",
+        "de": "Wechselrichter: der Energiefluss zwischen Solarmodulen, Netz, Haus und Batterien, nur lesend.",
+        "zh": "逆变器：太阳能板、电网、住宅和电池之间的能量流向，只读。",
+        "ja": "インバーター：ソーラーパネル、系統、住宅、バッテリー間のエネルギーの流れ（読み取り専用）。",
+        "pt": "Inversores: o fluxo de energia entre os painéis solares, a rede, a casa e as baterias, só de leitura."
+      }
+    },
+    {
+      "file": "site-designer.png",
+      "alt": {
+        "en": "Site designer",
+        "es": "Diseñador del sitio",
+        "fr": "Concepteur du site",
+        "it": "Progettista del sito",
+        "de": "Standort-Designer",
+        "zh": "现场设计器",
+        "ja": "サイトデザイナー",
+        "pt": "Desenhador do local"
+      },
+      "caption": {
+        "en": "Site designer: terrain, buildings, cameras and radars drawn on the plan that the rest of Studio uses.",
+        "es": "Diseñador del sitio: terreno, edificios, cámaras y radares dibujados en el plano que usa el resto de Studio.",
+        "fr": "Concepteur du site : terrain, bâtiments, caméras et radars dessinés sur le plan qu'utilise le reste de Studio.",
+        "it": "Progettista del sito: terreno, edifici, telecamere e radar disegnati sulla planimetria usata dal resto di Studio.",
+        "de": "Standort-Designer: Gelände, Gebäude, Kameras und Radare auf dem Plan, den der Rest von Studio verwendet.",
+        "zh": "现场设计器：在 Studio 其余部分共用的平面图上绘制地形、建筑、摄像头和雷达。",
+        "ja": "サイトデザイナー：Studio の他の画面が使う図面に、地形・建物・カメラ・レーダーを描きます。",
+        "pt": "Desenhador do local: terreno, edifícios, câmaras e radares desenhados na planta que o resto do Studio usa."
+      }
+    },
+    {
+      "file": "electrical-designer.png",
+      "alt": {
+        "en": "Electrical Designer",
+        "es": "Diseñador eléctrico",
+        "fr": "Concepteur électrique",
+        "it": "Progettista elettrico",
+        "de": "Elektro-Designer",
+        "zh": "电气设计器",
+        "ja": "電気デザイナー",
+        "pt": "Desenhador elétrico"
+      },
+      "caption": {
+        "en": "Electrical Designer: the AC and DC diagram of the house, with its checks, drawn from a ready example.",
+        "es": "Diseñador eléctrico: el esquema de corriente alterna y continua de la casa, con sus comprobaciones, desde un ejemplo listo.",
+        "fr": "Concepteur électrique : le schéma CA et CC de la maison, avec ses vérifications, à partir d'un exemple prêt à l'emploi.",
+        "it": "Progettista elettrico: lo schema CA e CC della casa, con i suoi controlli, partendo da un esempio pronto.",
+        "de": "Elektro-Designer: der AC- und DC-Plan des Hauses mit seinen Prüfungen, aus einem fertigen Beispiel.",
+        "zh": "电气设计器：住宅的交流和直流图纸及其检查，来自现成的示例。",
+        "ja": "電気デザイナー：住宅の AC・DC 回路図とそのチェックを、用意されたサンプルから表示します。",
+        "pt": "Desenhador elétrico: o esquema AC e DC da casa, com as suas verificações, a partir de um exemplo pronto."
+      }
+    },
+    {
+      "file": "alarm-panels.png",
+      "alt": {
+        "en": "Alarm panels",
+        "es": "Paneles de alarma",
+        "fr": "Centrales d'alarme",
+        "it": "Centrali d'allarme",
+        "de": "Alarmzentralen",
+        "zh": "报警主机",
+        "ja": "警報パネル",
+        "pt": "Painéis de alarme"
+      },
+      "caption": {
+        "en": "Alarm panels: whether each panel is guarding, its zones and what happened last.",
+        "es": "Paneles de alarma: si cada panel está vigilando, sus zonas y lo último que ocurrió.",
+        "fr": "Centrales d'alarme : si chacune surveille, ses zones et ce qui s'est passé en dernier.",
+        "it": "Centrali d'allarme: se ognuna sorveglia, le sue zone e l'ultimo evento accaduto.",
+        "de": "Alarmzentralen: ob jede überwacht, ihre Zonen und was zuletzt geschah.",
+        "zh": "报警主机：每台是否在布防、其防区以及最近发生的事件。",
+        "ja": "警報パネル：各パネルが警戒中か、そのゾーン、直近の出来事を表示します。",
+        "pt": "Painéis de alarme: se cada painel está a vigiar, as suas zonas e o que aconteceu por último."
+      }
+    },
+    {
+      "file": "history-heatmap.png",
+      "alt": {
+        "en": "History > Reports",
+        "es": "Historial > Informes",
+        "fr": "Historique > Rapports",
+        "it": "Cronologia > Rapporti",
+        "de": "Verlauf > Berichte",
+        "zh": "历史 > 报告",
+        "ja": "履歴 > レポート",
+        "pt": "Histórico > Relatórios"
+      },
+      "caption": {
+        "en": "History > Reports: the activity heat map of a camera, counted positions only, never a picture of anybody.",
+        "es": "Historial > Informes: el mapa de calor de actividad de una cámara, solo posiciones contadas, nunca una imagen de nadie.",
+        "fr": "Historique > Rapports : la carte de chaleur d'activité d'une caméra, uniquement des positions comptées, jamais l'image de quelqu'un.",
+        "it": "Cronologia > Rapporti: la mappa di calore dell'attività di una telecamera, solo posizioni contate, mai l'immagine di qualcuno.",
+        "de": "Verlauf > Berichte: die Aktivitäts-Heatmap einer Kamera, nur gezählte Positionen, nie ein Bild von jemandem.",
+        "zh": "历史 > 报告：摄像头的活动热力图，只统计位置，从不显示任何人的画面。",
+        "ja": "履歴 > レポート：カメラの動きのヒートマップ。数えた位置だけで、人の映像は含みません。",
+        "pt": "Histórico > Relatórios: o mapa de calor da atividade de uma câmara, só posições contadas, nunca a imagem de alguém."
+      }
+    },
+    {
+      "file": "arming-modes.png",
+      "alt": {
+        "en": "Alarm Designer > Modes",
+        "es": "Diseñador de alarma > Modos",
+        "fr": "Concepteur d'alarme > Modes",
+        "it": "Progettista d'allarme > Modalità",
+        "de": "Alarm-Designer > Modi",
+        "zh": "报警设计器 > 模式",
+        "ja": "アラームデザイナー > モード",
+        "pt": "Desenhador de alarme > Modos"
+      },
+      "caption": {
+        "en": "Alarm Designer > Modes: what each arming mode (away, home, night) defends, with its delays and panel profiles.",
+        "es": "Diseñador de alarma > Modos: lo que defiende cada modo de armado (ausente, en casa, noche), con sus retardos y perfiles de panel.",
+        "fr": "Concepteur d'alarme > Modes : ce que défend chaque mode d'armement (absent, présent, nuit), avec ses délais et profils de centrale.",
+        "it": "Progettista d'allarme > Modalità: ciò che difende ogni modalità di inserimento (fuori, in casa, notte), con ritardi e profili di centrale.",
+        "de": "Alarm-Designer > Modi: was jeder Scharfschaltmodus (abwesend, zu Hause, Nacht) schützt, mit Verzögerungen und Zentralenprofilen.",
+        "zh": "报警设计器 > 模式：每种布防模式（离家、在家、夜间）所守护的内容，以及延时和主机配置。",
+        "ja": "アラームデザイナー > モード：各警戒モード（外出、在宅、夜間）が守るものと、遅延、パネルのプロファイル。",
+        "pt": "Desenhador de alarme > Modos: o que cada modo de armação (ausente, em casa, noite) defende, com os seus atrasos e perfis de painel."
+      }
+    }
+  ]
+}

@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The README shows screenshots of Studio:** eight pictures with a sentence under each (overview, radar, inverters, site designer, electrical designer, alarm panels, reports and arming modes), in the eight languages, taken headless with made-up sample data by `tools/capture_screenshots.py` and listed in `docs/screenshots.json`.
+
 ## [0.8.1.9] - Switches for the metrics page and the dead-man ping, a report of how complete each language is, the incident record download, a check of an installation file before the import, the health of the console and a comparison of design versions
 
 - **Configuration > Security offers the numbers page for Prometheus and the dead-man ping:** two switches, both off, each with its explanation and its warning in eight languages; the contract types follow.

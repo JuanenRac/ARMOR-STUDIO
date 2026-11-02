@@ -131,16 +131,55 @@ flowchart LR
 
 ## 🖼️ Screenshots
 
-Aufgenommen mit 1920×1080 auf einem Prüfstand, mit Beispieldaten und ohne eine echte Anlage dahinter.
+Aufgenommen auf einem Prüfstand mit erfundenen Beispieldaten und ohne eine echte Anlage dahinter.
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="Übersicht: Zustand des Perimeters, Alarme, Radarknoten, Energie und die Live-Karte des Geländes auf einem Bildschirm." width="100%"><br><sub>Übersicht: Zustand des Perimeters, Alarme, Radarknoten, Energie und die Live-Karte des Geländes auf einem Bildschirm.</sub></td><td width="50%" valign="top"><img src="images/screenshots/radar.png" alt="Radar: die Ziele, die jedes Radar sieht, auf dem Plan des Geländes, mit dem Bereich, den jeder Sensor abdeckt." width="100%"><br><sub>Radar: die Ziele, die jedes Radar sieht, auf dem Plan des Geländes, mit dem Bereich, den jeder Sensor abdeckt.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/inverters.png" alt="Wechselrichter: der Energiefluss zwischen Solarmodulen, Netz, Haus und Batterien, nur lesend." width="100%"><br><sub>Wechselrichter: der Energiefluss zwischen Solarmodulen, Netz, Haus und Batterien, nur lesend.</sub></td><td width="50%" valign="top"><img src="images/screenshots/site-designer.png" alt="Standort-Designer: Gelände, Gebäude, Kameras und Radare auf dem Plan, den der Rest von Studio verwendet." width="100%"><br><sub>Standort-Designer: Gelände, Gebäude, Kameras und Radare auf dem Plan, den der Rest von Studio verwendet.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/electrical-designer.png" alt="Elektro-Designer: der AC- und DC-Plan des Hauses mit seinen Prüfungen, aus einem fertigen Beispiel." width="100%"><br><sub>Elektro-Designer: der AC- und DC-Plan des Hauses mit seinen Prüfungen, aus einem fertigen Beispiel.</sub></td><td width="50%" valign="top"><img src="images/screenshots/alarm-panels.png" alt="Alarmzentralen: ob jede überwacht, ihre Zonen und was zuletzt geschah." width="100%"><br><sub>Alarmzentralen: ob jede überwacht, ihre Zonen und was zuletzt geschah.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/false-alarm.png" alt="Alarme: ein Alarm kann als Fehlalarm markiert werden, und die Tageszusammenfassung zählt ihn." width="100%"><br><sub>Alarme: ein Alarm kann als Fehlalarm markiert werden, und die Tageszusammenfassung zählt ihn.</sub></td><td width="50%" valign="top"><img src="images/screenshots/history-summary.png" alt="Verlauf > Berichte: die Zusammenfassung eines Tages mit Zählungen, Mustern und Text." width="100%"><br><sub>Verlauf > Berichte: die Zusammenfassung eines Tages mit Zählungen, Mustern und Text.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/history-heatmap.png" alt="Verlauf > Berichte: die Aktivitäts-Heatmap einer Kamera, nur gezählte Positionen, nie ein Bild von jemandem." width="100%"><br><sub>Verlauf > Berichte: die Aktivitäts-Heatmap einer Kamera, nur gezählte Positionen, nie ein Bild von jemandem.</sub></td><td width="50%" valign="top"><img src="images/screenshots/coverage-floors.png" alt="Standort-Designer > Abdeckung: was die Radare sehen, mit den Grundriss-Vorlagen, die ein Gebäude mit eigenen Etagen hinzufügen." width="100%"><br><sub>Standort-Designer > Abdeckung: was die Radare sehen, mit den Grundriss-Vorlagen, die ein Gebäude mit eigenen Etagen hinzufügen.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/arming-modes.png" alt="Alarm-Designer > Modi: was jeder Scharfschaltmodus (abwesend, zu Hause, Nacht) schützt, mit Verzögerungen und Zentralenprofilen." width="100%"><br><sub>Alarm-Designer > Modi: was jeder Scharfschaltmodus (abwesend, zu Hause, Nacht) schützt, mit Verzögerungen und Zentralenprofilen.</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="Übersicht" width="100%">
+</p>
+
+<p align="center"><em>Übersicht: Zustand des Perimeters, Alarme, Radarknoten, Energie und die Live-Karte des Geländes auf einem Bildschirm.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/radar.png" alt="Radar" width="100%">
+</p>
+
+<p align="center"><em>Radar: die Ziele, die jedes Radar sieht, auf dem Plan des Geländes, mit dem Bereich, den jeder Sensor abdeckt.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/inverters.png" alt="Wechselrichter" width="100%">
+</p>
+
+<p align="center"><em>Wechselrichter: der Energiefluss zwischen Solarmodulen, Netz, Haus und Batterien, nur lesend.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/site-designer.png" alt="Standort-Designer" width="100%">
+</p>
+
+<p align="center"><em>Standort-Designer: Gelände, Gebäude, Kameras und Radare auf dem Plan, den der Rest von Studio verwendet.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/electrical-designer.png" alt="Elektro-Designer" width="100%">
+</p>
+
+<p align="center"><em>Elektro-Designer: der AC- und DC-Plan des Hauses mit seinen Prüfungen, aus einem fertigen Beispiel.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/alarm-panels.png" alt="Alarmzentralen" width="100%">
+</p>
+
+<p align="center"><em>Alarmzentralen: ob jede überwacht, ihre Zonen und was zuletzt geschah.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/history-heatmap.png" alt="Verlauf > Berichte" width="100%">
+</p>
+
+<p align="center"><em>Verlauf > Berichte: die Aktivitäts-Heatmap einer Kamera, nur gezählte Positionen, nie ein Bild von jemandem.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/arming-modes.png" alt="Alarm-Designer > Modi" width="100%">
+</p>
+
+<p align="center"><em>Alarm-Designer > Modi: was jeder Scharfschaltmodus (abwesend, zu Hause, Nacht) schützt, mit Verzögerungen und Zentralenprofilen.</em></p>
 
 ## 🔒 Sicherheit und Schutz
 

@@ -131,16 +131,55 @@ flowchart LR
 
 ## 🖼️ Captures d'écran
 
-Capturées en 1920×1080 sur un banc d'essai, avec des données d'exemple et sans installation réelle derrière.
+Capturées sur un banc d'essai avec des données d'exemple fictives et sans installation réelle derrière.
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="Résumé : l'état du périmètre, les alarmes, les nœuds radar, l'énergie et la carte en direct du site sur un seul écran." width="100%"><br><sub>Résumé : l'état du périmètre, les alarmes, les nœuds radar, l'énergie et la carte en direct du site sur un seul écran.</sub></td><td width="50%" valign="top"><img src="images/screenshots/radar.png" alt="Radar : les cibles que voit chaque radar, placées sur le plan du site, avec la zone couverte par chaque capteur." width="100%"><br><sub>Radar : les cibles que voit chaque radar, placées sur le plan du site, avec la zone couverte par chaque capteur.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/inverters.png" alt="Onduleurs : le flux d'énergie entre les panneaux solaires, le réseau, la maison et les batteries, en lecture seule." width="100%"><br><sub>Onduleurs : le flux d'énergie entre les panneaux solaires, le réseau, la maison et les batteries, en lecture seule.</sub></td><td width="50%" valign="top"><img src="images/screenshots/site-designer.png" alt="Concepteur du site : terrain, bâtiments, caméras et radars dessinés sur le plan qu'utilise le reste de Studio." width="100%"><br><sub>Concepteur du site : terrain, bâtiments, caméras et radars dessinés sur le plan qu'utilise le reste de Studio.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/electrical-designer.png" alt="Concepteur électrique : le schéma CA et CC de la maison, avec ses vérifications, à partir d'un exemple prêt à l'emploi." width="100%"><br><sub>Concepteur électrique : le schéma CA et CC de la maison, avec ses vérifications, à partir d'un exemple prêt à l'emploi.</sub></td><td width="50%" valign="top"><img src="images/screenshots/alarm-panels.png" alt="Centrales d'alarme : si chacune surveille, ses zones et ce qui s'est passé en dernier." width="100%"><br><sub>Centrales d'alarme : si chacune surveille, ses zones et ce qui s'est passé en dernier.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/false-alarm.png" alt="Alarmes : une alarme peut être marquée comme fausse alarme, et le résumé du jour la compte." width="100%"><br><sub>Alarmes : une alarme peut être marquée comme fausse alarme, et le résumé du jour la compte.</sub></td><td width="50%" valign="top"><img src="images/screenshots/history-summary.png" alt="Historique > Rapports : le résumé d'une journée, avec ses comptes, ses motifs et son texte." width="100%"><br><sub>Historique > Rapports : le résumé d'une journée, avec ses comptes, ses motifs et son texte.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/history-heatmap.png" alt="Historique > Rapports : la carte de chaleur d'activité d'une caméra, uniquement des positions comptées, jamais l'image de quelqu'un." width="100%"><br><sub>Historique > Rapports : la carte de chaleur d'activité d'une caméra, uniquement des positions comptées, jamais l'image de quelqu'un.</sub></td><td width="50%" valign="top"><img src="images/screenshots/coverage-floors.png" alt="Concepteur du site > Couverture : ce que voient les radars, avec les modèles de plan qui ajoutent un bâtiment avec ses propres étages." width="100%"><br><sub>Concepteur du site > Couverture : ce que voient les radars, avec les modèles de plan qui ajoutent un bâtiment avec ses propres étages.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/arming-modes.png" alt="Concepteur d'alarme > Modes : ce que défend chaque mode d'armement (absent, présent, nuit), avec ses délais et profils de centrale." width="100%"><br><sub>Concepteur d'alarme > Modes : ce que défend chaque mode d'armement (absent, présent, nuit), avec ses délais et profils de centrale.</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="Résumé" width="100%">
+</p>
+
+<p align="center"><em>Résumé : l'état du périmètre, les alarmes, les nœuds radar, l'énergie et la carte en direct du site sur un seul écran.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/radar.png" alt="Radar" width="100%">
+</p>
+
+<p align="center"><em>Radar : les cibles que voit chaque radar, placées sur le plan du site, avec la zone couverte par chaque capteur.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/inverters.png" alt="Onduleurs" width="100%">
+</p>
+
+<p align="center"><em>Onduleurs : le flux d'énergie entre les panneaux solaires, le réseau, la maison et les batteries, en lecture seule.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/site-designer.png" alt="Concepteur du site" width="100%">
+</p>
+
+<p align="center"><em>Concepteur du site : terrain, bâtiments, caméras et radars dessinés sur le plan qu'utilise le reste de Studio.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/electrical-designer.png" alt="Concepteur électrique" width="100%">
+</p>
+
+<p align="center"><em>Concepteur électrique : le schéma CA et CC de la maison, avec ses vérifications, à partir d'un exemple prêt à l'emploi.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/alarm-panels.png" alt="Centrales d'alarme" width="100%">
+</p>
+
+<p align="center"><em>Centrales d'alarme : si chacune surveille, ses zones et ce qui s'est passé en dernier.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/history-heatmap.png" alt="Historique > Rapports" width="100%">
+</p>
+
+<p align="center"><em>Historique > Rapports : la carte de chaleur d'activité d'une caméra, uniquement des positions comptées, jamais l'image de quelqu'un.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/arming-modes.png" alt="Concepteur d'alarme > Modes" width="100%">
+</p>
+
+<p align="center"><em>Concepteur d'alarme > Modes : ce que défend chaque mode d'armement (absent, présent, nuit), avec ses délais et profils de centrale.</em></p>
 
 ## 🔒 Sécurité et protection
 

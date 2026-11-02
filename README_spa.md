@@ -131,16 +131,55 @@ flowchart LR
 
 ## 🖼️ Capturas de pantalla
 
-Capturadas a 1920×1080 en un banco de pruebas, con datos de ejemplo y sin ninguna instalación real detrás.
+Capturadas en un banco de pruebas con datos de ejemplo inventados y sin ninguna instalación real detrás.
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="Resumen: el estado del perímetro, las alarmas, los nodos radar, la energía y el mapa en vivo del sitio en una sola pantalla." width="100%"><br><sub>Resumen: el estado del perímetro, las alarmas, los nodos radar, la energía y el mapa en vivo del sitio en una sola pantalla.</sub></td><td width="50%" valign="top"><img src="images/screenshots/radar.png" alt="Radar: los blancos que ve cada radar, colocados sobre el plano del sitio, con la zona que cubre cada sensor." width="100%"><br><sub>Radar: los blancos que ve cada radar, colocados sobre el plano del sitio, con la zona que cubre cada sensor.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/inverters.png" alt="Inversores: el flujo de energía entre los paneles solares, la red, la casa y las baterías, solo lectura." width="100%"><br><sub>Inversores: el flujo de energía entre los paneles solares, la red, la casa y las baterías, solo lectura.</sub></td><td width="50%" valign="top"><img src="images/screenshots/site-designer.png" alt="Diseñador del sitio: terreno, edificios, cámaras y radares dibujados en el plano que usa el resto de Studio." width="100%"><br><sub>Diseñador del sitio: terreno, edificios, cámaras y radares dibujados en el plano que usa el resto de Studio.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/electrical-designer.png" alt="Diseñador eléctrico: el esquema de corriente alterna y continua de la casa, con sus comprobaciones, desde un ejemplo listo." width="100%"><br><sub>Diseñador eléctrico: el esquema de corriente alterna y continua de la casa, con sus comprobaciones, desde un ejemplo listo.</sub></td><td width="50%" valign="top"><img src="images/screenshots/alarm-panels.png" alt="Paneles de alarma: si cada panel está vigilando, sus zonas y lo último que ocurrió." width="100%"><br><sub>Paneles de alarma: si cada panel está vigilando, sus zonas y lo último que ocurrió.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/false-alarm.png" alt="Alarmas: una alarma se puede marcar como falsa alarma, y el resumen del día la cuenta." width="100%"><br><sub>Alarmas: una alarma se puede marcar como falsa alarma, y el resumen del día la cuenta.</sub></td><td width="50%" valign="top"><img src="images/screenshots/history-summary.png" alt="Historial > Informes: el resumen de un día, con sus cuentas, sus patrones y su texto." width="100%"><br><sub>Historial > Informes: el resumen de un día, con sus cuentas, sus patrones y su texto.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/history-heatmap.png" alt="Historial > Informes: el mapa de calor de actividad de una cámara, solo posiciones contadas, nunca una imagen de nadie." width="100%"><br><sub>Historial > Informes: el mapa de calor de actividad de una cámara, solo posiciones contadas, nunca una imagen de nadie.</sub></td><td width="50%" valign="top"><img src="images/screenshots/coverage-floors.png" alt="Diseñador del sitio > Cobertura: lo que ven los radares, con las plantillas de planta que añaden un edificio con sus propios pisos." width="100%"><br><sub>Diseñador del sitio > Cobertura: lo que ven los radares, con las plantillas de planta que añaden un edificio con sus propios pisos.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/arming-modes.png" alt="Diseñador de alarma > Modos: lo que defiende cada modo de armado (ausente, en casa, noche), con sus retardos y perfiles de panel." width="100%"><br><sub>Diseñador de alarma > Modos: lo que defiende cada modo de armado (ausente, en casa, noche), con sus retardos y perfiles de panel.</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="Resumen" width="100%">
+</p>
+
+<p align="center"><em>Resumen: el estado del perímetro, las alarmas, los nodos radar, la energía y el mapa en vivo del sitio en una sola pantalla.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/radar.png" alt="Radar" width="100%">
+</p>
+
+<p align="center"><em>Radar: los blancos que ve cada radar, colocados sobre el plano del sitio, con la zona que cubre cada sensor.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/inverters.png" alt="Inversores" width="100%">
+</p>
+
+<p align="center"><em>Inversores: el flujo de energía entre los paneles solares, la red, la casa y las baterías, solo lectura.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/site-designer.png" alt="Diseñador del sitio" width="100%">
+</p>
+
+<p align="center"><em>Diseñador del sitio: terreno, edificios, cámaras y radares dibujados en el plano que usa el resto de Studio.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/electrical-designer.png" alt="Diseñador eléctrico" width="100%">
+</p>
+
+<p align="center"><em>Diseñador eléctrico: el esquema de corriente alterna y continua de la casa, con sus comprobaciones, desde un ejemplo listo.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/alarm-panels.png" alt="Paneles de alarma" width="100%">
+</p>
+
+<p align="center"><em>Paneles de alarma: si cada panel está vigilando, sus zonas y lo último que ocurrió.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/history-heatmap.png" alt="Historial > Informes" width="100%">
+</p>
+
+<p align="center"><em>Historial > Informes: el mapa de calor de actividad de una cámara, solo posiciones contadas, nunca una imagen de nadie.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/arming-modes.png" alt="Diseñador de alarma > Modos" width="100%">
+</p>
+
+<p align="center"><em>Diseñador de alarma > Modos: lo que defiende cada modo de armado (ausente, en casa, noche), con sus retardos y perfiles de panel.</em></p>
 
 ## 🔒 Seguridad y protección
 

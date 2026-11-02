@@ -131,16 +131,55 @@ flowchart LR
 
 ## 🖼️ Screenshots
 
-Captured at 1920×1080 on a test bench, with sample data and no real installation behind them.
+Captured on a test bench with made-up sample data and no real installation behind them.
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="Overview: the state of the perimeter, the alarms, the radar nodes, the energy and the live map of the site on one screen." width="100%"><br><sub>Overview: the state of the perimeter, the alarms, the radar nodes, the energy and the live map of the site on one screen.</sub></td><td width="50%" valign="top"><img src="images/screenshots/radar.png" alt="Radar: the targets each radar sees, placed on the plan of the site, with the area every sensor covers." width="100%"><br><sub>Radar: the targets each radar sees, placed on the plan of the site, with the area every sensor covers.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/inverters.png" alt="Inverters: the energy flow between the solar panels, the grid, the house and the batteries, read-only." width="100%"><br><sub>Inverters: the energy flow between the solar panels, the grid, the house and the batteries, read-only.</sub></td><td width="50%" valign="top"><img src="images/screenshots/site-designer.png" alt="Site designer: terrain, buildings, cameras and radars drawn on the plan that the rest of Studio uses." width="100%"><br><sub>Site designer: terrain, buildings, cameras and radars drawn on the plan that the rest of Studio uses.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/electrical-designer.png" alt="Electrical Designer: the AC and DC diagram of the house, with its checks, drawn from a ready example." width="100%"><br><sub>Electrical Designer: the AC and DC diagram of the house, with its checks, drawn from a ready example.</sub></td><td width="50%" valign="top"><img src="images/screenshots/alarm-panels.png" alt="Alarm panels: whether each panel is guarding, its zones and what happened last." width="100%"><br><sub>Alarm panels: whether each panel is guarding, its zones and what happened last.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/false-alarm.png" alt="Alarms: an alarm can be marked as a false alarm, and the summary of the day counts it." width="100%"><br><sub>Alarms: an alarm can be marked as a false alarm, and the summary of the day counts it.</sub></td><td width="50%" valign="top"><img src="images/screenshots/history-summary.png" alt="History > Reports: the summary of a day, with its counts, its patterns and its text." width="100%"><br><sub>History > Reports: the summary of a day, with its counts, its patterns and its text.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/history-heatmap.png" alt="History > Reports: the activity heat map of a camera, counted positions only, never a picture of anybody." width="100%"><br><sub>History > Reports: the activity heat map of a camera, counted positions only, never a picture of anybody.</sub></td><td width="50%" valign="top"><img src="images/screenshots/coverage-floors.png" alt="Site designer > Coverage: what the radars see, with the floor-plan templates that add a building with its own floors." width="100%"><br><sub>Site designer > Coverage: what the radars see, with the floor-plan templates that add a building with its own floors.</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/arming-modes.png" alt="Alarm Designer > Modes: what each arming mode (away, home, night) defends, with its delays and panel profiles." width="100%"><br><sub>Alarm Designer > Modes: what each arming mode (away, home, night) defends, with its delays and panel profiles.</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="Overview" width="100%">
+</p>
+
+<p align="center"><em>Overview: the state of the perimeter, the alarms, the radar nodes, the energy and the live map of the site on one screen.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/radar.png" alt="Radar" width="100%">
+</p>
+
+<p align="center"><em>Radar: the targets each radar sees, placed on the plan of the site, with the area every sensor covers.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/inverters.png" alt="Inverters" width="100%">
+</p>
+
+<p align="center"><em>Inverters: the energy flow between the solar panels, the grid, the house and the batteries, read-only.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/site-designer.png" alt="Site designer" width="100%">
+</p>
+
+<p align="center"><em>Site designer: terrain, buildings, cameras and radars drawn on the plan that the rest of Studio uses.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/electrical-designer.png" alt="Electrical Designer" width="100%">
+</p>
+
+<p align="center"><em>Electrical Designer: the AC and DC diagram of the house, with its checks, drawn from a ready example.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/alarm-panels.png" alt="Alarm panels" width="100%">
+</p>
+
+<p align="center"><em>Alarm panels: whether each panel is guarding, its zones and what happened last.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/history-heatmap.png" alt="History > Reports" width="100%">
+</p>
+
+<p align="center"><em>History > Reports: the activity heat map of a camera, counted positions only, never a picture of anybody.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/arming-modes.png" alt="Alarm Designer > Modes" width="100%">
+</p>
+
+<p align="center"><em>Alarm Designer > Modes: what each arming mode (away, home, night) defends, with its delays and panel profiles.</em></p>
 
 ## 🔒 Security & Safety
 

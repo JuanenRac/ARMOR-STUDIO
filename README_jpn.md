@@ -131,16 +131,55 @@ flowchart LR
 
 ## 🖼️ スクリーンショット
 
-テストベンチで 1920×1080 で撮影。サンプルデータを使用しており、実際の設備は接続されていません。
+テストベンチで架空のサンプルデータを使って撮影したもので、実際の設備は接続されていません。
 
-<table>
-<tr><td width="50%" valign="top"><img src="images/screenshots/overview.png" alt="概要：境界の状態、警報、レーダーノード、エネルギー、現場のライブマップを 1 画面に表示します。" width="100%"><br><sub>概要：境界の状態、警報、レーダーノード、エネルギー、現場のライブマップを 1 画面に表示します。</sub></td><td width="50%" valign="top"><img src="images/screenshots/radar.png" alt="レーダー：各レーダーが捉えた目標を現場の図面上に表示し、各センサーのカバー範囲も示します。" width="100%"><br><sub>レーダー：各レーダーが捉えた目標を現場の図面上に表示し、各センサーのカバー範囲も示します。</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/inverters.png" alt="インバーター：ソーラーパネル、系統、住宅、バッテリー間のエネルギーの流れ（読み取り専用）。" width="100%"><br><sub>インバーター：ソーラーパネル、系統、住宅、バッテリー間のエネルギーの流れ（読み取り専用）。</sub></td><td width="50%" valign="top"><img src="images/screenshots/site-designer.png" alt="サイトデザイナー：Studio の他の画面が使う図面に、地形・建物・カメラ・レーダーを描きます。" width="100%"><br><sub>サイトデザイナー：Studio の他の画面が使う図面に、地形・建物・カメラ・レーダーを描きます。</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/electrical-designer.png" alt="電気デザイナー：住宅の AC・DC 回路図とそのチェックを、用意されたサンプルから表示します。" width="100%"><br><sub>電気デザイナー：住宅の AC・DC 回路図とそのチェックを、用意されたサンプルから表示します。</sub></td><td width="50%" valign="top"><img src="images/screenshots/alarm-panels.png" alt="警報パネル：各パネルが警戒中か、そのゾーン、直近の出来事を表示します。" width="100%"><br><sub>警報パネル：各パネルが警戒中か、そのゾーン、直近の出来事を表示します。</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/false-alarm.png" alt="アラーム：アラームを誤報として記録でき、1 日のサマリーに数えられます。" width="100%"><br><sub>アラーム：アラームを誤報として記録でき、1 日のサマリーに数えられます。</sub></td><td width="50%" valign="top"><img src="images/screenshots/history-summary.png" alt="履歴 > レポート：1 日のサマリー（件数、パターン、文章）。" width="100%"><br><sub>履歴 > レポート：1 日のサマリー（件数、パターン、文章）。</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/history-heatmap.png" alt="履歴 > レポート：カメラの動きのヒートマップ。数えた位置だけで、人の映像は含みません。" width="100%"><br><sub>履歴 > レポート：カメラの動きのヒートマップ。数えた位置だけで、人の映像は含みません。</sub></td><td width="50%" valign="top"><img src="images/screenshots/coverage-floors.png" alt="サイトデザイナー > カバレッジ：レーダーが見える範囲と、階ごとの間取りを持つ建物を追加するテンプレート。" width="100%"><br><sub>サイトデザイナー > カバレッジ：レーダーが見える範囲と、階ごとの間取りを持つ建物を追加するテンプレート。</sub></td></tr>
-<tr><td width="50%" valign="top"><img src="images/screenshots/arming-modes.png" alt="アラームデザイナー > モード：各警戒モード（外出、在宅、夜間）が守るものと、遅延、パネルのプロファイル。" width="100%"><br><sub>アラームデザイナー > モード：各警戒モード（外出、在宅、夜間）が守るものと、遅延、パネルのプロファイル。</sub></td></tr>
-</table>
+<p align="center">
+  <img src="images/screenshots/overview.png" alt="概要" width="100%">
+</p>
+
+<p align="center"><em>概要：境界の状態、警報、レーダーノード、エネルギー、現場のライブマップを 1 画面に表示します。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/radar.png" alt="レーダー" width="100%">
+</p>
+
+<p align="center"><em>レーダー：各レーダーが捉えた目標を現場の図面上に表示し、各センサーのカバー範囲も示します。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/inverters.png" alt="インバーター" width="100%">
+</p>
+
+<p align="center"><em>インバーター：ソーラーパネル、系統、住宅、バッテリー間のエネルギーの流れ（読み取り専用）。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/site-designer.png" alt="サイトデザイナー" width="100%">
+</p>
+
+<p align="center"><em>サイトデザイナー：Studio の他の画面が使う図面に、地形・建物・カメラ・レーダーを描きます。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/electrical-designer.png" alt="電気デザイナー" width="100%">
+</p>
+
+<p align="center"><em>電気デザイナー：住宅の AC・DC 回路図とそのチェックを、用意されたサンプルから表示します。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/alarm-panels.png" alt="警報パネル" width="100%">
+</p>
+
+<p align="center"><em>警報パネル：各パネルが警戒中か、そのゾーン、直近の出来事を表示します。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/history-heatmap.png" alt="履歴 > レポート" width="100%">
+</p>
+
+<p align="center"><em>履歴 > レポート：カメラの動きのヒートマップ。数えた位置だけで、人の映像は含みません。</em></p>
+
+<p align="center">
+  <img src="images/screenshots/arming-modes.png" alt="アラームデザイナー > モード" width="100%">
+</p>
+
+<p align="center"><em>アラームデザイナー > モード：各警戒モード（外出、在宅、夜間）が守るものと、遅延、パネルのプロファイル。</em></p>
 
 ## 🔒 セキュリティと安全
 
