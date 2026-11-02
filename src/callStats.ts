@@ -13,7 +13,7 @@ let records: CallRecord[] = [];
 
 /** A route reduced to its first four parts with no query or fragment: "/api/v1/cameras/gate/snapshot?x=1" is "/api/v1/cameras/gate/…". */
 export function routeShape(url: string): string {
-  let path = url;
+  let path: string;
   try { path = new URL(url, "http://localhost").pathname; } catch { path = url.split(/[?#]/)[0] ?? ""; }
   const parts = path.split("/").filter(Boolean);
   if (parts.length === 0) return "/";

@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The linter is ESLint 10:** the development tools move to ESLint 10 (and its JavaScript rules), now that the TypeScript and React Hooks plugins support it; the check found one assignment whose value was never used in the call statistics, which is fixed, and an exemption comment in a test that no longer exempted anything is gone. TypeScript stays on 6 until the TypeScript plugin supports 7. No change for the people who use the console.
 - **The generated types of the HTTP contract follow the shared contracts again:** `armor-rest.ts` and `armor-contracts.ts` are the ones the shared repository generates now (the optional `kind` of the node messages, the signed alarm state option and a few more shared shapes).
 - **The Updates tab explains a server update that failed its trial:** when the maintenance helper is set to try the new server beside the running one and the new one does not start, the update ends with a sentence in the eight languages saying that nothing was changed, instead of a bare code.
 - **The README shows screenshots of Studio:** eight pictures with a sentence under each (overview, radar, inverters, site designer, electrical designer, alarm panels, reports and arming modes), in the eight languages, taken headless with made-up sample data by `tools/capture_screenshots.py` and listed in `docs/screenshots.json`.
