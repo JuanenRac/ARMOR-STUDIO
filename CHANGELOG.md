@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The generated types of the HTTP contract follow the shared contracts again:** `armor-rest.ts` and `armor-contracts.ts` are the ones the shared repository generates now (the optional `kind` of the node messages, the signed alarm state option and a few more shared shapes).
 - **The Updates tab explains a server update that failed its trial:** when the maintenance helper is set to try the new server beside the running one and the new one does not start, the update ends with a sentence in the eight languages saying that nothing was changed, instead of a bare code.
 - **The README shows screenshots of Studio:** eight pictures with a sentence under each (overview, radar, inverters, site designer, electrical designer, alarm panels, reports and arming modes), in the eight languages, taken headless with made-up sample data by `tools/capture_screenshots.py` and listed in `docs/screenshots.json`.
 

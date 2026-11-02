@@ -9,6 +9,7 @@ export type RadarTrack = {
 };
 
 export type Telemetry = {
+  kind?: "telemetry";
   node_id: string;
   timestamp_ms: number;
   lux: number;
@@ -23,6 +24,7 @@ export type Health = {
 };
 
 export type Command = {
+  kind?: "command";
   node_id: string;
   timestamp_ms: number;
   command: "calibrate" | "set_thresholds" | "restart";
@@ -30,6 +32,7 @@ export type Command = {
 };
 
 export type Info = {
+  kind?: "info";
   node_id: string;
   timestamp_ms: number;
   name: string;
@@ -607,6 +610,8 @@ export type Alarm = {
   profile?: string;
   siren_loop?: "unknown" | "ok" | "open" | "short" | "unreadable";
   siren_fault?: boolean;
+  seq?: number;
+  sig?: string;
 };
 
 export type ArmProfileZone = {
@@ -1107,6 +1112,50 @@ export type Network = {
   scan?: NetworkScan;
   public?: NetworkPublic;
   results?: NetworkResults[];
+};
+
+export type DeviceState = {
+  on: boolean;
+};
+
+export type NetworkOrdersCommands = {
+  id: string;
+  type: "scan_now" | "ping" | "traceroute" | "wake" | "ports" | "http" | "inspect";
+  device_id?: string;
+  ip?: string;
+  mac?: string;
+  port?: number;
+  auth_sealed?: string;
+};
+
+export type NetworkOrders = {
+  accepted: true;
+  commands: NetworkOrdersCommands[];
+};
+
+export type ServerAlert = {
+  service: "armor-server";
+  event: "alert.raised" | "alert.cleared" | "node.offline" | "node.stale" | "camera.offline" | "alarm.raised" | "alarm.escalated" | "automation.notify" | "login.remote" | "alert.test";
+  at: string;
+  mode: "armed" | "disarmed";
+  node_id?: string;
+  camera_id?: string;
+  targets?: number;
+  minutes?: number;
+  alarm_id?: string;
+  severity?: "critical" | "high" | "warning";
+  code?: string;
+  device_id?: string;
+  solar_id?: string;
+  electrical_id?: string;
+  alarm_node_id?: string;
+  network_id?: string;
+  silent?: true;
+  automation?: string;
+  login_user?: string;
+  login_from?: string;
+  login_country?: string;
+  login_country_new?: true;
 };
 
 export const MAX_TARGETS = 15;
