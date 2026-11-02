@@ -4911,6 +4911,8 @@ const catalogue: Record<string, string> = {
 "fw_err_did_not_come_back": "Il nodo non è tornato in tempo con la nuova versione. Controllalo prima di riprovare.",
 "fw_err_node_wrong_firmware": "Quel firmware appartiene a un altro progetto.",
 "fw_err_node_not_firmware": "Il nodo dice che quel file non è un'immagine firmware.",
+"fw_err_node_wrong_board": "Quel firmware è stato costruito per l'altra scheda (Wi-Fi o Ethernet).",
+"fw_err_node_no_board_mark": "Quel firmware non dice per quale scheda è fatto (uno vecchio); l'impostazione security.ota_require_board_mark del nodo lo consente.",
 "fw_err_checksum_mismatch": "L'immagine della versione non corrisponde alla somma pubblicata: non è stata usata.",
 "fw_err_no_checksum": "La versione non include un file di somma (.sha256), quindi non viene usata.",
 "fw_err_no_signature": "La versione non include la firma del suo manifesto (.sig2), quindi non viene usata.",

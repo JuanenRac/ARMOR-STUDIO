@@ -5034,6 +5034,8 @@ const catalogue: Record<string, string> = {
 "fw_err_did_not_come_back": "The node did not come back with the new version in time. Check it before trying again.",
 "fw_err_node_wrong_firmware": "That firmware belongs to another project.",
 "fw_err_node_not_firmware": "The node says that file is not a firmware image.",
+"fw_err_node_wrong_board": "That firmware was built for the other board (Wi-Fi or Ethernet).",
+"fw_err_node_no_board_mark": "That firmware does not say which board it is for (an older one); the node's setting security.ota_require_board_mark allows it.",
 "fw_err_checksum_mismatch": "The release's image does not match the hash it publishes: it was not used.",
 "fw_err_no_checksum": "The release carries no hash file (.sha256), so it is not used.",
 "fw_err_no_signature": "The release carries no signature of its manifest (.sig2), so it is not used.",

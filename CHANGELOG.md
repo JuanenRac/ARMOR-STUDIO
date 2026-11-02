@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The firmware panel explains the two new refusals of a node** (an image built for the other board, and an image that says nothing of its board), in eight languages, and the contract types follow ARMOR-COMMON (the wiring of the siren of an alarm node).
+
 ## [0.8.1.8] - The sign-in warns about Caps Lock and checks the server address, passwords and PINs are checked while typing, there are one-key shortcuts and a skip link, and closing the tab with an unsaved drawing asks first
 
 - **Every password field warns when Caps Lock is on:** a short note under the field, announced by a screen reader and tied to the field, that goes away when the key is off or the field loses the focus; it covers the sign-in, the account, the users and the PINs. Eight languages, Portuguese of Portugal included.

@@ -4870,6 +4870,8 @@ const catalogue: Record<string, string> = {
 "fw_err_did_not_come_back": "Der Knoten kam nicht rechtzeitig mit der neuen Version zurück. Prüfe ihn, bevor du es erneut versuchst.",
 "fw_err_node_wrong_firmware": "Diese Firmware gehört zu einem anderen Projekt.",
 "fw_err_node_not_firmware": "Der Knoten sagt, diese Datei sei kein Firmware-Image.",
+"fw_err_node_wrong_board": "Diese Firmware wurde für die andere Platine (WLAN oder Ethernet) gebaut.",
+"fw_err_node_no_board_mark": "Diese Firmware gibt nicht an, für welche Platine sie ist (eine ältere); die Einstellung security.ota_require_board_mark des Knotens erlaubt sie.",
 "fw_err_checksum_mismatch": "Das Image der Version stimmt nicht mit der veröffentlichten Prüfsumme überein: nicht verwendet.",
 "fw_err_no_checksum": "Die Version enthält keine Prüfsummendatei (.sha256) und wird deshalb nicht verwendet.",
 "fw_err_no_signature": "Die Version enthält keine Signatur ihres Manifests (.sig2) und wird deshalb nicht verwendet.",

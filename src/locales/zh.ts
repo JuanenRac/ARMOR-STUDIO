@@ -5012,6 +5012,8 @@ const catalogue: Record<string, string> = {
 "fw_err_did_not_come_back": "节点未能及时以新版本重新上线。重试前请先检查它。",
 "fw_err_node_wrong_firmware": "该固件属于另一个项目。",
 "fw_err_node_not_firmware": "节点表示该文件不是固件镜像。",
+"fw_err_node_wrong_board": "该固件是为另一种电路板（Wi-Fi 或以太网）构建的。",
+"fw_err_node_no_board_mark": "该固件没有说明适用于哪种电路板（较旧的版本）；可由节点设置 security.ota_require_board_mark 允许。",
 "fw_err_checksum_mismatch": "该发布的镜像与其公布的校验和不符：未使用。",
 "fw_err_no_checksum": "该发布没有校验和文件 (.sha256)，因此不使用。",
 "fw_err_no_signature": "该发布没有清单签名 (.sig2)，因此不使用。",

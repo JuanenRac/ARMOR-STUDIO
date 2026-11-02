@@ -5008,6 +5008,8 @@ const catalogue: Record<string, string> = {
 "fw_err_did_not_come_back": "ノードが時間内に新しいバージョンで戻りませんでした。再試行する前に確認してください。",
 "fw_err_node_wrong_firmware": "そのファームウェアは別のプロジェクトのものです。",
 "fw_err_node_not_firmware": "ノードはそのファイルがファームウェアイメージではないと言っています。",
+"fw_err_node_wrong_board": "そのファームウェアはもう一方の基板（Wi-Fi または Ethernet）用に作られています。",
+"fw_err_node_no_board_mark": "そのファームウェアは対象の基板を示していません（古いものです）。ノードの設定 security.ota_require_board_mark で許可できます。",
 "fw_err_checksum_mismatch": "リリースのイメージが公開されたハッシュと一致しないため、使用しませんでした。",
 "fw_err_no_checksum": "このリリースにはハッシュファイル (.sha256) がないため、使用しません。",
 "fw_err_no_signature": "このリリースにはマニフェストの署名 (.sig2) がないため、使用しません。",

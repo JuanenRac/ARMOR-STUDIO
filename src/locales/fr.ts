@@ -4875,6 +4875,8 @@ const catalogue: Record<string, string> = {
 "fw_err_did_not_come_back": "Le nœud n'est pas revenu à temps avec la nouvelle version. Vérifiez-le avant de réessayer.",
 "fw_err_node_wrong_firmware": "Ce firmware appartient à un autre projet.",
 "fw_err_node_not_firmware": "Le nœud dit que ce fichier n'est pas une image de firmware.",
+"fw_err_node_wrong_board": "Ce firmware a été construit pour l'autre carte (Wi-Fi ou Ethernet).",
+"fw_err_node_no_board_mark": "Ce firmware n'indique pas pour quelle carte il est fait (un ancien) ; le réglage security.ota_require_board_mark du nœud l'autorise.",
 "fw_err_checksum_mismatch": "L'image de la version ne correspond pas à la somme publiée : elle n'a pas été utilisée.",
 "fw_err_no_checksum": "La version ne contient pas de fichier de somme (.sha256) ; elle n'est donc pas utilisée.",
 "fw_err_no_signature": "La version ne contient pas la signature de son manifeste (.sig2) ; elle n'est donc pas utilisée.",
