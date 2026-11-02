@@ -4169,6 +4169,7 @@ const catalogue: Record<string, string> = {
 "mt_err_unsafe_archive": "O pacote contém ficheiros fora da sua pasta: recusado.",
 "mt_err_bad_archive": "O pacote não é o esperado.",
 "mt_err_unhealthy_rolled_back": "O programa não funcionou após a atualização: foi reposto o anterior.",
+"mt_err_staging_failed": "O programa novo não arrancou ao ser testado ao lado do que está em execução: não foi alterado nada.",
 "mt_err_nothing_to_go_back_to": "Não há versão anterior para onde voltar.",
 "mt_err_apt_update_failed": "Não foi possível atualizar a lista de pacotes do sistema.",
 "mt_err_apt_upgrade_failed": "A atualização do sistema falhou; o registo diz porquê.",

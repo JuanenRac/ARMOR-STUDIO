@@ -3430,6 +3430,7 @@ const catalogue: Record<string, string> = {
 "mt_err_unsafe_archive": "El paquete lleva ficheros fuera de su carpeta: rechazado.",
 "mt_err_bad_archive": "El paquete no es el esperado.",
 "mt_err_unhealthy_rolled_back": "El programa no funcionó tras la actualización: se devolvió el anterior.",
+"mt_err_staging_failed": "El programa nuevo no arrancó al probarlo junto al que está en marcha: no se cambió nada.",
 "mt_err_nothing_to_go_back_to": "No hay una versión anterior a la que volver.",
 "mt_err_apt_update_failed": "No se pudo actualizar la lista de paquetes del sistema.",
 "mt_err_apt_upgrade_failed": "La actualización del sistema falló; el registro dice por qué.",

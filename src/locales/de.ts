@@ -3368,6 +3368,7 @@ const catalogue: Record<string, string> = {
 "mt_err_unsafe_archive": "Das Paket enthält Dateien außerhalb seines Ordners: abgelehnt.",
 "mt_err_bad_archive": "Das Paket ist nicht das erwartete.",
 "mt_err_unhealthy_rolled_back": "Das Programm lief nach dem Update nicht: das vorherige wurde wiederhergestellt.",
+"mt_err_staging_failed": "Das neue Programm startete beim Test neben dem laufenden nicht: es wurde nichts geändert.",
 "mt_err_nothing_to_go_back_to": "Es gibt keine vorherige Version, zu der man zurückkehren könnte.",
 "mt_err_apt_update_failed": "Die Paketliste des Systems konnte nicht aktualisiert werden.",
 "mt_err_apt_upgrade_failed": "Das System-Update ist fehlgeschlagen; das Protokoll nennt den Grund.",

@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The Updates tab explains a server update that failed its trial:** when the maintenance helper is set to try the new server beside the running one and the new one does not start, the update ends with a sentence in the eight languages saying that nothing was changed, instead of a bare code.
 - **The README shows screenshots of Studio:** eight pictures with a sentence under each (overview, radar, inverters, site designer, electrical designer, alarm panels, reports and arming modes), in the eight languages, taken headless with made-up sample data by `tools/capture_screenshots.py` and listed in `docs/screenshots.json`.
 
 ## [0.8.1.9] - Switches for the metrics page and the dead-man ping, a report of how complete each language is, the incident record download, a check of an installation file before the import, the health of the console and a comparison of design versions

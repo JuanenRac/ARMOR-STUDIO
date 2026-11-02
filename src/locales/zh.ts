@@ -3484,6 +3484,7 @@ const catalogue: Record<string, string> = {
 "mt_err_unsafe_archive": "安装包含有其文件夹之外的文件：已拒绝。",
 "mt_err_bad_archive": "安装包不是预期的内容。",
 "mt_err_unhealthy_rolled_back": "更新后程序无法运行：已还原为上一版本。",
+"mt_err_staging_failed": "与运行中的程序并行试运行时新程序未能启动：未做任何更改。",
 "mt_err_nothing_to_go_back_to": "没有可还原的上一版本。",
 "mt_err_apt_update_failed": "无法刷新系统软件包列表。",
 "mt_err_apt_upgrade_failed": "系统更新失败，原因见日志。",

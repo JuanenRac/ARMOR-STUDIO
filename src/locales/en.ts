@@ -3504,6 +3504,7 @@ const catalogue: Record<string, string> = {
 "mt_err_unsafe_archive": "The package holds files outside its folder: refused.",
 "mt_err_bad_archive": "The package is not what was expected.",
 "mt_err_unhealthy_rolled_back": "The program did not work after the update: the previous one was put back.",
+"mt_err_staging_failed": "The new program did not start when tried beside the running one: nothing was changed.",
 "mt_err_nothing_to_go_back_to": "There is no previous version to go back to.",
 "mt_err_apt_update_failed": "The system's package list could not be refreshed.",
 "mt_err_apt_upgrade_failed": "The system update failed; the log says why.",

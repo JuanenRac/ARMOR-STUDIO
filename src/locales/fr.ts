@@ -3391,6 +3391,7 @@ const catalogue: Record<string, string> = {
 "mt_err_unsafe_archive": "Le paquet contient des fichiers hors de son dossier : refusé.",
 "mt_err_bad_archive": "Le paquet n'est pas celui attendu.",
 "mt_err_unhealthy_rolled_back": "Le programme ne fonctionnait pas après la mise à jour : le précédent a été remis.",
+"mt_err_staging_failed": "Le nouveau programme n'a pas démarré lors de l'essai à côté de celui en marche : rien n'a été changé.",
 "mt_err_nothing_to_go_back_to": "Il n'y a pas de version précédente à restaurer.",
 "mt_err_apt_update_failed": "La liste des paquets du système n'a pas pu être actualisée.",
 "mt_err_apt_upgrade_failed": "La mise à jour du système a échoué ; le journal dit pourquoi.",

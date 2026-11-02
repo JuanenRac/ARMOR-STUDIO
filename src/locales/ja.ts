@@ -3481,6 +3481,7 @@ const catalogue: Record<string, string> = {
 "mt_err_unsafe_archive": "パッケージにフォルダ外のファイルが含まれています。拒否しました。",
 "mt_err_bad_archive": "パッケージが想定したものではありません。",
 "mt_err_unhealthy_rolled_back": "更新後にプログラムが動作しなかったため、前のものを戻しました。",
+"mt_err_staging_failed": "実行中のものと並べて試したところ新しいプログラムが起動しなかったため、何も変更していません。",
 "mt_err_nothing_to_go_back_to": "戻せる前のバージョンがありません。",
 "mt_err_apt_update_failed": "システムのパッケージ一覧を更新できませんでした。",
 "mt_err_apt_upgrade_failed": "システムの更新に失敗しました。理由はログを確認してください。",
