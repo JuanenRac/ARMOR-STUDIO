@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.1.9] - Switches for the metrics page and the dead-man ping, a report of how complete each language is, the incident record download, a check of an installation file before the import, the health of the console and a comparison of design versions
+
 - **Configuration > Security offers the numbers page for Prometheus and the dead-man ping:** two switches, both off, each with its explanation and its warning in eight languages; the contract types follow.
 - **A report of how complete each language is:** `npm run locales:report` prints, per language, the phrases it lacks, the long ones it leaves in English and the short labels (buttons, tabs) whose translation is much longer than the English one and may not fit; `--json` for a machine and `--max-missing N` to fail a check.
 - **The record of an incident can be downloaded from Configuration > Installation:** two times and a button give the signed document the server builds (events, audit lines and evidence files of that window, at most seven days).
