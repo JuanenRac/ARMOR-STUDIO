@@ -3,10 +3,11 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useEffect, useState } from "react";
-import { deleteDesignVersion, deleteDesignVersions, listDesignVersions, readDesignVersion, type DesignKind, type DesignVersion } from "./api";
+import { deleteDesignVersion, deleteDesignVersions, listDesignVersions, readCurrentDesign, readDesignVersion, type DesignKind, type DesignVersion } from "./api";
 import type { Translate } from "./components/camera";
 import { useDialogFocus } from "./components/useDialogFocus";
 import { DialogLogo } from "./menuLogos";
+import { diffDesigns, type DesignDiff } from "./designDiff";
 
 const COUNT_KEYS = ["buildings", "openings", "features", "sensors"] as const;
 
@@ -18,6 +19,7 @@ export function DesignVersionsDialog({ kind, origin, t, close, draft, restoreDra
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState("");
   const [done, setDone] = useState("");
+  const [diff, setDiff] = useState<{ id: string; result: DesignDiff | "loading" | "failed" } | null>(null);   // the comparison open under one version
   const [sure, setSure] = useState("");   // the version (or "all") whose deletion waits for a second click
   useEffect(() => {
     let cancelled = false;
@@ -32,6 +34,23 @@ export function DesignVersionsDialog({ kind, origin, t, close, draft, restoreDra
     try { const design = await readDesignVersion(origin, kind, version.id); if (design) { restore(design); setDone(t("versionsRestored")); } else setFailed(true); }
     catch { setFailed(true); }
     setBusy("");
+  };
+  const compare = async (version: DesignVersion) => {
+    if (diff?.id === version.id) { setDiff(null); return; }
+    setDiff({ id: version.id, result: "loading" });
+    try {
+      const [kept, now] = await Promise.all([readDesignVersion(origin, kind, version.id), readCurrentDesign(origin, kind)]);
+      setDiff({ id: version.id, result: kept && now ? diffDesigns(kept, now) : "failed" });
+    } catch { setDiff({ id: version.id, result: "failed" }); }
+  };
+  const diffView = (result: DesignDiff | "loading" | "failed") => {
+    if (result === "loading") return <p className="muted">{t("versionsDiffLoading")}</p>;
+    if (result === "failed") return <p className="versions-failed" role="alert">{t("versionsDiffFailed")}</p>;
+    if (result.same) return <p className="muted">{t("versionsDiffSame")}</p>;
+    const names = (ids: string[]) => ids.slice(0, 5).join(", ") + (ids.length > 5 ? ` ${t("versionsDiffMore").replace("{0}", String(ids.length - 5))}` : "");
+    return <div className="versions-diff"><p className="muted">{t("versionsDiffTitle")} <small>({t("versionsDiffLegend")})</small></p>
+      <ul>{result.parts.map(part => <li key={part.name}><strong>{t(`count_${part.name}`) === `count_${part.name}` ? part.name : t(`count_${part.name}`)}</strong>
+        {part.back.length > 0 && <small> + {names(part.back)}</small>}{part.gone.length > 0 && <small> − {names(part.gone)}</small>}{part.changed.length > 0 && <small> ~ {names(part.changed)}</small>}</li>)}</ul></div>;
   };
   const forget = async (id: string) => {
     if (sure !== id) { setSure(id); return; }
@@ -57,9 +76,11 @@ export function DesignVersionsDialog({ kind, origin, t, close, draft, restoreDra
         {versions?.map(version => <li key={version.id}>
           <div><strong>{when(version.saved_at)}</strong><small>#{version.revision}{version.updated_by ? ` · ${t("versionsBy")} ${version.updated_by}` : ""}</small><small>{summary(version.counts)}</small></div>
           <span className="versions-actions">
+            <button onClick={() => void compare(version)} disabled={busy !== ""} aria-expanded={diff?.id === version.id}>{diff?.id === version.id ? t("versionsCompareHide") : t("versionsCompare")}</button>
             <button onClick={() => void take(version)} disabled={busy !== ""}>{t("versionsRestore")}</button>
             <button className="danger" onClick={() => void forget(version.id)} onBlur={() => setSure("")} disabled={busy !== ""}>{sure === version.id ? t("versionsDeleteSure") : t("versionsDelete")}</button>
           </span>
+          {diff?.id === version.id && <div className="versions-diff-row">{diffView(diff.result)}</div>}
         </li>)}
       </ul>
       {(versions?.length ?? 0) > 1 && <div className="versions-footer"><button className="danger" onClick={() => void forget("all")} onBlur={() => setSure("")} disabled={busy !== ""}>{sure === "all" ? t("versionsDeleteSure") : `${t("versionsDeleteAll")} (${versions?.length})`}</button></div>}

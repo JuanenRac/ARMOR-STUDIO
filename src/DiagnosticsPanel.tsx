@@ -12,6 +12,7 @@ import {
 import { askConfirm } from "./askConfirm";
 import type { Translate } from "./components/camera";
 import { ASK_GAP_MS, askWait, buildTokenRequest, configEntries, DEFAULT_TTL_S, diagnosticsErrorKey, leastStack, MAX_TOKEN_NODES, sortTokens, tokenState, ttlKey, TTL_CHOICES } from "./diagnosticsModel";
+import { ConsoleHealthCard } from "./ConsoleHealthCard";
 import { downloadText } from "./download";
 import { usePolled } from "./hooks";
 import { bootLines, fillAll, formatBytes, formatUptime, resetText } from "./nodeHealthModel";
@@ -210,6 +211,7 @@ function AdminDiagnostics({ t, origin }: { t: Translate; origin: string }) {
       <div className="adm-foot"><button type="button" onClick={() => tokens.reload()}>{t("svcRefresh")}</button></div>
     </article>
     <NodeDiagnosticsCard t={t} origin={origin} nodes={nodeIds} />
+    <ConsoleHealthCard t={t} />
   </div>;
 }
 

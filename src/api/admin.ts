@@ -1,8 +1,10 @@
 import { userCall } from "./transport";
 /** What importing an installation file did (see ARMOR-SERVER's installation.ts). */
 export type InstallationReport = { applied: Record<string, string>; skipped: Record<string, string>; failed: Record<string, string>; cameras_need_credentials: string[] };
+/** The signed record of an incident between two times (an administrator; the server refuses a window of more than seven days). */
+export const incidentExport = (origin: string, from: string, to: string) => userCall<unknown>(origin, "GET", `/api/v1/admin/incident?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
 export const installationExport = (origin: string) => userCall<unknown>(origin, "GET", "/api/v1/admin/installation");
-export const installationImport = (origin: string, bundle: unknown, parts: string[]) => userCall<InstallationReport>(origin, "POST", "/api/v1/admin/installation", { bundle, parts });
+export const installationImport = (origin: string, bundle: unknown, parts: string[], dryRun = false) => userCall<InstallationReport>(origin, "POST", "/api/v1/admin/installation", dryRun ? { bundle, parts, dry_run: true } : { bundle, parts });
 // ---- administration (an administrator): services, settings files, the broker's accounts, adopting a node ----
 export type AdminService = { id: string; unit: string; description: string; installed: boolean; active: string; sub: string; enabled: string; pid: number; since: string; /** The process is frozen (paused), though systemd still calls the service active. */ paused?: boolean };
 export type AdminFileInfo = { id: string; path: string; format: string; description: string; units: string[]; exists: boolean; mtime: number };

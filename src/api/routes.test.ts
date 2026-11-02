@@ -44,6 +44,7 @@ const rows: Row[] = [
   ["adminAddAccount", () => api.adminAddAccount(O, "node", "radar-1"), "POST", "/api/v1/admin/mqtt/accounts", { role: "node", name: "radar-1" }],
   ["adminRemoveAccount", () => api.adminRemoveAccount(O, ODD), "DELETE", `/api/v1/admin/mqtt/accounts/${ENC}`],
   ["installationImport", () => api.installationImport(O, { a: 1 }, ["users"]), "POST", "/api/v1/admin/installation", { bundle: { a: 1 }, parts: ["users"] }],
+  ["installationImport (dry run)", () => api.installationImport(O, { a: 1 }, ["users"], true), "POST", "/api/v1/admin/installation", { bundle: { a: 1 }, parts: ["users"], dry_run: true }],
   ["notificationsTest all", () => api.notificationsTest(O), "POST", "/api/v1/admin/notifications/test", {}],
   ["notificationsTest one", () => api.notificationsTest(O, "ntfy"), "POST", "/api/v1/admin/notifications/test", { channel: "ntfy" }],
   ["readUpdates", () => api.readUpdates(O), "GET", "/api/v1/admin/updates"],

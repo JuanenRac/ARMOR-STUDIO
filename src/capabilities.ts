@@ -21,6 +21,10 @@ export type SecurityOptions = {
   "server.zone_feed_signature": boolean;
   "media.rtsp_proxy": boolean;
   "network.login_secure_only": boolean;
+  /** GET /metrics answers the numbers of the server in the Prometheus text form (needs ARMOR_METRICS_TOKEN). */
+  "metrics.prometheus": boolean;
+  /** The server pings ARMOR_HEARTBEAT_URL so a service outside the house can tell when it stops. */
+  "heartbeat.enabled": boolean;
   "login.country_alert": boolean;
   "electrical.set_aside_old_readings": boolean;
   "voice.multipart_turn": boolean;

@@ -5,7 +5,7 @@
  */
 import { useRef, useState } from "react";
 import { downloadText } from "./download";
-import { installationExport, installationImport, type InstallationReport } from "./api";
+import { incidentExport, installationExport, installationImport, type InstallationReport } from "./api";
 import { errorText } from "./apiErrorText";
 
 type Translate = (key: string, ...args: Array<string | number>) => string;
@@ -49,6 +49,9 @@ export function InstallationPanel({ t, origin, isAdmin }: Props) {
   const [report, setReport] = useState<InstallationReport | null>(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [incidentFrom, setIncidentFrom] = useState("");
+  const [incidentTo, setIncidentTo] = useState("");
+  const [dry, setDry] = useState(false);   // the report on screen is a dry run: nothing was changed
   const input = useRef<HTMLInputElement>(null);
   if (!isAdmin) return <article className="stack-card"><h3>{t("in_title")}</h3><p className="muted">{t("cs_admin_only")}</p></article>;
 
@@ -58,6 +61,16 @@ export function InstallationPanel({ t, origin, isAdmin }: Props) {
       const file = await installationExport(origin);
       downloadText(`armor-installation-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(file, null, 2), "application/json");
       setMessage(t("in_exported"));
+    } catch (error) { setMessage(explain(t, error)); } finally { setBusy(false); }
+  };
+  const downloadIncident = async () => {
+    const from = new Date(incidentFrom), to = new Date(incidentTo);
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime()) || to <= from || to.getTime() - from.getTime() > 7 * 86_400_000) { setMessage(t("in_inc_bad")); return; }
+    setBusy(true); setMessage(""); setReport(null);
+    try {
+      const file = await incidentExport(origin, from.toISOString(), to.toISOString());
+      downloadText(`armor-incident-${from.toISOString().slice(0, 16).replace(/[:T]/g, "-")}.json`, JSON.stringify(file, null, 2), "application/json");
+      setMessage(t("in_inc_done"));
     } catch (error) { setMessage(explain(t, error)); } finally { setBusy(false); }
   };
   const choose = async (file: File | undefined) => {
@@ -71,10 +84,10 @@ export function InstallationPanel({ t, origin, isAdmin }: Props) {
       setTicked(new Set(parts.filter(item => item.part !== "users").map(item => item.part)));   // everything but the users, which are never imported
     } catch { setBundle(null); setTicked(new Set()); setMessage(t("in_not_bundle")); }
   };
-  const run = async () => {
+  const run = async (dryRun = false) => {
     if (ticked.size === 0) { setMessage(t("in_nothing_ticked")); return; }
-    setBusy(true); setMessage(""); setReport(null);
-    try { setReport(await installationImport(origin, bundle, [...ticked])); } catch (error) { setMessage(explain(t, error)); } finally { setBusy(false); }
+    setBusy(true); setMessage(""); setReport(null); setDry(dryRun);
+    try { setReport(await installationImport(origin, bundle, [...ticked], dryRun)); } catch (error) { setMessage(explain(t, error)); } finally { setBusy(false); }
   };
   const available = partsOf(bundle);
 
@@ -86,6 +99,13 @@ export function InstallationPanel({ t, origin, isAdmin }: Props) {
         <button disabled={busy} onClick={() => void download()}>{t("in_export")}</button>
       </article>
       <article className="stack-card">
+        <h3>{t("in_inc_title")}</h3>
+        <p className="muted">{t("in_inc_help")}</p>
+        <label>{t("in_inc_from")} <input type="datetime-local" value={incidentFrom} onChange={event => setIncidentFrom(event.target.value)} /></label>{" "}
+        <label>{t("in_inc_to")} <input type="datetime-local" value={incidentTo} onChange={event => setIncidentTo(event.target.value)} /></label>{" "}
+        <button disabled={busy || !incidentFrom || !incidentTo} onClick={() => void downloadIncident()}>{t("in_inc_button")}</button>
+      </article>
+      <article className="stack-card">
         <h3>{t("in_import")}</h3>
         <p className="muted">{t("in_import_help")}</p>
         <input ref={input} type="file" accept="application/json,.json" aria-label={t("in_choose")} onChange={event => void choose(event.target.files?.[0])} />
@@ -93,10 +113,11 @@ export function InstallationPanel({ t, origin, isAdmin }: Props) {
           <ul className="in-parts">{available.map(({ part, count }) => <li key={part}>
             <label><input type="checkbox" disabled={part === "users"} checked={ticked.has(part)} onChange={event => setTicked(current => { const next = new Set(current); if (event.target.checked) next.add(part); else next.delete(part); return next; })} /> {t(`in_part_${part}`)} <small className="muted">{t("in_count", count)}</small></label>
           </li>)}</ul>
+          <button disabled={busy} onClick={() => void run(true)}>{t("in_dry_run")}</button>{" "}
           <button disabled={busy} onClick={() => void run()}>{t("in_run")}</button>
         </>}
         {message && <p className="muted" role="status">{message}</p>}
-        {report && <><h4>{t("in_result")}</h4><ReportView t={t} report={report} /></>}
+        {report && <><h4>{t(dry ? "in_dry_result" : "in_result")}</h4><ReportView t={t} report={report} /></>}
       </article>
     </div>
   </div>;

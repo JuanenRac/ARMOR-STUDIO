@@ -12,6 +12,12 @@ export async function saveSite(origin: string, revision: number, site: Record<st
 export type DesignKind = "site" | "electrical" | "network" | "alarm";
 export type DesignVersion = { id: string; revision: number; saved_at: string; updated_by: string | null; counts: Record<string, number> };
 const DESIGN_ROUTE: Record<DesignKind, string> = { site: "/api/v1/site", electrical: "/api/v1/electrical/design", network: "/api/v1/network/design", alarm: "/api/v1/alarm/design" };
+/** The design as the server holds it now (the other side of a comparison with a kept version). */
+export async function readCurrentDesign(origin: string, kind: DesignKind): Promise<Record<string, unknown> | null> {
+  const document = await userCall<Record<string, unknown>>(origin, "GET", DESIGN_ROUTE[kind]);
+  const design = document[kind === "alarm" ? "alarm_design" : kind];
+  return typeof design === "object" && design !== null ? design as Record<string, unknown> : null;
+}
 export const listDesignVersions = (origin: string, kind: DesignKind) => userCall<{ versions: DesignVersion[] }>(origin, "GET", `${DESIGN_ROUTE[kind]}/versions`);
 /** Forget one kept version, or all of them (the current design is not touched); the second returns how many there were. */
 export async function deleteDesignVersion(origin: string, kind: DesignKind, id: string): Promise<void> {

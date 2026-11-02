@@ -1180,6 +1180,52 @@ export type IgnoreZonesInput = {
   zones: IgnoreZone[];
 };
 
+/** The record of one incident, signed by the server */
+export type IncidentExport = {
+  version: 1;
+  issued_at: string;
+  issuer: "armor-server";
+  window: {
+    from: string;
+    to: string;
+  };
+  /** The events of the history inside the window */
+  events: {
+    [key: string]: unknown;
+  }[];
+  /** The lines of the audit trail inside the window */
+  audit: {
+    [key: string]: unknown;
+  }[];
+  /** The evidence files made inside the window (at most 200); a file bigger than 512 MB is listed without its digest */
+  files: {
+    camera: string;
+    kind: string;
+    name: string;
+    bytes: number;
+    created_at: string;
+    sha256: string | null;
+    protected: boolean;
+  }[];
+  truncated: {
+    events: boolean;
+    audit: boolean;
+    files: boolean;
+  };
+  /** Whether the audit trail still reaches back to the start of the window */
+  audit_complete: boolean;
+  signature: {
+    algorithm: "HMAC-SHA256";
+    value: string;
+  };
+};
+
+export type IncidentVerdict = {
+  genuine: boolean;
+  files_match: boolean;
+  issued_at?: string;
+};
+
 export type IngestLog = {
   topics: {
     topic: string;
@@ -1218,6 +1264,8 @@ export type InstallationReport = {
     [key: string]: string;
   };
   cameras_need_credentials: string[];
+  /** true when the request asked for a dry run: the lines say what would be done, and nothing was changed */
+  dry_run?: boolean;
 };
 
 /** A background job and how far it got */
@@ -1781,6 +1829,8 @@ export type PostAdminInstallationRequest = {
   bundle: {
     [key: string]: unknown;
   };
+  /** true: answer what the import would do and change nothing */
+  dry_run?: boolean;
   parts?: ("cameras" | "site" | "electrical" | "network" | "rules" | "automations" | "devices" | "solar_devices" | "energy_alarms" | "users")[];
 };
 
@@ -2219,6 +2269,10 @@ export type SecuritySettings = {
   "server.zone_feed_signature"?: boolean;
   "media.rtsp_proxy"?: boolean;
   "network.login_secure_only"?: boolean;
+  /** GET /metrics answers the numbers of the server in the Prometheus text form to the bearer token ARMOR_METRICS_TOKEN (off: 404) */
+  "metrics.prometheus"?: boolean;
+  /** The server asks the address ARMOR_HEARTBEAT_URL every ARMOR_HEARTBEAT_INTERVAL_S seconds, so a service outside the house can tell the owner when the pings stop */
+  "heartbeat.enabled"?: boolean;
   "login.country_alert"?: boolean;
   /** A channel of an electrical node whose own reading is old is left out of the grid figure and the graphs and marked as having no data */
   "electrical.set_aside_old_readings"?: boolean;

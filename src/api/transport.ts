@@ -1,4 +1,5 @@
 import manifest from "../../package.json";
+import { recordCall } from "../callStats";
 export const endpoint = (origin: string, suffix: string) => origin.replace(/\/$/, "") + suffix;
 export const localSession = { credentials: "include" as const };
 /**
@@ -11,7 +12,12 @@ export const CLIENT_NAME = `studio/${manifest.version}`;
 export const timedFetch = (url: string, init: RequestInit = {}): Promise<Response> => {
   const headers = new Headers(init.headers);
   if (!headers.has("X-Armor-Client")) headers.set("X-Armor-Client", CLIENT_NAME);
-  return fetch(url, { ...init, headers, signal: init.signal ?? AbortSignal.timeout(CALL_TIMEOUT_MS) });
+  const started = performance.now(), method = init.method ?? "GET";
+  // every call is counted by the shape of its route and its status (see callStats.ts); a call that never got an answer is status 0
+  return fetch(url, { ...init, headers, signal: init.signal ?? AbortSignal.timeout(CALL_TIMEOUT_MS) }).then(
+    response => { recordCall(method, url, response.status, performance.now() - started); return response; },
+    (error: unknown) => { recordCall(method, url, 0, performance.now() - started); throw error; },
+  );
 };
 /** An answer the server refused, with the stable `code` that says why. */
 export class ApiError extends Error {

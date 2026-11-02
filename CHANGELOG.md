@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Configuration > Security offers the numbers page for Prometheus and the dead-man ping:** two switches, both off, each with its explanation and its warning in eight languages; the contract types follow.
+- **A report of how complete each language is:** `npm run locales:report` prints, per language, the phrases it lacks, the long ones it leaves in English and the short labels (buttons, tabs) whose translation is much longer than the English one and may not fit; `--json` for a machine and `--max-missing N` to fail a check.
+- **The record of an incident can be downloaded from Configuration > Installation:** two times and a button give the signed document the server builds (events, audit lines and evidence files of that window, at most seven days).
+- **An installation file can be checked before it is imported:** a new button asks the server what the import would do and shows it, part by part, without changing anything.
+- **Configuration > Diagnostics shows the health of the console itself:** calls a minute, calls the server refused, server errors and calls that got no answer, and the busiest routes with their average and slowest time, measured in the browser by the one function every call goes through (routes are cut to their first four parts, so no id or query is kept; nothing is sent anywhere); the text can be copied for whoever is helping from afar.
+- **A kept version of a design can be compared with the current one before it is restored:** the versions dialog lists, per part, what comes back, what goes away and what changes, by the id of each item.
 - **The firmware panel explains the two new refusals of a node** (an image built for the other board, and an image that says nothing of its board), in eight languages, and the contract types follow ARMOR-COMMON (the wiring of the siren of an alarm node).
 
 ## [0.8.1.8] - The sign-in warns about Caps Lock and checks the server address, passwords and PINs are checked while typing, there are one-key shortcuts and a skip link, and closing the tab with an unsaved drawing asks first

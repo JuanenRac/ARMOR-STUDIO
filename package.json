@@ -14,7 +14,8 @@
     "test": "vitest run",
     "lint": "eslint src",
     "locales": "node tools/build_locales.mjs",
-    "locales:check": "node tools/build_locales.mjs --check"
+    "locales:check": "node tools/build_locales.mjs --check",
+    "locales:report": "node tools/i18n_report.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",
