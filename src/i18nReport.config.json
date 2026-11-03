@@ -1,0 +1,7 @@
+{
+  "schema": "armor-studio/locales-report-config/1",
+  "warnMissing": 0,
+  "failMissing": 1000000,
+  "warnSameAsEnglish": 100000,
+  "warnLongLabels": 100000
+}

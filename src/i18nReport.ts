@@ -31,6 +31,28 @@ export function reportLanguages(catalogues: Record<string, Record<string, string
   });
 }
 
+/**
+ * The limits the check of the language tables is held to (src/i18nReport.config.json). A language over a "warn" limit is reported as a warning and never stops anything; only
+ * "failMissing" can fail a run, and it is set so high that nothing fails until the limit is lowered on purpose. A value that is not a whole number of at least 0 is read as "never".
+ */
+export type ReportLimits = { warnMissing: number; failMissing: number; warnSameAsEnglish: number; warnLongLabels: number };
+const NEVER = Number.MAX_SAFE_INTEGER;
+const limit = (value: unknown): number => (typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : NEVER);
+export function readLimits(raw: Record<string, unknown>): ReportLimits {
+  return { warnMissing: limit(raw.warnMissing), failMissing: limit(raw.failMissing), warnSameAsEnglish: limit(raw.warnSameAsEnglish), warnLongLabels: limit(raw.warnLongLabels) };
+}
+/** What the limits say about a report: lines to warn about, and lines that fail the run. */
+export function judgeReport(reports: LanguageReport[], limits: ReportLimits): { warnings: string[]; failures: string[] } {
+  const warnings: string[] = [], failures: string[] = [];
+  for (const item of reports) {
+    if (item.missing > limits.failMissing) failures.push(`${item.code} lacks ${item.missing} phrases (the limit is ${limits.failMissing})`);
+    else if (item.missing > limits.warnMissing) warnings.push(`${item.code} lacks ${item.missing} phrases`);
+    if (item.sameAsEnglish > limits.warnSameAsEnglish) warnings.push(`${item.code} leaves ${item.sameAsEnglish} long phrases in English`);
+    if (item.longLabels.length > limits.warnLongLabels) warnings.push(`${item.code} has ${item.longLabels.length} labels much longer than English`);
+  }
+  return { warnings, failures };
+}
+
 /** The report as lines of text for a person (or a CI log). */
 export function renderReport(reports: LanguageReport[], listLongest = 5): string {
   const lines = ["language  phrases  missing  same-as-English  long-labels"];

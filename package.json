@@ -15,7 +15,8 @@
     "lint": "eslint src",
     "locales": "node tools/build_locales.mjs",
     "locales:check": "node tools/build_locales.mjs --check",
-    "locales:report": "node tools/i18n_report.mjs"
+    "locales:report": "node tools/i18n_report.mjs",
+    "locales:report:ci": "node tools/i18n_report.mjs --limits --github"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",
