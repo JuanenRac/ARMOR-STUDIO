@@ -2,7 +2,9 @@
  * Runtime configuration for A.R.M.O.R. Studio.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-export const DEFAULT_SERVER_ORIGIN = "http://127.0.0.1:8080";
+import { ARMOR_PORTS } from "./api/contract/armor-ports";
+
+export const DEFAULT_SERVER_ORIGIN = `http://127.0.0.1:${ARMOR_PORTS.server}`;
 
 /** Accept only a plain http(s) origin: no credentials, path, query or fragment. */
 export function parseServerOrigin(value: unknown): string | null {

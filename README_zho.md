@@ -221,7 +221,7 @@ flowchart LR
 | `TLS_CERT_PATH`  `TLS_KEY_PATH` | 关闭 | 要么都设要么都不设：静态主机的原生 HTTPS |
 | `ARMOR_PUBLIC_ORIGIN`  `ARMOR_SERVER_UPSTREAM` | same-origin | 容器内：`/armor-config.json` 的内容，以及 nginx 把 `/api/` 转发到的服务器 `host:port` |
 
-未配置来源时，客户端使用 `http://127.0.0.1:8080`。语言、主题（十六种）和天气地点跟随账户而不是浏览器。`tools/serve.mjs` 读取上面的变量；要在 CM5 测试台上安装整套软件，请见 [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS)。
+未配置来源时，客户端使用 `http://127.0.0.1:18080`。语言、主题（十六种）和天气地点跟随账户而不是浏览器。`tools/serve.mjs` 读取上面的变量；要在 CM5 测试台上安装整套软件，请见 [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS)。
 
 ## 🚀 快速开始
 
@@ -229,7 +229,7 @@ flowchart LR
 
 ```powershell
 npm install                                                                    # 依赖
-npm run dev                                                                    # http://127.0.0.1:5178 连接 127.0.0.1:8080 上的服务器
+npm run dev                                                                    # http://127.0.0.1:5178 连接 127.0.0.1:18080 上的服务器
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # 修改文案后写出每种语言的表
 npm test                                                                       # 1363 项

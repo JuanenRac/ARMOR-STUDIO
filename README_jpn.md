@@ -221,7 +221,7 @@ flowchart LR
 | `TLS_CERT_PATH`  `TLS_KEY_PATH` | オフ | 両方指定か両方なし：静的ホストのネイティブ HTTPS |
 | `ARMOR_PUBLIC_ORIGIN`  `ARMOR_SERVER_UPSTREAM` | same-origin | コンテナ内：`/armor-config.json` の内容と、nginx が `/api/` を中継するサーバーの `host:port` |
 
-オリジンを設定しない場合、クライアントは `http://127.0.0.1:8080` を使います。言語、テーマ（16 種類）、天気の場所はブラウザーではなくアカウントに従います。`tools/serve.mjs` は上の変数を読みます。CM5 テストベンチへスタック全体をインストールするには [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS) を参照してください。
+オリジンを設定しない場合、クライアントは `http://127.0.0.1:18080` を使います。言語、テーマ（16 種類）、天気の場所はブラウザーではなくアカウントに従います。`tools/serve.mjs` は上の変数を読みます。CM5 テストベンチへスタック全体をインストールするには [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS) を参照してください。
 
 ## 🚀 クイックスタート
 
@@ -229,7 +229,7 @@ flowchart LR
 
 ```powershell
 npm install                                                                    # 依存関係
-npm run dev                                                                    # 127.0.0.1:8080 のサーバーに対して http://127.0.0.1:5178
+npm run dev                                                                    # 127.0.0.1:18080 のサーバーに対して http://127.0.0.1:5178
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # 文言を変えたら各言語の表を書き出す
 npm test                                                                       # 1363 件

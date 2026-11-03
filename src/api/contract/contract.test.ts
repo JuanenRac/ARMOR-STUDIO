@@ -189,7 +189,7 @@ const common = path.join(process.cwd(), "..", "ARMOR-COMMON", "generated");
 const required = process.env.ARMOR_REQUIRE_SIBLINGS === "1";
 
 describe("the types of the HTTP contract", () => {
-  for (const file of ["armor-rest.ts", "armor-contracts.ts"]) {
+  for (const file of ["armor-rest.ts", "armor-contracts.ts", "armor-ports.ts"]) {
     it(`${file} is what ARMOR-COMMON generates now`, () => {
       const shared = path.join(common, file);
       if (!fs.existsSync(shared)) {

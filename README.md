@@ -221,7 +221,7 @@ Captured on a test bench with made-up sample data and no real installation behin
 | `TLS_CERT_PATH`  `TLS_KEY_PATH` | off | both or none: native HTTPS of the static host |
 | `ARMOR_PUBLIC_ORIGIN`  `ARMOR_SERVER_UPSTREAM` | same-origin | in the container: what `/armor-config.json` says, and the `host:port` of the server that nginx proxies `/api/` to |
 
-Without a configured origin the client uses `http://127.0.0.1:8080`. The language, the theme (sixteen) and the weather place follow the account, not the browser. `tools/serve.mjs` reads the variables above; to install the whole stack on the CM5 test bench see [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS).
+Without a configured origin the client uses `http://127.0.0.1:18080`. The language, the theme (sixteen) and the weather place follow the account, not the browser. `tools/serve.mjs` reads the variables above; to install the whole stack on the CM5 test bench see [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS).
 
 ## 🚀 Quick start
 
@@ -229,7 +229,7 @@ Without a configured origin the client uses `http://127.0.0.1:8080`. The languag
 
 ```powershell
 npm install                                                                    # dependencies
-npm run dev                                                                    # http://127.0.0.1:5178 against a server on 127.0.0.1:8080
+npm run dev                                                                    # http://127.0.0.1:5178 against a server on 127.0.0.1:18080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # write the table of each language after changing a phrase
 npm test                                                                       # 1363 tests

@@ -221,7 +221,7 @@ Capturadas numa bancada de testes com dados de exemplo inventados e sem qualquer
 | `TLS_CERT_PATH`  `TLS_KEY_PATH` | desligado | ambos ou nenhum: HTTPS nativo do anfitrião estático |
 | `ARMOR_PUBLIC_ORIGIN`  `ARMOR_SERVER_UPSTREAM` | same-origin | no contentor: o que diz `/armor-config.json` e o `host:porta` do servidor para onde o nginx reencaminha `/api/` |
 
-Sem origem configurada o cliente usa `http://127.0.0.1:8080`. O idioma, o tema (dezasseis) e o local do tempo seguem a conta, não o navegador. `tools/serve.mjs` lê as variáveis acima; para instalar toda a pilha na bancada do CM5 veja [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS).
+Sem origem configurada o cliente usa `http://127.0.0.1:18080`. O idioma, o tema (dezasseis) e o local do tempo seguem a conta, não o navegador. `tools/serve.mjs` lê as variáveis acima; para instalar toda a pilha na bancada do CM5 veja [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS).
 
 ## 🚀 Início rápido
 
@@ -229,7 +229,7 @@ Sem origem configurada o cliente usa `http://127.0.0.1:8080`. O idioma, o tema (
 
 ```powershell
 npm install                                                                    # dependências
-npm run dev                                                                    # http://127.0.0.1:5178 contra um servidor em 127.0.0.1:8080
+npm run dev                                                                    # http://127.0.0.1:5178 contra um servidor em 127.0.0.1:18080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # escreve a tabela de cada idioma depois de mudar uma frase
 npm test                                                                       # 1363 testes

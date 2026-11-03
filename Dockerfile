@@ -15,7 +15,7 @@ FROM nginx:1.29-alpine
 # ARMOR_PUBLIC_ORIGIN is the server Studio starts with. "same-origin" is the address the browser opened this page with, which is right for any machine that reaches it;
 # name an address only for a deployment whose browsers must talk to another origin.
 ENV ARMOR_PUBLIC_ORIGIN=same-origin \
-    ARMOR_SERVER_UPSTREAM=server:8080 \
+    ARMOR_SERVER_UPSTREAM=server:18080 \
     NGINX_ENVSUBST_FILTER=ARMOR_
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY nginx/security_headers.conf /etc/nginx/snippets/security_headers.conf

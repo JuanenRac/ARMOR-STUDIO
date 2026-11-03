@@ -221,7 +221,7 @@ Capturées sur un banc d'essai avec des données d'exemple fictives et sans inst
 | `TLS_CERT_PATH`  `TLS_KEY_PATH` | désactivé | les deux ou aucun : HTTPS natif de l'hôte statique |
 | `ARMOR_PUBLIC_ORIGIN`  `ARMOR_SERVER_UPSTREAM` | same-origin | dans le conteneur : ce que dit `/armor-config.json` et le `hôte:port` du serveur vers lequel nginx relaie `/api/` |
 
-Sans origine configurée, le client utilise `http://127.0.0.1:8080`. La langue, le thème (seize) et le lieu météo suivent le compte, pas le navigateur. `tools/serve.mjs` lit les variables ci-dessus ; pour installer toute la pile sur le banc d'essai CM5, voir [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS).
+Sans origine configurée, le client utilise `http://127.0.0.1:18080`. La langue, le thème (seize) et le lieu météo suivent le compte, pas le navigateur. `tools/serve.mjs` lit les variables ci-dessus ; pour installer toute la pile sur le banc d'essai CM5, voir [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS).
 
 ## 🚀 Démarrage rapide
 
@@ -229,7 +229,7 @@ Sans origine configurée, le client utilise `http://127.0.0.1:8080`. La langue, 
 
 ```powershell
 npm install                                                                    # dépendances
-npm run dev                                                                    # http://127.0.0.1:5178 face à un serveur sur 127.0.0.1:8080
+npm run dev                                                                    # http://127.0.0.1:5178 face à un serveur sur 127.0.0.1:18080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # écrit la table de chaque langue après un changement de phrase
 npm test                                                                       # 1363 tests

@@ -221,7 +221,7 @@ Aufgenommen auf einem Prüfstand mit erfundenen Beispieldaten und ohne eine echt
 | `TLS_CERT_PATH`  `TLS_KEY_PATH` | aus | beide oder keines: natives HTTPS des statischen Hosts |
 | `ARMOR_PUBLIC_ORIGIN`  `ARMOR_SERVER_UPSTREAM` | same-origin | im Container: was `/armor-config.json` sagt, und `host:port` des Servers, an den nginx `/api/` weiterleitet |
 
-Ohne konfigurierten Ursprung nutzt der Client `http://127.0.0.1:8080`. Sprache, Thema (sechzehn) und Wetterort folgen dem Konto, nicht dem Browser. `tools/serve.mjs` liest die obigen Variablen; zur Installation des ganzen Stacks auf dem CM5-Prüfstand siehe [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS).
+Ohne konfigurierten Ursprung nutzt der Client `http://127.0.0.1:18080`. Sprache, Thema (sechzehn) und Wetterort folgen dem Konto, nicht dem Browser. `tools/serve.mjs` liest die obigen Variablen; zur Installation des ganzen Stacks auf dem CM5-Prüfstand siehe [ARMOR-DEVOPS](https://github.com/JuanenRac/ARMOR-DEVOPS).
 
 ## 🚀 Schnellstart
 
@@ -229,7 +229,7 @@ Ohne konfigurierten Ursprung nutzt der Client `http://127.0.0.1:8080`. Sprache, 
 
 ```powershell
 npm install                                                                    # Abhängigkeiten
-npm run dev                                                                    # http://127.0.0.1:5178 gegen einen Server auf 127.0.0.1:8080
+npm run dev                                                                    # http://127.0.0.1:5178 gegen einen Server auf 127.0.0.1:18080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # die Tabelle jeder Sprache nach einer Änderung schreiben
 npm test                                                                       # 1363 Tests
