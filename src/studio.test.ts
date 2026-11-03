@@ -8,7 +8,7 @@ const camera = (id: string, extra: Partial<Camera> = {}): Camera => ({ id, name:
 
 describe("deployment defaults", () => {
   it("starts against the local server and with the family theme", () => {
-    expect(DEFAULT_SERVER_ORIGIN).toBe("http://127.0.0.1:8080");
+    expect(DEFAULT_SERVER_ORIGIN).toBe("http://127.0.0.1:18080");
     expect(DEFAULT_THEME).toBe("Armor");
     expect(THEMES[0]).toBe("Armor");
   });
