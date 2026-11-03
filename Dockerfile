@@ -1,6 +1,6 @@
 # ARMOR-STUDIO static web build.
 # Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
-FROM node:22-bookworm-slim AS build
+FROM node:26-bookworm-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
@@ -10,7 +10,7 @@ COPY src ./src
 COPY public ./public
 RUN npm run build
 
-FROM nginx:1.29-alpine
+FROM nginx:1.31-alpine
 # The template is rendered with the two variables below when the container starts.
 # ARMOR_PUBLIC_ORIGIN is the server Studio starts with. "same-origin" is the address the browser opened this page with, which is right for any machine that reaches it;
 # name an address only for a deployment whose browsers must talk to another origin.
