@@ -470,14 +470,15 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
   return <article className="stack-card sec-card" data-testid="security-options">
     <h3>{t("sec_group_options")}</h3>
     <p className="muted">{t("sec_opt_help")}</p>
+    <div className="sec-options-grid" data-testid="security-options-grid">
     {OPTIONS.filter(option => !option.optional || state.settings[option.key] !== undefined).map(option => {
       const current = state.settings[option.key];
       const fixed = state.locked.includes(option.key);
       const lowest = option.values[option.values.length - 1];
       return <fieldset key={option.key} className="sec-option" data-testid={`security-option-${option.id}`} disabled={busy || fixed}>
         <legend>{t(`sec_opt_${option.id}`)}</legend>
-        <p className="muted">{t(`sec_opt_${option.id}_help`)}</p>
-        <select aria-label={t(`sec_opt_${option.id}`)} value={String(current)} onChange={event => { const picked = option.values.find(value => String(value) === event.target.value); if (picked !== undefined) void change(option, picked); }}>
+        <p className="muted" id={`sec-opt-help-${option.id}`}>{t(`sec_opt_${option.id}_help`)}</p>
+        <select aria-describedby={`sec-opt-help-${option.id}`} aria-label={t(`sec_opt_${option.id}`)} value={String(current)} onChange={event => { const picked = option.values.find(value => String(value) === event.target.value); if (picked !== undefined) void change(option, picked); }}>
           {option.values.map(value => <option key={String(value)} value={String(value)}>{valueName(t, option.id, value)}</option>)}
         </select>
         {current === lowest && !option.calm && <p className="notice bad" role="alert" data-testid={`security-option-${option.id}-warning`}>{t(`sec_opt_${option.id}_warn`)}</p>}
@@ -489,6 +490,7 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
     {typeof state.settings["vision.service_url"] === "string" && <VisionService t={t} state={state} apply={applyLimits} busy={busy} />}
     {state.settings["client.trusted_devices"] === true && typeof state.settings["client.trusted_session_h"] === "number" && <TrustedHours t={t} state={state} apply={applyLimits} busy={busy} />}
     {typeof state.settings["reports.timeout_s"] === "number" && <ReportLimits t={t} state={state} apply={applyLimits} busy={busy} />}
+    </div>
     <p className="muted">{t("sec_opt_node_pending")}</p>
     <Message message={message} />
   </article>;

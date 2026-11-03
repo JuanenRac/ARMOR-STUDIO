@@ -5,6 +5,7 @@ All notable changes to this project are documented here.
 ## [Unreleased]
 
 - **A switch for the copy of the node traffic in Security:** the option `ingest.recording` (off by default, asks before it is turned on) makes the server keep a copy of what the nodes send in a file that the simulator plays again; its text is in the eight languages.
+- **The security options of the server are laid out in three columns with short selectors** (two on a tablet, one on a phone), each setting keeping its help linked to its selector.
 
 
 ## [0.8.2.1] - The phrases of the counting lines have their own source: they were written by hand into the language files, so npm run locales erased them; they now live in src/countLinesText.ts like every other phrase, and a test fails when... (and 10 more changes)

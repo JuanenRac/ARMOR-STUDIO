@@ -31,3 +31,12 @@
 .sec-option > legend { padding: 0 .35rem; font-weight: 600; }
 .sec-option > p { margin: 0; max-width: none; line-height: 1.4; }
 .sec-option select { max-width: 100%; }
+/* Server security options: three columns on wide screens, two on tablets, one on phones; each setting is a compact cell (label, help, short selector). */
+.sec-options-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem 1rem; align-items: stretch; }
+.sec-options-grid > .sec-option { min-height: 9rem; align-content: start; overflow-wrap: anywhere; }
+.sec-options-grid > .sec-option select { width: 100%; max-width: 16rem; }
+.sec-options-grid > .sec-option :is(input, textarea) { max-width: 100%; box-sizing: border-box; }
+.sec-options-grid > .sec-option:focus-within { border-color: #00e5ff; box-shadow: 0 0 0 1px #00e5ff; }
+.sec-options-grid > .sec-option :is(select, input, button):focus-visible { outline: 2px solid #00e5ff; outline-offset: 2px; }
+@media (max-width: 1100px) { .sec-options-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .sec-options-grid { grid-template-columns: minmax(0, 1fr); } .sec-options-grid > .sec-option { min-height: 0; } .sec-options-grid > .sec-option select { max-width: none; } }

@@ -1,6 +1,9 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { ElevationDialog } from "./ElevationHost";
 import { envValue, isLowering, SecurityPanel, TRUSTED_HOURS, trustedHoursValue, setEnvLines, REPORT_LIMITS, reportLimitValue, VOICE_LIMITS, visionServiceUrlValue, voiceLimitValue } from "./SecurityPanel";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
@@ -163,5 +166,20 @@ describe("the security screen", () => {
     expect(trustedHoursValue(" 1 ")).toBe(1);
     expect(trustedHoursValue("720")).toBe(720);
     for (const bad of ["", "0", "721", "-5", "7.5", "abc", "99999"]) expect(trustedHoursValue(bad), bad).toBeUndefined();
+  });
+
+  it("lays the server options out as a grid of three columns of short selectors (two on a tablet, one on a phone), every setting keeping its help linked to its selector", () => {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const css = readFileSync(join(here, "security.css"), "utf8");
+    const source = readFileSync(join(here, "SecurityPanel.tsx"), "utf8");
+    expect(css).toMatch(/\.sec-options-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
+    expect(css).toMatch(/max-width:\s*1100px\)\s*\{\s*\.sec-options-grid\s*\{\s*grid-template-columns:\s*repeat\(2/);
+    expect(css).toMatch(/max-width:\s*640px\)[^}]*\.sec-options-grid\s*\{\s*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+    expect(css).toMatch(/\.sec-options-grid > \.sec-option select\s*\{[^}]*max-width:\s*16rem/);
+    // the grid wraps the same list of settings as before (one cell for each, none added or dropped) and each selector points at its help
+    expect(source.match(/OPTIONS\.filter\(option => !option\.optional/g)).toHaveLength(1);
+    expect(source).toContain('className="sec-options-grid"');
+    expect(source).toContain("aria-describedby={`sec-opt-help-${option.id}`}");
+    expect(source).toContain("id={`sec-opt-help-${option.id}`}");
   });
 });
