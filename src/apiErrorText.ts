@@ -6,9 +6,15 @@ import { ApiError } from "./api/transport";
  * since the server stops it before it can say a code of its own.
  */
 export function errorText(t: (key: string) => string, error: unknown, prefix: string): string {
-  const code = error instanceof ApiError ? error.code : "generic";
-  let text = t(`${prefix}${code}`);
-  if (text === `${prefix}${code}` && error instanceof ApiError && error.status === 413) text = t(`${prefix}too_large`);
-  if (text === `${prefix}${code}` || text === `${prefix}too_large`) return t(`${prefix}generic`);
-  return text;
+  // A call that never got an answer (the network, a refused connection) fails with a TypeError: "unreachable" when the screen has the words for it.
+  const code = error instanceof ApiError ? error.code : error instanceof TypeError ? "unreachable" : "generic";
+  const said = (key: string): string | null => { const text = t(`${prefix}${key}`); return text === `${prefix}${key}` ? null : text; };
+  // the words for the code itself first; "generic" says nothing, so the kind of answer (a body too large, too many requests, the server failing) comes before it
+  if (code !== "generic") { const own = said(code); if (own) return own; }
+  if (error instanceof ApiError) {
+    const kind = error.status === 413 ? "too_large" : error.status === 429 ? "status_429" : error.status >= 500 ? "status_5xx" : `status_${error.status}`;
+    const byKind = said(kind);
+    if (byKind) return byKind;
+  }
+  return t(`${prefix}generic`);
 }

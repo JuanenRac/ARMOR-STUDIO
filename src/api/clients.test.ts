@@ -284,8 +284,9 @@ describe("cameras and evidence", () => {
     await sendPtz(O, "c1", "left");
     expect(JSON.parse(last().body!)).toEqual({ command: "left" });
     await expect(sendPtz(O, "c1", "left")).rejects.toThrow("the camera refused the login");
-    await expect(sendPtz(O, "c1", "left")).rejects.toThrow("PTZ command returned 502");
-    await expect(sendPtz(O, "c1", "left")).rejects.toThrow("PTZ command returned 500");
+    // no words from the server: a refusal that carries the status, for the screen to tell in the language of the person
+    await expect(sendPtz(O, "c1", "left")).rejects.toMatchObject({ status: 502, code: "generic" });
+    await expect(sendPtz(O, "c1", "left")).rejects.toMatchObject({ status: 500, code: "generic" });
   });
 
   it("evidence: the snapshot comes out of its envelope, protection is a PUT with a flag, the proof is pretty JSON for a file", async () => {

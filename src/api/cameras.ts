@@ -1,4 +1,4 @@
-import { endpoint, localSession, timedFetch, userCall } from "./transport";
+import { endpoint, localSession, refusal, timedFetch, userCall } from "./transport";
 export type DiscoveredCamera = { host: string; ports: number[] };
 export type CameraParams = { wifiSsid?: string; ip?: string; encoder?: string; bitrateKbps?: number; resolution?: string };
 /** What a camera is beyond how to reach it (all optional; a camera saved before has none). "split" is one stream with two lenses, one above the other; cameras of one body share `group`. */
@@ -31,18 +31,18 @@ export async function configureCamera(origin: string, camera: CameraConnection):
   const response = await timedFetch(origin.replace(/\/$/, "") + "/api/v1/cameras/configure", {
     method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" }, ...localSession, body: JSON.stringify(camera),
   });
-  if (!response.ok) throw new Error("Camera configuration returned " + response.status);
+  if (!response.ok) throw await refusal(response);
   return response.json() as Promise<PublicCameraConnection>;
 }
 export async function deleteCamera(origin: string, id: string): Promise<void> {
   const response = await timedFetch(endpoint(origin, "/api/v1/cameras/" + encodeURIComponent(id)), { method: "DELETE", ...localSession });
-  if (!response.ok) throw new Error("Camera delete returned " + response.status);
+  if (!response.ok) throw await refusal(response);
 }
 export async function discoverCameraStreams(origin: string, id: string): Promise<{ paths: string[]; camera: PublicCameraConnection }> {
   const response = await timedFetch(origin.replace(/\/$/, "") + "/api/v1/cameras/" + encodeURIComponent(id) + "/discover-rtsp", {
     method: "POST", headers: { Accept: "application/json" }, ...localSession, signal: AbortSignal.timeout(150_000),   // trying the paths of a camera on Wi-Fi can take a minute
   });
-  if (!response.ok) throw new Error("RTSP discovery returned " + response.status);
+  if (!response.ok) throw await refusal(response);
   return response.json() as Promise<{ paths: string[]; camera: PublicCameraConnection }>;
 }
 /** A path the server may hand out for a camera stream: under the cameras route, with no way back up the tree ("..", also encoded) and no second slash that would make it another host. */
@@ -77,8 +77,9 @@ export async function sendPtz(origin: string, id: string, command: string): Prom
   });
   if (!response.ok) {
     // The server explains why in plain words (login refused, no PTZ hardware, camera silent): show that.
-    const body = await response.json().catch(() => ({})) as { error?: string };
-    throw new Error(body.error || "PTZ command returned " + response.status);
+    const body = await response.clone().json().catch(() => ({})) as { error?: string };
+    if (body.error) throw new Error(body.error);
+    throw await refusal(response);   // no words from the server: the screen tells the kind of answer in the language of the person
   }
 }
 export async function captureSnapshot(origin: string, id: string): Promise<MediaItem> {

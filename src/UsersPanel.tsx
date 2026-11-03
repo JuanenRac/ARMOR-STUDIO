@@ -7,7 +7,7 @@ import { PasswordInput } from "./components/PasswordInput";
 import { askConfirm } from "./askConfirm";
 import { useCallback, useContext, useEffect, useState, type FormEvent } from "react";
 import { changeAccount, clearUserPin, createUser, deleteUser, listUsers, setMyPin, setUserPin, updateUser, type ListedUser, type Role } from "./api";
-import { SessionUserContext } from "./sessionContext";
+import { SessionUserContext, useMayDo } from "./sessionContext";
 import { errorText } from "./apiErrorText";
 import { issueMessage, passwordIssues, pinIssues, type CredentialIssue } from "./ux/credentialRules";
 
@@ -25,7 +25,9 @@ export function UsersPanel({ t, origin }: Props) {
   const say = (text: string, bad = false) => setMessage({ text, bad });
   const explain = (error: unknown) => say(errorText(t, error, "userErr_"), true);
 
-  const isAdmin = me?.role === "admin";
+  // managing the other accounts is its own permission (an older server sends none, and then the role decides)
+  const mayManage = useMayDo("manage_users");
+  const isAdmin = me?.role === "admin" && mayManage;
   const reload = useCallback(async () => {
     if (!isAdmin) { setUsers(null); return; }
     try { const listed = await listUsers(origin); setUsers(listed.users); setMinimum(listed.minPasswordLength); } catch { /* the list keeps what it had; the next reload tries again */ }

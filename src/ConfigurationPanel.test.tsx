@@ -120,9 +120,13 @@ describe("the technical settings of the server", () => {
 
   it("a refusal is shown with its reason and does not look like a success", async () => {
     await show({ isAdmin: true });
-    api.saveConnection.mockRejectedValue(new Error("port in use"));
+    const { ApiError } = await import("./api/transport");   // the one the panel loaded, not another copy
+    api.saveConnection.mockRejectedValue(new ApiError(400, "invalid_port"));
     await click([...container.querySelectorAll("button")].find(item => item.textContent === t("cs_save"))!);
-    expect(container.textContent).toContain(`${t("cs_error")}port in use`);
+    expect(container.textContent).toContain(`${t("cs_error")}${t("srv_err_status_400")}`);
     expect(container.textContent).not.toContain(t("cs_done"));
+    api.saveConnection.mockRejectedValue(new TypeError("Failed to fetch"));
+    await click([...container.querySelectorAll("button")].find(item => item.textContent === t("cs_save"))!);
+    expect(container.textContent).toContain(t("srv_err_unreachable"));
   });
 });

@@ -7,6 +7,7 @@ import type { CameraTraits } from "./api/cameras";
 import { PasswordInput } from "./components/PasswordInput";
 import { IgnoreZonesEditor } from "./IgnoreZonesEditor";
 import { askConfirm } from "./askConfirm";
+import { errorText } from "./apiErrorText";
 import { snapshotHasLogin } from "./snapshotLogin";
 import { useEffect, useState } from "react";
 import { configureCamera, deleteCamera, discoverCameraStreams, type CameraConnection, type DiscoveredCamera, type PublicCameraConnection } from "./api";
@@ -84,7 +85,7 @@ export function CameraSettings(props: Props) {
       props.onCameraSaved({ ...saved, enabled: selected?.enabled ?? true, x: selected?.x ?? 50, y: selected?.y ?? 50 });
       selectCamera(saved.id);
       return saved;
-    } catch (error) { setMessage(`${t("cameraSaveFailed")} (${error instanceof Error ? error.message : ""})`); return undefined; }
+    } catch (error) { setMessage(`${t("cameraSaveFailed")} ${errorText(t, error, "srv_err_")}`); return undefined; }
   };
   const saveCamera = async () => {
     if (!isNewMulti) { if (await persist()) setMessage(t("cameraSaved")); return; }
@@ -99,7 +100,7 @@ export function CameraSettings(props: Props) {
       setForm(current => ({ ...current, password: "" }));
       if (last) selectCamera(last.id);
       setMessage(t("cameraSaved"));
-    } catch (error) { setMessage(`${t("cameraSaveFailed")} (${error instanceof Error ? error.message : ""})`); }
+    } catch (error) { setMessage(`${t("cameraSaveFailed")} ${errorText(t, error, "srv_err_")}`); }
   };
   /** One button for the whole thing: it saves what is on the form (the camera has to be known to the server) and then tries the paths of the camera's family. */
   const findStream = async () => {
@@ -114,7 +115,7 @@ export function CameraSettings(props: Props) {
       setForm(current => ({ ...current, rtspPath: result.camera.rtspPath ?? result.paths[0], previewPath: result.camera.previewPath ?? current.previewPath }));
       props.onCameraSaved({ ...result.camera, enabled: selected?.enabled ?? true, x: selected?.x ?? 50, y: selected?.y ?? 50 });
       setMessage(`${t("rtspFound")}: ${result.paths.length}`);
-    } catch { setMessage(t("rtspDiscoverFailed")); }
+    } catch (error) { setMessage(`${t("rtspDiscoverFailed")} ${errorText(t, error, "srv_err_")}`); }
     finally { setFinding(false); }
   };
   const applyFound = async (path: string, as: "rtspPath" | "previewPath") => {
@@ -129,7 +130,7 @@ export function CameraSettings(props: Props) {
   const removeCamera = async () => {
     if (!selected || !(await askConfirm(t("confirmDeleteCamera"), t))) return;
     try { await deleteCamera(props.origin, selected.id); props.onCameraDeleted(selected.id); newCamera(); setMessage(t("cameraDeleted")); }
-    catch { setMessage(t("cameraDeleteFailed")); }
+    catch (error) { setMessage(`${t("cameraDeleteFailed")} ${errorText(t, error, "srv_err_")}`); }
   };
   const hasLogin = Boolean(selected?.hasCredentials || (form.username && form.password));
   const connectionReady = Boolean(form.name.trim() && form.host.trim() && hasLogin);

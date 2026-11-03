@@ -30,4 +30,23 @@ describe("the words for what the server refused", () => {
       expect(said, language).toMatch(/9/);
     }
   });
+  it("falls back to the words for the kind of answer when the screen has none for the code", () => {
+    const words: Record<string, string> = { "z_err_generic": "generic", "z_err_status_429": "slow down", "z_err_status_5xx": "server failed", "z_err_status_404": "gone", "z_err_unreachable": "no answer" };
+    const say = (key: string) => words[key] ?? key;
+    expect(errorText(say, new ApiError(429, "x"), "z_err_")).toBe("slow down");
+    expect(errorText(say, new ApiError(503, "x"), "z_err_")).toBe("server failed");
+    expect(errorText(say, new ApiError(404, "x"), "z_err_")).toBe("gone");
+    expect(errorText(say, new ApiError(409, "x"), "z_err_")).toBe("generic");
+    expect(errorText(say, new TypeError("Failed to fetch"), "z_err_")).toBe("no answer");
+    expect(errorText(say, new Error("other"), "z_err_")).toBe("generic");
+  });
+  it("tells every kind of refusal of the camera forms and the connection settings in every language", () => {
+    const answers: ApiError[] = [new ApiError(403, "forbidden"), new ApiError(400, "x"), new ApiError(404, "x"), new ApiError(429, "x"), new ApiError(500, "x"), new ApiError(502, "x"), new ApiError(409, "x")];
+    for (const language of LANGUAGES) {
+      const t2 = (key: string) => text(language, key);
+      const said = [...answers, new TypeError("Failed to fetch")].map(error => errorText(t2, error, "srv_err_"));
+      for (const line of said) expect(line, language).not.toMatch(/^srv_err_/);
+      expect(new Set(said).size, language).toBeGreaterThanOrEqual(7);
+    }
+  });
 });

@@ -23,6 +23,12 @@ export const timedFetch = (url: string, init: RequestInit = {}): Promise<Respons
 export class ApiError extends Error {
   constructor(readonly status: number, readonly code: string) { super(`${status} ${code}`); }
 }
+/** The refusal in an answer that is not ok, as an ApiError: the machine code the server gave (`code`, or an `error` that is one), or "forbidden" for 401 and 403, or "generic". For the calls that do not go through `userCall`. */
+export async function refusal(response: Response): Promise<ApiError> {
+  const parsed = await response.json().catch(() => ({})) as { code?: unknown; error?: unknown };
+  const machine = typeof parsed.error === "string" && /^[a-z_]+(:\d+)?$/.test(parsed.error) ? parsed.error : undefined;
+  return new ApiError(response.status, typeof parsed.code === "string" ? parsed.code : machine ?? (response.status === 403 || response.status === 401 ? "forbidden" : "generic"));
+}
 /** Set by the app: asks the person for their password (or a code) again and says whether they proved themselves. Critical actions from outside the house ask for it (see ElevationHost). */
 let elevationAsker: ((origin: string) => Promise<boolean>) | null = null;
 export const setElevationAsker = (asker: ((origin: string) => Promise<boolean>) | null): void => { elevationAsker = asker; };

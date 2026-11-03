@@ -5,6 +5,9 @@
 import { createCameraStreamUrl, type Reachability } from "../api";
 import { useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { StreamRenewContext } from "../streamContext";
+import { useMayDo } from "../sessionContext";
+import { errorText } from "../apiErrorText";
+import { ApiError } from "../api/transport";
 
 /**
  * A live picture (a stream that never ends). When it goes away its connection is closed on purpose: a browser keeps a removed picture's stream open until it
@@ -116,13 +119,16 @@ function HoldButton({ command, label, title, enabled, invoke }: { command: strin
 }
 
 /** The PTZ controls: four directions and stop, zoom, and the camera's own error in place when a move fails. */
-export function CameraPtz({ enabled, invoke, t, pan = true, zoom = true }: { enabled: boolean; invoke: (command: string) => Promise<void>; t: Translate; /** Whether the lens turns, and whether it zooms: the buttons that it cannot use are not drawn. */ pan?: boolean; zoom?: boolean }) {
+export function CameraPtz({ enabled: wanted, invoke, t, pan = true, zoom = true }: { enabled: boolean; invoke: (command: string) => Promise<void>; t: Translate; /** Whether the lens turns, and whether it zooms: the buttons that it cannot use are not drawn. */ pan?: boolean; zoom?: boolean }) {
+  // moving a camera is its own permission: without it the pad is drawn but does nothing
+  const mayMove = useMayDo("camera_control");
+  const enabled = wanted && mayMove;
   const [problem, setProblem] = useState("");
   const timer = useRef<number | undefined>(undefined);
   const safe = async (command: string) => {
     try { await invoke(command); if (command !== "stop") setProblem(""); }
     catch (error) {
-      setProblem(error instanceof Error ? error.message : t("ptzUnavailable"));
+      setProblem(error instanceof ApiError || error instanceof TypeError ? errorText(t, error, "srv_err_") : error instanceof Error ? error.message : t("ptzUnavailable"));
       window.clearTimeout(timer.current);
       timer.current = window.setTimeout(() => setProblem(""), 6000);
     }
