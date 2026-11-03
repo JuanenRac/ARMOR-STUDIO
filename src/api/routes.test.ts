@@ -119,6 +119,8 @@ const rows: Row[] = [
   ["readServices", () => api.readServices(O), "GET", "/api/v1/system/services"],
   ["readMetrics", () => api.readMetrics(O), "GET", "/api/v1/system/metrics"],
   ["readIgnoreZones", () => api.readIgnoreZones(O, ODD), "GET", `/api/v1/cameras/${ENC}/ignore-zones`],
+  ["readCountLines", () => api.readCountLines(O, ODD), "GET", `/api/v1/cameras/${ENC}/count-lines`],
+  ["saveCountLines", () => api.saveCountLines(O, "c1", [{ id: "gate", a: [0.3, 0.7], b: [0.9, 0.7] }]), "PUT", "/api/v1/cameras/c1/count-lines", { lines: [{ id: "gate", a: [0.3, 0.7], b: [0.9, 0.7] }] }],
   ["saveIgnoreZones", () => api.saveIgnoreZones(O, "c1", [{ x: 0, y: 0, w: 0.5, h: 0.5 }]), "PUT", "/api/v1/cameras/c1/ignore-zones", { zones: [{ x: 0, y: 0, w: 0.5, h: 0.5 }] }],
 ];
 

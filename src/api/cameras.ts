@@ -135,6 +135,9 @@ export type CaptureRecord = { camera_id: string; at: string; photos: number; vid
 /** A part of a camera's picture that the observation service does not look at: a rectangle in fractions of the picture, from the top left. */
 export type IgnoreZone = { x: number; y: number; w: number; h: number };
 export const readIgnoreZones = (origin: string, id: string) => userCall<{ camera_id: string; zones: IgnoreZone[] }>(origin, "GET", `/api/v1/cameras/${encodeURIComponent(id)}/ignore-zones`);
+export type CountLine = { id: string; a: number[]; b: number[]; labels?: string[] };
+export const readCountLines = (origin: string, id: string) => userCall<{ camera_id: string; lines: CountLine[] }>(origin, "GET", `/api/v1/cameras/${encodeURIComponent(id)}/count-lines`);
+export const saveCountLines = (origin: string, id: string, lines: CountLine[]) => userCall<{ camera_id: string; lines: CountLine[] }>(origin, "PUT", `/api/v1/cameras/${encodeURIComponent(id)}/count-lines`, { lines });
 export const saveIgnoreZones = (origin: string, id: string, zones: IgnoreZone[]) => userCall<{ camera_id: string; zones: IgnoreZone[] }>(origin, "PUT", `/api/v1/cameras/${encodeURIComponent(id)}/ignore-zones`, { zones });
 export const readCaptureSettings = (origin: string) => userCall<{ settings: CaptureSettings; recent: CaptureRecord[] }>(origin, "GET", "/api/v1/capture-settings");
 export const saveCaptureSettings = (origin: string, settings: CaptureSettings) => userCall<{ settings: CaptureSettings }>(origin, "PUT", "/api/v1/capture-settings", settings);

@@ -51,3 +51,7 @@
 .iz-zone.draft { border-style: dashed; background: rgba(255, 111, 121, .15); }
 .iz-list { margin: .5rem 0; padding-left: 1.1rem; display: grid; gap: .3rem; }
 .iz-list button { margin-left: .5rem; }
+
+.lc-lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.lc-line { stroke: #ffd24a; stroke-width: 3; stroke-linecap: round; }
+.lc-line.draft { stroke-dasharray: 6 4; opacity: .7; }
