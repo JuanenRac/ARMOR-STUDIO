@@ -3364,6 +3364,7 @@ export const PT_CATALOGUE: Record<string, string> = {
  "alarm_alarm_tamper": "Uma zona do alarme mostra violação (um fio cortado ou em curto-circuito)",
  "apState_trouble": "não é possível ler",
  "alarm_alarm_zone_trouble": "Uma zona do alarme não pode ser lida: não está a vigiar",
+ "alarm_alarm_siren_fault": "A sirene do alarme pode não tocar: a sua cablagem está aberta, em curto-circuito ou ilegível",
  "alarm_alarm_locked_out": "A central de alarme está bloqueada após PIN errados",
  "alarm_alarm_offline": "Um nó de alarme deixou de reportar",
  "alarm_mode_panel_sync_failed": "Uma central de alarme não confirmou o modo de armamento: o servidor defende-o, a central talvez não",

@@ -17,6 +17,8 @@ export type SecurityOptions = {
   /** Choosing a mode also arms the alarm panels with the matching profile (away, stay, night). */
   "alarm.mode_panel_sync": boolean;
   "alarm.config_hash": boolean;
+  /** A warning in the alarm centre while the wiring of the siren of a panel is open, shorted or unreadable (on by default). */
+  "alarm.siren_fault_notice": boolean;
   "server.zone_feed": boolean;
   "server.zone_feed_signature": boolean;
   "media.rtsp_proxy": boolean;
