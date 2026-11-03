@@ -16,6 +16,10 @@ type Props = {
   mode: "armed" | "disarmed"; toggleMode: () => void; now: number; isAdmin: boolean;
   /** A viewer sees the alarms and cannot act on them (the server would answer 403 to each of these buttons). */
   readOnly?: boolean;
+  /** The permission for the step the big button would take (arm when disarmed, disarm when armed) is missing. */
+  modeLocked?: boolean;
+  /** The permission to acknowledge is missing. */
+  ackLocked?: boolean;
 };
 
 /** Where an alarm came from, in words and (for a device) as its icon. */
@@ -56,7 +60,7 @@ const summaryOf = (alarm: Alarm): string => [alarm.detail?.device, alarm.detail?
 
 type Confirming = { kind: "delete"; alarm: Alarm } | { kind: "clear" } | { kind: "unmark"; alarm: Alarm } | null;
 
-export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mode, toggleMode, now, readOnly = false }: Props) {
+export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mode, toggleMode, now, readOnly = false, modeLocked = false, ackLocked = false }: Props) {
   const [message, setMessage] = useState<{ text: string; bad: boolean }>({ text: "", bad: false });
   const [confirming, setConfirming] = useState<Confirming>(null);
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
@@ -99,7 +103,7 @@ export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mo
   };
 
   const controls = (alarm: Alarm, compact = false) => <div className={`alarm-actions ${compact ? "compact" : ""}`}>
-    {!alarm.acknowledged_at && <button className="primary" disabled={readOnly} onClick={() => void act(() => acknowledgeAlarm(origin, alarm.id))}>{t("acknowledge")}</button>}
+    {!alarm.acknowledged_at && <button className="primary" disabled={readOnly || ackLocked} onClick={() => void act(() => acknowledgeAlarm(origin, alarm.id))}>{t("acknowledge")}</button>}
     {alarm.code === "network_new_device" && !alarm.cleared_at && <button disabled={readOnly} onClick={() => markKnown(alarm)}>{t("alarmMarkKnown")}</button>}
     <button disabled={readOnly} onClick={() => alarm.false_alarm === true ? setConfirming({ kind: "unmark", alarm }) : void act(() => markFalseAlarm(origin, alarm.id, true), () => t("alarmFalseDone"))} title={t("alarmFalseTitle")}>{t(alarm.false_alarm === true ? "alarmFalseUndo" : "alarmFalse")}</button>
     <button onClick={() => toggle(alarm.id)} aria-expanded={open.has(alarm.id)}>{open.has(alarm.id) ? t("alarmHideDetails") : t("alarmDetails")}</button>
@@ -115,8 +119,8 @@ export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mo
         <p className="muted">{pending === 0 ? t("allClearHelp") : t("alarmsHelp")}</p>
       </div>
       <div className="alarm-hero-actions" data-tour="al-actions">
-        <button className={`mode-big ${mode}`} onClick={toggleMode} disabled={readOnly}>{mode === "armed" ? t("disarmSystem") : t("armSystem")}<small>{mode === "armed" ? t("armed") : t("disarmed")}</small></button>
-        {pending > 0 && <button className="primary" disabled={readOnly} onClick={() => void act(() => acknowledgeAllAlarms(origin))}>{t("acknowledgeAll")}</button>}
+        <button className={`mode-big ${mode}`} onClick={toggleMode} disabled={readOnly || modeLocked}>{mode === "armed" ? t("disarmSystem") : t("armSystem")}<small>{mode === "armed" ? t("armed") : t("disarmed")}</small></button>
+        {pending > 0 && <button className="primary" disabled={readOnly || ackLocked} onClick={() => void act(() => acknowledgeAllAlarms(origin))}>{t("acknowledgeAll")}</button>}
       </div>
     </header>
     {message.text && <p className={`notice ${message.bad ? "bad" : ""}`} role="status">{message.text}</p>}

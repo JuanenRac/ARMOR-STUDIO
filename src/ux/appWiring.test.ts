@@ -15,6 +15,7 @@ describe("the console wires the keyboard and screen reader comforts", () => {
     expect(app).toMatch(/role="status" aria-live="polite" data-testid="view-announcement"/);
     expect(app).toContain("usePageTitle(t(view))");
     expect(app).toContain("useShortcuts(prefs.shortcuts");
+    expect(app).toContain("useTabKeys();");
     expect(app).toMatch(/useUnloadGuard\(hasUnsavedWork\(\[siteSync\.status, electricalStatus, networkStatus, alarmDesignStatus\]\)\)/);
   });
 

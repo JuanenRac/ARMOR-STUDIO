@@ -145,6 +145,6 @@ export function ConsolePanel({ t, origin, isAdmin }: Props) {
       {running ? <button type="button" className="danger" onClick={stop}>{t("mc_stop")}</button> : <button type="submit" className="primary" disabled={line.trim() === ""}>{t("mc_run")}</button>}
       <button type="button" onClick={() => setEntries([])} disabled={entries.length === 0}>{t("mc_clear")}</button>
     </form>
-    {message && <p className="notice">{message}</p>}
+    {message && <p className="notice" role="status">{message}</p>}
   </article>;
 }

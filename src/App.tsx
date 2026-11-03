@@ -83,6 +83,7 @@ import { InvertersView } from "./views/InvertersView";
 import { BatteriesView } from "./views/BatteriesView";
 import manifest from "../armor.project.json";
 import { useShortcuts, type ShortcutAction } from "./ux/shortcuts";
+import { useTabKeys } from "./ux/tabKeys";
 import { usePageTitle } from "./ux/pageTitle";
 import { hasUnsavedWork, useUnloadGuard } from "./ux/unloadGuard";
 import "./ux/ux.css";
@@ -143,7 +144,6 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const signedIn = sessionUser.user !== null;
   const isAdmin = capabilities.can("administer");
   const isViewer = signedIn && !capabilities.can("operate");
-  const cannotArm = signedIn && !capabilities.can("arm");
   const [pendingMode, setPendingMode] = useState<"armed" | "disarmed" | null>(null);
   const [modeDialog, setModeDialog] = useState(false);
   const [checkOpen, setCheckOpen] = useState(false);
@@ -165,6 +165,9 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const [notice, setNotice] = useState("");
 
   const { state, connection: connectionState, latencyMs, live: liveChannel, apply: applyState } = useServerStatus(origin, { live: true });
+  // arming and disarming are two permissions: the button asks for the one of the step it would take
+  const cannotToggle = signedIn && !capabilities.can(state.mode === "armed" ? "disarm" : "arm");
+  const cannotAcknowledge = signedIn && !capabilities.can("acknowledge");
   const remoteConnection = useRemoteConnection(origin, connectionState !== "demo" && sessionUser.user !== null);
   const serverInfo = useServerInfo(origin);
   const { urls: streamUrls, renew: renewStream } = useStreamUrls(origin, cameras);
@@ -289,6 +292,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const alarmDesignStatus = useAlarmDesignSync({ origin, enabled: restored && operatorUnlocked && signedIn, persist: restored && signedIn, design: alarmDesign, apply: setAlarmDesign, onConflict: () => setNotice(t("elConflict")) });
   // Comforts of the keyboard and of the screen reader: the title of the tab follows the menu, one-key shortcuts (they can be turned off in Preferences) and a warning when the tab is closed with a drawing not yet on the server.
   usePageTitle(t(view));
+  useTabKeys();   // the arrow keys move across the tabs of every tab list
   useShortcuts(prefs.shortcuts, useCallback((action: ShortcutAction) => { if (action === "help") setHelpOpen(true); else setSidebarOpen(value => !value); }, []));
   useUnloadGuard(hasUnsavedWork([siteSync.status, electricalStatus, networkStatus, alarmDesignStatus]));
 
@@ -379,8 +383,8 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const visitedViews = useRef(new Set<View>());
   const shownPanels = useRef(new Map<View, ReactNode>());
   const panels: Record<View, ReactNode> = {
-    overview: <Ticking>{now => <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} readOnly={cannotArm} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} panels={alarmNodesPoll.data ?? null} solar={solarPoll.data ?? null} electrical={electricalPoll.data ?? null} network={networkPoll.data ?? null} census={census} />}</Ticking>,
-    alarms: <Ticking>{now => <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} readOnly={cannotArm} />}</Ticking>,
+    overview: <Ticking>{now => <OverviewView t={t} origin={origin} mode={state.mode} toggleMode={toggleMode} demo={connectionState === "demo"} readOnly={cannotToggle} nodes={nodes} cameras={cameras} reachability={reachability} devices={devices} alarms={alarms} model={site} dimensions={dimensions} setView={setView} onDevice={() => setView("devices")} now={now} panels={alarmNodesPoll.data ?? null} solar={solarPoll.data ?? null} electrical={electricalPoll.data ?? null} network={networkPoll.data ?? null} census={census} />}</Ticking>,
+    alarms: <Ticking>{now => <AlarmsView t={t} origin={origin} alarms={alarms} reload={alarmPoll.reload} devices={devices} cameraNames={cameraNames} mode={state.mode} toggleMode={toggleMode} now={now} isAdmin={isAdmin} readOnly={isViewer} modeLocked={cannotToggle} ackLocked={cannotAcknowledge} />}</Ticking>,
     alarmPanels: <Ticking>{now => <AlarmPanelsView openDesigner={() => setView("alarmDesigner")} t={t} origin={origin} nodes={alarmNodesPoll.data ?? null} unreachable={alarmNodesPoll.failed} network={networkPoll.data ?? null} isAdmin={isAdmin} now={now} />}</Ticking>,
     electrical: <Ticking>{now => <ElectricalView isAdmin={isAdmin} openDevices={() => setView("devices")} t={t} origin={origin} readings={electricalPoll.data ?? null} unreachable={electricalPoll.failed} design={electrical} openDesigner={() => setView("electricalDesigner")} network={networkPoll.data} now={now} />}</Ticking>,
     inverters: <Ticking>{now => <InvertersView isAdmin={isAdmin} t={t} origin={origin} devices={solarPoll.data?.devices ?? []} waiting={solarPoll.data?.waiting ?? []} catalog={solarPoll.data?.catalog ?? null} reload={solarPoll.reload} totals={solarPoll.data?.totals ?? null} now={now} unreachable={solarPoll.failed} network={networkPoll.data} />}</Ticking>,
@@ -422,7 +426,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} alarmBadge={alarmsPending} t={t} />
     <section className="main-stage" data-tour="stage" id="studio-main" tabIndex={-1}>
       <p className="ux-sr" role="status" aria-live="polite" data-testid="view-announcement">{t("ux_now_showing").replace("{0}", t(view))}</p>
-      <TopBar view={view} revision={state.revision} mode={state.mode} armingMode={modesOn ? state.arming_mode : undefined} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={cannotArm} checkPerimeter={() => setCheckOpen(true)} remote={remoteConnection} t={t} />
+      <TopBar view={view} revision={state.revision} mode={state.mode} armingMode={modesOn ? state.arming_mode : undefined} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={cannotToggle} checkPerimeter={() => setCheckOpen(true)} remote={remoteConnection} t={t} />
       {modesOn && state.panel_sync && <PanelSyncNote t={t} sync={state.panel_sync} />}
       {viewsToDraw(VIEW_ORDER, view, visitedViews.current).map(shown => {
         // a hidden menu keeps the last thing it was given (the same element: React does not draw it again every second); it is refreshed when it is shown
