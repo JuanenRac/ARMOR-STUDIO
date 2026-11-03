@@ -13,3 +13,5 @@ export const changeAccount = (origin: string, change: { currentPassword: string;
 export const setMyPin = (origin: string, change: { currentPassword: string; pin?: string; duress_pin?: string; clear?: boolean }) => userCall<StudioUser>(origin, "PUT", "/api/v1/account/pin", change);
 export const setUserPin = (origin: string, id: string, pin: string, duress_pin?: string) => userCall<ListedUser>(origin, "PUT", `/api/v1/users/${encodeURIComponent(id)}/pin`, { pin, ...(duress_pin ? { duress_pin } : {}) });
 export const clearUserPin = (origin: string, id: string) => userCall<ListedUser>(origin, "DELETE", `/api/v1/users/${encodeURIComponent(id)}/pin`);
+/** Your own silent panic phrase (after confirming the password): set or replace it with `phrase`, remove it with `clear`. The phrase is never read back; the answer only says that one is set. */
+export const setMyPanicPhrase = (origin: string, change: { currentPassword: string; phrase?: string; clear?: boolean }) => userCall<StudioUser & { hasPanicPhrase?: boolean }>(origin, "PUT", "/api/v1/account/panic-phrase", change);

@@ -9,6 +9,7 @@ import { adminFile, adminSaveFile, adminStatus, endMySession, endOtherSessions, 
   type RemoteCheck, type SessionRow, type TotpState } from "./api";
 import { askConfirm } from "./askConfirm";
 import { AlarmSounds } from "./AlarmSounds";
+import { PanicPhraseCard } from "./PanicPhraseCard";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
 import "./security.css";
 import { errorText } from "./apiErrorText";
@@ -195,7 +196,7 @@ function RemoteSettings({ t, origin }: { t: (key: string) => string; origin: str
   </article>;
 }
 
-type OptionKey = Exclude<keyof SecurityOptions, "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute">;
+type OptionKey = Exclude<keyof SecurityOptions, "voice.panic_cooldown_s" | "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute">;
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
 const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean; optional?: boolean }> = [
   { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN", node: true },
@@ -213,6 +214,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "login.country_alert", id: "country", values: [true, false] },
   { key: "electrical.set_aside_old_readings", id: "oldread", values: [true, false] },
   { key: "voice.multipart_turn", id: "voiceturn", values: [false, true] },
+  { key: "voice.panic_phrase", id: "panic", values: [true, false], calm: true, optional: true },   // off by default; turning it off lowers the safety, so it asks first
   { key: "panel.live_events", id: "panellive", values: [false, true] },
   { key: "alarm_audio.spoken", id: "alspoken", values: [false, true], calm: true },
   { key: "alarm_audio.custom_sounds", id: "alsounds", values: [false, true], calm: true },
@@ -232,6 +234,7 @@ export const isLowering = (values: Array<string | boolean>, from: string | boole
 export const VOICE_LIMITS = {
   "voice.turn_max_bytes": { min: 3_200, max: 1_920_000, id: "turn" },
   "voice.reply_audio_max_bytes": { min: 3_200, max: 1_000_000, id: "reply" },
+  "voice.panic_cooldown_s": { min: 10, max: 3_600, id: "panic" },
 } as const;
 type VoiceLimitKey = keyof typeof VOICE_LIMITS;
 /** The whole number a field holds, or undefined when it is not a whole number inside the range of that limit. */
@@ -283,7 +286,7 @@ const fill = (text: string, values: Record<string, string | number>) => text.rep
 
 /** The sizes of a spoken turn, as numbers an administrator types; the server refuses what is outside its ceilings and the field says so before it asks. */
 function VoiceLimits({ t, state, apply, busy }: { t: (key: string) => string; state: SecurityOptionsState; apply: (change: Partial<SecurityOptions>, raising: boolean) => Promise<boolean>; busy: boolean }) {
-  const keys = Object.keys(VOICE_LIMITS) as VoiceLimitKey[];
+  const keys = (Object.keys(VOICE_LIMITS) as VoiceLimitKey[]).filter(key => typeof state.settings[key] === "number");   // an older server announces only the ones it has
   const [typed, setTyped] = useState<Record<string, string>>({});
   const [invalid, setInvalid] = useState(false);
   const shown = (key: VoiceLimitKey) => typed[key] ?? String(state.settings[key] ?? "");
@@ -294,7 +297,7 @@ function VoiceLimits({ t, state, apply, busy }: { t: (key: string) => string; st
     for (const key of keys) {
       const value = voiceLimitValue(key, shown(key));
       if (value === undefined) { setInvalid(true); return; }
-      if (value !== state.settings[key]) { change[key] = value; if (value > Number(state.settings[key])) raising = true; }
+      if (value !== state.settings[key]) { change[key] = value; if (value > Number(state.settings[key]) && key !== "voice.panic_cooldown_s") raising = true; }
     }
     setInvalid(false);
     if (!Object.keys(change).length) return;
@@ -442,7 +445,7 @@ export function SecurityPanel({ t, origin, isAdmin }: Props) {
     <div className="panel-heading"><h3>{t("sec_title")}</h3><p className="muted">{t("sec_help")}</p></div>
     <section className="sec-section" data-testid="security-group-account">
       <h4 className="sec-section-title">{t("sec_group_account")}</h4>
-      <div className="sec-row"><SecondFactor t={t} origin={origin} /><Sessions t={t} origin={origin} /></div>
+      <div className="sec-row"><SecondFactor t={t} origin={origin} /><Sessions t={t} origin={origin} /><PanicPhraseCard t={t} origin={origin} /></div>
     </section>
     <section className="sec-section" data-testid="security-group-server">
       <h4 className="sec-section-title">{t("sec_group_server")}</h4>

@@ -24,6 +24,7 @@ const rows: Row[] = [
   ["updateUser", () => api.updateUser(O, ODD, { role: "admin" }), "PATCH", `/api/v1/users/${ENC}`, { role: "admin" }],
   ["deleteUser", () => api.deleteUser(O, ODD), "DELETE", `/api/v1/users/${ENC}`],
   ["changeAccount", () => api.changeAccount(O, { currentPassword: "x", newPassword: "y" }), "PATCH", "/api/v1/account", { currentPassword: "x", newPassword: "y" }],
+  ["setMyPanicPhrase", () => api.setMyPanicPhrase(O, { currentPassword: "x", phrase: "one two three" }), "PUT", "/api/v1/account/panic-phrase", { currentPassword: "x", phrase: "one two three" }],
   ["setMyPin", () => api.setMyPin(O, { currentPassword: "x", pin: "1234" }), "PUT", "/api/v1/account/pin", { currentPassword: "x", pin: "1234" }],
   ["setUserPin without duress", () => api.setUserPin(O, ODD, "1234"), "PUT", `/api/v1/users/${ENC}/pin`, { pin: "1234" }],
   ["setUserPin with duress", () => api.setUserPin(O, ODD, "1234", "4321"), "PUT", `/api/v1/users/${ENC}/pin`, { pin: "1234", duress_pin: "4321" }],
