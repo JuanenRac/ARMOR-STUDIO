@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The copy of the shared contract is current:** the generated types of the HTTP contract and of the node messages now carry the list of refusal codes, the refusal about a PIN and the observation of a camera.
 - **Counting lines on a camera:** under the zones to ignore, Configuration > Cameras shows the live picture with the counting lines drawn over it; an administrator drags to draw a line, removes one or all and saves them, and everybody who may look sees them (the lines are kept by the server and handed to the observation service). The text is in the eight languages.
 - **The launchers find the shared repository through `ARMOR_COMMON_DIR`:** `build`, `build-test`, `test` and `run` (`.sh` and `.bat`) use the folder named by that variable when it is set and the sibling `ARMOR-COMMON` folder otherwise, so a checkout with another layout builds without changing a file.
 - **Automatic security updates in Updates:** a card in Configuration > Updates with the switch, what to do when an update needs a reboot (never by itself, or inside the window of the night and only when nothing is armed), the window, what was applied, how the services were after the last run, the warning of the risk and, read only, how the packages are signed (the mode and the fingerprints of the keys the helper trusts), in the eight languages.
