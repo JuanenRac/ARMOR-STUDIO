@@ -12,6 +12,7 @@ import {
   type MaintComponent, type MaintJob, type MaintOverview,
 } from "./api";
 import { CopyButton } from "./components/CopyButton";
+import { AutoUpdatesCard } from "./AutoUpdatesCard";
 import "./maintenance.css";
 
 type Translate = (key: string) => string;
@@ -207,6 +208,8 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
         <button className={os?.reboot_required ? "danger" : ""} onClick={() => void system("reboot")} disabled={running}>{t("mt_os_reboot")}</button>
       </div>
     </article>
+
+    <AutoUpdatesCard t={t} origin={origin} signatureMode={overview?.signature_mode} fingerprints={overview?.trusted_fingerprints} />
 
     {job && <article className="stack-card mt-job">
       <div className="mt-head"><h3>{t("mt_job_title")}</h3><span><span className={`mt-badge job-${job.state}`}>{t(`mt_job_${job.state}`)}</span>{job.state !== "running" && <button className="mt-dismiss" onClick={dismiss} aria-label={t("close")} title={t("close")}>×</button>}</span></div>

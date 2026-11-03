@@ -12,6 +12,7 @@ import type { Alarm as ClientAlarm } from "../alarms";
 import type { AlarmNodes as ClientAlarmNodes } from "../alarmNodes";
 import type { AutomationAction as ClientAutomationAction } from "../devices";
 import type { AutomationInput as ClientAutomationInput } from "../devices";
+import type { AutoUpdates as ClientAutoUpdates, AutoUpdatesChange as ClientAutoUpdatesChange, AutoUpdatesSettings as ClientAutoUpdatesSettings } from "../maintenance";
 import type { BatteryImage as ClientBatteryImage } from "../battery";
 import type { CameraView as ClientCameraView, CameraParams as ClientCameraParams } from "../cameras";
 import type { CaptureSettings as ClientCaptureSettings } from "../cameras";
@@ -70,6 +71,9 @@ type Checked = {
   AlarmNodes: Fits<Rest.AlarmNodes, ClientAlarmNodes>;
   AutomationAction: Fits<Rest.AutomationAction, ClientAutomationAction>;
   AutomationInput: Fits<Rest.AutomationInput, ClientAutomationInput>;
+  AutoUpdates: Fits<Rest.AutoUpdates, ClientAutoUpdates>;
+  AutoUpdatesChange: Fits<Rest.AutoUpdatesChange, ClientAutoUpdatesChange>;
+  AutoUpdatesSettings: Fits<Rest.AutoUpdatesSettings, ClientAutoUpdatesSettings>;
   BatteryImage: Fits<Rest.BatteryImage, ClientBatteryImage>;
   CameraView: Fits<Rest.CameraView, ClientCameraView>;
   CameraParams: Fits<Rest.CameraParams, ClientCameraParams>;
@@ -125,6 +129,9 @@ export const checked: Checked = {
   AlarmNodes: true,
   AutomationAction: true,
   AutomationInput: true,
+  AutoUpdates: true,
+  AutoUpdatesChange: true,
+  AutoUpdatesSettings: true,
   BatteryImage: true,
   CameraView: true,
   CameraParams: true,
