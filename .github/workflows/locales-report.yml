@@ -1,0 +1,41 @@
+# =============================================================================
+# A.R.M.O.R. - the workflow that publishes the state of the language tables of Studio in the log of the CI
+# Copyright (C) 2026 JuanenRac (Electro Hobby 3D)
+# GPL-3.0-or-later - see LICENSE
+# =============================================================================
+# It never stops a change: a language that lacks phrases, keeps English text or has labels much longer than English is written as a warning
+# (an annotation of the run), judged by the limits in src/i18nReport.config.json. Only a language over "failMissing" fails the run, and that
+# limit is set so high that nothing fails yet. Turn it off with the repository variable ARMOR_LOCALES_REPORT set to "off".
+name: Language tables report
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    name: Language tables
+    if: ${{ vars.ARMOR_LOCALES_REPORT != 'off' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install the dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Report the language tables
+        run: node tools/i18n_report.mjs --limits --github
