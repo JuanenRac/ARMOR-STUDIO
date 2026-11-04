@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.2.1] - The phrases of the counting lines have their own source: they were written by hand into the language files, so npm run locales erased them; they now live in src/countLinesText.ts like every other phrase, and a test fails when... (and 10 more changes)
+
 - **The phrases of the counting lines have their own source:** they were written by hand into the language files, so `npm run locales` erased them; they now live in `src/countLinesText.ts` like every other phrase, and a test fails when a language file holds a phrase that no source writes or one that differs from its source.
 - **Trusted phones in Security:** an option `client.trusted_devices` (off by default, asks before it is turned on) lets the phone app keep a key that never leaves the phone and renew its session by signing a challenge, with the hours of that session (1 to 720, 72 by default) next to it; a card lists the phones of the person (an administrator sees everybody's) with the way to end each one. The eight languages are in.
 - **The copy of the shared contract is current:** the generated types of the HTTP contract and of the node messages now carry the list of refusal codes, the refusal about a PIN and the observation of a camera.
