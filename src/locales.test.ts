@@ -15,6 +15,20 @@ describe("the language tables the console loads (src/locales, written by tools/b
     }
   });
 
+  it("hold no phrase that the sources do not have (a phrase written by hand into src/locales would be erased by `npm run locales`)", async () => {
+    for (const locale of locales) {
+      const written = (await import(`./locales/${locale}.ts`)).default as Record<string, string>;
+      const orphans = Object.keys(written).filter(key => !(key in sourceCatalogues[locale]));
+      expect(orphans.slice(0, 10), `${locale} has ${orphans.length} phrases with no source`).toEqual([]);
+      const changed = Object.entries(written).filter(([key, value]) => sourceCatalogues[locale][key] !== value).map(([key]) => key);
+      expect(changed.slice(0, 10), `${locale} differs from its source in ${changed.length} phrases`).toEqual([]);
+    }
+  });
+
+  it("carry the counting lines of a camera in the eight languages from their own source", () => {
+    for (const locale of locales) for (const key of ["lc_title", "lc_help", "lc_draw", "lc_none", "lc_line", "lc_remove", "lc_clear", "lc_save", "lc_saved", "lc_error"]) expect(sourceCatalogues[locale][key], `${locale}:${key}`).toBeTruthy();
+  });
+
   it("have every phrase of English in every language (a language that lacks one would show it in English)", () => {
     for (const locale of locales) {
       const missing = Object.keys(sourceCatalogues.en).filter(key => !(key in sourceCatalogues[locale]) && !key.startsWith(HINT_PREFIX));
