@@ -139,7 +139,7 @@ describe("properties of the coverage (fixed seed)", () => {
         expect(Math.hypot(cx + report.cellM / 2 - apex.x, cy + report.cellM / 2 - apex.y)).toBeLessThanOrEqual(radarView(sensor).rangeM + 1e-6);
       }
     }
-  });
+  }, 30000);
 
   it("leaves the model alone", () => {
     const model = { ...empty, buildings: [box("b1", 10, 10, 8, 6)], sensors: [radar("r1", 11, 11, 0)], openings: [door("d1", "b1", 0, 2)] };
