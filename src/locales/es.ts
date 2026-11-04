@@ -5224,6 +5224,8 @@ const catalogue: Record<string, string> = {
 "lc_save": "Guardar las líneas",
 "lc_saved": "Guardado: el servicio de observación las usa desde ahora.",
 "lc_error": "No se pudieron guardar las líneas.",
+"ct_differs": "contratos {node}, el servidor {server}",
+"ct_help": "Este nodo se construyó con otros contratos que los del servidor. Puede que sigan funcionando juntos; actualiza el nodo o el servidor para que sean de la misma versión de la familia.",
 "tabBatteries": "Mantenimiento de baterías",
 "bm_title": "Mantenimiento de baterías",
 "bm_help": "Cambia lo que guarda una batería Pylontech (su reloj, sus contadores, sus límites, sus salidas, su número de serie e incluso su firmware) por la consola del nodo pasarela al que está conectada, como hace la herramienta del propio fabricante. Cada operación es un paso guiado y comprobado, nunca un comando libre; antes y después se lee la batería y todo queda en el historial.",

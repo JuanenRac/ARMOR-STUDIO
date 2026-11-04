@@ -5321,6 +5321,8 @@ const catalogue: Record<string, string> = {
 "lc_save": "Save the lines",
 "lc_saved": "Saved: the observation service uses them from now on.",
 "lc_error": "Could not save the lines.",
+"ct_differs": "contracts {node}, the server {server}",
+"ct_help": "This node was built against other contracts than the server uses. They may still work together; update the node or the server so that both are of the same version of the family.",
 "tabBatteries": "Battery maintenance",
 "bm_title": "Battery maintenance",
 "bm_help": "Change what a Pylontech battery keeps (its clock, its counters, its limits, its outputs, its serial number, even its firmware) through the console of the gateway node it is plugged into, as the maker's own tool does. Each operation is a guided, checked step, never a free command; before and after it the battery is read, and everything is written to the history.",

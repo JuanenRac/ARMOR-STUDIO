@@ -5145,6 +5145,8 @@ const catalogue: Record<string, string> = {
 "lc_save": "Linien speichern",
 "lc_saved": "Gespeichert: Der Beobachtungsdienst verwendet sie ab jetzt.",
 "lc_error": "Die Linien konnten nicht gespeichert werden.",
+"ct_differs": "Verträge {node}, der Server {server}",
+"ct_help": "Dieser Knoten wurde gegen andere Verträge gebaut als die, die der Server verwendet. Sie können weiter zusammenarbeiten; aktualisieren Sie den Knoten oder den Server, damit beide zur selben Version der Familie gehören.",
 "tabBatteries": "Batteriewartung",
 "bm_title": "Batteriewartung",
 "bm_help": "Ändert, was eine Pylontech-Batterie speichert (Uhr, Zähler, Grenzwerte, Ausgänge, Seriennummer, sogar die Firmware) über die Konsole des Gateway-Knotens, an dem sie hängt, wie das Werkzeug des Herstellers. Jede Operation ist ein geführter, geprüfter Schritt, nie ein freier Befehl; davor und danach wird die Batterie gelesen, und alles landet im Verlauf.",

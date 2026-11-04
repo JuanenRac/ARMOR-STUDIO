@@ -5,7 +5,8 @@
  */
 import { askConfirm } from "../askConfirm";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { readRules, readStatus, type Rules, type StudioDevice } from "../api";
+import { readInfo, readRules, readStatus, type Rules, type StudioDevice } from "../api";
+import { contractState } from "../contractNote";
 import { bounds, centroid, offsetPolygon } from "../designer/geometry";
 import { arcPoints, cameraView, fitTransform, headingOf, radarView, sectorPoints, toMetres, type Point } from "../designer/model";
 import type { SiteModel } from "../designer/ops";
@@ -64,6 +65,9 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
   const [mapMode, setMapMode] = useMapMode("armor-studio-radar-map");
   const [rules, setRules] = useState<Rules | null>(null);
   useEffect(() => { void readRules(origin).then(setRules).catch(() => setRules(null)); }, [origin]);
+  // the contracts the server was checked against, to warn about a node built against other ones
+  const [serverContract, setServerContract] = useState<string | undefined>(undefined);
+  useEffect(() => { void Promise.resolve().then(() => readInfo(origin)).then(info => setServerContract(info?.contract)).catch(() => setServerContract(undefined)); }, [origin]);
   const box = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 800, height: 520 });
   const [view, setView] = useState<{ scale: number; x: number; y: number } | null>(null);
@@ -181,7 +185,7 @@ export function RadarView({ nodes: consoleNodes, model, dimensions, origin, forg
         <p className="eyebrow">{t("radarFusion")}</p><h3>{t("activeRadarNodes")}</h3>
         {nodes.map(node => <div className="node-row" key={node.node_id}>
           <span className={`state-dot ${node.online && !node.stale ? node.alert_level : "silent"}`} />
-          <div><strong>{node.node_id}</strong><small>{node.stale ? t("staleWord") : node.online ? t("online") : t("offlineWord")} · {node.online && !node.stale ? `${node.target_count} ${t("tracksWord")}` : `— ${t("tracksWord")}`} · {model.sensors.filter(sensor => sensor.node === node.node_id).length} {t("radarNodeLinked")} · {node.lux ?? "—"} lux{node.panel ? ` · ${t("firmwareWord")} ${node.panel.firmware}` : ""}</small></div>
+          <div><strong>{node.node_id}</strong><small>{node.stale ? t("staleWord") : node.online ? t("online") : t("offlineWord")} · {node.online && !node.stale ? `${node.target_count} ${t("tracksWord")}` : `— ${t("tracksWord")}`} · {model.sensors.filter(sensor => sensor.node === node.node_id).length} {t("radarNodeLinked")} · {node.lux ?? "—"} lux{node.panel ? ` · ${t("firmwareWord")} ${node.panel.firmware}` : ""}{node.panel && contractState(node.panel.contract, serverContract) === "different" && <span className="contract-warning" title={t("ct_help")}>{` · ⚠ ${t("ct_differs").replace("{node}", node.panel.contract ?? "").replace("{server}", serverContract ?? "")}`}</span>}</small></div>
           <b>{node.online && !node.stale ? node.alert_level : "—"}</b>
           <NodeToolsBar t={t} tools={tools} id={node.node_id} panel={node.panel} silent={!node.online || Boolean(node.stale)}
             forget={async () => { if (await askConfirm(`${t("confirmForgetNode")} ${node.node_id}`, t)) forget(node.node_id); }} />

@@ -2824,6 +2824,8 @@ const catalogue: Record<string, string> = {
 "lc_save": "Guardar as linhas",
 "lc_saved": "Guardado: o serviço de observação usa-as a partir de agora.",
 "lc_error": "Não foi possível guardar as linhas.",
+"ct_differs": "contratos {node}, o servidor {server}",
+"ct_help": "Este nó foi construído com outros contratos que não os do servidor. Pode ser que continuem a funcionar em conjunto; atualize o nó ou o servidor para que ambos sejam da mesma versão da família.",
 "no_public_none": "O nó ainda não indicou o endereço público (pode ter sido desligado com --no-public-info, ou não foi possível chegar ao serviço).",
 "no_public_note": "Consultado a um serviço público a cada dez minutos: um pedido https, sem nada da casa.",
 "no_tab_services": "Serviços",

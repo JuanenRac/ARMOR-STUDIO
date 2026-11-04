@@ -29,3 +29,6 @@
 .warn-line { color: #ffcf7d; }
 .check-line { display: flex; align-items: center; gap: .5rem; }
 @media (max-width: 1100px) { .radar-view { grid-template-columns: 1fr; } }
+
+.contract-warning { color: #ffb020; }
+

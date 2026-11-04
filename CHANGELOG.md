@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A warning when a node was built against other contracts than the server:** in Radar > Nodes, a node whose information message says it was checked against contracts of another version than the server says (`contract` in `/api/v1/info`) shows the two versions in amber with an explanation in the eight languages; a node or a server that does not say it is not warned about. The copies of the shared contract types follow the shared repository, and the new generated cases compare the node id pattern, the command list and the sensitivity range of the console with the schemas.
+
 ## [0.8.2.1] - The phrases of the counting lines have their own source: they were written by hand into the language files, so npm run locales erased them; they now live in src/countLinesText.ts like every other phrase, and a test fails when... (and 10 more changes)
 
 - **The phrases of the counting lines have their own source:** they were written by hand into the language files, so `npm run locales` erased them; they now live in `src/countLinesText.ts` like every other phrase, and a test fails when a language file holds a phrase that no source writes or one that differs from its source.

@@ -6,7 +6,7 @@ export async function readStatus(origin: string): Promise<SystemState> {
   return response.json() as Promise<SystemState>;
 }
 /** What the server says about itself: the version and the uptime only to a signed-in client, the rest only to an operator. */
-export type ServerInfo = { service: string; version?: string; uptime_s?: number; mode?: "armed" | "disarmed"; live_video?: boolean; mqtt?: boolean };
+export type ServerInfo = { service: string; version?: string; uptime_s?: number; /** The version of the shared contracts the server was checked against (a signed-in client). */ contract?: string; mode?: "armed" | "disarmed"; live_video?: boolean; mqtt?: boolean };
 export async function readInfo(origin: string): Promise<ServerInfo> {
   const response = await timedFetch(endpoint(origin, "/api/v1/info"), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`Info returned ${response.status}`);

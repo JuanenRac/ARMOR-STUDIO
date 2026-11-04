@@ -5149,6 +5149,8 @@ const catalogue: Record<string, string> = {
 "lc_save": "Enregistrer les lignes",
 "lc_saved": "Enregistré : le service d'observation les utilise dès maintenant.",
 "lc_error": "Impossible d'enregistrer les lignes.",
+"ct_differs": "contrats {node}, le serveur {server}",
+"ct_help": "Ce nœud a été construit avec d'autres contrats que ceux du serveur. Ils peuvent continuer à fonctionner ensemble ; mettez à jour le nœud ou le serveur pour qu'ils soient de la même version de la famille.",
 "tabBatteries": "Maintenance des batteries",
 "bm_title": "Maintenance des batteries",
 "bm_help": "Modifie ce que garde une batterie Pylontech (son horloge, ses compteurs, ses limites, ses sorties, son numéro de série, voire son firmware) par la console du nœud passerelle auquel elle est reliée, comme le fait l'outil du fabricant. Chaque opération est une étape guidée et vérifiée, jamais une commande libre ; la batterie est lue avant et après, et tout est consigné dans l'historique.",
