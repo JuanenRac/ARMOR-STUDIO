@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ElevationDialog } from "./ElevationHost";
-import { envValue, isLowering, SecurityPanel, setEnvLines, REPORT_LIMITS, reportLimitValue, VOICE_LIMITS, visionServiceUrlValue, voiceLimitValue } from "./SecurityPanel";
+import { envValue, isLowering, SecurityPanel, TRUSTED_HOURS, trustedHoursValue, setEnvLines, REPORT_LIMITS, reportLimitValue, VOICE_LIMITS, visionServiceUrlValue, voiceLimitValue } from "./SecurityPanel";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
 import { SessionUserContext } from "./sessionContext";
 import { locales, requiredUiKeys, text } from "./i18n";
@@ -146,5 +146,22 @@ describe("the security screen", () => {
         expect(text(locale, id), `${locale} ${id} is not the key`).not.toBe(id);
       }
     }
+  });
+
+  it("offers the trusted phones in every language, asks before they are turned on, and holds the hours of their session to the range of the server", () => {
+    for (const id of ["sec_opt_trusted", "sec_opt_trusted_help", "sec_opt_trusted_warn", "sec_tp_title", "sec_tp_help", "sec_tp_off", "sec_tp_none", "sec_tp_added", "sec_tp_used", "sec_tp_end", "sec_tp_ended", "sec_tp_hours", "sec_tp_hours_help"]) {
+      for (const locale of locales) {
+        expect(text(locale, id).trim().length, `${locale} ${id}`).toBeGreaterThan(1);
+        expect(text(locale, id), `${locale} ${id} is not the key`).not.toBe(id);
+      }
+    }
+    expect(text("pt", "sec_tp_title")).toContain("Telemóveis");
+    expect(isLowering([false, true], false, true)).toBe(true);    // turning it on asks first
+    expect(isLowering([false, true], true, false)).toBe(false);
+    expect(TRUSTED_HOURS).toEqual({ min: 1, max: 720 });
+    expect(trustedHoursValue("72")).toBe(72);
+    expect(trustedHoursValue(" 1 ")).toBe(1);
+    expect(trustedHoursValue("720")).toBe(720);
+    for (const bad of ["", "0", "721", "-5", "7.5", "abc", "99999"]) expect(trustedHoursValue(bad), bad).toBeUndefined();
   });
 });

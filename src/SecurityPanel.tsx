@@ -5,8 +5,8 @@
  */
 import { PasswordInput } from "./components/PasswordInput";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { adminFile, adminSaveFile, adminStatus, endMySession, endOtherSessions, listMySessions, remoteCheck, totpDisable, totpEnable, totpSetup, totpState,
-  type RemoteCheck, type SessionRow, type TotpState } from "./api";
+import { adminFile, adminSaveFile, adminStatus, endMySession, endOtherSessions, listMySessions, listTrustedPhones, removeTrustedPhone, remoteCheck, totpDisable, totpEnable, totpSetup, totpState,
+  type RemoteCheck, type SessionRow, type TotpState, type TrustedPhone } from "./api";
 import { askConfirm } from "./askConfirm";
 import { AlarmSounds } from "./AlarmSounds";
 import { PanicPhraseCard } from "./PanicPhraseCard";
@@ -196,7 +196,59 @@ function RemoteSettings({ t, origin }: { t: (key: string) => string; origin: str
   </article>;
 }
 
-type OptionKey = Exclude<keyof SecurityOptions, "voice.panic_cooldown_s" | "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute">;
+/** How long the session of a trusted phone lasts, in hours: the range the server holds it to. */
+export const TRUSTED_HOURS = { min: 1, max: 720 } as const;
+export const trustedHoursValue = (text: string): number | undefined => {
+  const trimmed = text.trim();
+  if (!/^\d{1,4}$/.test(trimmed)) return undefined;
+  const value = Number(trimmed);
+  return value >= TRUSTED_HOURS.min && value <= TRUSTED_HOURS.max ? value : undefined;
+};
+
+/** The phones the person (or, for an administrator, everybody) registered as trusted, with the way to end each one. */
+function TrustedPhones({ t, origin, isAdmin }: { t: (key: string) => string; origin: string; isAdmin: boolean }) {
+  const [rows, setRows] = useState<TrustedPhone[] | null>(null);
+  const [enabled, setEnabled] = useState(false);
+  const [message, setMessage] = useState({ text: "", bad: false });
+  const load = useCallback(() => listTrustedPhones(origin, isAdmin).then(list => { setEnabled(list.enabled); setRows(list.devices); }).catch(() => undefined), [origin, isAdmin]);
+  useEffect(() => { void load(); }, [load]);
+  const end = async (row: TrustedPhone) => {
+    if (!(await askConfirm(`${t("sec_tp_end")}: ${row.name}?`, t))) return;
+    try { await removeTrustedPhone(origin, row.id); setMessage({ text: t("sec_tp_ended"), bad: false }); await load(); } catch (error) { setMessage({ text: explain(t, error), bad: true }); }
+  };
+  if (!rows || (!enabled && rows.length === 0)) return null;
+  return <article className="stack-card sec-card" data-testid="security-trusted-phones">
+    <h3>{t("sec_tp_title")}</h3>
+    <p className="muted">{t(enabled ? "sec_tp_help" : "sec_tp_off")}</p>
+    {rows.length === 0 && <p className="muted">{t("sec_tp_none")}</p>}
+    <ul className="plain-list">{rows.map(row => <li key={row.id}>
+      <b>{row.name}</b>{isAdmin && row.username ? ` (${row.username})` : ""} · {t("sec_tp_added")} {new Date(row.created_at).toLocaleDateString()} · {t("sec_tp_used")} {row.last_used_at ? new Date(row.last_used_at).toLocaleString() : "-"}
+      {" "}<button onClick={() => void end(row)}>{t("sec_tp_end")}</button>
+    </li>)}</ul>
+    <Message message={message} />
+  </article>;
+}
+
+/** The hours a trusted phone's session lasts (only where the server announces the option). */
+function TrustedHours({ t, state, apply, busy }: { t: (key: string) => string; state: SecurityOptionsState; apply: (change: Partial<SecurityOptions>, raising: boolean) => Promise<boolean>; busy: boolean }) {
+  const current = state.settings["client.trusted_session_h"];
+  const [typed, setTyped] = useState<string | null>(null);
+  const shown = typed ?? String(current ?? "");
+  const value = trustedHoursValue(shown);
+  const locked = state.locked.includes("client.trusted_session_h");
+  return <fieldset className="sec-option" data-testid="security-trusted-hours" disabled={busy || locked}>
+    <legend>{t("sec_tp_hours")}</legend>
+    <p className="muted">{t("sec_tp_hours_help")}</p>
+    <form onSubmit={event => { event.preventDefault(); if (value !== undefined && value !== current) void apply({ "client.trusted_session_h": value }, false).then(done => { if (done) setTyped(null); }); }}>
+      <input inputMode="numeric" value={shown} aria-invalid={value === undefined} data-testid="security-trusted-hours-input" onChange={event => setTyped(event.target.value.replace(/\D/g, ""))} />
+      <span className="muted">{fill(t("sec_rep_range"), { min: TRUSTED_HOURS.min, max: TRUSTED_HOURS.max })}</span>
+      {value === undefined && <p className="notice bad" role="alert">{t("sec_rep_invalid")}</p>}
+      <button className="primary" disabled={busy || value === undefined}>{t("sec_rep_save")}</button>
+    </form>
+  </fieldset>;
+}
+
+type OptionKey = Exclude<keyof SecurityOptions, "voice.panic_cooldown_s" | "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute" | "client.trusted_session_h">;
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
 const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean; optional?: boolean }> = [
   { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN", node: true },
@@ -225,6 +277,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "vision.heatmap", id: "heatmap", values: [false, true], optional: true },
   { key: "vision.service_remote", id: "visionremote", values: [false, true], optional: true },
   { key: "client.device_lock", id: "lock", values: ["always", "sensitive", "user"], calm: true },
+  { key: "client.trusted_devices", id: "trusted", values: [false, true], optional: true },   // off by default; on gives a registered phone a longer session, so it asks first
   { key: "nodes.nvs_encryption", id: "nvs", values: ["secrets", "off"], node: true, calm: true },
 ];
 const valueName = (t: (key: string) => string, id: string, value: string | boolean) => typeof value === "boolean" ? t(value ? "sec_opt_on" : "sec_opt_off") : t(`sec_opt_${id}_${value}`);
@@ -432,6 +485,7 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
     {typeof state.settings["alarm_audio.custom_sounds"] === "boolean" && <AlarmSounds t={t} origin={origin} spokenOn={state.settings["alarm_audio.spoken"] === true} customOn={state.settings["alarm_audio.custom_sounds"]} />}
     {typeof state.settings["voice.turn_max_bytes"] === "number" && <VoiceLimits t={t} state={state} apply={applyLimits} busy={busy} />}
     {typeof state.settings["vision.service_url"] === "string" && <VisionService t={t} state={state} apply={applyLimits} busy={busy} />}
+    {state.settings["client.trusted_devices"] === true && typeof state.settings["client.trusted_session_h"] === "number" && <TrustedHours t={t} state={state} apply={applyLimits} busy={busy} />}
     {typeof state.settings["reports.timeout_s"] === "number" && <ReportLimits t={t} state={state} apply={applyLimits} busy={busy} />}
     <p className="muted">{t("sec_opt_node_pending")}</p>
     <Message message={message} />
@@ -446,7 +500,7 @@ export function SecurityPanel({ t, origin, isAdmin }: Props) {
     <div className="panel-heading"><h3>{t("sec_title")}</h3><p className="muted">{t("sec_help")}</p></div>
     <section className="sec-section" data-testid="security-group-account">
       <h4 className="sec-section-title">{t("sec_group_account")}</h4>
-      <div className="sec-row"><SecondFactor t={t} origin={origin} /><Sessions t={t} origin={origin} /><PanicPhraseCard t={t} origin={origin} /></div>
+      <div className="sec-row"><SecondFactor t={t} origin={origin} /><Sessions t={t} origin={origin} /><TrustedPhones t={t} origin={origin} isAdmin={isAdmin} /><PanicPhraseCard t={t} origin={origin} /></div>
     </section>
     <section className="sec-section" data-testid="security-group-server">
       <h4 className="sec-section-title">{t("sec_group_server")}</h4>

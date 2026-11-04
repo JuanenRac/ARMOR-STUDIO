@@ -7,6 +7,10 @@ export type RemoteCheck = { ip: string; origin: "local" | "remote"; session_orig
 export const listMySessions = (origin: string) => userCall<{ sessions: SessionRow[] }>(origin, "GET", "/api/v1/studio/sessions");
 export const endMySession = (origin: string, id: string) => userCall<void>(origin, "DELETE", `/api/v1/studio/sessions/${encodeURIComponent(id)}`);
 export const endOtherSessions = (origin: string) => userCall<void>(origin, "POST", "/api/v1/studio/sessions/end-others");
+/** A phone that holds a key pair registered with the server; `username` is filled by the server (an administrator sees everybody's with `all`). */
+export type TrustedPhone = { id: string; user_id: string; name: string; created_at: string; last_used_at: string | null; username: string };
+export const listTrustedPhones = (origin: string, all = false) => userCall<{ enabled: boolean; devices: TrustedPhone[] }>(origin, "GET", `/api/v1/devices/trust${all ? "?all=1" : ""}`);
+export const removeTrustedPhone = (origin: string, id: string) => userCall<void>(origin, "DELETE", `/api/v1/devices/trust/${encodeURIComponent(id)}`);
 export const totpState = (origin: string) => userCall<TotpState>(origin, "GET", "/api/v1/studio/totp");
 export const totpSetup = (origin: string, password: string) => userCall<{ secret: string; uri: string }>(origin, "POST", "/api/v1/studio/totp/setup", { password });
 export const totpEnable = (origin: string, code: string) => userCall<{ enabled: true; recovery_codes: string[] }>(origin, "POST", "/api/v1/studio/totp/enable", { code });

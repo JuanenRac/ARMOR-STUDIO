@@ -35,6 +35,9 @@ export type SecurityOptions = {
   "voice.panic_cooldown_s": number;
   "panel.live_events": boolean;
   "client.device_lock": "user" | "sensitive" | "always";
+  /** A phone may register a key pair that stays in it and renew its session by signing a challenge (off by default), and how many hours that session lasts (1 to 720, 72). */
+  "client.trusted_devices": boolean;
+  "client.trusted_session_h": number;
   "nodes.nvs_encryption": "off" | "secrets";
   /** The most audio of a spoken turn and the most spoken answer handed back to the wall panel, in bytes. */
   "voice.turn_max_bytes": number;

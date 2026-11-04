@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Trusted phones in Security:** an option `client.trusted_devices` (off by default, asks before it is turned on) lets the phone app keep a key that never leaves the phone and renew its session by signing a challenge, with the hours of that session (1 to 720, 72 by default) next to it; a card lists the phones of the person (an administrator sees everybody's) with the way to end each one. The eight languages are in.
 - **The copy of the shared contract is current:** the generated types of the HTTP contract and of the node messages now carry the list of refusal codes, the refusal about a PIN and the observation of a camera.
 - **Counting lines on a camera:** under the zones to ignore, Configuration > Cameras shows the live picture with the counting lines drawn over it; an administrator drags to draw a line, removes one or all and saves them, and everybody who may look sees them (the lines are kept by the server and handed to the observation service). The text is in the eight languages.
 - **The launchers find the shared repository through `ARMOR_COMMON_DIR`:** `build`, `build-test`, `test` and `run` (`.sh` and `.bat`) use the folder named by that variable when it is set and the sibling `ARMOR-COMMON` folder otherwise, so a checkout with another layout builds without changing a file.
