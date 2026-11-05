@@ -5063,6 +5063,7 @@ const catalogue: Record<string, string> = {
 "fw_err_no_signature": "La versión no trae la firma de su manifiesto (.sig2), por eso no se usa.",
 "fw_err_bad_signature": "La firma de la versión no coincide con la clave de las versiones de A.R.M.O.R.: no se usó.",
 "fw_err_no_release": "Este tipo de nodo aún no tiene versión publicada en GitHub.",
+"fw_err_no_image_for_board": "La última versión no trae imagen para la placa de este nodo.",
 "fw_err_no_image_in_release": "La última versión no trae imagen de firmware.",
 "fw_err_github_unreachable": "El servidor no pudo llegar a GitHub.",
 "fw_err_download_failed": "No se pudo descargar la versión.",

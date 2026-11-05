@@ -3602,6 +3602,7 @@ export const PT_CATALOGUE: Record<string, string> = {
  "fw_err_no_signature": "A versão não traz a assinatura do seu manifesto (.sig2), por isso não se usa.",
  "fw_err_bad_signature": "A assinatura da versão não coincide com a chave das versões do A.R.M.O.R.: não se usou.",
  "fw_err_no_release": "Este tipo de nó ainda não tem versão no GitHub.",
+ "fw_err_no_image_for_board": "A versão mais recente não tem imagem para a placa deste nó.",
  "fw_err_no_image_in_release": "A versão mais recente não tem imagem de firmware anexada.",
  "fw_err_github_unreachable": "Não foi possível chegar ao GitHub a partir do servidor.",
  "fw_err_download_failed": "Não foi possível descarregar a versão.",

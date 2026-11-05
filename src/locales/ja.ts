@@ -5129,6 +5129,7 @@ const catalogue: Record<string, string> = {
 "fw_err_no_signature": "このリリースにはマニフェストの署名 (.sig2) がないため、使用しません。",
 "fw_err_bad_signature": "リリースの署名が A.R.M.O.R. リリースの鍵と一致しないため、使用しませんでした。",
 "fw_err_no_release": "このタイプのノードには GitHub にまだリリースがありません。",
+"fw_err_no_image_for_board": "最新リリースには、このノードのボード用のイメージがありません。",
 "fw_err_no_image_in_release": "最新リリースにはファームウェアイメージが添付されていません。",
 "fw_err_github_unreachable": "サーバーから GitHub に接続できませんでした。",
 "fw_err_download_failed": "リリースをダウンロードできませんでした。",

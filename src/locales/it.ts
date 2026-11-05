@@ -5032,6 +5032,7 @@ const catalogue: Record<string, string> = {
 "fw_err_no_signature": "La versione non include la firma del suo manifesto (.sig2), quindi non viene usata.",
 "fw_err_bad_signature": "La firma della versione non corrisponde alla chiave delle versioni A.R.M.O.R.: non è stata usata.",
 "fw_err_no_release": "Questo tipo di nodo non ha ancora una versione su GitHub.",
+"fw_err_no_image_for_board": "L'ultima versione non ha un'immagine per la scheda di questo nodo.",
 "fw_err_no_image_in_release": "L'ultima versione non ha un'immagine firmware allegata.",
 "fw_err_github_unreachable": "Il server non ha potuto raggiungere GitHub.",
 "fw_err_download_failed": "Non è stato possibile scaricare la versione.",

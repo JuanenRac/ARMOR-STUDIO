@@ -4995,6 +4995,7 @@ const catalogue: Record<string, string> = {
 "fw_err_no_signature": "La version ne contient pas la signature de son manifeste (.sig2) ; elle n'est donc pas utilisée.",
 "fw_err_bad_signature": "La signature de la version ne correspond pas à la clé des versions A.R.M.O.R. : elle n'a pas été utilisée.",
 "fw_err_no_release": "Ce type de nœud n'a pas encore de version sur GitHub.",
+"fw_err_no_image_for_board": "La dernière version n'a pas d'image pour la carte de ce nœud.",
 "fw_err_no_image_in_release": "La dernière version n'a pas d'image de firmware jointe.",
 "fw_err_github_unreachable": "Le serveur n'a pas pu joindre GitHub.",
 "fw_err_download_failed": "La version n'a pas pu être téléchargée.",

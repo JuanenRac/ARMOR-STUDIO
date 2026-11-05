@@ -5133,6 +5133,7 @@ const catalogue: Record<string, string> = {
 "fw_err_no_signature": "该发布没有清单签名 (.sig2)，因此不使用。",
 "fw_err_bad_signature": "该发布的签名与 A.R.M.O.R. 发布密钥不符：未使用。",
 "fw_err_no_release": "此类型的节点在 GitHub 上还没有发布版本。",
+"fw_err_no_image_for_board": "最新发布没有适用于该节点开发板的镜像。",
 "fw_err_no_image_in_release": "最新发布没有附带固件镜像。",
 "fw_err_github_unreachable": "服务器无法访问 GitHub。",
 "fw_err_download_failed": "无法下载该发布版本。",

@@ -4990,6 +4990,7 @@ const catalogue: Record<string, string> = {
 "fw_err_no_signature": "Die Version enthält keine Signatur ihres Manifests (.sig2) und wird deshalb nicht verwendet.",
 "fw_err_bad_signature": "Die Signatur der Version passt nicht zum Schlüssel der A.R.M.O.R.-Versionen: nicht verwendet.",
 "fw_err_no_release": "Für diese Art von Knoten gibt es auf GitHub noch keine Version.",
+"fw_err_no_image_for_board": "An der neuesten Version hängt kein Image für die Platine dieses Knotens.",
 "fw_err_no_image_in_release": "An der neuesten Version hängt kein Firmware-Image.",
 "fw_err_github_unreachable": "Der Server konnte GitHub nicht erreichen.",
 "fw_err_download_failed": "Die Version konnte nicht heruntergeladen werden.",

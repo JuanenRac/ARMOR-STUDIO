@@ -5155,6 +5155,7 @@ const catalogue: Record<string, string> = {
 "fw_err_no_signature": "The release carries no signature of its manifest (.sig2), so it is not used.",
 "fw_err_bad_signature": "The signature of the release does not match the key of the A.R.M.O.R. releases: it was not used.",
 "fw_err_no_release": "This kind of node has no release on GitHub yet.",
+"fw_err_no_image_for_board": "The newest release has no image for the board of this node.",
 "fw_err_no_image_in_release": "The newest release has no firmware image attached.",
 "fw_err_github_unreachable": "GitHub could not be reached from the server.",
 "fw_err_download_failed": "The release could not be downloaded.",
