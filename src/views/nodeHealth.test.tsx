@@ -20,6 +20,29 @@ const cable: NodeHealthItem = {
 const card = (node: NodeHealthItem, language: Parameters<typeof text>[0] = "en", isAdmin = true) =>
   renderToStaticMarkup(createElement(NodeCard, { t: (key: string) => text(language, key), node, levels, now: Date.now(), opened: false, toggle: () => undefined, origin: "http://x", isAdmin, forget: () => undefined }));
 
+describe("the contracts a node says it was checked against", () => {
+  const cardWith = (node: NodeHealthItem, serverContract: string | undefined, language: Parameters<typeof text>[0] = "en") =>
+    renderToStaticMarkup(createElement(NodeCard, { t: (key: string) => text(language, key), node, serverContract, levels, now: Date.now(), opened: false, toggle: () => undefined, origin: "http://x", isAdmin: true, forget: () => undefined }));
+  const says = (contract?: string): NodeHealthItem => ({ ...cable, report: { ...cable.report, ...(contract === undefined ? {} : { contract }) } });
+
+  it("warns, in every language, when a node was built against other contracts than the server and says both", () => {
+    for (const language of locales) {
+      const html = cardWith(says("0.8.0.6"), "0.8.0.7", language);
+      expect(html, language).toContain("nh-contract-alarm-1");
+      expect(html, language).toContain("0.8.0.6");
+      expect(html, language).toContain("0.8.0.7");
+      expect(html, language).not.toContain("ct_");
+    }
+  });
+
+  it("warns about nothing that is not known, and not about the same contracts (three numbers are four with a zero)", () => {
+    expect(cardWith(says("0.8.0.7"), "0.8.0.7")).not.toContain("nh-contract-");
+    expect(cardWith(says("0.8.0"), "0.8.0.0")).not.toContain("nh-contract-");
+    expect(cardWith(says(), "0.8.0.7")).not.toContain("nh-contract-");              // an older node does not say it
+    expect(cardWith(says("0.8.0.6"), undefined)).not.toContain("nh-contract-");     // a server that does not say it, or nobody signed in
+  });
+});
+
 describe("the health of the nodes, in the System menu", () => {
   it("shows what a node says about itself and the warnings the server raised, with no phrase left untranslated in any language", () => {
     for (const language of locales) {

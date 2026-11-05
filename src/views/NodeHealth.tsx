@@ -5,8 +5,9 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useEffect, useRef, useState } from "react";
-import { ApiError, forgetNodeHealth, readNodeControlOperation, readNodeHealth, readNodeHealthDetail, type HealthFamily, type NodeControlOperation, type NodeHealthDetail, type NodeHealthItem, type NodeHealthLevels } from "../api";
+import { ApiError, forgetNodeHealth, readInfo, readNodeControlOperation, readNodeHealth, readNodeHealthDetail, type HealthFamily, type NodeControlOperation, type NodeHealthDetail, type NodeHealthItem, type NodeHealthLevels } from "../api";
 import { askConfirm } from "../askConfirm";
+import { contractState } from "../contractNote";
 import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
 import { causeText, fillAll, formatBytes, formatUptime, heapMeter, heapSeries, HEALTH_FAMILIES, isAbnormalReset, resetText, signalLevel, signalSeries, sparkline, statusClass, visibleNodes, warningExplanation } from "../nodeHealthModel";
@@ -30,6 +31,9 @@ export function NodeHealth({ t, origin, isAdmin, now = Date.now() }: { t: Transl
   const [dialog, setDialog] = useState<DialogRequest | null>(null);
   const [order, setOrder] = useState<NodeControlOperation | null>(null);
   const data = poll.data;
+  // the contracts the server was checked against, to warn about a node built against other ones (nothing is warned while it is not known)
+  const [serverContract, setServerContract] = useState<string | undefined>(undefined);
+  useEffect(() => { void Promise.resolve().then(() => readInfo(origin)).then(info => setServerContract(info?.contract)).catch(() => setServerContract(undefined)); }, [origin]);
   const orderOpen = order !== null && !operationFinished(order);
   const orderId = order?.id;
   const alive = useRef(true);
@@ -71,7 +75,7 @@ export function NodeHealth({ t, origin, isAdmin, now = Date.now() }: { t: Transl
     </label>}
     {data && data.nodes.length === 0 && <div className="nh-empty"><h4>{t("nh_none")}</h4><p className="muted">{t("nh_none_help")}</p></div>}
     <div className="nh-grid">
-      {nodes.map(node => <NodeCard key={node.node_id} t={t} node={node} levels={data!.levels} now={now} opened={open === node.node_id} toggle={() => setOpen(open === node.node_id ? null : node.node_id)}
+      {nodes.map(node => <NodeCard key={node.node_id} t={t} node={node} serverContract={serverContract} levels={data!.levels} now={now} opened={open === node.node_id} toggle={() => setOpen(open === node.node_id ? null : node.node_id)}
         origin={origin} isAdmin={isAdmin} forget={() => void forget(node)} control={action => setDialog({ operation: action.operation, scope: "node", node, label: action.label })} />)}
     </div>
     {data && data.waiting.length > 0 && <p className="muted small nh-waiting">{t("nh_waiting")} {data.waiting.map(item => `${item.node_id} (${t(`nh_family_${item.family}`)})`).join(", ")}</p>}
@@ -80,7 +84,7 @@ export function NodeHealth({ t, origin, isAdmin, now = Date.now() }: { t: Transl
   </article>;
 }
 
-export function NodeCard({ t, node, levels, now, opened, toggle, origin, isAdmin, forget, control }: { t: Translate; node: NodeHealthItem; levels: NodeHealthLevels; now: number; opened: boolean; toggle: () => void; origin: string; isAdmin: boolean; forget: () => void; control?: (action: NodeAction) => void }) {
+export function NodeCard({ t, node, serverContract, levels, now, opened, toggle, origin, isAdmin, forget, control }: { t: Translate; node: NodeHealthItem; serverContract?: string; levels: NodeHealthLevels; now: number; opened: boolean; toggle: () => void; origin: string; isAdmin: boolean; forget: () => void; control?: (action: NodeAction) => void }) {
   const report = node.report;
   const memory = heapMeter(report.heap_free, levels.low_heap_b);
   const internal = heapMeter(report.heap_internal_free ?? 0, levels.low_internal_b ?? 40_960);
@@ -95,7 +99,7 @@ export function NodeCard({ t, node, levels, now, opened, toggle, origin, isAdmin
     {chips.length > 0 && <div className="nc-chips" data-testid={`nc-chips-${node.node_id}`}>{chips.map(chip => <span key={chip.id} className={`el-pill nc-chip ${chip.id}`}>{chip.text}</span>)}</div>}
     {node.warnings.length > 0 && <ul className="nh-warnings">{node.warnings.map(warning => <li key={warning.code}>{t(`nh_warn_${warning.code}`)}{warningExplanation(warning, t) && <small className="nh-warning-why">{warningExplanation(warning, t)}</small>}</li>)}</ul>}
     <dl className="nh-facts">
-      <div><dt>{t("nh_firmware")}</dt><dd>{node.firmware}{node.board ? ` · ${node.board}` : ""}</dd></div>
+      <div><dt>{t("nh_firmware")}</dt><dd>{node.firmware}{node.board ? ` · ${node.board}` : ""}{contractState(report.contract, serverContract) === "different" && <span className="contract-warning" title={t("ct_help")} data-testid={`nh-contract-${node.node_id}`}>{` · ⚠ ${t("ct_differs").replace("{node}", report.contract ?? "").replace("{server}", serverContract ?? "")}`}</span>}</dd></div>
       <div><dt>{t("nh_uptime")}</dt><dd>{formatUptime(report.uptime_s, t)}</dd></div>
       <div><dt>{t("nh_reset")}</dt><dd className={abnormal ? "bad" : ""}>{resetText(report.reset_reason, t)}{abnormal ? ` · ${t("nh_unexpected")}` : ""}</dd></div>
       <div><dt>{t("nh_heap")}</dt><dd>

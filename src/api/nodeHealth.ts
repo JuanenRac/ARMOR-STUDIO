@@ -3,7 +3,7 @@ import { userCall } from "./transport";
 export type ControlState = "running" | "paused" | "standby";
 export type HealthFamily = "radar" | "solar" | "electrical" | "alarm" | "hmi";
 export type NodeHealthReport = {
-  kind: "node_health"; node_id: string; timestamp_ms: number; family: HealthFamily; firmware: string; board?: string; uptime_s: number; reset_reason: string; heap_free: number; heap_min: number;
+  kind: "node_health"; node_id: string; timestamp_ms: number; family: HealthFamily; firmware: string; board?: string; /** The version of the contracts the firmware was checked against (an older node does not say it). */ contract?: string; uptime_s: number; reset_reason: string; heap_free: number; heap_min: number;
   /** The internal memory on its own and the external RAM, when the node tells them (a node of an older firmware does not). */
   heap_internal_free?: number; heap_internal_min?: number; heap_internal_largest?: number; psram_free?: number;
   link: "wifi" | "ethernet" | "none"; link_up: boolean; rssi_dbm?: number; broker_reconnects: number; low_stack_tasks?: number; last_error?: string;
