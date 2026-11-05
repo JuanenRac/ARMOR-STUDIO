@@ -7,10 +7,11 @@
 import { PasswordInput } from "./components/PasswordInput";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import {
-  adminAccounts, adminAddAccount, adminFile, adminFiles, adminRemoveAccount, adminSaveFile, adminServiceAction, adminServices, adminStatus, setAdminSecret,
+  adminAccounts, adminAddAccount, adminFile, adminFiles, adminRemoveAccount, adminSaveFile, adminServiceAction, adminServices, adminStatus, setAdminApproval, setAdminSecret,
   ApiError, type AdminFile, type AdminFileInfo, type AdminProtection, type AdminService, type BrokerAccount,
 } from "./api";
 import { ConfirmDialog } from "./components/chrome";
+import { RelaysCard } from "./AdminRelays";
 import { ActionIcon, actionsFor, type ServiceAction } from "./views/ServicesView";
 import { askConfirm } from "./askConfirm";
 import { readConnection, type MqttTlsView, type ServiceState } from "./api";
@@ -40,15 +41,23 @@ function useAgent(origin: string, isAdmin: boolean): "checking" | "ready" | "mis
 /** What the admin agent does about rewriting the broker rules and the env files: open (the admin token alone, with the warning), a second secret (typed here, kept in memory only), or never from here. */
 export function AgentProtection({ t, origin }: { t: Translate; origin: string }) {
   const [protection, setProtection] = useState<AdminProtection | undefined>(undefined);
+  const [approval, setApproval] = useState<"totp" | "not_enrolled" | null>(null);
   const [secret, setSecret] = useState("");
-  useEffect(() => { let live = true; void adminStatus(origin).then(status => { if (live) setProtection(status.sensitive_writes ?? null); }, () => { if (live) setProtection(null); }); return () => { live = false; }; }, [origin]);
-  useEffect(() => () => setAdminSecret(""), []);
-  if (!protection) return null;
-  if (protection.mode === "open") return <p className="notice" role="note" data-testid="agent-open">{t("adm_sensitive_open")}</p>;
-  if (protection.mode === "read_only") return <p className="muted" role="note" data-testid="agent-read-only">{t("adm_sensitive_read_only")}</p>;
-  return <label className="adm-secret-field" data-testid="agent-second-secret">{t("adm_sensitive_second")}
+  const [code, setCode] = useState("");
+  useEffect(() => { let live = true; void adminStatus(origin).then(status => { if (live) { setProtection(status.sensitive_writes ?? null); setApproval(status.approval ?? null); } }, () => { if (live) setProtection(null); }); return () => { live = false; }; }, [origin]);
+  useEffect(() => () => { setAdminSecret(""); setAdminApproval(""); }, []);
+  // The one-time code of the authenticator, when the agent has one set up: it is also asked to save the broker rules file.
+  const codeField = approval === "totp"
+    ? <label className="adm-secret-field" data-testid="agent-totp">{t("adm_totp")}
+      <input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" value={code} onChange={event => { const digits = event.target.value.replace(/\D/g, ""); setCode(digits); setAdminApproval(digits); }} />
+      <small className="hint">{t("adm_totp_help")}</small></label>
+    : null;
+  if (!protection) return codeField;
+  if (protection.mode === "open") return <><p className="notice" role="note" data-testid="agent-open">{t("adm_sensitive_open")}</p>{codeField}</>;
+  if (protection.mode === "read_only") return <><p className="muted" role="note" data-testid="agent-read-only">{t("adm_sensitive_read_only")}</p>{codeField}</>;
+  return <><label className="adm-secret-field" data-testid="agent-second-secret">{t("adm_sensitive_second")}
     <PasswordInput t={t} autoComplete="off" value={secret} onChange={event => { setSecret(event.target.value); setAdminSecret(event.target.value); }} />
-    <small className="hint">{t("adm_sensitive_second_help")}</small></label>;
+    <small className="hint">{t("adm_sensitive_second_help")}</small></label>{codeField}</>;
 }
 
 function Gate({ t, state }: { t: Translate; state: "checking" | "missing" | "denied" }) {
@@ -243,6 +252,7 @@ export function BrokerPanel({ t, origin, isAdmin }: Props) {
         {opened === account.user && <pre className="adm-topics">{account.topics.join("\n") || "-"}</pre>}
       </li>)}</ul>
     </article>
+    <RelaysCard t={t} origin={origin} />
     {files.map(info => <FileEditor key={info.id} t={t} origin={origin} info={info} />)}
     {removing && <ConfirmDialog t={t} danger title={t("adm_remove")} text={`${removing.user} - ${t("adm_remove_ask")}`} confirmLabel={t("adm_remove")} cancel={() => setRemoving(null)} confirm={() => void remove(removing)} />}
   </div>;
