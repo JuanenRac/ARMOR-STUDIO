@@ -5,7 +5,8 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useEffect, useRef, useState } from "react";
-import { createCameraStreamUrl, readCountLines, saveCountLines, type CountLine } from "./api";
+import { createCameraStreamUrl, readCountLines, readLineCounts, saveCountLines, type CountLine } from "./api";
+import { errorText } from "./apiErrorText";
 import { LiveImage } from "./components/camera";
 
 type Props = { t: (key: string) => string; origin: string; cameraId: string; isAdmin: boolean };
@@ -36,12 +37,20 @@ export function CountLinesEditor({ t, origin, cameraId, isAdmin }: Props) {
   const [drawing, setDrawing] = useState<{ from: Point; to: Point } | null>(null);
   const [message, setMessage] = useState<{ text: string; bad: boolean } | null>(null);
   const box = useRef<HTMLDivElement>(null);
+  // the crossings counted so far: asked once when the camera is opened and when the person asks again (each ask is written in the audit trail of the server, so it is not polled)
+  const [counts, setCounts] = useState<Record<string, { to_left: number; to_right: number }> | null>(null);
+  const [countsFailure, setCountsFailure] = useState<unknown>(null);
+  const loadCounts = () => {
+    setCounts(null); setCountsFailure(null);
+    readLineCounts(origin).then(answer => setCounts(answer.cameras[cameraId] ?? {})).catch(error => setCountsFailure(error));
+  };
 
   useEffect(() => {
     let live = true;
-    setLines(null); setMessage(null);
+    setLines(null); setMessage(null); setCounts(null); setCountsFailure(null);
     readCountLines(origin, cameraId).then(answer => { if (live) setLines(answer.lines); }).catch(() => { if (live) setLines([]); });
     createCameraStreamUrl(origin, cameraId).then(url => { if (live) setPicture(url); }).catch(() => undefined);
+    readLineCounts(origin).then(answer => { if (live) setCounts(answer.cameras[cameraId] ?? {}); }).catch(error => { if (live) setCountsFailure(error); });
     return () => { live = false; };
   }, [origin, cameraId]);
 
@@ -77,6 +86,14 @@ export function CountLinesEditor({ t, origin, cameraId, isAdmin }: Props) {
     {lines.length === 0 ? <p className="muted">{t("lc_none")}</p>
       : <ul className="iz-list">{lines.map((line, index) => <li key={line.id}><b>{t("lc_line")} {line.id}</b> · {Math.round(line.a[0] * 100)}%, {Math.round(line.a[1] * 100)}% → {Math.round(line.b[0] * 100)}%, {Math.round(line.b[1] * 100)}%
         {isAdmin && <button type="button" onClick={() => { setMessage(null); setLines(lines.filter((_, at) => at !== index)); }}>{t("lc_remove")}</button>}</li>)}</ul>}
+    {lines.length > 0 && <div className="lc-counts" data-testid="lc-counts">
+      <h4>{t("lc_counts_title")}</h4>
+      {countsFailure !== null ? <p className="muted small">{errorText(t, countsFailure, "lc_counts_err_")}</p> : counts === null ? null : <>
+        {lines.some(line => counts[line.id]) ? <ul className="iz-list">{lines.filter(line => counts[line.id]).map(line => <li key={line.id}><b>{t("lc_line")} {line.id}</b> · {t("lc_counts_left")}: {counts[line.id]!.to_left} · {t("lc_counts_right")}: {counts[line.id]!.to_right}</li>)}</ul> : <p className="muted small">{t("lc_counts_none")}</p>}
+        <p className="muted small">{t("lc_counts_reading")}</p>
+      </>}
+      <button type="button" onClick={loadCounts}>{t("lc_counts_refresh")}</button>
+    </div>}
     {isAdmin && <div className="pf-actions">
       <button className="primary" type="button" onClick={() => void save(lines)}>{t("lc_save")}</button>
       {lines.length > 0 && <button type="button" onClick={() => { setMessage(null); setLines([]); }}>{t("lc_clear")}</button>}

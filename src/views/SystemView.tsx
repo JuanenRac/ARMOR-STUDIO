@@ -12,6 +12,7 @@ import { MenuTitle } from "../menuLogos";
 import { MachineMonitor } from "./MachineMonitor";
 import { NodeHealth } from "./NodeHealth";
 import { NodeMessages } from "./NodeMessages";
+import { IngestRecording } from "./IngestRecording";
 
 const size = (bytes: number): string => bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1)} GB` : bytes >= 1e6 ? `${(bytes / 1e6).toFixed(1)} MB` : `${Math.round(bytes / 1e3)} kB`;
 export const uptimeText = (seconds: number, t: Translate): string => {
@@ -56,6 +57,7 @@ export function SystemView({ t, origin, isAdmin }: { t: Translate; origin: strin
     </>}
     <NodeHealth t={t} origin={origin} isAdmin={isAdmin} />
     <NodeMessages t={t} origin={origin} />
+    {isAdmin && <IngestRecording t={t} origin={origin} />}
     <article className="stack-card audit-card" data-tour="sys-audit">
       <div className="log-head"><h3>{t("auditTitle")}</h3>{isAdmin && <CopyButton t={t} text={() => entries.map(entry => [entry.at, entry.outcome, entry.action, entry.actor ?? "", entry.target ?? "", entry.detail ?? ""].join(" | ")).join("\n")} />}</div>
       {!isAdmin ? <p className="muted">{t("auditOnlyAdmin")}</p> : <>

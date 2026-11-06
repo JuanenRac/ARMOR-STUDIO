@@ -141,3 +141,6 @@ export const saveCountLines = (origin: string, id: string, lines: CountLine[]) =
 export const saveIgnoreZones = (origin: string, id: string, zones: IgnoreZone[]) => userCall<{ camera_id: string; zones: IgnoreZone[] }>(origin, "PUT", `/api/v1/cameras/${encodeURIComponent(id)}/ignore-zones`, { zones });
 export const readCaptureSettings = (origin: string) => userCall<{ settings: CaptureSettings; recent: CaptureRecord[] }>(origin, "GET", "/api/v1/capture-settings");
 export const saveCaptureSettings = (origin: string, settings: CaptureSettings) => userCall<{ settings: CaptureSettings }>(origin, "PUT", "/api/v1/capture-settings", settings);
+/** How many times each counting line has been crossed in each direction (numbers only, camera -> line -> counts; an administrator or an operator, and only while the activity report is on). */
+export type LineCounts = Record<string, Record<string, { to_left: number; to_right: number }>>;
+export const readLineCounts = (origin: string) => userCall<{ cameras: LineCounts }>(origin, "GET", "/api/v1/vision/counts");

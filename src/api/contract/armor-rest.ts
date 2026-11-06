@@ -1334,13 +1334,25 @@ export type IngestRecording = {
   max_bytes: number;
   max_files: number;
   lines: number;
+  /** Lines written for a message that was taken, since the server started */
+  accepted: number;
+  /** Lines written for a message that was refused, since the server started */
+  rejected: number;
   skipped: number;
   rotations: number;
   since: string | null;
+  /** The files that exist, newest first (index 0 is the one being written) */
+  file_list: IngestRecordingFile[];
 };
 
 export type IngestRecordingChange = {
   enabled: boolean;
+};
+
+export type IngestRecordingFile = {
+  index: number;
+  name: string;
+  bytes: number;
 };
 
 export type InstallationBundle = {
@@ -1381,6 +1393,11 @@ export type Job = {
 
 export type JobStarted = {
   id: string;
+};
+
+export type LineCount = {
+  to_left: number;
+  to_right: number;
 };
 
 export type MaintenanceArmed = {
@@ -2935,6 +2952,15 @@ export type UserList = {
     current: boolean;
   })[];
   minPasswordLength: number;
+};
+
+export type VisionCounts = {
+  /** Camera id -> line id -> the crossings counted so far */
+  cameras: {
+    [key: string]: {
+      [key: string]: LineCount;
+    };
+  };
 };
 
 export type VoiceCommandResult = {

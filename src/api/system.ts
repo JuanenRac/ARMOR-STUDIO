@@ -1,5 +1,5 @@
 import type { SystemState } from "../types";
-import { ApiError, endpoint, localSession, timedFetch, userCall } from "./transport";
+import { ApiError, askElevation, endpoint, localSession, refusal, timedFetch, userCall } from "./transport";
 export async function readStatus(origin: string): Promise<SystemState> {
   const response = await timedFetch(`${origin.replace(/\/$/, "")}/api/v1/status`, { headers: { Accept: "application/json" }, ...localSession, signal: AbortSignal.timeout(8_000) });
   if (!response.ok) throw new Error(`Server returned ${response.status}`);
@@ -71,3 +71,18 @@ export type MqttTlsView = { configured: boolean; tls: boolean; pinned_ca: boolea
 export type ConnectionState = { active: { host: string; port: number; tls: boolean; studio_origins: string[] }; mqtt_tls?: MqttTlsView; saved: ConnectionSettings; restart_required: boolean };
 export const readConnection = (origin: string) => userCall<ConnectionState>(origin, "GET", "/api/v1/system/connection");
 export const saveConnection = (origin: string, settings: ConnectionSettings) => userCall<ConnectionState>(origin, "PUT", "/api/v1/system/connection", settings);
+
+/** The state of the optional copy of the node traffic (an administrator): what is on disk and how many messages were taken and refused since the server started. */
+export type IngestRecordingState = {
+  enabled: boolean; file: string; bytes: number; files: number; max_bytes: number; max_files: number; lines: number; accepted: number; rejected: number; skipped: number; rotations: number; since: string | null;
+  file_list: Array<{ index: number; name: string; bytes: number }>;
+};
+export const readIngestRecording = (origin: string) => userCall<IngestRecordingState>(origin, "GET", "/api/v1/system/ingest/recording");
+/** One file of the copy as text (an administrator; the server answers only while the copy is on, asks a session from outside the house to prove itself again and limits the downloads per hour). */
+export async function downloadIngestRecording(origin: string, index: number, retried = false): Promise<string> {
+  const response = await timedFetch(endpoint(origin, `/api/v1/system/ingest/recording/file?index=${encodeURIComponent(String(index))}`), { headers: { Accept: "application/x-ndjson, text/plain" }, ...localSession });
+  if (response.ok) return response.text();
+  const failure = await refusal(response);
+  if (response.status === 403 && failure.code === "elevation_required" && !retried && await askElevation(origin)) return downloadIngestRecording(origin, index, true);
+  throw failure;
+}
