@@ -34,6 +34,16 @@ const ROWS: Record<string, Row> = {
   rec_err_generic: ["The file could not be downloaded.", "No se pudo descargar el archivo.", "Die Datei konnte nicht heruntergeladen werden.", "Le fichier n'a pas pu être téléchargé.", "Non è stato possibile scaricare il file.", "ファイルをダウンロードできませんでした。", "无法下载该文件。"],
 };
 const PT: Record<string, string> = {
+  ing_title: "O que enviam os nós",
+  ing_help: "Cada tópico que o servidor recebeu dos nós: quantas mensagens aceitou, quantas recusou e porquê. Um nó que não aparece no seu menu explica-se aqui.",
+  ing_topic: "Tópico",
+  ing_ok: "Aceites",
+  ing_bad: "Recusadas",
+  ing_last: "Última mensagem aceite",
+  ing_why: "Última recusa",
+  ing_ignored: "Campos de um firmware mais recente que este servidor ignora",
+  ing_empty: "Nenhum nó enviou nada desde que o servidor arrancou.",
+  ing_payload: "O que foi enviado (início)",
   rec_title: "Cópia do tráfego dos nós",
   rec_help: "O ficheiro que o servidor escreve enquanto a opção de Configuração > Segurança estiver ligada, para reproduzir um incidente na bancada. Nunca contém ordens para os nós nem campos que pareçam um segredo.",
   rec_off: "A cópia está desligada. Não se escreve nada e o ficheiro não pode ser descarregado.",
