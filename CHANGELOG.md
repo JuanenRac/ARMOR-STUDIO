@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A card for updating the programs of the machine from the phone:** Configuration > Updates now shows whether administrators can check and update the programs of this machine from the phone apps: on or off, why it is off (the server's switch, no maintenance helper, the helper's switch, the helper not answering), how to turn it on (the two switches live in the environment of the server and of the helper, never in the apps or here), the programs the helper can update, whether signatures are required and the latest checks and update requests from the audit trail. It only shows and explains, it changes nothing. Texts in the eight languages.
 - **Every refusal code of the server has its own words in the eight languages:** a screen with no text of its own for a code (a wrong proof of identity, an image for another board, a node of the wrong kind, an administrator-only action...) now says the shared phrase for that code instead of its generic one.
 
 ## [0.8.2.2] - The parsers that the shared contracts generate are tested here: src/api/contract/armor-parsers.ts is a copy of the TypeScript parsers that ARMOR-COMMON generates from its schemas (parseMessage, checkMessage), and a test keeps... (and 4 more changes)

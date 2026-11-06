@@ -30,3 +30,6 @@ export const lockConsole = (origin: string) => userCall<{ unlocked_until: number
 export const runConsole = (origin: string, command: string, cwd: string, timeout: number) => userCall<ConsoleJob>(origin, "POST", "/api/v1/admin/console/run", { command, cwd, timeout });
 export const readConsoleJob = (origin: string, id: string, since = 0) => userCall<ConsoleJob>(origin, "GET", `/api/v1/admin/console/jobs/${encodeURIComponent(id)}?since=${since}`);
 export const cancelConsoleJob = (origin: string, id: string) => userCall<{ ok: boolean }>(origin, "POST", `/api/v1/admin/console/jobs/${encodeURIComponent(id)}/cancel`);
+/** Whether updating the programs of the machine from the phone is on (the server's switch and the maintenance helper's), why not, and the programs the helper can update. Reading it changes nothing. */
+export type MachineUpdateInfo = { enabled: boolean; available?: boolean; require_signed?: boolean; projects?: string[]; reason?: string };
+export const readMachineUpdate = (origin: string) => userCall<MachineUpdateInfo>(origin, "GET", "/api/v1/admin/machine-update");

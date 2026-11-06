@@ -57,6 +57,7 @@ const rows: Row[] = [
   ["rollbackUpdate", () => api.rollbackUpdate(O, ODD), "POST", `/api/v1/admin/updates/${ENC}/rollback`],
   ["systemAction reboot", () => api.systemAction(O, "reboot"), "POST", "/api/v1/admin/system/reboot"],
   ["readAutoUpdates", () => api.readAutoUpdates(O), "GET", "/api/v1/admin/system/auto-updates"],
+  ["readMachineUpdate", () => api.readMachineUpdate(O), "GET", "/api/v1/admin/machine-update"],
   ["changeAutoUpdates", () => api.changeAutoUpdates(O, { enabled: false }), "PUT", "/api/v1/admin/system/auto-updates", { enabled: false }],
   ["systemAction upgrade with mode", () => api.systemAction(O, "upgrade", "full"), "POST", "/api/v1/admin/system/upgrade", { mode: "full" }],
   ["systemAction upgrade without mode", () => api.systemAction(O, "upgrade"), "POST", "/api/v1/admin/system/upgrade"],
