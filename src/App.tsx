@@ -337,6 +337,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
       if (error instanceof ApiError && error.status === 401) { setNotice(t("modeSessionEnded")); sessionUser.refresh(); }
       else if (error instanceof ApiError && (error.code === "wrong_pin" || error.code === "pin_locked" || error.code === "pin_not_set")) setNotice(t(`mode_${error.code}`));
       else if (error instanceof ApiError && error.status === 403) setNotice(t("modeForbidden"));
+      else if (error instanceof ApiError && (error.status === 429 || error.code === "rate_limited")) setNotice(t("modeRateLimited"));
       else if (error instanceof ApiError) setNotice(t("modeServerError").replace("{status}", String(error.status)));
       else setNotice(t("modeNoAnswer"));
     }

@@ -1747,6 +1747,7 @@ const catalogue: Record<string, string> = {
 "bat_examples_removed": "Beispielwerte entfernt: die Geräte warten auf die echten",
 "pinPlaceholder": "Ihre PIN, falls vorhanden",
 "modeNoAnswer": "Der Server hat nicht geantwortet, der Modus wurde nicht geändert. Versuchen Sie es erneut.",
+"modeRateLimited": "Zu viele Moduswechsel in kurzer Zeit: bitte kurz warten und erneut versuchen.",
 "modeServerError": "Der Server hat die Änderung abgelehnt (Fehler {status}).",
 "confirmAction": "Bestätigen",
 "mediaProtect": "Aufbewahren (schützen)",

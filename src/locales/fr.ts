@@ -1758,6 +1758,7 @@ const catalogue: Record<string, string> = {
 "pinLabel": "Code PIN",
 "pinPlaceholder": "Votre code PIN, si vous en avez un",
 "modeNoAnswer": "Le serveur n'a pas répondu, le mode n'a pas changé. Réessayez.",
+"modeRateLimited": "Trop de changements de mode en peu de temps : patientez un peu puis réessayez.",
 "modeServerError": "Le serveur a refusé le changement (erreur {status}).",
 "confirmAction": "Confirmer",
 "mediaProtect": "Conserver (protéger)",

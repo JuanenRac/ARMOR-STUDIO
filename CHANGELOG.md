@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Changing the mode too often says why:** when the server refuses an arm or disarm because too many changes came in a short time (the rate limit), the notice now says so in plain words, in all eight languages, instead of a bare error number.
+
 - **The pairing code of a node, shown and scanned when a node is added:** in the form that adds a node (Radar, Inverters and Batteries menus), "Show pairing code" draws a QR code with the name of the node and the address of the server (no password, token or certificate in it) and "Scan pairing code" reads one with the camera or from a picture and fills in the name of the node. The text is the same the shared library writes and reads, and anything that could hold a secret is refused. Texts in the eight languages.
 - **A firmware update that finds no image for the board of the node says so in plain words:** the code `no_image_for_board` that the server gives when the newest release has no image for the board (Wi-Fi or Ethernet) of the node now has its own message in the eight languages, instead of the generic one, and the test of the reasons lists it.
 - **The health card of a node warns when it was built against other contracts than the server:** the `contract` of the health report of any node (alarm, electrical, solar, radar, wall panel) is compared with the one the server says in System > Node health, as Radar > Nodes already did for the information message, in the eight languages; a node that does not say it, or a server that does not, warns about nothing. The generated types of the contracts are copied again.

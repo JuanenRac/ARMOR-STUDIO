@@ -1792,6 +1792,7 @@ const catalogue: Record<string, string> = {
 "bat_examples_removed": "示例读数已移除：设备将等待真实读数",
 "pinPlaceholder": "你的 PIN（如已设置）",
 "modeNoAnswer": "服务器没有响应，模式未更改。请重试。",
+"modeRateLimited": "短时间内更改模式次数过多：请稍等片刻后重试。",
 "modeServerError": "服务器拒绝了更改（错误 {status}）。",
 "confirmAction": "确认",
 "mediaProtect": "保护",

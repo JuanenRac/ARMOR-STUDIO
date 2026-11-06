@@ -1775,6 +1775,7 @@ const catalogue: Record<string, string> = {
 "bat_examples_removed": "Lecturas de ejemplo quitadas: los equipos esperan las reales",
 "pinPlaceholder": "Tu PIN, si tienes uno",
 "modeNoAnswer": "El servidor no ha respondido, así que el modo no ha cambiado. Inténtalo de nuevo.",
+"modeRateLimited": "Demasiados cambios de modo en poco tiempo: espera un poco y vuelve a intentarlo.",
 "modeServerError": "El servidor ha rechazado el cambio (error {status}).",
 "confirmAction": "Confirmar",
 "mediaProtect": "Conservar (proteger)",

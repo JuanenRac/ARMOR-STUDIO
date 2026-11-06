@@ -1417,6 +1417,7 @@ export const PT_CATALOGUE: Record<string, string> = {
  "pw_hide": "Ocultar a palavra-passe",
  "pinPlaceholder": "O seu PIN, se tiver um",
  "modeNoAnswer": "O servidor não respondeu, por isso o modo não mudou. Tente de novo.",
+ "modeRateLimited": "Demasiadas mudanças de modo em pouco tempo: aguarde um pouco e tente de novo.",
  "modeServerError": "O servidor recusou a alteração (erro {status}).",
  "confirmAction": "Confirmar",
  "mediaProtect": "Manter (proteger)",

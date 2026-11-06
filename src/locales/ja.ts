@@ -1792,6 +1792,7 @@ const catalogue: Record<string, string> = {
 "bat_examples_removed": "サンプル値を削除しました。機器は実際の値を待ちます",
 "pinPlaceholder": "PIN（設定している場合）",
 "modeNoAnswer": "サーバーが応答せず、モードは変更されていません。もう一度お試しください。",
+"modeRateLimited": "短時間にモードを変更しすぎました。少し待ってからもう一度お試しください。",
 "modeServerError": "サーバーが変更を拒否しました（エラー {status}）。",
 "confirmAction": "確認",
 "mediaProtect": "保護する",
