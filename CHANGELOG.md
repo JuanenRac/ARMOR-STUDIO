@@ -4,12 +4,6 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
-- **The parsers that the shared contracts generate are tested here:** `src/api/contract/armor-parsers.ts` is a copy of the TypeScript parsers that ARMOR-COMMON generates from its schemas (`parseMessage`, `checkMessage`), and a test keeps it equal to the generated file and runs the seeded cases of the contracts (each with the verdict of the Python validator) through it.
-- **A switch for the copy of the node traffic in Security:** the option `ingest.recording` (off by default, asks before it is turned on) makes the server keep a copy of what the nodes send in a file that the simulator plays again; its text is in the eight languages.
-- **The state of the copy of the node traffic, and its download, in System:** for an administrator, a card shows whether the copy is on, how many messages it holds (taken, refused and not playable), the size of the file against its limit, the files kept and how many times it rotated, and a button downloads each file (the server answers only while the copy is on, asks a session from outside the house to prove itself again, limits the downloads per hour and writes each one in the audit trail). Eight languages.
-- **The crossings counted on each counting line, in Configuration > Cameras:** under the lines of a camera Studio lists how many times each one has been crossed to the left and to the right since the observation service started, asked of the server when the camera is opened and when the person asks again; if the activity report is off, the analysis is off or the service is not set up it says so in words. Eight languages.
-- **The security options of the server are laid out in three columns with short selectors** (two on a tablet, one on a phone), each setting keeping its help linked to its selector.
-
 
 ## [0.8.2.1] - The phrases of the counting lines have their own source: they were written by hand into the language files, so npm run locales erased them; they now live in src/countLinesText.ts like every other phrase, and a test fails when... (and 10 more changes)
 
