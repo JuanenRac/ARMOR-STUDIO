@@ -27,6 +27,8 @@ export type SecurityOptions = {
   "metrics.prometheus": boolean;
   /** The server pings ARMOR_HEARTBEAT_URL so a service outside the house can tell when it stops. */
   "heartbeat.enabled": boolean;
+  /** The server keeps a copy of the node traffic in a file the simulator plays again (off by default); its size limit and rotation are set in the environment of the server. */
+  "ingest.recording": boolean;
   "login.country_alert": boolean;
   "electrical.set_aside_old_readings": boolean;
   "voice.multipart_turn": boolean;

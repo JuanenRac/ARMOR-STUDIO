@@ -274,6 +274,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "alarm_audio.custom_sounds", id: "alsounds", values: [false, true], calm: true },
   { key: "metrics.prometheus", id: "metrics", values: [false, true], optional: true },
   { key: "heartbeat.enabled", id: "heartbeat", values: [false, true], optional: true },
+  { key: "ingest.recording", id: "recording", values: [false, true], optional: true },   // off by default; on keeps a copy of the node traffic on the server, so it asks first
   { key: "summary.daily", id: "dailysummary", values: [false, true], optional: true },
   { key: "vision.heatmap", id: "heatmap", values: [false, true], optional: true },
   { key: "vision.service_remote", id: "visionremote", values: [false, true], optional: true },
