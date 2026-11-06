@@ -13,6 +13,7 @@ import "./actionButtons.css";
 import type { Translate } from "./components/camera";
 import type { NetworkOverview } from "./networkModel";
 import { nodeKindOf } from "./nodeKind";
+import { ProvisioningQr, ProvisionScanner } from "./ProvisioningQr";
 
 export type NodeKind = "radar" | "solar" | "electrical" | "alarm";
 export type NodeCandidate = {
@@ -68,6 +69,7 @@ function AdoptForm({ t, origin, candidate, close }: { t: Translate; origin: stri
   const [form, setForm] = useState({ node_id: candidate.nodeId ?? "", user: "admin", password: "", broker_host: guessedHost });
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<ProvisionResult | null>(null);
+  const [pairing, setPairing] = useState<"" | "show" | "scan">("");
   const [error, setError] = useState("");
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -84,6 +86,12 @@ function AdoptForm({ t, origin, candidate, close }: { t: Translate; origin: stri
   return <form className="adm-form adopt-form" onSubmit={event => void submit(event)}>
     <p className="muted small">{t("adm_adopt_help")}</p>
     <label>{t("adm_adopt_id")}<input value={form.node_id} onChange={event => setForm({ ...form, node_id: event.target.value.toLowerCase() })} placeholder="nodo-radar-2" autoComplete="off" /></label>
+    <div className="adm-foot pairing-code">
+      <button type="button" onClick={() => setPairing(pairing === "show" ? "" : "show")}>{t("adm_qr_show")}</button>
+      <button type="button" onClick={() => setPairing(pairing === "scan" ? "" : "scan")}>{t("adm_qr_scan")}</button>
+    </div>
+    {pairing === "show" && <ProvisioningQr t={t} nodeId={form.node_id.trim()} server={origin || window.location.origin} />}
+    {pairing === "scan" && <ProvisionScanner t={t} onClose={() => setPairing("")} onRead={read => { setForm(current => ({ ...current, node_id: read.node_id })); setPairing(""); }} />}
     <label>{t("adm_adopt_broker")}<input value={form.broker_host} onChange={event => setForm({ ...form, broker_host: event.target.value })} autoComplete="off" /></label>
     <label>{t("adm_adopt_user")}<input value={form.user} onChange={event => setForm({ ...form, user: event.target.value })} autoComplete="off" /></label>
     <label>{t("adm_adopt_password")}<PasswordInput t={t} value={form.password} onChange={event => setForm({ ...form, password: event.target.value })} autoComplete="new-password" /></label>
