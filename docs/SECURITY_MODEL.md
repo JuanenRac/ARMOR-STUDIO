@@ -50,3 +50,14 @@ A server that has them offers five more options in Configuration > Security, all
 
 Studio never decides what a mode defends: the dialog that arms asks the server, which answers `no_zones_assigned` for a mode that defends nothing (Studio asks the person to confirm and sends `confirm_unassigned`) and a PIN error when the change defends less (Studio then asks for the PIN). Home and Night start with nothing assigned. The assignment is made in the Modes tab of the Alarm Designer by an administrator: whole zones (the places of the devices), single sensors, radar nodes and cameras; saving replaces the whole document with the revision that was read, and editing arms nothing. The preflight check before arming is shown when arming from disarmed, as for a plain arm. A wall panel or a node display still shows only armed or disarmed.
 
+
+## Phones, the panic phrase and the copy of the node traffic
+
+Four more options of the server appear in Configuration > Security for an administrator, each off or in its careful state by default, and each asks before it is turned into the less safe setting:
+
+- `client.trusted_devices` (trusted phones): the phone app keeps a key that never leaves the phone and renews its session by signing a challenge of the server; the hours of that session (1 to 720, 72 by default) are set next to the switch, and a card lists the phones of the person (an administrator sees everybody's) with the way to end each one.
+- `voice.panic_phrase` and `voice.panic_cooldown_s`: a secret sentence of the person's own that, said or typed to the voice assistant, raises the silent duress alarm like the duress PIN. Studio sends the phrase once, empties the field at once and never shows or keeps it again.
+- `alarm.siren_fault_notice`: on by default; turning it off stops the warning that the wiring of a siren is open, shorted or unreadable.
+- `ingest.recording`: the server keeps a copy of what the nodes send in a file that the simulator can play again; it never copies the orders to the nodes or any field named like a secret.
+
+In Configuration > Updates the card of the automatic security updates carries the switch, the rule for a reboot (never by itself, or inside the window of the night and only when nothing is armed) and, read only, how the packages are signed.
