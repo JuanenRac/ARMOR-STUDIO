@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Every refusal code of the server has its own words in the eight languages:** a screen with no text of its own for a code (a wrong proof of identity, an image for another board, a node of the wrong kind, an administrator-only action...) now says the shared phrase for that code instead of its generic one.
+
 ## [0.8.2.2] - The parsers that the shared contracts generate are tested here: src/api/contract/armor-parsers.ts is a copy of the TypeScript parsers that ARMOR-COMMON generates from its schemas (parseMessage, checkMessage), and a test keeps... (and 4 more changes)
 
 - **The parsers that the shared contracts generate are tested here:** `src/api/contract/armor-parsers.ts` is a copy of the TypeScript parsers that ARMOR-COMMON generates from its schemas (`parseMessage`, `checkMessage`), and a test keeps it equal to the generated file and runs the seeded cases of the contracts (each with the verdict of the Python validator) through it.

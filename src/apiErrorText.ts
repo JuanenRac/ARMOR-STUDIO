@@ -2,7 +2,7 @@ import { ApiError } from "./api/transport";
 
 /**
  * The words for something the server refused, in the language of the person. Each screen keeps its refusals under a prefix ("in_err_", "nt_err_"...): the code the server gave
- * is looked up there, and a screen without a text for it says its generic one. A body that was too large for the server (413) is told as "too_large" when the screen has that text,
+ * is looked up there, and a screen without a text for it says the shared words for that code (api_code_*) when the server has such a code, and then its generic one. A body that was too large for the server (413) is told as "too_large" when the screen has that text,
  * since the server stops it before it can say a code of its own.
  */
 export function errorText(t: (key: string) => string, error: unknown, prefix: string): string {
@@ -16,5 +16,7 @@ export function errorText(t: (key: string) => string, error: unknown, prefix: st
     const byKind = said(kind);
     if (byKind) return byKind;
   }
+  // the words every screen shares for the codes of the server (apiCodesText.ts), before the generic phrase of the screen
+  if (code !== "generic") { const shared = t(`api_code_${code}`); if (shared !== `api_code_${code}`) return shared; }
   return t(`${prefix}generic`);
 }

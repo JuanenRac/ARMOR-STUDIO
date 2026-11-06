@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { errorText } from "./apiErrorText";
 import { ApiError } from "./api/transport";
 import { text } from "./i18n";
+import { readFileSync } from "node:fs";
 
 const LANGUAGES = ["en", "es", "de", "fr", "it", "ja", "zh", "pt"] as const;
 
@@ -48,5 +49,21 @@ describe("the words for what the server refused", () => {
       for (const line of said) expect(line, language).not.toMatch(/^srv_err_/);
       expect(new Set(said).size, language).toBeGreaterThanOrEqual(7);
     }
+  });
+  it("says its own words for every code of the server in every language, on a screen that has none for it", () => {
+    const source = readFileSync(new URL("./api/contract/armor-rest.ts", import.meta.url), "utf8");
+    const codes = /export type ApiErrorCode = ([^;]+);/.exec(source)?.[1].match(/"[a-z_]+"/g)?.map(quoted => quoted.slice(1, -1)) ?? [];
+    expect(codes.length).toBeGreaterThanOrEqual(27);
+    for (const language of LANGUAGES) {
+      const t2 = (key: string) => text(language, key);
+      const said = codes.map(code => errorText(t2, new ApiError(400, code), "no_such_screen_err_"));
+      for (const [index, line] of said.entries()) { expect(line, `${language}:${codes[index]}`).not.toMatch(/^(no_such_screen_err_|api_code_)/); expect(line.trim(), `${language}:${codes[index]}`).not.toBe(""); }
+      expect(new Set(said).size, language).toBeGreaterThanOrEqual(codes.length - 4);
+    }
+  });
+  it("keeps the words of the screen before the shared ones", () => {
+    const own = (key: string) => (key === "q_err_wrong_board" ? "mine" : key === "api_code_wrong_board" ? "shared" : key === "api_code_bad_proof" ? "shared proof" : key);
+    expect(errorText(own, new ApiError(400, "wrong_board"), "q_err_")).toBe("mine");
+    expect(errorText(own, new ApiError(403, "bad_proof"), "q_err_")).toBe("shared proof");
   });
 });
