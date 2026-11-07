@@ -32,6 +32,12 @@ export const adminRelays = (origin: string) => userCall<RelaysState>(origin, "GE
 export const adminSetRelay = (origin: string, kind: AdminRelayKind, change: { node?: string; state: "on" | "off"; confirmText: string }, code: string) =>
   userCall<RelaysState & { ok: boolean; relay: AdminRelayKind; state: "on" | "off" }>(origin, "POST", `/api/v1/admin/mqtt/relays/${kind}`,
     { ...(change.node ? { node: change.node } : {}), state: change.state, confirm: true, confirm_text: change.confirmText }, false, { "X-Armor-Maint-Totp": code });
+/** The one switch of the host firewall that Studio may ask for (the setting admin.field_http must be on for the server to answer): may the field network also reach the server's port over HTTP. */
+export type FirewallState = { enabled: boolean; installed?: boolean; field_http?: boolean; approval?: "totp" | "not_enrolled" };
+export const adminFirewall = (origin: string) => userCall<FirewallState>(origin, "GET", "/api/v1/admin/firewall");
+/** `confirmText` is the word field-http, typed again by the administrator; `code` is the code of the authenticator. */
+export const adminSetFieldHttp = (origin: string, change: { state: "on" | "off"; confirmText: string }, code: string) =>
+  userCall<FirewallState & { ok: boolean; state: "on" | "off" }>(origin, "POST", "/api/v1/admin/firewall/field-http", { state: change.state, confirm: true, confirm_text: change.confirmText }, false, { "X-Armor-Maint-Totp": code });
 export const adminServices = (origin: string) => userCall<{ services: AdminService[] }>(origin, "GET", "/api/v1/admin/services");
 export const adminServiceAction = (origin: string, id: string, action: "start" | "stop" | "restart" | "reload" | "pause" | "resume") => userCall<{ ok: boolean }>(origin, "POST", `/api/v1/admin/services/${encodeURIComponent(id)}/${action}`);
 export const adminFiles = (origin: string) => userCall<{ files: AdminFileInfo[] }>(origin, "GET", "/api/v1/admin/files");

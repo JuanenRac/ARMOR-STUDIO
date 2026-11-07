@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Two switches for the machine, both guarded (eight languages):** Configuration > Broker gets the card "Field network over HTTP" (the firewall rule that lets the field network also reach the server's port; off until the new security option "Field HTTP switch from Studio" is turned on, then two confirmations, the word typed again and the code of the authenticator), and Configuration > Updates gets "Try a new server before switching" (the maintenance helper starts the new server on the side and asks if it answers before it replaces the running one; off by default, and it says whether the choice comes from here or from the helper's settings file). Tests included.
+
 - **Users: the administrator allows who may have a silent panic phrase:** a checkbox in the edit form of a user (eight languages) sends `panicPhraseAllowed`; the card of the phrase explains the refusal `panic_not_allowed` in eight languages.
 
 - **A floor for the test coverage:** `npm run coverage` runs the tests with the V8 coverage and fails below the numbers of `docs/coverage_threshold.json` (lines, statements, functions and branches, each just under what the tests reach), and the CI runs it. Raising a floor is a change of that one file; a repository without the file is not affected.

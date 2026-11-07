@@ -268,6 +268,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "electrical.set_aside_old_readings", id: "oldread", values: [true, false] },
   { key: "voice.multipart_turn", id: "voiceturn", values: [false, true] },
   { key: "voice.panic_phrase", id: "panic", values: [true, false], calm: true, optional: true },   // off by default; turning it off lowers the safety, so it asks first
+  { key: "admin.field_http", id: "fieldhttp", values: [false, true], optional: true },   // off by default; turning it on lets Studio ask the admin agent to open the server's port to the field network, so it asks first
   { key: "admin.acl_relays", id: "aclrelays", values: [false, true], optional: true },   // off by default; turning it on lets Studio ask the admin agent for two switches of the broker rules, so it asks first
   { key: "panel.live_events", id: "panellive", values: [false, true] },
   { key: "alarm_audio.spoken", id: "alspoken", values: [false, true], calm: true },

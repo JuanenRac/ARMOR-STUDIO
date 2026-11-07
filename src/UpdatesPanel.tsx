@@ -13,6 +13,7 @@ import {
 } from "./api";
 import { CopyButton } from "./components/CopyButton";
 import { AutoUpdatesCard } from "./AutoUpdatesCard";
+import { StagingCard } from "./StagingCard";
 import { MachineUpdateCard } from "./MachineUpdateCard";
 import "./maintenance.css";
 
@@ -212,6 +213,8 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
     </article>
 
     <AutoUpdatesCard t={t} origin={origin} signatureMode={overview?.signature_mode} fingerprints={overview?.trusted_fingerprints} />
+
+    <StagingCard t={t} origin={origin} />
 
     <MachineUpdateCard t={t} origin={origin} />
 

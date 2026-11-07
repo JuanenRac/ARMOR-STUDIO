@@ -17,6 +17,10 @@ export type AutoUpdatesChange = Partial<AutoUpdatesSettings>;
 export type AutoUpdates = { settings: AutoUpdatesSettings; package: boolean; applied: Array<{ at: string; packages: string[]; state: "started" | "installed" | "failed" }>; reboot_required: boolean; reboot_note: string; last_reboot: number;
   health: { checked?: number; ok?: boolean; restarted?: string[]; down?: string[] }; conf_written: boolean };
 export const readAutoUpdates = (origin: string) => userCall<AutoUpdates>(origin, "GET", "/api/v1/admin/system/auto-updates");
+/** Whether an update of the server first starts the new one on the side (off by default); `source` says who decides: studio (chosen here) or env (the settings file of the helper). */
+export type StagingState = { enabled: boolean; source: "studio" | "env"; wait_s: number };
+export const readStaging = (origin: string) => userCall<StagingState>(origin, "GET", "/api/v1/admin/maintenance/staging");
+export const changeStaging = (origin: string, enabled: boolean) => userCall<StagingState>(origin, "PUT", "/api/v1/admin/maintenance/staging", { enabled });
 export const changeAutoUpdates = (origin: string, change: AutoUpdatesChange) => userCall<AutoUpdates>(origin, "PUT", "/api/v1/admin/system/auto-updates", change);
 export type UpgradeMode = "upgrade" | "full" | "repair";
 export const systemAction = (origin: string, action: "check" | "upgrade" | "reboot", mode?: UpgradeMode) => userCall<MaintJob>(origin, "POST", `/api/v1/admin/system/${action}`, action === "upgrade" && mode ? { mode } : undefined);

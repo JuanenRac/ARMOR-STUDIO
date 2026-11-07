@@ -36,6 +36,7 @@ export type SecurityOptions = {
   "voice.panic_phrase": boolean;
   "voice.panic_cooldown_s": number;
   "admin.acl_relays": boolean;
+  "admin.field_http": boolean;
   "panel.live_events": boolean;
   "client.device_lock": "user" | "sensitive" | "always";
   /** A phone may register a key pair that stays in it and renew its session by signing a challenge (off by default), and how many hours that session lasts (1 to 720, 72). */
