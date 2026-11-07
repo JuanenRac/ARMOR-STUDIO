@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **More of the interface is run for real in the tests, and the coverage floor goes up:** a small helper (`src/testLive.tsx`) mounts a component in the test browser, answers what it asks from a stand-in server and uses every control once. With it the cards of the automatic updates, the server trial and the field HTTP rule, and every panel of the site designer inspector (terrain, buildings, openings, lamps, features, cameras, sensors) are exercised. The floor is now 69.5 % lines, 63 % statements, 52 % functions and 56 % branches (it was 69, 62, 51, 55).
+
 - **Two switches for the machine, both guarded (eight languages):** Configuration > Broker gets the card "Field network over HTTP" (the firewall rule that lets the field network also reach the server's port; off until the new security option "Field HTTP switch from Studio" is turned on, then two confirmations, the word typed again and the code of the authenticator), and Configuration > Updates gets "Try a new server before switching" (the maintenance helper starts the new server on the side and asks if it answers before it replaces the running one; off by default, and it says whether the choice comes from here or from the helper's settings file). Tests included.
 
 - **Users: the administrator allows who may have a silent panic phrase:** a checkbox in the edit form of a user (eight languages) sends `panicPhraseAllowed`; the card of the phrase explains the refusal `panic_not_allowed` in eight languages.

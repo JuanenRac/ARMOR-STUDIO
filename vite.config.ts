@@ -26,6 +26,6 @@ export default defineConfig({
   // Portuguese is fetched the first time it is chosen; the tests read every language, so it is there before any of them runs.
   test: {
     setupFiles: ["./src/testSetup.ts"],
-    coverage: { provider: "v8", include: ["src/**/*.{ts,tsx}"], exclude: ["src/**/*.test.{ts,tsx}", "src/testSetup.ts", "src/testLive.tsx"], reporter: ["text", "text-summary"], thresholds: coverageFloor() },
+    coverage: { provider: "v8", include: ["src/**/*.{ts,tsx}"], exclude: ["src/**/*.test.{ts,tsx}", "src/testSetup.ts", "src/testLive.tsx"], reporter: ["text-summary"], thresholds: coverageFloor() },
   },
 });
