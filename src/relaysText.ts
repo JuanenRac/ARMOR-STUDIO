@@ -256,6 +256,27 @@ const rows: Record<string, Row> = {
   ],
   mt_staging_label: ["Try the new server first", "Probar primero el servidor nuevo", "Neuen Server zuerst ausprobieren", "Essayer d'abord le nouveau serveur", "Provare prima il nuovo server", "先に新しいサーバーを試す", "先试运行新服务器", "Experimentar primeiro o servidor novo"],
   mt_staging_env: ["Decided by the settings file of the maintenance helper until you choose here.", "Lo decide el fichero de ajustes del ayudante de mantenimiento hasta que elijas aquí.", "Bestimmt die Einstellungsdatei des Wartungshelfers, bis Sie hier wählen.", "Décidé par le fichier de réglages de l'assistant de maintenance tant que vous ne choisissez pas ici.", "Lo decide il file delle impostazioni dell'assistente di manutenzione finché non scegli qui.", "ここで選ぶまでは、メンテナンスヘルパーの設定ファイルが決めます。", "在您在此处选择之前，由维护助手的设置文件决定。", "Decidido pelo ficheiro de definições do assistente de manutenção até escolher aqui."],
+  sec_opt_wakeword: ["Wake word on the wall panel", "Palabra de activación en el panel de pared", "Weckwort am Wandpanel", "Mot d'activation sur le panneau mural", "Parola di attivazione sul pannello a muro", "壁パネルのウェイクワード", "墙面面板的唤醒词", "Palavra de ativação no painel de parede"],
+  sec_opt_wakeword_help: [
+    "The wall panel may send short chunks of audio to the voice gateway of this machine to hear its wake word (\"hey armor\", \"oye armor\"; other languages by configuration). The detector runs here, with no cloud and no account, and the audio is dropped as soon as it is looked at. Off, the default: the server answers 403 and passes nothing on. The gateway also needs ARMOR_WAKE_WORD=on.",
+    "El panel de pared puede enviar trozos cortos de audio al ayudante de voz de esta máquina para oír su palabra de activación («hey armor», «oye armor»; otros idiomas por configuración). El detector funciona aquí, sin nube ni cuenta, y el audio se descarta en cuanto se mira. Desactivado, por defecto: el servidor responde 403 y no pasa nada. El ayudante también necesita ARMOR_WAKE_WORD=on.",
+    "Das Wandpanel darf kurze Audioabschnitte an das Sprach-Gateway dieser Maschine senden, um sein Weckwort zu hören („hey armor“, „oye armor“; weitere Sprachen per Konfiguration). Der Detektor läuft hier, ohne Cloud und ohne Konto, und das Audio wird nach der Prüfung verworfen. Aus, die Voreinstellung: Der Server antwortet 403 und gibt nichts weiter. Das Gateway braucht außerdem ARMOR_WAKE_WORD=on.",
+    "Le panneau mural peut envoyer de courts extraits audio à la passerelle vocale de cette machine pour entendre son mot d'activation (« hey armor », « oye armor » ; d'autres langues par configuration). Le détecteur tourne ici, sans cloud ni compte, et l'audio est jeté dès qu'il est examiné. Désactivé, par défaut : le serveur répond 403 et ne transmet rien. La passerelle exige aussi ARMOR_WAKE_WORD=on.",
+    "Il pannello a muro può inviare brevi pezzi di audio al gateway vocale di questa macchina per sentire la sua parola di attivazione («hey armor», «oye armor»; altre lingue per configurazione). Il rilevatore gira qui, senza cloud né account, e l'audio viene scartato appena esaminato. Disattivato, come predefinito: il server risponde 403 e non inoltra nulla. Il gateway richiede anche ARMOR_WAKE_WORD=on.",
+    "壁パネルは、このマシンの音声ゲートウェイに短い音声を送り、ウェイクワード（「hey armor」「oye armor」。他の言語は設定で追加）を聞き取らせることができます。検出はここで動作し、クラウドもアカウントも使わず、音声は調べた直後に破棄されます。オフ（既定）の間、サーバーは 403 を返し何も渡しません。ゲートウェイ側にも ARMOR_WAKE_WORD=on が必要です。",
+    "墙面面板可以把简短音频发送到本机的语音网关，以听取唤醒词（“hey armor”“oye armor”，其他语言通过配置添加）。检测在本机运行，不使用云端和账户，音频检查后立即丢弃。关闭（默认）时，服务器返回 403 且不转发任何内容。网关也需要 ARMOR_WAKE_WORD=on。",
+    "O painel de parede pode enviar pequenos trechos de áudio ao gateway de voz desta máquina para ouvir a sua palavra de ativação («hey armor», «oye armor»; outros idiomas por configuração). O detetor corre aqui, sem nuvem nem conta, e o áudio é descartado logo que é analisado. Desativado, por omissão: o servidor responde 403 e não reencaminha nada. O gateway também precisa de ARMOR_WAKE_WORD=on.",
+  ],
+  sec_opt_wakeword_warn: [
+    "With this on, the panel listens for its word all the time (the audio never leaves the house and is not kept). Keep it off unless you want to talk to the panel without touching it.",
+    "Con esto activado, el panel escucha su palabra todo el tiempo (el audio no sale de casa y no se guarda). Déjalo desactivado salvo que quieras hablar con el panel sin tocarlo.",
+    "Ist es an, hört das Panel ständig auf sein Wort (das Audio verlässt das Haus nicht und wird nicht gespeichert). Lassen Sie es aus, außer Sie wollen das Panel ohne Berührung ansprechen.",
+    "Activé, le panneau écoute son mot en permanence (l'audio ne quitte pas la maison et n'est pas conservé). Laissez-le désactivé sauf si vous voulez parler au panneau sans le toucher.",
+    "Attivato, il pannello ascolta la sua parola di continuo (l'audio non esce di casa e non viene conservato). Lascialo disattivato a meno che tu voglia parlare al pannello senza toccarlo.",
+    "オンにすると、パネルは常にウェイクワードを待ち受けます（音声は家の外に出ず、保存もされません）。触れずにパネルへ話しかけたい場合のみオンにしてください。",
+    "开启后，面板会一直监听唤醒词（音频不会离开家，也不会保存）。除非想不用触碰就对面板说话，否则请保持关闭。",
+    "Com isto ativado, o painel escuta a sua palavra o tempo todo (o áudio não sai de casa e não é guardado). Deixe-o desativado, a não ser que queira falar com o painel sem lhe tocar.",
+  ],
 };
 
 /** The catalogue of one language. */

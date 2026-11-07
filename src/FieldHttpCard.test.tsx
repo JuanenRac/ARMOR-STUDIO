@@ -51,7 +51,7 @@ describe("the field-http switch of the firewall", () => {
 
   it("has a text in every language", () => {
     const keys = ["adm_fhttp", "adm_fhttp_help", "adm_fhttp_off", "adm_fhttp_missing", "adm_fhttp_ask", "adm_fhttp_done", "adm_err_field_http_disabled", "adm_err_firewall_not_loaded", "adm_err_firewall_failed",
-      "sec_opt_fieldhttp", "sec_opt_fieldhttp_help", "sec_opt_fieldhttp_warn", "mt_staging", "mt_staging_help", "mt_staging_label", "mt_staging_env"];
+      "sec_opt_fieldhttp", "sec_opt_fieldhttp_help", "sec_opt_fieldhttp_warn", "sec_opt_wakeword", "sec_opt_wakeword_help", "sec_opt_wakeword_warn", "mt_staging", "mt_staging_help", "mt_staging_label", "mt_staging_env"];
     for (const locale of locales) for (const key of keys) expect(text(locale, key), `${locale} ${key}`).not.toBe(key);
     for (const locale of locales) expect(text(locale, "adm_fhttp_ask")).toContain("{state}");
   });
