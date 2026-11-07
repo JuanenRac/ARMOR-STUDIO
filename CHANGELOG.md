@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The ten pictures of the README are taken again in one go, with the same browser and fonts:** they were a mix of two browsers (Edge on Windows and Chromium on Linux); now every one comes from the screenshots job on a runner against a real server fed by the simulator with made-up data, so the typography and the sizes agree.
+
 ## [0.8.2.3] - The card of the programs of the machine is no longer hidden when the maintenance console is off: it is the place that says how the helper is turned on, so Configuration > Updates now shows it even when the console is not... (and 3 more changes)
 
 - **The card of the programs of the machine is no longer hidden when the maintenance console is off:** it is the place that says how the helper is turned on, so Configuration > Updates now shows it even when the console is not available.
