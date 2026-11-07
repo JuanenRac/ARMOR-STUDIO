@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Users: the administrator allows who may have a silent panic phrase:** a checkbox in the edit form of a user (eight languages) sends `panicPhraseAllowed`; the card of the phrase explains the refusal `panic_not_allowed` in eight languages.
+
 - **A floor for the test coverage:** `npm run coverage` runs the tests with the V8 coverage and fails below the numbers of `docs/coverage_threshold.json` (lines, statements, functions and branches, each just under what the tests reach), and the CI runs it. Raising a floor is a change of that one file; a repository without the file is not affected.
 - **The ten pictures of the README are taken again in one go, with the same browser and fonts:** they were a mix of two browsers (Edge on Windows and Chromium on Linux); now every one comes from the screenshots job on a runner against a real server fed by the simulator with made-up data, so the typography and the sizes agree.
 

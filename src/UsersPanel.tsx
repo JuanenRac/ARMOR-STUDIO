@@ -75,15 +75,16 @@ export function UsersPanel({ t, origin }: Props) {
     try { await createUser(origin, { ...fresh, username: fresh.username.trim() }); setFresh({ username: "", password: "", role: "operator" }); say(t("userCreated")); await reload(); }
     catch (error) { explain(error); }
   };
-  const [draft, setDraft] = useState<{ username: string; password: string; role: Role; pin: string; duress: string }>({ username: "", password: "", role: "operator", pin: "", duress: "" });
-  const startEdit = (user: ListedUser) => { setEditing(user.id); setDraft({ username: user.username, password: "", role: user.role, pin: "", duress: "" }); };
+  const [draft, setDraft] = useState<{ username: string; password: string; role: Role; pin: string; duress: string; panicAllowed: boolean }>({ username: "", password: "", role: "operator", pin: "", duress: "", panicAllowed: false });
+  const startEdit = (user: ListedUser) => { setEditing(user.id); setDraft({ username: user.username, password: "", role: user.role, pin: "", duress: "", panicAllowed: user.panicPhraseAllowed === true }); };
   const draftIssues = [...passwordIssues(draft.password, { minimum, username: draft.username }), ...pinIssues(draft.pin, draft.duress)];
   const saveEdit = async (user: ListedUser) => {
     if (draftIssues.length) { say(issueMessage(t, draftIssues[0], minimum), true); return; }
-    const change: { username?: string; password?: string; role?: Role } = {};
+    const change: { username?: string; password?: string; role?: Role; panicPhraseAllowed?: boolean } = {};
     if (draft.username.trim() !== user.username) change.username = draft.username.trim();
     if (draft.password) change.password = draft.password;
     if (draft.role !== user.role) change.role = draft.role;
+    if (draft.panicAllowed !== (user.panicPhraseAllowed === true)) change.panicPhraseAllowed = draft.panicAllowed;
     if (!Object.keys(change).length && !draft.pin) { setEditing(""); return; }
     try {
       if (Object.keys(change).length) await updateUser(origin, user.id, change);
@@ -138,6 +139,7 @@ export function UsersPanel({ t, origin }: Props) {
                       <label>{t("newPassword")}<PasswordInput t={t} autoComplete="new-password" placeholder={t("keepPassword")} value={draft.password} onChange={event => setDraft({ ...draft, password: event.target.value })} /></label>
                       <label>{t("role")}<select value={draft.role} onChange={event => setDraft({ ...draft, role: event.target.value as Role })}>{ROLES.map(role => <option key={role} value={role}>{roleName(role)}</option>)}</select></label>
                       <p className="muted small">{t(`roleHelp_${draft.role}`)}</p>
+                      <label className="check"><input type="checkbox" checked={draft.panicAllowed} onChange={event => setDraft({ ...draft, panicAllowed: event.target.checked })} data-testid="user-panic-allowed" /> {t("userPanicAllowed")}</label>
                       <label>{t("pinValue")}<PasswordInput t={t} inputMode="numeric" autoComplete="off" maxLength={10} placeholder={user.hasPin ? t("keepPassword") : ""} value={draft.pin} onChange={event => setDraft({ ...draft, pin: digits(event.target.value) })} /></label>
                       <label>{t("duressValue")}<PasswordInput t={t} inputMode="numeric" autoComplete="off" maxLength={10} value={draft.duress} onChange={event => setDraft({ ...draft, duress: digits(event.target.value) })} /></label>
                       {issuesNote(draftIssues)}

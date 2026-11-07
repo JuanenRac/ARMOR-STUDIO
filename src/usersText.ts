@@ -27,6 +27,7 @@ const ROWS: Record<string, Row> = {
   roleOperator: ["Operator", "Operador", "Operator", "Opérateur", "Operatore", "オペレーター", "操作员"],
   addUser: ["Add a user", "Añadir un usuario", "Benutzer hinzufügen", "Ajouter un utilisateur", "Aggiungi un utente", "ユーザーを追加", "添加用户"],
   createUser: ["Create user", "Crear usuario", "Benutzer erstellen", "Créer l'utilisateur", "Crea utente", "ユーザーを作成", "创建用户"],
+  userPanicAllowed: ["May have a silent panic phrase (only they set it; you never see it)", "Puede tener una frase de pánico silenciosa (solo ella la fija; tú nunca la ves)", "Darf eine stille Panikphrase haben (nur die Person legt sie fest; Sie sehen sie nie)", "Peut avoir une phrase de panique silencieuse (seule la personne la définit ; vous ne la voyez jamais)", "Può avere una frase di panico silenziosa (solo la persona la imposta; tu non la vedi mai)", "サイレント・パニックフレーズを許可（設定するのは本人のみで、管理者には見えません）", "允许设置静默恐慌口令（仅本人设置，管理员看不到）"],
   userCreated: ["User created.", "Usuario creado.", "Benutzer erstellt.", "Utilisateur créé.", "Utente creato.", "ユーザーを作成しました。", "用户已创建。"],
   userUpdated: ["User updated.", "Usuario actualizado.", "Benutzer aktualisiert.", "Utilisateur mis à jour.", "Utente aggiornato.", "ユーザーを更新しました。", "用户已更新。"],
   userDeleted: ["User deleted.", "Usuario eliminado.", "Benutzer gelöscht.", "Utilisateur supprimé.", "Utente eliminato.", "ユーザーを削除しました。", "用户已删除。"],

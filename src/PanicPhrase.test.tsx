@@ -65,7 +65,7 @@ describe("the silent panic phrase", () => {
   it("has every phrase of the card, the option and its quiet time in all eight languages, Portuguese from Portugal", () => {
     const ids = ["pp_title", "pp_help", "pp_rules", "pp_password", "pp_phrase", "pp_save", "pp_clear", "pp_clear_confirm", "pp_saved", "pp_cleared", "pp_state_set", "pp_state_none",
       "pp_err_phrase_too_short", "pp_err_phrase_too_long", "pp_err_phrase_too_common", "pp_err_phrase_is_example", "pp_err_invalid_phrase", "pp_err_wrong_password", "pp_err_status_429",
-      "pp_err_unreachable", "pp_err_generic", "sec_opt_panic", "sec_opt_panic_help", "sec_opt_panic_warn", "sec_voice_panic"];
+      "pp_err_panic_not_allowed", "pp_err_unreachable", "pp_err_generic", "sec_opt_panic", "sec_opt_panic_help", "sec_opt_panic_warn", "sec_voice_panic"];
     expect(locales.length).toBe(8);
     for (const locale of locales) for (const id of ids) {
       const words = text(locale, id);

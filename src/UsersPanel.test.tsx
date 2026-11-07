@@ -156,6 +156,32 @@ describe("creating and editing users", () => {
     expect(notice()).toBe(t("userUpdated"));
   });
 
+  it("the permission to have a panic phrase is a checkbox that sends only its own change", async () => {
+    api.listUsers.mockResolvedValue({ users: [admin, listed("u2", "guard", "operator", { panicPhraseAllowed: false })], minPasswordLength: 12 });
+    await show({ user: admin });
+    await click(button(t("editUser"), container.querySelectorAll(".users-list li")[1]!));
+    const editor = container.querySelector(".users-edit")!;
+    const box = editor.querySelector<HTMLInputElement>('[data-testid="user-panic-allowed"]')!;
+    expect(box.checked).toBe(false);
+    expect(editor.textContent).toContain(t("userPanicAllowed"));
+    await click(box);
+    api.updateUser.mockResolvedValue({});
+    await click(button(t("saveUser"), editor));
+    expect(api.updateUser).toHaveBeenCalledWith("http://s", "u2", { panicPhraseAllowed: true });
+    expect(api.setUserPin).not.toHaveBeenCalled();
+  });
+
+  it("an allowed user shows the box ticked, and saving without touching it sends nothing", async () => {
+    api.listUsers.mockResolvedValue({ users: [admin, listed("u2", "guard", "operator", { panicPhraseAllowed: true })], minPasswordLength: 12 });
+    await show({ user: admin });
+    await click(button(t("editUser"), container.querySelectorAll(".users-list li")[1]!));
+    const editor = container.querySelector(".users-edit")!;
+    expect(editor.querySelector<HTMLInputElement>('[data-testid="user-panic-allowed"]')!.checked).toBe(true);
+    api.updateUser.mockClear();
+    await click(button(t("saveUser"), editor));
+    expect(api.updateUser).not.toHaveBeenCalled();
+  });
+
   it("a PIN typed while editing is sent with its duress PIN, digits only, and the duress one is left out when empty", async () => {
     await show({ user: admin });
     await click(button(t("editUser"), container.querySelectorAll(".users-list li")[1]!));

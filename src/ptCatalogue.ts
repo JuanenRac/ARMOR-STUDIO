@@ -1071,6 +1071,7 @@ export const PT_CATALOGUE: Record<string, string> = {
  "createUser": "Criar utilizador",
  "userCreated": "Utilizador criado.",
  "userUpdated": "Utilizador atualizado.",
+ "userPanicAllowed": "Pode ter uma frase de pânico silenciosa (só a própria a define; nunca a vê)",
  "userDeleted": "Utilizador apagado.",
  "editUser": "Editar",
  "saveUser": "Guardar",

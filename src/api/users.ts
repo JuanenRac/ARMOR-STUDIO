@@ -3,10 +3,10 @@ import { userCall } from "./transport";
 
 export type Role = "admin" | "operator" | "panel" | "viewer";
 export type StudioUser = { id: string; username: string; role: Role };
-export type ListedUser = StudioUser & { createdAt: string; updatedAt: string; current: boolean; hasPin: boolean; hasDuress: boolean };
+export type ListedUser = StudioUser & { createdAt: string; updatedAt: string; current: boolean; hasPin: boolean; hasDuress: boolean; panicPhraseAllowed?: boolean };
 export const listUsers = (origin: string) => userCall<{ users: ListedUser[]; minPasswordLength: number }>(origin, "GET", "/api/v1/users");
 export const createUser = (origin: string, user: { username: string; password: string; role: Role }) => userCall<StudioUser>(origin, "POST", "/api/v1/users", user);
-export const updateUser = (origin: string, id: string, change: { username?: string; password?: string; role?: Role }) => userCall<StudioUser>(origin, "PATCH", `/api/v1/users/${encodeURIComponent(id)}`, change);
+export const updateUser = (origin: string, id: string, change: { username?: string; password?: string; role?: Role; panicPhraseAllowed?: boolean }) => userCall<StudioUser>(origin, "PATCH", `/api/v1/users/${encodeURIComponent(id)}`, change);
 export const deleteUser = (origin: string, id: string) => userCall<void>(origin, "DELETE", `/api/v1/users/${encodeURIComponent(id)}`);
 export const changeAccount = (origin: string, change: { currentPassword: string; username?: string; newPassword?: string }) => userCall<StudioUser>(origin, "PATCH", "/api/v1/account", change);
 /** The PIN that disarms the system: yours (after confirming the password), or anybody's for an administrator. The duress PIN disarms as well, and warns in silence. */
