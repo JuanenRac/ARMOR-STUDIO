@@ -1,6 +1,9 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { adminFirewall, adminSetFieldHttp, changeStaging, readStaging } from "./api";
-import { FIELD_HTTP_WORD, fieldHttpReady } from "./FieldHttpCard";
+import { FIELD_HTTP_WORD, FieldHttpCard, fieldHttpReady } from "./FieldHttpCard";
+import { StagingCard } from "./StagingCard";
 import { locales, text } from "./i18n";
 
 type Seen = { url: string; method: string; headers: Headers; body: Record<string, unknown> };
@@ -63,5 +66,13 @@ describe("the trial of a new server before the switch", () => {
     expect(seen[1]!.method).toBe("PUT");
     expect(seen[1]!.url).toContain("/api/v1/admin/maintenance/staging");
     expect(seen[1]!.body).toEqual({ enabled: true });
+  });
+});
+
+describe("the two cards while the server has not answered yet", () => {
+  const t = (key: string) => text("en", key);
+  it("show nothing (the field-http card never offers a control before it knows the option is on, and the trial card waits for its state)", () => {
+    expect(renderToStaticMarkup(createElement(FieldHttpCard, { t, origin: O }))).toBe("");
+    expect(renderToStaticMarkup(createElement(StagingCard, { t, origin: O }))).toBe("");
   });
 });
