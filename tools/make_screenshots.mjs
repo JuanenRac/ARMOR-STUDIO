@@ -134,7 +134,9 @@ try {
   await keepPanel();
   await sleep(6000);
 
-  browser = await chromium.launch({ channel: "msedge", headless: true });
+  // Edge on Windows by default; ARMOR_SHOTS_CHANNEL=chromium takes the Chromium that Playwright installs (a runner without Edge)
+  const channel = process.env.ARMOR_SHOTS_CHANNEL ?? "msedge";
+  browser = await chromium.launch(channel === "chromium" ? { headless: true } : { channel, headless: true });
   const context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1, locale: "en-US" });
   const page = await context.newPage();
   await page.addInitScript(() => { try { window.localStorage.setItem("armor-studio-prefs-v1", JSON.stringify({ tutorial: false, tourAutoStart: false, assistant: false, assistantAutoOpen: false, ...(window.localStorage.getItem("armor-shots-aids") === "1" ? { designAids: true } : {}) })); window.localStorage.setItem("armor-studio-settings-v1", JSON.stringify({ language: "en" })); } catch { /* storage blocked */ } });
@@ -145,7 +147,7 @@ try {
   await page.locator(".sidebar").waitFor();
   const open = async label => { await page.locator(".sidebar nav button:not(.nav-group-title)").filter({ hasText: new RegExp(label, "i") }).first().evaluate(element => element.click()); await page.waitForTimeout(2500); };
   // the clock of the status bar shows today's date: only the time stays in the pictures
-  const hideDate = () => page.evaluate(() => { for (const element of document.querySelectorAll("footer *, .statusbar *, .status-bar *, [class*=clock] *, [class*=clock]")) if (element.children.length === 0 && /\d{1,2}\s+[A-Za-z]{3}\s+\d{4}/.test(element.textContent ?? "")) element.style.visibility = "hidden"; });
+  const hideDate = () => page.evaluate(() => { for (const element of document.querySelectorAll("footer *, .statusbar *, .status-bar *, [class*=clock] *, [class*=clock]")) if (element.children.length === 0 && /(\d{1,2}\s+[A-Za-z]{3}\s+\d{4})|([A-Za-z]{3}\s+\d{1,2},\s*\d{4})/.test(element.textContent ?? "")) element.style.visibility = "hidden"; });
   const shot = async (file, label) => { await keepPanel(); await open(label); await hideDate(); await page.screenshot({ path: path.join(out, file + ".png") }); console.log("wrote", path.join(out, file + ".png")); };
 
   await shot("overview", "Overview");
@@ -202,6 +204,27 @@ try {
   await page.getByTestId("ad-tab-modes").click();
   await page.waitForTimeout(1500);
   await take("arming-modes");
+
+  // the starting points of the Alarm Designer (a flat, a shop, a warehouse with a perimeter): the first one is put on the sheet
+  await keepPanel(); await open("Alarm Designer");
+  const alarmTemplates = page.locator("select.ed-templates").first();
+  if (await alarmTemplates.count()) {
+    await alarmTemplates.selectOption({ index: 1 });
+    await page.waitForTimeout(1200);
+    const sure = page.locator("[role=dialog] button, [role=alertdialog] button").filter({ hasText: /^(ok|yes|confirm|accept|continue|clear)/i }).first();
+    if (await sure.count()) await sure.click();
+    await page.waitForTimeout(2000);
+  }
+  await take("alarm-templates");
+
+  // the card that says whether the programs of the machine can be updated from the phone (Configuration > Updates); it only shows, the switches live in the server
+  await keepPanel(); await open("Configuration");
+  await page.getByRole("tab", { name: /^updates$/i }).or(page.getByRole("button", { name: /^updates$/i })).first().click();
+  await page.getByTestId("machine-update-card").waitFor({ timeout: 30000 });
+  await page.getByTestId("machine-update-card").scrollIntoViewIfNeeded();
+  await page.addStyleTag({ content: ".alarm-popups { display: none !important; }" });   // the pop-ups of the simulated nodes would cover the card
+  await page.waitForTimeout(1500);
+  await take("machine-update");
 
 } finally {
   await browser?.close();

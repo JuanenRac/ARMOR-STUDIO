@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Linguaggio">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Lingue">
-  <img src="https://img.shields.io/badge/Tests-1446%20passing-2ea44f.svg" alt="Test">
+  <img src="https://img.shields.io/badge/Tests-1495%20passing-2ea44f.svg" alt="Test">
   <img src="https://img.shields.io/badge/Version-0.8.2.2-0f6cbd.svg" alt="Versione">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturità">
 </p>
 
 ---
 
-**Controllo di onestà - cosa funziona oggi:** Studio dialoga con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) ed è coperto da 1446 test unitari (lettura delle impostazioni, fusione delle telecamere, aritmetica dei grafici solari, geometria e controlli dei progettisti, annunciatore degli allarmi, dizionario dell'assistente, ogni menu reso nelle otto lingue, host statico) e da test nel browser. Funziona in uso quotidiano contro il banco di prova CM5 con il vero server, vere telecamere IP e un nodo radar sulla sua scheda; le immagini della Guida sono fatte con dati di esempio. Ciò che **non** è stato provato è il video dal vivo e il PTZ con tutte le telecamere possibili, i menu solare, elettrico, centrali d'allarme e pannello touch con apparecchi reali (esiste solo il nodo radar) e una revisione formale di accessibilità o usabilità. Finché il server non è raggiungibile, Studio mostra dati dimostrativi e lo dice nella barra superiore.
+**Controllo di onestà - cosa funziona oggi:** Studio dialoga con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) ed è coperto da 1495 test unitari (lettura delle impostazioni, fusione delle telecamere, aritmetica dei grafici solari, geometria e controlli dei progettisti, annunciatore degli allarmi, dizionario dell'assistente, ogni menu reso nelle otto lingue, host statico) e da test nel browser. Funziona in uso quotidiano contro il banco di prova CM5 con il vero server, vere telecamere IP e un nodo radar sulla sua scheda; le immagini della Guida sono fatte con dati di esempio. Ciò che **non** è stato provato è il video dal vivo e il PTZ con tutte le telecamere possibili, i menu solare, elettrico, centrali d'allarme e pannello touch con apparecchi reali (esiste solo il nodo radar) e una revisione formale di accessibilità o usabilità. Finché il server non è raggiungibile, Studio mostra dati dimostrativi e lo dice nella barra superiore.
 
 ---
 
@@ -41,7 +41,7 @@
 | Maturità | Consolidato |
 | Ruolo | Console di operatività e progettazione della famiglia |
 | Tecnologia | React 19, TypeScript, Vite, Three.js, Leaflet |
-| Test | 1446 (`npm test`, Vitest) e test nel browser (Playwright) |
+| Test | 1495 (`npm test`, Vitest) e test nel browser (Playwright) |
 | Contratto | Parla solo con ARMOR-SERVER (HTTP `/api/v1/*` con sessione HttpOnly, WebSocket `/api/v1/events`) |
 | In ascolto su | `127.0.0.1:5178` (`tools/serve.mjs`) |
 | Gira su | Un browser; i file li serve `tools/serve.mjs` o il nginx del container |
@@ -59,7 +59,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Area | Stato | Cosa significa qui |
 |---|---|---|
 | Software | 🟢 | La console funziona ogni giorno contro il server reale del banco di prova CM5. |
-| Test | 🟢 | Superano 1446 test unitari (`npm test`) e girano i test nel browser: impostazioni, fusione delle telecamere, grafici solari, geometria e controlli dei progettisti, annunciatore di allarmi, dizionario dell'assistente e ogni menu nelle otto lingue. |
+| Test | 🟢 | Superano 1495 test unitari (`npm test`) e girano i test nel browser: impostazioni, fusione delle telecamere, grafici solari, geometria e controlli dei progettisti, annunciatore di allarmi, dizionario dell'assistente e ogni menu nelle otto lingue. |
 | Interfaccia | 🟡 | Il video dal vivo e il PTZ non sono provati con ogni telecamera possibile, non c'è stata una revisione formale di accessibilità o usabilità e le immagini della Guida sono fatte con dati di esempio. |
 | Hardware | 🟡 | È usato ogni giorno con il server reale, telecamere IP reali e un nodo radar reale; i menu solare, elettrico, della centralina d'allarme e del pannello touch attendono nodi reali. |
 | Sicurezza | 🟡 | Sessioni, ruoli e rifiuto delle credenziali delle telecamere negli indirizzi sono coperti da test; non c'è stata una revisione indipendente. |
@@ -99,6 +99,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 * **Verifica di copertura per piano, per altezza e con modelli di planimetria (tre opzioni in Preferenze > Aiuti di progetto, disattivate per impostazione predefinita):** un radar ha un piano facoltativo, la verifica può esaminare ogni piano di un edificio a parte e tenere conto di altezza e inclinazione dei radar, i quadrati ciechi accanto a un radar possono essere colorati solo dove nulla li vede (le cifre restano prudenti come prima) e la scheda di copertura aggiunge un edificio con la sua planimetria e i suoi radar messi ai rispettivi piani. Vedi `docs/DESIGN_AIDS.md`.
 * **Modalità di inserimento del sistema (Fuori casa, In casa, Notte):** quando un amministratore attiva *Modalità di inserimento In casa e Notte* in Configurazione > Sicurezza, il pulsante di inserimento apre un dialogo per inserire in una modalità, passare dall'una all'altra o disinserire; una modalità che non protegge nulla chiede conferma e un passaggio a una modalità che protegge meno chiede il PIN, come disinserire. Il Progettista allarme ottiene una scheda *Modalità* per contrassegnare, per In casa e Notte, zone intere (i luoghi dei dispositivi), sensori, nodi radar e telecamere (partono vuote), i ritardi di uscita e di ingresso e una programmazione. Altre tre opzioni (il PIN per passare a una modalità che protegge meno, la programmazione e se può abbassare la difesa) sono in Configurazione > Sicurezza. Disattivato per impostazione predefinita: con l'opzione spenta la console inserisce e disinserisce esattamente come prima.
 * **Accesso più sicuro, moduli e tastiera più gentili:** l'accesso controlla l'indirizzo del server prima di inviare qualsiasi cosa, avvisa (o, con un interruttore nelle Preferenze, rifiuta) l'http non cifrato fuori dalla rete locale e dice se la password era sbagliata, c'erano troppi tentativi, il server ha avuto un guasto o non era raggiungibile; ogni campo password avvisa quando il blocco maiuscole è attivo; le nuove password e i PIN vengono controllati mentre si scrive; c'è un link per saltare al contenuto, le scorciatoie a un tasto `?` (Guida) e `B` (menu) con interruttore, un titolo della scheda e un annuncio per lettori di schermo che seguono il menu aperto, e una conferma alla chiusura della scheda con un disegno non ancora arrivato al server. I limiti sono in un file di configurazione (`src/ux/ux.config.json`). Otto lingue, portoghese del Portogallo incluso.
+* **Programmi della macchina dal telefono, visti in Studio:** Configurazione > Aggiornamenti ha una scheda che dice se i programmi della macchina si possono aggiornare dal telefono (attivo o no, e perché), come accenderlo (`ARMOR_CM5_UPDATE` sul server e `ARMOR_MAINT_UPDATER` sull'assistente), quali programmi copre, se è richiesta la firma e l'attività recente del registro di audit. La scheda si limita a mostrare: gli interruttori stanno nell'ambiente del server.
 
 ## 🧩 Ruolo in A.R.M.O.R.
 
@@ -181,6 +182,18 @@ Catturate su un banco di prova con dati di esempio inventati e senza alcuna inst
 
 <p align="center"><em>Progettista d'allarme > Modalità: ciò che difende ogni modalità di inserimento (fuori, in casa, notte), con ritardi e profili di centrale.</em></p>
 
+<p align="center">
+  <img src="images/screenshots/alarm-templates.png" alt="Progettista d'allarme > Parti da un modello" width="100%">
+</p>
+
+<p align="center"><em>Progettista d'allarme > Parti da un modello: con gli Aiuti di progetto attivi, un appartamento, un negozio o un capannone con perimetro viene messo sul foglio come punto di partenza da adattare all'edificio reale.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/machine-update.png" alt="Configurazione > Aggiornamenti > Programmi della macchina, dal telefono" width="100%">
+</p>
+
+<p align="center"><em>Configurazione > Aggiornamenti: la scheda che dice se i programmi della macchina si possono aggiornare dal telefono (qui spento, e perché), come si accende e l'attività recente; si limita a mostrare, gli interruttori stanno nel server.</em></p>
+
 ## 🔒 Sicurezza e protezione
 
 * **Nessun segreto nel browser.** Le password delle telecamere si digitano una volta, si inviano al server e poi si vedono solo come stato «salvata» mascherato. Le esportazioni del sito omettono nomi utente e indicatori di credenziali.
@@ -232,7 +245,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 con un server su 127.0.0.1:18080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # scrive la tabella di ogni lingua dopo aver cambiato una frase
-npm test                                                                       # 1446 test
+npm test                                                                       # 1495 test
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # serve la build
 ```

@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Langage">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Langues">
-  <img src="https://img.shields.io/badge/Tests-1446%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-1495%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.2.2-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturité">
 </p>
 
 ---
 
-**Vérification d'honnêteté - ce qui fonctionne aujourd'hui :** Studio dialogue avec [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) et est couvert par 1446 tests unitaires (lecture des réglages, fusion des caméras, arithmétique des graphiques solaires, géométrie et vérifications des concepteurs, annonceur d'alarmes, dictionnaire de l'assistant, chaque menu rendu dans les huit langues, hôte statique) et par des tests dans un navigateur. Il fonctionne en usage quotidien contre le banc de test CM5 avec le vrai serveur, de vraies caméras IP et un nœud radar sur sa carte ; les images de l'Aide sont faites avec des données d'exemple. Ce qui n'a **pas** été prouvé : la vidéo en direct et le PTZ avec toutes les caméras possibles, les menus solaire, électrique, centrales d'alarme et panneau tactile avec du vrai matériel (seul le nœud radar existe) et une revue formelle d'accessibilité ou d'utilisabilité. Tant que le serveur est injoignable, Studio affiche des données de démonstration et le dit dans la barre supérieure.
+**Vérification d'honnêteté - ce qui fonctionne aujourd'hui :** Studio dialogue avec [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) et est couvert par 1495 tests unitaires (lecture des réglages, fusion des caméras, arithmétique des graphiques solaires, géométrie et vérifications des concepteurs, annonceur d'alarmes, dictionnaire de l'assistant, chaque menu rendu dans les huit langues, hôte statique) et par des tests dans un navigateur. Il fonctionne en usage quotidien contre le banc de test CM5 avec le vrai serveur, de vraies caméras IP et un nœud radar sur sa carte ; les images de l'Aide sont faites avec des données d'exemple. Ce qui n'a **pas** été prouvé : la vidéo en direct et le PTZ avec toutes les caméras possibles, les menus solaire, électrique, centrales d'alarme et panneau tactile avec du vrai matériel (seul le nœud radar existe) et une revue formelle d'accessibilité ou d'utilisabilité. Tant que le serveur est injoignable, Studio affiche des données de démonstration et le dit dans la barre supérieure.
 
 ---
 
@@ -41,7 +41,7 @@
 | Maturité | Établi |
 | Rôle | Console d'exploitation et de conception de la famille |
 | Technologie | React 19, TypeScript, Vite, Three.js, Leaflet |
-| Tests | 1446 (`npm test`, Vitest) et tests navigateur (Playwright) |
+| Tests | 1495 (`npm test`, Vitest) et tests navigateur (Playwright) |
 | Contrat | Ne parle qu'à ARMOR-SERVER (HTTP `/api/v1/*` avec session HttpOnly, WebSocket `/api/v1/events`) |
 | Écoute sur | `127.0.0.1:5178` (`tools/serve.mjs`) |
 | Fonctionne sur | Un navigateur ; les fichiers sont servis par `tools/serve.mjs` ou par le nginx du conteneur |
@@ -59,7 +59,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Logiciel | 🟢 | La console tourne au quotidien contre le vrai serveur du banc d'essai CM5. |
-| Tests | 🟢 | 1446 tests unitaires réussissent (`npm test`) et les tests de navigateur s'exécutent : réglages, fusion des caméras, graphiques solaires, géométrie et contrôles des concepteurs, annonceur d'alarmes, dictionnaire de l'assistant et chaque menu dans les huit langues. |
+| Tests | 🟢 | 1495 tests unitaires réussissent (`npm test`) et les tests de navigateur s'exécutent : réglages, fusion des caméras, graphiques solaires, géométrie et contrôles des concepteurs, annonceur d'alarmes, dictionnaire de l'assistant et chaque menu dans les huit langues. |
 | Interface | 🟡 | La vidéo en direct et le PTZ ne sont pas prouvés avec toutes les caméras possibles, il n'y a pas eu de revue formelle d'accessibilité ou d'utilisabilité, et les images de l'aide sont faites avec des données d'exemple. |
 | Matériel | 🟡 | Il est utilisé chaque jour avec le vrai serveur, de vraies caméras IP et un vrai nœud radar ; les menus solaire, électrique, de centrale d'alarme et de panneau tactile attendent de vrais nœuds. |
 | Sécurité | 🟡 | Les sessions, les rôles et le refus des identifiants de caméra dans les adresses sont couverts par des tests ; il n'y a pas eu de revue indépendante. |
@@ -99,6 +99,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 * **Contrôle de couverture par étage, par hauteur et avec des modèles de plan (trois options dans Préférences > Aides à la conception, désactivées par défaut) :** un radar a un étage facultatif, le contrôle peut examiner chaque étage d'un bâtiment séparément et tenir compte de la hauteur et de l'inclinaison des radars, les carrés aveugles près d'un radar peuvent n'être peints que là où rien ne les voit (les chiffres restent aussi prudents) et la carte de couverture ajoute un bâtiment avec son propre plan d'étage et ses radars placés à leurs étages. Voir `docs/DESIGN_AIDS.md`.
 * **Modes d'armement du système (Absent, À la maison, Nuit) :** quand un administrateur active *Modes d'armement À la maison et Nuit* dans Configuration > Sécurité, le bouton d'armement ouvre un dialogue pour armer dans un mode, passer de l'un à l'autre ou désarmer ; un mode qui ne protège rien demande une confirmation et un passage à un mode qui protège moins demande le PIN, comme un désarmement. Le Concepteur d'alarme gagne un onglet *Modes* pour marquer, pour À la maison et Nuit, des zones entières (les lieux des appareils), des capteurs, des nœuds radar et des caméras (ils commencent vides), les délais de sortie et d'entrée et une programmation. Trois autres options (le PIN pour passer à un mode qui protège moins, la programmation et si elle peut baisser la protection) sont dans Configuration > Sécurité. Désactivé par défaut : option éteinte, la console arme et désarme exactement comme avant.
 * **Connexion plus sûre, formulaires et clavier plus agréables :** la connexion vérifie l'adresse du serveur avant d'envoyer quoi que ce soit, avertit (ou, avec un interrupteur dans les Préférences, refuse) le http non chiffré hors du réseau local et dit si le mot de passe était faux, s'il y a eu trop de tentatives, si le serveur a échoué ou s'il était injoignable ; chaque champ de mot de passe avertit quand le verrouillage des majuscules est activé ; les nouveaux mots de passe et codes PIN sont vérifiés pendant la saisie ; il y a un lien d'évitement vers le contenu, les raccourcis à une touche `?` (Aide) et `B` (menu) avec interrupteur, un titre d'onglet et une annonce pour lecteurs d'écran qui suivent le menu ouvert, et une confirmation à la fermeture de l'onglet avec un dessin pas encore arrivé au serveur. Les limites sont dans un fichier de configuration (`src/ux/ux.config.json`). Huit langues, portugais du Portugal compris.
+* **Programmes de la machine depuis le téléphone, vus dans Studio :** Configuration > Mises à jour a une carte qui dit si les programmes de la machine peuvent être mis à jour depuis le téléphone (activé ou non, et pourquoi), comment l'activer (`ARMOR_CM5_UPDATE` sur le serveur et `ARMOR_MAINT_UPDATER` chez l'assistant), quels programmes elle couvre, si une signature est exigée et l'activité récente du journal d'audit. La carte ne fait qu'afficher : les interrupteurs sont dans l'environnement du serveur.
 
 ## 🧩 Rôle dans A.R.M.O.R.
 
@@ -181,6 +182,18 @@ Capturées sur un banc d'essai avec des données d'exemple fictives et sans inst
 
 <p align="center"><em>Concepteur d'alarme > Modes : ce que défend chaque mode d'armement (absent, présent, nuit), avec ses délais et profils de centrale.</em></p>
 
+<p align="center">
+  <img src="images/screenshots/alarm-templates.png" alt="Concepteur d'alarme > Partir d'un modèle" width="100%">
+</p>
+
+<p align="center"><em>Concepteur d'alarme > Partir d'un modèle : avec les Aides à la conception activées, un appartement, un commerce ou un entrepôt avec périmètre est posé sur la feuille comme point de départ à ajuster au bâtiment réel.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/machine-update.png" alt="Configuration > Mises à jour > Programmes de la machine, depuis le téléphone" width="100%">
+</p>
+
+<p align="center"><em>Configuration > Mises à jour : la carte qui dit si les programmes de la machine peuvent être mis à jour depuis le téléphone (ici désactivé, et pourquoi), comment l'activer et l'activité récente ; elle ne fait qu'afficher, les interrupteurs sont dans le serveur.</em></p>
+
 ## 🔒 Sécurité et protection
 
 * **Aucun secret dans le navigateur.** Les mots de passe des caméras sont saisis une fois, envoyés au serveur et ensuite affichés seulement comme un état « enregistré » masqué. Les exports du site suppriment les noms d'utilisateur et les indicateurs d'identifiants.
@@ -232,7 +245,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 face à un serveur sur 127.0.0.1:18080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # écrit la table de chaque langue après un changement de phrase
-npm test                                                                       # 1446 tests
+npm test                                                                       # 1495 tests
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # sert le build
 ```

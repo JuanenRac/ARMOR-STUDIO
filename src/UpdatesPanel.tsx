@@ -119,7 +119,8 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
   useEffect(() => { logEnd.current?.scrollIntoView?.({ block: "nearest" }); }, [job?.log.length]);
 
   if (!isAdmin) return <article className="stack-card"><h3>{t("mt_title")}</h3><p className="muted">{t("cs_admin_only")}</p></article>;
-  if (available === false) return <article className="stack-card"><h3>{t("mt_title")}</h3><p className="notice">{t("mt_unavailable")}</p><p className="muted">{hint || t("mt_hint")}</p></article>;
+  // without the maintenance console the card of the programs of the machine still shows, since it is the place that says how the helper is turned on
+  if (available === false) return <div className="mt-panel"><article className="stack-card"><h3>{t("mt_title")}</h3><p className="notice">{t("mt_unavailable")}</p><p className="muted">{hint || t("mt_hint")}</p></article><MachineUpdateCard t={t} origin={origin} /></div>;
 
   const begin = (next: MaintJob) => { logLines.current = next.log ?? []; setJob({ ...next, log: logLines.current }); setWaiting(false); keepJob(next.id); };
   const dismiss = () => { keepJob(""); logLines.current = []; setJob(null); };

@@ -183,6 +183,52 @@
         "ja": "アラームデザイナー > モード：各警戒モード（外出、在宅、夜間）が守るものと、遅延、パネルのプロファイル。",
         "pt": "Desenhador de alarme > Modos: o que cada modo de armação (ausente, em casa, noite) defende, com os seus atrasos e perfis de painel."
       }
+    },
+    {
+      "file": "alarm-templates.png",
+      "alt": {
+        "en": "Alarm Designer > Start from a template",
+        "es": "Diseñador de alarma > Empezar desde una plantilla",
+        "fr": "Concepteur d'alarme > Partir d'un modèle",
+        "it": "Progettista d'allarme > Parti da un modello",
+        "de": "Alarm-Designer > Mit einer Vorlage beginnen",
+        "zh": "报警设计器 > 从模板开始",
+        "ja": "アラームデザイナー > テンプレートから始める",
+        "pt": "Desenhador de alarme > Começar a partir de um modelo"
+      },
+      "caption": {
+        "en": "Alarm Designer > Start from a template: with Design aids on, a flat, a shop or a warehouse with a perimeter is put on the sheet as a starting point to adjust to the real building.",
+        "es": "Diseñador de alarma > Empezar desde una plantilla: con las Ayudas de diseño activadas, un piso, un local comercial o una nave con perímetro se pone en la hoja como punto de partida para ajustarlo al edificio real.",
+        "fr": "Concepteur d'alarme > Partir d'un modèle : avec les Aides à la conception activées, un appartement, un commerce ou un entrepôt avec périmètre est posé sur la feuille comme point de départ à ajuster au bâtiment réel.",
+        "it": "Progettista d'allarme > Parti da un modello: con gli Aiuti di progetto attivi, un appartamento, un negozio o un capannone con perimetro viene messo sul foglio come punto di partenza da adattare all'edificio reale.",
+        "de": "Alarm-Designer > Mit einer Vorlage beginnen: Bei eingeschalteten Entwurfshilfen wird eine Wohnung, ein Laden oder eine Halle mit Außenschutz als Ausgangspunkt auf das Blatt gelegt, den man an das echte Gebäude anpasst.",
+        "zh": "报警设计器 > 从模板开始：开启设计辅助后，可把一套公寓、一家商店或带周界的仓库作为起点放到图纸上，再按真实建筑调整。",
+        "ja": "アラームデザイナー > テンプレートから始める：設計ヘルプをオンにすると、住戸、店舗、周界つきの倉庫を出発点として図面に置き、実際の建物に合わせて調整できます。",
+        "pt": "Desenhador de alarme > Começar a partir de um modelo: com as Ajudas de desenho ativadas, um apartamento, uma loja ou um armazém com perímetro é posto na folha como ponto de partida para ajustar ao edifício real."
+      }
+    },
+    {
+      "file": "machine-update.png",
+      "alt": {
+        "en": "Configuration > Updates > Programs of the machine, from the phone",
+        "es": "Configuración > Actualizaciones > Programas del equipo, desde el móvil",
+        "fr": "Configuration > Mises à jour > Programmes de la machine, depuis le téléphone",
+        "it": "Configurazione > Aggiornamenti > Programmi della macchina, dal telefono",
+        "de": "Konfiguration > Updates > Programme der Maschine, vom Handy aus",
+        "zh": "配置 > 更新 > 从手机更新设备程序",
+        "ja": "設定 > アップデート > スマートフォンから行う本体のプログラム更新",
+        "pt": "Configuração > Atualizações > Programas do equipamento, a partir do telemóvel"
+      },
+      "caption": {
+        "en": "Configuration > Updates: the card that says whether the programs of the machine can be updated from the phone (here off, and why), how it is turned on and the recent activity; it only shows, the switches live in the server.",
+        "es": "Configuración > Actualizaciones: la tarjeta que dice si los programas del equipo se pueden actualizar desde el móvil (aquí apagado, y por qué), cómo se enciende y la actividad reciente; solo muestra, los interruptores viven en el servidor.",
+        "fr": "Configuration > Mises à jour : la carte qui dit si les programmes de la machine peuvent être mis à jour depuis le téléphone (ici désactivé, et pourquoi), comment l'activer et l'activité récente ; elle ne fait qu'afficher, les interrupteurs sont dans le serveur.",
+        "it": "Configurazione > Aggiornamenti: la scheda che dice se i programmi della macchina si possono aggiornare dal telefono (qui spento, e perché), come si accende e l'attività recente; si limita a mostrare, gli interruttori stanno nel server.",
+        "de": "Konfiguration > Updates: die Karte, die sagt, ob die Programme der Maschine vom Handy aus aktualisiert werden können (hier aus, und warum), wie man es einschaltet, und die jüngste Aktivität; sie zeigt nur an, die Schalter liegen im Server.",
+        "zh": "配置 > 更新：说明是否可从手机更新设备程序的卡片（此处为关闭及原因）、开启方法和近期活动；它只负责显示，开关位于服务器中。",
+        "ja": "設定 > アップデート：本体のプログラムをスマートフォンから更新できるか（ここではオフとその理由）、有効にする方法、最近の動きを示すカード。表示するだけで、スイッチはサーバー側にあります。",
+        "pt": "Configuração > Atualizações: o cartão que diz se os programas do equipamento se podem atualizar a partir do telemóvel (aqui desligado, e porquê), como se liga e a atividade recente; só mostra, os interruptores vivem no servidor."
+      }
     }
   ]
 }
