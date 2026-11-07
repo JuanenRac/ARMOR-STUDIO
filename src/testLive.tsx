@@ -43,3 +43,30 @@ export function fakeServer(routes: Record<string, Answer>): Call[] {
   }));
   return calls;
 }
+
+/** Uses every control in a mounted component once: each field gets a new value, each list every option, each button a click. Used to run the handlers a person would reach. */
+export async function pokeAll(host: HTMLElement): Promise<number> {
+  let used = 0;
+  const setNative = (element: HTMLInputElement | HTMLSelectElement, value: string) => {
+    const proto = element instanceof HTMLSelectElement ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
+    Object.getOwnPropertyDescriptor(proto, "value")?.set?.call(element, value);
+    element.dispatchEvent(new Event(element instanceof HTMLSelectElement ? "change" : "input", { bubbles: true }));
+  };
+  for (const input of [...host.querySelectorAll<HTMLInputElement>("input")]) {
+    await act(async () => {
+      if (input.type === "checkbox" || input.type === "radio") input.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      else if (input.type === "number" || input.type === "range") { setNative(input, String(Number(input.value || 0) + 1)); setNative(input, "0"); setNative(input, "-3"); setNative(input, ""); }
+      else if (input.type === "color") setNative(input, "#336699");
+      else setNative(input, "x");
+    });
+    used += 1;
+  }
+  for (const select of [...host.querySelectorAll<HTMLSelectElement>("select")]) {
+    for (const option of [...select.options]) { await act(async () => { setNative(select, option.value); }); used += 1; }
+  }
+  for (const button of [...host.querySelectorAll<HTMLButtonElement>("button")]) {
+    await act(async () => { button.dispatchEvent(new MouseEvent("click", { bubbles: true })); });
+    used += 1;
+  }
+  return used;
+}

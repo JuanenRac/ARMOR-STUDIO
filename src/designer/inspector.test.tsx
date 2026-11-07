@@ -5,7 +5,7 @@ import { INITIAL_BUILDINGS, INITIAL_CAMERAS, INITIAL_DIMENSIONS, INITIAL_FEATURE
 import { Inspector, type InspectorProps } from "./Inspector";
 import { NO_SELECTION, type Selection } from "./model";
 import type { SiteModel } from "./ops";
-import { mount } from "../testLive";
+import { mount, pokeAll } from "../testLive";
 
 const model = (): SiteModel => ({
   terrain: structuredClone(INITIAL_TERRAIN), buildings: structuredClone(INITIAL_BUILDINGS), openings: structuredClone(INITIAL_OPENINGS), roofItems: structuredClone(INITIAL_ROOF_ITEMS),
@@ -22,6 +22,7 @@ async function properties(selection: Selection, extra: Partial<InspectorProps> =
   const view = await mount(createElement(Inspector, props(selection, extra)));
   const tab = [...view.host.querySelectorAll<HTMLButtonElement>("[role=tab]")][1];
   await view.click(tab ?? null);
+  expect(await pokeAll(view.host)).toBeGreaterThan(0);
   return view;
 }
 
@@ -35,7 +36,7 @@ describe("the properties panel of the site designer", () => {
     expect(view.host.innerHTML.length).not.toBe(first);
     expect(view.host.querySelectorAll("input").length).toBeGreaterThan(0);
     await view.unmount();
-  });
+  }, 60000);
 
   it("draws the panel of the terrain, with or without a corner chosen", async () => {
     for (const selection of [{ kind: "terrain" }, { kind: "terrain", vertex: 0 }] as Selection[]) {
@@ -43,7 +44,7 @@ describe("the properties panel of the site designer", () => {
       expect(view.host.querySelectorAll("input").length, JSON.stringify(selection)).toBeGreaterThan(2);
       await view.unmount();
     }
-  });
+  }, 60000);
 
   it("draws the panel of every building of the demo site, and of one of its corners", async () => {
     for (const building of model().buildings) {
@@ -54,7 +55,7 @@ describe("the properties panel of the site designer", () => {
     const corner = await properties({ kind: "building", id: model().buildings[0]!.id, vertex: 0 });
     expect(corner.host.querySelectorAll("input").length).toBeGreaterThan(3);
     await corner.unmount();
-  });
+  }, 60000);
 
   it("draws the panel of each kind of object the site holds", async () => {
     const site = model();
@@ -67,11 +68,11 @@ describe("the properties panel of the site designer", () => {
       expect(view.host.querySelectorAll("input,select").length, kind).toBeGreaterThan(1);
       await view.unmount();
     }
-  });
+  }, 60000);
 
   it("keeps drawing when the selected object is gone", async () => {
     const view = await properties({ kind: "camera", id: "no-such-camera" });
     expect(view.host.querySelector("aside")).not.toBeNull();
     await view.unmount();
-  });
+  }, 60000);
 });
