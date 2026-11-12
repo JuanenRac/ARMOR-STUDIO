@@ -1115,6 +1115,7 @@ const catalogue: Record<string, string> = {
 "sec_opt_pin_warn": "启用后，任何已登录且有权撤防的人都无需 PIN 即可撤防。",
 "sec_opt_voice": "语音静音警报",
 "sec_opt_voice_help": "语音助手在静音警报前要求什么。服务器在每一轮对话中都会告知语音服务。",
+"sec_opt_voice_challenge": "面板屏幕上显示的数字，需念出（助手从不朗读）",
 "sec_opt_voice_double_turn": "在第二轮中确认",
 "sec_opt_voice_pin": "说出 PIN",
 "sec_opt_voice_off": "无需确认：立即静音",

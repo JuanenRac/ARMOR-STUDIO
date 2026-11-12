@@ -1115,6 +1115,7 @@ const catalogue: Record<string, string> = {
 "sec_opt_pin_warn": "この設定では、解除できるログイン済みの人は誰でも PIN なしで解除できます。",
 "sec_opt_voice": "音声でのアラーム停止",
 "sec_opt_voice_help": "音声アシスタントがアラームを止める前に求めること。サーバーは音声サービスに毎回これを伝えます。",
+"sec_opt_voice_challenge": "パネルの画面に表示される数字を読み上げる（アシスタントは声に出さない）",
 "sec_opt_voice_double_turn": "2 回目の発話で確認",
 "sec_opt_voice_pin": "PIN を言う",
 "sec_opt_voice_off": "確認なし（すぐに停止）",

@@ -252,7 +252,7 @@ type OptionKey = Exclude<keyof SecurityOptions, "voice.panic_cooldown_s" | "voic
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
 const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean; optional?: boolean }> = [
   { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN", node: true },
-  { key: "voice.silence_confirmation", id: "voice", values: ["double_turn", "pin", "off"] },
+  { key: "voice.silence_confirmation", id: "voice", values: ["challenge", "double_turn", "pin", "off"] },
   { key: "alarm.arming_modes", id: "modes", values: [false, true], calm: true, optional: true },
   { key: "alarm.mode_downgrade_pin", id: "modepin", values: ["required", "not_required"], optional: true },
   { key: "alarm.mode_schedule", id: "modesched", values: [false, true], calm: true, optional: true },

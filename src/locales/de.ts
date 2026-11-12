@@ -1084,6 +1084,7 @@ const catalogue: Record<string, string> = {
 "sec_opt_pin_warn": "Damit entschärft jeder angemeldete Benutzer, der das darf, ohne PIN.",
 "sec_opt_voice": "Alarm per Sprache stummschalten",
 "sec_opt_voice_help": "Was der Sprachassistent verlangt, bevor er den Alarm stummschaltet. Der Server teilt es dem Sprachdienst bei jedem Durchgang mit.",
+"sec_opt_voice_challenge": "Eine Zahl auf dem Display des Panels, die Sie nachsprechen (der Assistent sagt sie nie)",
 "sec_opt_voice_double_turn": "In einem zweiten Durchgang bestätigen",
 "sec_opt_voice_pin": "Die PIN sagen",
 "sec_opt_voice_off": "Nichts: sofort stummgeschaltet",

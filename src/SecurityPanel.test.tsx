@@ -44,6 +44,20 @@ describe("the security screen", () => {
     expect(isLowering([true, false], false, true)).toBe(false);
   });
 
+  it("offers the challenge mode of the voice silence option in every language, as the strictest value, and moving off it is a loss", () => {
+    const values = ["challenge", "double_turn", "pin", "off"];
+    for (const locale of locales) {
+      const words = text(locale, "sec_opt_voice_challenge");
+      expect(words.trim().length, locale).toBeGreaterThan(8);
+      expect(words, `${locale} is not the key`).not.toBe("sec_opt_voice_challenge");
+    }
+    expect(new Set(locales.map(locale => text(locale, "sec_opt_voice_challenge"))).size).toBe(locales.length);
+    expect(isLowering(values, "challenge", "double_turn")).toBe(true);
+    expect(isLowering(values, "double_turn", "challenge")).toBe(false);
+    expect(isLowering(values, "pin", "challenge")).toBe(false);
+    expect(isLowering(values, "challenge", "off")).toBe(true);
+  });
+
   it("offers the option that keeps device logins from nodes that did not come over TLS, in every language, with its warning", () => {
     for (const locale of locales) for (const id of ["sec_opt_metrics", "sec_opt_metrics_help", "sec_opt_metrics_warn", "sec_opt_heartbeat", "sec_opt_heartbeat_help", "sec_opt_heartbeat_warn", "sec_opt_recording", "sec_opt_recording_help", "sec_opt_recording_warn", "in_dry_run", "ch_help", "ch_summary", "in_dry_result", "versionsDiffLoading", "versionsDiffTitle", "versionsDiffLegend", "versionsDiffSame", "versionsDiffFailed", "versionsDiffMore", "sec_opt_netlogin", "sec_opt_netlogin_help", "sec_opt_netlogin_warn", "sec_opt_country", "sec_opt_country_help", "sec_opt_country_warn", "sec_opt_voiceturn", "sec_opt_voiceturn_help", "sec_opt_voiceturn_warn", "sec_opt_panellive", "sec_opt_panellive_help", "sec_opt_panellive_warn", "sec_opt_nvs", "sec_opt_nvs_help", "sec_opt_nvs_off", "sec_opt_nvs_secrets", "sec_opt_nvs_warn", "sec_opt_lock", "sec_opt_lock_help", "sec_opt_lock_warn", "sec_opt_lock_user", "sec_opt_lock_sensitive", "sec_opt_lock_always"]) {
       const words = text(locale, id);

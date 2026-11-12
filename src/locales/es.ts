@@ -1106,6 +1106,7 @@ const catalogue: Record<string, string> = {
 "sec_opt_pin_warn": "Con esto, cualquiera que haya iniciado sesión y pueda desarmar lo hace sin PIN.",
 "sec_opt_voice": "Silenciar la alarma por voz",
 "sec_opt_voice_help": "Lo que pide el asistente de voz antes de silenciar la alarma. El servidor se lo comunica al servicio de voz en cada turno.",
+"sec_opt_voice_challenge": "Un número en la pantalla del panel, dicho en voz alta (nunca lo dice el asistente)",
 "sec_opt_voice_double_turn": "Confirmar en un segundo turno",
 "sec_opt_voice_pin": "Decir el PIN",
 "sec_opt_voice_off": "Nada: se silencia de inmediato",
