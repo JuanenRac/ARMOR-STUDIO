@@ -25,7 +25,7 @@ import type { ElectricalReadings as ClientElectricalReadings } from "../electric
 import type { EnergyAlarmSettings as ClientEnergyAlarmSettings } from "../solar";
 import type { FirmwareUpload as ClientFirmwareUpload } from "../firmware";
 import type { CountLine as ClientCountLine } from "../cameras";
-import type { IgnoreZone as ClientIgnoreZone } from "../cameras";
+import type { IgnoreZone as ClientIgnoreZone, DetectionZone as ClientDetectionZone } from "../cameras";
 import type { MediaItem as ClientMediaItem } from "../cameras";
 import type { NodeControlAllRequest as ClientNodeControlAllRequest } from "../nodeControl";
 import type { NodeControlLine as ClientNodeControlLine } from "../nodeControl";
@@ -89,6 +89,7 @@ type Checked = {
   FirmwareUpload: Fits<Rest.FirmwareUpload, ClientFirmwareUpload>;
   CountLine: Fits<Rest.CountLine, ClientCountLine>;
   IgnoreZone: Fits<Rest.IgnoreZone, ClientIgnoreZone>;
+  DetectionZone: Fits<Rest.DetectionZone, ClientDetectionZone>;
   MediaItem: Fits<Rest.MediaItem, ClientMediaItem>;
   NodeControlAllRequest: Fits<Rest.NodeControlAllRequest, ClientNodeControlAllRequest>;
   NodeControlLine: Fits<Rest.NodeControlLine, ClientNodeControlLine>;
@@ -148,6 +149,7 @@ export const checked: Checked = {
   FirmwareUpload: true,
   CountLine: true,
   IgnoreZone: true,
+  DetectionZone: true,
   MediaItem: true,
   NodeControlAllRequest: true,
   NodeControlLine: true,
