@@ -44,6 +44,33 @@ const ROWS: Record<string, Row> = {
     "オンにすると、管理者やオペレーターなら誰でも、カメラの前で人がどこを動いたかを見られるようになります。画像は含みませんが、人に関する情報です。必要がなければオフのままにしてください。",
     "开启后，任何管理员或操作员都可以看到人们在摄像头前走动的位置。它不含图像，但属于与人有关的信息：不需要时请保持关闭。",
   ],
+  sec_opt_actevents: [
+    "Activity events of the vision service",
+    "Eventos de actividad del servicio de visión",
+    "Aktivitätsereignisse des Vision-Dienstes",
+    "Événements d'activité du service de vision",
+    "Eventi di attività del servizio di visione",
+    "ビジョンサービスのアクティビティイベント",
+    "视觉服务的活动事件",
+  ],
+  sec_opt_actevents_help: [
+    "The server takes the zone and line events that ARMOR-VISION reports (an object entered, stayed in or loitered in a zone, crossed a line). Every event is recorded; an alert zone may raise an alarm only while armed, and not when the profile of the mode says not to tell anybody. Off (the default): the server reads nothing and answers that the feature is off.",
+    "El servidor acepta los eventos de zona y de línea que informa ARMOR-VISION (un objeto entró, permaneció o merodeó en una zona, cruzó una línea). Todo evento se registra; una zona de alerta puede levantar una alarma solo con el sistema armado, y no cuando el perfil del modo dice que no se avise a nadie. Apagado (por defecto): el servidor no lee nada y responde que la función está apagada.",
+    "Der Server nimmt die Zonen- und Linienereignisse an, die ARMOR-VISION meldet (ein Objekt betrat eine Zone, blieb darin oder verweilte, überquerte eine Linie). Jedes Ereignis wird aufgezeichnet; eine Alarmzone kann nur bei scharfem System einen Alarm auslösen, und nicht, wenn das Profil des Modus sagt, dass niemand benachrichtigt wird. Aus (Standard): Der Server liest nichts und antwortet, dass die Funktion aus ist.",
+    "Le serveur accepte les événements de zone et de ligne que signale ARMOR-VISION (un objet est entré, est resté ou a rôdé dans une zone, a franchi une ligne). Chaque événement est enregistré ; une zone d'alerte peut déclencher une alarme seulement quand le système est armé, et pas quand le profil du mode dit de ne prévenir personne. Éteint (par défaut) : le serveur ne lit rien et répond que la fonction est éteinte.",
+    "Il server accetta gli eventi di zona e di linea che segnala ARMOR-VISION (un oggetto è entrato, si è fermato o ha bighellonato in una zona, ha attraversato una linea). Ogni evento viene registrato; una zona di allarme può far scattare un allarme solo a sistema armato, e non quando il profilo della modalità dice di non avvisare nessuno. Spento (predefinito): il server non legge nulla e risponde che la funzione è spenta.",
+    "サーバーは ARMOR-VISION が報告するゾーンと線のイベント（物体がゾーンに入った、留まった、うろついた、線を越えた）を受け付けます。すべてのイベントは記録され、警報ゾーンは武装中のみ、かつモードのプロファイルが通知しないとしていない場合にだけ警報を出せます。オフ（既定）：サーバーは何も読まず、機能がオフであると応答します。",
+    "服务器接收 ARMOR-VISION 报告的区域和线事件（物体进入、停留或徘徊于某区域，或越过某条线）。每个事件都会被记录；警报区域只有在布防时才能触发警报，并且当该模式的配置文件规定不通知任何人时不会触发。关闭（默认）：服务器不读取任何内容，并回复该功能已关闭。",
+  ],
+  sec_opt_actevents_warn: [
+    "Turning it on lets the vision service raise alarms in the zones marked as alert. Nothing is switched off.",
+    "Al activarlo, el servicio de visión puede levantar alarmas en las zonas marcadas como de alerta. No se desactiva nada.",
+    "Wenn Sie es einschalten, kann der Vision-Dienst in den als Alarm markierten Zonen Alarme auslösen. Nichts wird abgeschaltet.",
+    "En l'activant, le service de vision peut déclencher des alarmes dans les zones marquées comme alerte. Rien n'est désactivé.",
+    "Attivandolo, il servizio di visione può far scattare allarmi nelle zone segnate come di allarme. Non viene disattivato nulla.",
+    "オンにすると、ビジョンサービスは警報として指定されたゾーンで警報を出せます。無効になるものはありません。",
+    "开启后，视觉服务可在标记为警报的区域触发警报。不会关闭任何东西。",
+  ],
 };
 
 const PT: Record<string, string> = {
@@ -53,6 +80,9 @@ const PT: Record<string, string> = {
   sec_opt_heatmap: "Mapa de calor da atividade de uma câmara",
   sec_opt_heatmap_help: "Os administradores e operadores podem pedir ao servidor o mapa de calor de uma câmara: quanta atividade houve em cada parte da cena, feito pelo ARMOR-VISION a partir de deteções gravadas. Contam-se apenas posições, nunca imagens. Desligado, a rota responde 404.",
   sec_opt_heatmap_warn: "Ligá-lo permite que qualquer administrador ou operador veja por onde as pessoas se moveram à frente de uma câmara. Não contém nenhuma imagem, mas é informação sobre pessoas: deixe-o desligado, a não ser que precise dele.",
+  sec_opt_actevents: "Eventos de atividade do serviço de visão",
+  sec_opt_actevents_help: "O servidor aceita os eventos de zona e de linha que o ARMOR-VISION comunica (um objeto entrou, ficou ou vadiou numa zona, atravessou uma linha). Todo o evento é registado; uma zona de alerta só pode levantar um alarme com o sistema armado, e não quando o perfil do modo diz para não avisar ninguém. Desligado (por omissão): o servidor não lê nada e responde que a funcionalidade está desligada.",
+  sec_opt_actevents_warn: "Ao ativá-lo, o serviço de visão pode levantar alarmes nas zonas marcadas como de alerta. Não se desativa nada.",
 };
 
 export const reportsCatalogues: RowCatalogues = { ...cataloguesFromRows(ROWS), pt: PT };
