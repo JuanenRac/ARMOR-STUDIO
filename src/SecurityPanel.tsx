@@ -248,7 +248,7 @@ function TrustedHours({ t, state, apply, busy }: { t: (key: string) => string; s
   </fieldset>;
 }
 
-type OptionKey = Exclude<keyof SecurityOptions, "voice.panic_cooldown_s" | "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute" | "client.trusted_session_h" | "vision.semantic_search" | "vision.plates" | "vision.faces" | "vision.semantic_search_ack" | "vision.plates_ack" | "vision.faces_ack">;
+type OptionKey = Exclude<keyof SecurityOptions, "voice.panic_cooldown_s" | "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute" | "client.trusted_session_h" | "media.retention_snapshot_days" | "media.retention_recording_days" | "vision.semantic_search" | "vision.plates" | "vision.faces" | "vision.semantic_search_ack" | "vision.plates_ack" | "vision.faces_ack">;
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
 const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean; optional?: boolean }> = [
   { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN", node: true },
@@ -473,6 +473,54 @@ function VisionPersonal({ t, state, apply, busy }: { t: (key: string) => string;
   </fieldset>;
 }
 
+/** The days photos and recordings are kept, each kind on its own: 0 to 3650, 0 meaning the general limit of the server. */
+export const RETENTION_LIMITS = {
+  "media.retention_snapshot_days": { min: 0, max: 3650, id: "snapshot" },
+  "media.retention_recording_days": { min: 0, max: 3650, id: "recording" },
+} as const;
+type RetentionKey = keyof typeof RETENTION_LIMITS;
+/** The whole number of days a field holds, or undefined when it is not one inside the range. */
+export function retentionValue(key: RetentionKey, text: string): number | undefined {
+  const trimmed = text.trim();
+  if (!/^\d{1,4}$/.test(trimmed)) return undefined;
+  const value = Number(trimmed);
+  return value >= RETENTION_LIMITS[key].min && value <= RETENTION_LIMITS[key].max ? value : undefined;
+}
+function RetentionLimits({ t, state, apply, busy }: { t: (key: string) => string; state: SecurityOptionsState; apply: (change: Partial<SecurityOptions>, raising: boolean) => Promise<boolean>; busy: boolean }) {
+  const keys = (Object.keys(RETENTION_LIMITS) as RetentionKey[]).filter(key => typeof state.settings[key] === "number");
+  const [typed, setTyped] = useState<Record<string, string>>({});
+  const [invalid, setInvalid] = useState(false);
+  const shown = (key: RetentionKey) => typed[key] ?? String(state.settings[key] ?? "");
+  const save = async (event: FormEvent) => {
+    event.preventDefault();
+    const change: Record<string, number> = {};
+    for (const key of keys) {
+      const value = retentionValue(key, shown(key));
+      if (value === undefined) { setInvalid(true); return; }
+      if (value !== state.settings[key]) change[key] = value;
+    }
+    setInvalid(false);
+    if (!Object.keys(change).length) return;
+    if (await apply(change as Partial<SecurityOptions>, false)) setTyped({});
+  };
+  const locked = state.locked.some(key => keys.includes(key as RetentionKey));
+  return <fieldset className="sec-option" data-testid="security-retention" disabled={busy || locked}>
+    <legend>{t("sec_ret_title")}</legend>
+    <p className="muted">{t("sec_ret_help")}</p>
+    <form onSubmit={event => void save(event)}>
+      {keys.map(key => {
+        const limit = RETENTION_LIMITS[key], value = retentionValue(key, shown(key));
+        return <label key={key}>{t(`sec_ret_${limit.id}`)}
+          <input inputMode="numeric" value={shown(key)} aria-invalid={value === undefined} data-testid={`security-retention-${limit.id}`} onChange={event => { setInvalid(false); setTyped(current => ({ ...current, [key]: event.target.value.replace(/\D/g, "") })); }} />
+          <span className="muted">{fill(t("sec_rep_range"), { min: limit.min, max: limit.max })}</span>
+        </label>;
+      })}
+      {invalid && <p className="notice bad" role="alert">{t("sec_rep_invalid")}</p>}
+      <button className="primary" disabled={busy}>{t("sec_rep_save")}</button>
+    </form>
+  </fieldset>;
+}
+
 function ServerOptions({ t, origin }: { t: (key: string) => string; origin: string }) {
   const [state, setState] = useState<SecurityOptionsState | null>(null);
   const [message, setMessage] = useState({ text: "", bad: false });
@@ -516,6 +564,7 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
     })}
     {typeof state.settings["alarm_audio.custom_sounds"] === "boolean" && <AlarmSounds t={t} origin={origin} spokenOn={state.settings["alarm_audio.spoken"] === true} customOn={state.settings["alarm_audio.custom_sounds"]} />}
     {typeof state.settings["voice.turn_max_bytes"] === "number" && <VoiceLimits t={t} state={state} apply={applyLimits} busy={busy} />}
+    {typeof state.settings["media.retention_snapshot_days"] === "number" && <RetentionLimits t={t} state={state} apply={applyLimits} busy={busy} />}
     {typeof state.settings["vision.semantic_search"] === "boolean" && <VisionPersonal t={t} state={state} apply={applyLimits} busy={busy} />}
     {state.settings["network.lan_ca"] === true && <p><a href={`${origin}/api/v1/security/lan-ca`} download="armor-lan-ca.crt" data-testid="security-lanca-download">{t("sec_lanca_download")}</a></p>}
     {typeof state.settings["vision.service_url"] === "string" && <VisionService t={t} state={state} apply={applyLimits} busy={busy} />}

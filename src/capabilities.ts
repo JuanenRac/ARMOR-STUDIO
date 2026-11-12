@@ -25,6 +25,9 @@ export type SecurityOptions = {
   "network.login_secure_only": boolean;
   /** An administrator may download the public certificate of the local CA of the LAN (off by default). */
   "network.lan_ca": boolean;
+  /** How many days snapshots and recordings are kept, each kind on its own (0 to 3650; 0: the general limit of the server). */
+  "media.retention_snapshot_days": number;
+  "media.retention_recording_days": number;
   /** The three features of the second phase of ARMOR-VISION that read personal data (all off by default); each can only be on once its acknowledgement of the privacy notice is. */
   "vision.semantic_search": boolean;
   "vision.plates": boolean;

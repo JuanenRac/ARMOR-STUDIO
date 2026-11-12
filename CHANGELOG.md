@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The days photos and recordings are kept can be set per kind:** Configuration > Security has two fields (photos and recordings, 0 to 3650 days, 0 = the general limit of the server), in the eight languages.
+
 - **Detection zones and a profile for each arming mode, in Configuration > Cameras:** a click adds a corner of a zone over the live picture and closing it keeps the polygon (3 to 12 corners); each zone has a name, alert or only recorded, the labels it counts and the frames and seconds an object stays before it counts. Below, one profile per mode (away, home, night, disarmed) chooses the zones watched, the sensitivity and whether it is told; a mode without a profile watches every zone. In the eight languages.
 
 - **Switches for the local CA of the LAN and for search by meaning, plates and faces:** Configuration > Security shows the option `network.lan_ca` (off by default; when on, a link downloads the public certificate of the local CA, never a key) and a card for the three features of ARMOR-VISION that read personal data. Each one shows its privacy notice, needs the box "I have read the privacy notice" ticked before it can be turned on, and turning it off takes the tick back; all in the eight languages.

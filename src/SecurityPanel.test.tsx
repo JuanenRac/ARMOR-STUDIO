@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ElevationDialog } from "./ElevationHost";
-import { envValue, isLowering, SecurityPanel, TRUSTED_HOURS, trustedHoursValue, setEnvLines, REPORT_LIMITS, reportLimitValue, VOICE_LIMITS, visionServiceUrlValue, voiceLimitValue } from "./SecurityPanel";
+import { retentionValue, envValue, isLowering, SecurityPanel, TRUSTED_HOURS, trustedHoursValue, setEnvLines, REPORT_LIMITS, reportLimitValue, VOICE_LIMITS, visionServiceUrlValue, voiceLimitValue } from "./SecurityPanel";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
 import { SessionUserContext } from "./sessionContext";
 import { locales, requiredUiKeys, text } from "./i18n";
@@ -109,6 +109,17 @@ describe("the security screen", () => {
     const html = renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }));
     expect(html).not.toContain("security-vision-personal");
     expect(html).not.toContain("security-option-lanca");
+  });
+
+  it("reads the days of retention as whole numbers inside the range, and has its words in every language", () => {
+    expect(retentionValue("media.retention_snapshot_days", "0")).toBe(0);
+    expect(retentionValue("media.retention_recording_days", "3650")).toBe(3650);
+    for (const bad of ["", "-1", "3651", "1.5", "abc", "12345"]) expect(retentionValue("media.retention_snapshot_days", bad), bad).toBeUndefined();
+    for (const id of ["sec_ret_title", "sec_ret_help", "sec_ret_snapshot", "sec_ret_recording"]) {
+      const words = new Set<string>();
+      for (const locale of locales) { const phrase = text(locale, id); expect(phrase.trim().length, `${locale} ${id}`).toBeGreaterThan(2); expect(phrase).not.toBe(id); words.add(phrase); }
+      expect(words.size, id).toBeGreaterThan(5);
+    }
   });
 
   it("draws the cards of the account, and the dialog that asks for the password again", () => {
