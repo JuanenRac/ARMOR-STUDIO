@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Tests of the calls that write to a battery:** every route of the battery operations is checked (the identifier of an operation never leaves its place in the address) and so is the upload of a firmware image: the password is asked again only when the server wants it and only once, and every other refusal becomes its code or `generic`.
+
 - **A box in Configuration > Security for the activity events of the vision service:** the option `vision.activity_events` (off by default, in the eight languages) lets the server take the zone and line events of the vision service; off, the server reads nothing and says the feature is off. Turning it on adds a source of alarms in the zones marked as alert and switches nothing off.
 
 - **The days photos and recordings are kept can be set per kind:** Configuration > Security has two fields (photos and recordings, 0 to 3650 days, 0 = the general limit of the server), in the eight languages.
