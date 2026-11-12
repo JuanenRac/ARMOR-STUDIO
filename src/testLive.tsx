@@ -70,3 +70,18 @@ export async function pokeAll(host: HTMLElement): Promise<number> {
   }
   return used;
 }
+
+/** The first control of `selector` (a button by default) whose text is `label`; null when there is none. */
+export function byText(host: ParentNode, label: string, selector = "button"): HTMLElement | null {
+  return [...host.querySelectorAll<HTMLElement>(selector)].find(element => (element.textContent ?? "").trim() === label) ?? null;
+}
+
+/** Types a value into a field the way a person would, so the component sees its change handler run. */
+export async function typeInto(element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null, value: string): Promise<void> {
+  if (!element) return;
+  const proto = element instanceof HTMLSelectElement ? HTMLSelectElement.prototype : element instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+  await act(async () => {
+    Object.getOwnPropertyDescriptor(proto, "value")?.set?.call(element, value);
+    element.dispatchEvent(new Event(element instanceof HTMLSelectElement ? "change" : "input", { bubbles: true }));
+  });
+}

@@ -115,8 +115,8 @@ export function FileEditor({ t, origin, info, services, onSaved }: { t: Translat
   const [text, setText] = useState("");
   const [message, setMessage] = useState<{ text: string; bad: boolean }>({ text: "", bad: false });
   const [busy, setBusy] = useState(false);
-  const load = useCallback(async () => {
-    try { const loaded = await adminFile(origin, info.id); setFile(loaded); setText(loaded.content); setMessage({ text: "", bad: false }); }
+  const load = useCallback(async (keepMessage = false) => {
+    try { const loaded = await adminFile(origin, info.id); setFile(loaded); setText(loaded.content); if (!keepMessage) setMessage({ text: "", bad: false }); }
     catch (error) { setMessage({ text: explain(t, error), bad: true }); }
   }, [origin, info.id]);   // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { void load(); }, [load]);
@@ -127,7 +127,7 @@ export function FileEditor({ t, origin, info, services, onSaved }: { t: Translat
     try {
       const result = await adminSaveFile(origin, info.id, { content: text, restart, expect_mtime: file.exists ? file.mtime : undefined });
       setMessage({ text: restart ? `${t("adm_saved_restarted")} ${result.restarted.map(id => services?.[id] ?? id).join(", ")}` : t("adm_saved"), bad: false });
-      await load(); onSaved?.();
+      await load(true); onSaved?.();   // the line that says it was saved stays
     } catch (error) { setMessage({ text: explain(t, error), bad: true }); } finally { setBusy(false); }
   };
   return <article className="stack-card adm-file">
