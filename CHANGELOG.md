@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The updates panel, the console, the services menu and the floating tool panel are run for real in the tests, and the coverage floor goes up again:** the administrator checks of each panel, the questions asked before an update or a stop, the refusals shown to the person, the quick commands and time limits of the console, the filters and buttons of the services menu and the drag, fold and keys of the tool panel are exercised (measured in Actions: lines 71.5 %, statements 65.1 %, functions 54.8 %, branches 58.2 %; floors 71 / 64.5 / 54.3 / 57.7). A console whose lock call fails no longer escapes as an unhandled error: the person is asked to confirm again.
+
 - **Wake word option (eight languages):** Configuration > Security gets "Wake word on the wall panel" (off by default; it asks before it is turned on) for the server option `voice.wake_word`.
 
 - **More of the interface is run for real in the tests, and the coverage floor goes up:** a small helper (`src/testLive.tsx`) mounts a component in the test browser, answers what it asks from a stand-in server and uses every control once. With it the cards of the automatic updates, the server trial and the field HTTP rule, and every panel of the site designer inspector (terrain, buildings, openings, lamps, features, cameras, sensors) are exercised. The floor is now 69.5 % lines, 63 % statements, 52 % functions and 56 % branches (it was 69, 62, 51, 55).

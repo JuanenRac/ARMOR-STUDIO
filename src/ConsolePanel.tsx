@@ -88,7 +88,7 @@ export function ConsolePanel({ t, origin, isAdmin }: Props) {
       setMessage(error instanceof ApiError && error.status === 429 ? t("mc_too_many") : t("mc_wrong"));
     }
   };
-  const close = async () => { try { await lockConsole(origin); } finally { await refresh(); } };
+  const close = async () => { try { await lockConsole(origin); } catch { setMessage(t("mc_lock_title")); } finally { await refresh(); } };
   const run = async (command: string) => {
     const text = command.trim();
     if (!text || running) return;
