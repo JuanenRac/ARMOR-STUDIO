@@ -88,6 +88,29 @@ describe("the security screen", () => {
     expect(renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }))).not.toContain("security-option-heatmap");
   });
 
+  it("offers the LAN CA switch and the three personal-data features of the vision service in every language, translated and not repeated", () => {
+    const ids = ["sec_opt_lanca", "sec_opt_lanca_help", "sec_opt_lanca_warn", "sec_lanca_download", "sec_vp_title", "sec_vp_help", "sec_vp_ack", "sec_vp_need_ack", "sec_vp_confirm",
+      ...["semantic_search", "plates", "faces"].flatMap(feature => [`sec_vp_${feature}`, `sec_vp_${feature}_notice`])];
+    for (const id of ids) {
+      const words = new Set<string>();
+      for (const locale of locales) {
+        const phrase = text(locale, id);
+        expect(phrase.trim().length, `${locale} ${id}`).toBeGreaterThan(2);
+        expect(phrase, `${locale} ${id} is not the key`).not.toBe(id);
+        words.add(phrase);
+      }
+      expect(words.size, `${id} is translated, not repeated`).toBe(8);
+    }
+    // turning the LAN CA on is a loss; the privacy notice of a feature that reads faces says what it is
+    expect(isLowering([false, true], false, true)).toBe(true);
+    expect(text("en", "sec_vp_faces_notice")).toContain("biometric");
+    // an older server that does not announce the options shows neither
+    const t = (key: string) => text("en", key);
+    const html = renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }));
+    expect(html).not.toContain("security-vision-personal");
+    expect(html).not.toContain("security-option-lanca");
+  });
+
   it("draws the cards of the account, and the dialog that asks for the password again", () => {
     const t = (key: string) => text("en", key);
     const panel = renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }));

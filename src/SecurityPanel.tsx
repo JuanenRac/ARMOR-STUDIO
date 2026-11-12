@@ -248,7 +248,7 @@ function TrustedHours({ t, state, apply, busy }: { t: (key: string) => string; s
   </fieldset>;
 }
 
-type OptionKey = Exclude<keyof SecurityOptions, "voice.panic_cooldown_s" | "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute" | "client.trusted_session_h">;
+type OptionKey = Exclude<keyof SecurityOptions, "voice.panic_cooldown_s" | "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute" | "client.trusted_session_h" | "vision.semantic_search" | "vision.plates" | "vision.faces" | "vision.semantic_search_ack" | "vision.plates_ack" | "vision.faces_ack">;
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
 const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean; optional?: boolean }> = [
   { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN", node: true },
@@ -264,6 +264,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "server.zone_feed_signature", id: "sign", values: [true, false], node: true },
   { key: "media.rtsp_proxy", id: "rtsp", values: [true, false] },
   { key: "network.login_secure_only", id: "netlogin", values: [true, false] },
+  { key: "network.lan_ca", id: "lanca", values: [false, true], optional: true },   // off by default; on lets an administrator download the public certificate of the local CA, so it asks first
   { key: "login.country_alert", id: "country", values: [true, false] },
   { key: "electrical.set_aside_old_readings", id: "oldread", values: [true, false] },
   { key: "voice.wake_word", id: "wakeword", values: [false, true], optional: true },   // off by default; turning it on lets the wall panel listen for its word all the time, so it asks first
@@ -446,6 +447,32 @@ function VisionService({ t, state, apply, busy }: { t: (key: string) => string; 
   </fieldset>;
 }
 
+/** The three features of ARMOR-VISION that read personal data: off, each needs the privacy notice read (a tick) before it can be turned on, and turning it off takes the tick back. */
+export const VISION_PERSONAL = [
+  { feature: "semantic_search", id: "semantic_search" },
+  { feature: "plates", id: "plates" },
+  { feature: "faces", id: "faces" },
+] as const;
+function VisionPersonal({ t, state, apply, busy }: { t: (key: string) => string; state: SecurityOptionsState; apply: (change: Partial<SecurityOptions>, raising: boolean, confirmText?: string) => Promise<boolean>; busy: boolean }) {
+  const [read, setRead] = useState<Record<string, boolean>>({});
+  return <fieldset className="sec-option" data-testid="security-vision-personal" disabled={busy}>
+    <legend>{t("sec_vp_title")}</legend>
+    <p className="muted">{t("sec_vp_help")}</p>
+    {VISION_PERSONAL.map(({ feature, id }) => {
+      const on = state.settings[`vision.${feature}`] === true;
+      const ticked = on || read[feature] === true;
+      return <div key={feature} className="sec-vp" data-testid={`security-vp-${id}`}>
+        <h4>{t(`sec_vp_${id}`)} - {t(on ? "sec_vp_state_on" : "sec_vp_state_off")}</h4>
+        <p className="muted">{t(`sec_vp_${id}_notice`)}</p>
+        {!on && <label><input type="checkbox" checked={ticked} data-testid={`security-vp-${id}-ack`} onChange={event => setRead({ ...read, [feature]: event.target.checked })} /> {t("sec_vp_ack")}</label>}
+        {!on && !ticked && <p className="muted">{t("sec_vp_need_ack")}</p>}
+        <button className={on ? "" : "primary"} disabled={busy || (!on && !ticked)} data-testid={`security-vp-${id}-toggle`}
+          onClick={() => { void apply({ [`vision.${feature}`]: !on, [`vision.${feature}_ack`]: !on } as Partial<SecurityOptions>, !on, `${t("sec_vp_confirm")} ${t(`sec_vp_${id}`)}`).then(() => setRead({ ...read, [feature]: false })); }}>{t(on ? "sec_vp_turn_off" : "sec_vp_turn_on")}</button>
+      </div>;
+    })}
+  </fieldset>;
+}
+
 function ServerOptions({ t, origin }: { t: (key: string) => string; origin: string }) {
   const [state, setState] = useState<SecurityOptionsState | null>(null);
   const [message, setMessage] = useState({ text: "", bad: false });
@@ -460,9 +487,9 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
     catch (error) { setMessage({ text: errorText(t, error, "sec_err_"), bad: true }); }
     finally { setBusy(false); }
   };
-  const applyLimits = async (change: Partial<SecurityOptions>, raising: boolean): Promise<boolean> => {
+  const applyLimits = async (change: Partial<SecurityOptions>, raising: boolean, confirmText?: string): Promise<boolean> => {
     if (busy) return false;
-    if (raising && !(await askConfirm(`${t("sec_voice_confirm")}\n${t("sec_voice_warn")}`, t))) return false;
+    if (raising && !(await askConfirm(confirmText ?? `${t("sec_voice_confirm")}\n${t("sec_voice_warn")}`, t))) return false;
     setBusy(true);
     try { setState(await changeSecurityOptions(origin, change)); setMessage({ text: t("sec_opt_saved"), bad: false }); return true; }
     catch (error) { setMessage({ text: errorText(t, error, "sec_err_"), bad: true }); return false; }
@@ -489,6 +516,8 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
     })}
     {typeof state.settings["alarm_audio.custom_sounds"] === "boolean" && <AlarmSounds t={t} origin={origin} spokenOn={state.settings["alarm_audio.spoken"] === true} customOn={state.settings["alarm_audio.custom_sounds"]} />}
     {typeof state.settings["voice.turn_max_bytes"] === "number" && <VoiceLimits t={t} state={state} apply={applyLimits} busy={busy} />}
+    {typeof state.settings["vision.semantic_search"] === "boolean" && <VisionPersonal t={t} state={state} apply={applyLimits} busy={busy} />}
+    {state.settings["network.lan_ca"] === true && <p><a href={`${origin}/api/v1/security/lan-ca`} download="armor-lan-ca.crt" data-testid="security-lanca-download">{t("sec_lanca_download")}</a></p>}
     {typeof state.settings["vision.service_url"] === "string" && <VisionService t={t} state={state} apply={applyLimits} busy={busy} />}
     {state.settings["client.trusted_devices"] === true && typeof state.settings["client.trusted_session_h"] === "number" && <TrustedHours t={t} state={state} apply={applyLimits} busy={busy} />}
     {typeof state.settings["reports.timeout_s"] === "number" && <ReportLimits t={t} state={state} apply={applyLimits} busy={busy} />}

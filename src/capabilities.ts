@@ -23,6 +23,15 @@ export type SecurityOptions = {
   "server.zone_feed_signature": boolean;
   "media.rtsp_proxy": boolean;
   "network.login_secure_only": boolean;
+  /** An administrator may download the public certificate of the local CA of the LAN (off by default). */
+  "network.lan_ca": boolean;
+  /** The three features of the second phase of ARMOR-VISION that read personal data (all off by default); each can only be on once its acknowledgement of the privacy notice is. */
+  "vision.semantic_search": boolean;
+  "vision.plates": boolean;
+  "vision.faces": boolean;
+  "vision.semantic_search_ack": boolean;
+  "vision.plates_ack": boolean;
+  "vision.faces_ack": boolean;
   /** GET /metrics answers the numbers of the server in the Prometheus text form (needs ARMOR_METRICS_TOKEN). */
   "metrics.prometheus": boolean;
   /** The server pings ARMOR_HEARTBEAT_URL so a service outside the house can tell when it stops. */
