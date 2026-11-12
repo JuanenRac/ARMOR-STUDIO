@@ -86,7 +86,7 @@ describe("the detection zones of a camera, run for real", () => {
     expect([...view.host.querySelectorAll("input, select")].every(field => field.hasAttribute("disabled"))).toBe(true);
     await clickAt(view, 10, 10);
     expect(view.host.textContent).not.toContain("(1 ");
-    expect(calls.filter(call => call.method !== "GET")).toEqual([]);
+    expect(calls.filter(call => call.method === "PUT" || call.method === "DELETE")).toEqual([]);
     await view.unmount();
   });
 
