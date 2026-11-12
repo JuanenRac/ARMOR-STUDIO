@@ -4392,6 +4392,7 @@ const catalogue: Record<string, string> = {
 "nh_reconnects_hint": "自启动以来；1 表示从未丢失",
 "nh_restarts": "24 小时内重启",
 "nh_stack": "栈空间不足的任务",
+"nh_stack_min": "最小剩余栈空间（任务）",
 "nh_last_error": "最后一个错误",
 "nh_no_error": "无记录",
 "nh_details": "详情",

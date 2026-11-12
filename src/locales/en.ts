@@ -4413,6 +4413,7 @@ const catalogue: Record<string, string> = {
 "nh_reconnects_hint": "since it started; 1 is a node that never lost it",
 "nh_restarts": "Restarts in 24 h",
 "nh_stack": "Tasks short of stack",
+"nh_stack_min": "Least stack left (task)",
 "nh_last_error": "Last error",
 "nh_no_error": "none logged",
 "nh_details": "Details",

@@ -4389,6 +4389,7 @@ const catalogue: Record<string, string> = {
 "nh_reconnects_hint": "起動後の回数。1 は一度も切れていないことを示します",
 "nh_restarts": "24 時間の再起動",
 "nh_stack": "スタック不足のタスク",
+"nh_stack_min": "最小の空きスタック（タスク）",
 "nh_last_error": "最後のエラー",
 "nh_no_error": "記録なし",
 "nh_details": "詳細",

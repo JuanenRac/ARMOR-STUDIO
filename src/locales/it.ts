@@ -4300,6 +4300,7 @@ const catalogue: Record<string, string> = {
 "nh_reconnects_hint": "dall'avvio; 1 significa mai perso",
 "nh_restarts": "Riavvii in 24 h",
 "nh_stack": "Task a corto di stack",
+"nh_stack_min": "Stack libero minimo (task)",
 "nh_last_error": "Ultimo errore",
 "nh_no_error": "nessuno registrato",
 "nh_details": "Dettagli",

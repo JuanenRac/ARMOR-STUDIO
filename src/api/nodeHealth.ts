@@ -6,7 +6,7 @@ export type NodeHealthReport = {
   kind: "node_health"; node_id: string; timestamp_ms: number; family: HealthFamily; firmware: string; board?: string; /** The version of the contracts the firmware was checked against (an older node does not say it). */ contract?: string; uptime_s: number; reset_reason: string; heap_free: number; heap_min: number;
   /** The internal memory on its own and the external RAM, when the node tells them (a node of an older firmware does not). */
   heap_internal_free?: number; heap_internal_min?: number; heap_internal_largest?: number; psram_free?: number;
-  link: "wifi" | "ethernet" | "none"; link_up: boolean; rssi_dbm?: number; broker_reconnects: number; low_stack_tasks?: number; last_error?: string;
+  link: "wifi" | "ethernet" | "none"; link_up: boolean; rssi_dbm?: number; broker_reconnects: number; low_stack_tasks?: number; /** The least stack any task had free at its worst, in bytes, and the task it is (told together; an older firmware does not say it). */ stack_min_free?: number; stack_min_task?: string; last_error?: string;
   /** What the node says about its own control state (the server's node_health contract): running, paused or in standby, since when and by whom, and the maintenance window. */
   control_state?: ControlState; control_since_ms?: number; control_by?: string; control_until_s?: number; maintenance?: boolean; maintenance_until_s?: number;
   /** How the node last started, when that was a fault (told only for a few minutes after a dirty start). */

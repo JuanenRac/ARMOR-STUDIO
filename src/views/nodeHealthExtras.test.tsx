@@ -158,3 +158,20 @@ describe("the three new warnings", () => {
     }
   });
 });
+
+describe("the stack of the tightest task, on the health card", () => {
+  it("names the task with the least stack left, and marks it when it is short", () => {
+    const html = card(base({ stack_min_free: 2_400, stack_min_task: "mqtt_link" }));
+    expect(html).toContain("Least stack left (task)");
+    expect(html).toContain("mqtt_link");
+    expect(html).toContain('data-testid="nh-stack-min"');
+    expect(html).not.toContain('data-testid="nh-stack-min" class="bad"');
+    expect(card(base({ stack_min_free: 300, stack_min_task: "meters" }))).toContain('data-testid="nh-stack-min" class="bad"');
+  });
+  it("says nothing when the node does not tell it (an older firmware)", () => {
+    expect(card(base())).not.toContain("nh-stack-min");
+  });
+  it("has the label in the eight languages", () => {
+    for (const language of locales) expect(text(language, "nh_stack_min")).not.toBe("nh_stack_min");
+  });
+});

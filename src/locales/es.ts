@@ -4330,6 +4330,7 @@ const catalogue: Record<string, string> = {
 "nh_reconnects_hint": "desde que arrancó; 1 es un nodo que nunca lo perdió",
 "nh_restarts": "Reinicios en 24 h",
 "nh_stack": "Tareas cortas de pila",
+"nh_stack_min": "Pila libre mínima (tarea)",
 "nh_last_error": "Último error",
 "nh_no_error": "ninguno anotado",
 "nh_details": "Detalles",

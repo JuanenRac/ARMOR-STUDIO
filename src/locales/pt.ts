@@ -348,6 +348,7 @@ const catalogue: Record<string, string> = {
 "nh_reconnects_hint": "desde que arrancou; 1 é um nó que nunca o perdeu",
 "nh_restarts": "Reinícios em 24 h",
 "nh_stack": "Tarefas com pouca pilha",
+"nh_stack_min": "Pilha livre mínima (tarefa)",
 "nh_last_error": "Último erro",
 "nh_no_error": "nenhum registado",
 "nh_details": "Detalhes",

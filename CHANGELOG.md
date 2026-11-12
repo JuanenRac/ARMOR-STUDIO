@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The health card names the task with the least stack:** the nodes now tell the least stack any task had free and which task it is, and the card of each node shows it (in red under 512 bytes), in the eight languages; a node of an older firmware simply shows nothing. The copies of the shared contract follow.
+
 - **TypeScript 7, @types/node 26 and three 0.187:** the type check now runs on TypeScript 7 (an override lets typescript-eslint, which does not yet list it as a supported peer, share it), the Node typings are those of Node 26, the 3D view uses three 0.187 and its typings, and the other dependency updates of the same group (Vite plugin for React, Vitest coverage, globals) came with them. The workflows and the container image build with Node 26, the current long-term-support line; the package still runs on Node 22 and later.
 
 - **Challenge mode for silencing the alarm by voice (eight languages):** Configuration > Security offers a fourth value, "A number on the panel screen, said back", for the server option `voice.silence_confirmation`. It is the strictest value, so going from it to any other asks first; nothing changes unless an administrator picks it (the server keeps its own default). Studio does not show the number: with this mode only a panel that shows it can silence by voice and Studio asks for the signed confirmation instead. Tests for the order of the values and the phrase in every language.

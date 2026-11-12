@@ -114,6 +114,7 @@ export function NodeCard({ t, node, serverContract, levels, now, opened, toggle,
       <div><dt>{t("nh_reconnects")}</dt><dd title={t("nh_reconnects_hint")}>{report.broker_reconnects}</dd></div>
       <div><dt>{t("nh_restarts")}</dt><dd>{node.restarts_24h}</dd></div>
       {(report.low_stack_tasks ?? 0) > 0 && <div><dt>{t("nh_stack")}</dt><dd className="bad">{report.low_stack_tasks}</dd></div>}
+      {report.stack_min_free !== undefined && report.stack_min_task !== undefined && <div><dt>{t("nh_stack_min")}</dt><dd data-testid="nh-stack-min" className={report.stack_min_free < 512 ? "bad" : ""}>{formatBytes(report.stack_min_free)} · <span className="mono">{report.stack_min_task}</span></dd></div>}
       <div className="wide"><dt>{t("nh_last_error")}</dt><dd className={report.last_error ? "mono" : "muted"}>{report.last_error ?? t("nh_no_error")}</dd></div>
     </dl>
     <StartInfo t={t} report={report} />

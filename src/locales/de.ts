@@ -4262,6 +4262,7 @@ const catalogue: Record<string, string> = {
 "nh_reconnects_hint": "seit dem Start; 1 heißt: nie verloren",
 "nh_restarts": "Neustarts in 24 h",
 "nh_stack": "Aufgaben mit knappem Stack",
+"nh_stack_min": "Geringster freier Stack (Aufgabe)",
 "nh_last_error": "Letzter Fehler",
 "nh_no_error": "keiner protokolliert",
 "nh_hide": "Details ausblenden",

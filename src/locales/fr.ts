@@ -4274,6 +4274,7 @@ const catalogue: Record<string, string> = {
 "nh_reconnects_hint": "depuis le démarrage ; 1 : jamais perdu",
 "nh_restarts": "Redémarrages en 24 h",
 "nh_stack": "Tâches à court de pile",
+"nh_stack_min": "Pile libre minimale (tâche)",
 "nh_last_error": "Dernière erreur",
 "nh_no_error": "aucune notée",
 "nh_details": "Détails",
