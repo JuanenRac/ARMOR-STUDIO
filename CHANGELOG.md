@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A box in Configuration > Security for the activity events of the vision service:** the option `vision.activity_events` (off by default, in the eight languages) lets the server take the zone and line events of the vision service; off, the server reads nothing and says the feature is off. Turning it on adds a source of alarms in the zones marked as alert and switches nothing off.
+
 - **The days photos and recordings are kept can be set per kind:** Configuration > Security has two fields (photos and recordings, 0 to 3650 days, 0 = the general limit of the server), in the eight languages.
 
 - **Detection zones and a profile for each arming mode, in Configuration > Cameras:** a click adds a corner of a zone over the live picture and closing it keeps the polygon (3 to 12 corners); each zone has a name, alert or only recorded, the labels it counts and the frames and seconds an object stays before it counts. Below, one profile per mode (away, home, night, disarmed) chooses the zones watched, the sensitivity and whether it is told; a mode without a profile watches every zone. In the eight languages.

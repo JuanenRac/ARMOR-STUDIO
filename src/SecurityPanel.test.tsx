@@ -67,6 +67,21 @@ describe("the security screen", () => {
     expect(text("en", "sec_opt_node_pending")).not.toContain("will act on them");
   });
 
+  it("offers the activity events of the vision service in every language, translated and not repeated", () => {
+    for (const suffix of ["", "_help", "_warn"]) {
+      const words = new Set<string>();
+      for (const locale of locales) {
+        const phrase = text(locale, "sec_opt_actevents" + suffix);
+        expect(phrase.trim().length, `${locale} ${suffix}`).toBeGreaterThan(8);
+        expect(phrase, `${locale} ${suffix} is not the key`).not.toBe("sec_opt_actevents" + suffix);
+        words.add(phrase);
+      }
+      expect(words.size, `sec_opt_actevents${suffix} is translated, not repeated`).toBe(8);
+    }
+    const t = (key: string) => text("en", key);
+    expect(renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }))).not.toContain("security-option-actevents");
+  });
+
   it("offers the summary of a day and the heat map in every language, with their warnings, and turning either on is a loss", () => {
     for (const id of ["sec_opt_dailysummary", "sec_opt_heatmap"]) for (const suffix of ["", "_help", "_warn"]) {
       const words = new Set<string>();

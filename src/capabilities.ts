@@ -65,6 +65,8 @@ export type SecurityOptions = {
   /** The summary of a day and the activity heat map for administrators and operators (both off by default). */
   "summary.daily": boolean;
   "vision.heatmap": boolean;
+  /** The server takes the activity events of the vision service (off by default). */
+  "vision.activity_events": boolean;
   /** How the two reports are tuned: the seconds one may run, how many may wait, how many requests a minute (an older server does not announce them). */
   /** Where the live ARMOR-VISION service listens (empty: not set up) and whether it may be on another machine (off: only this machine). */
   "vision.service_url": string;
