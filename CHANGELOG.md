@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The detection zones editor is run for real in the tests:** the corners are clicked over the picture and kept inside it (twelve at most), a flat zone or one with too few corners is not closed, the last corner can be taken back, a viewer can change and save nothing, a removed zone leaves every profile, the clear button and a refused save are told, and a camera holds sixteen zones at most.
+
 - **Tests of the settings screens (preferences, sounds and voices of the alarm, cameras):** each is drawn in the eight languages, every phrase it asks for must be translated in every one and must be the same set in all, the cameras screen is drawn with none, one and two cameras as a viewer and as an administrator, and a saved password is never written into the page.
 
 - **Tests of the pairing code of a node:** the picture and its help in every language, exactly the text the shared library writes and no secret, the refusal (with its reason) of a node or server that is not valid, the camera reader's parts, a picture with no code in it, and the nine phrases in the eight languages.
