@@ -274,7 +274,7 @@ python -I tools/armor_ci_validate.py
 
 ## 🏗️ 构建与发布
 
-`npm run build` 把静态站点写入 `dist/`；`Dockerfile` 用 Node 22 构建并用 nginx（`nginx/`）提供。版本记录在 `package.json`、`armor.project.json` 和 README 徽章中（读取自清单）；每个版本在 [CHANGELOG.md](CHANGELOG.md) 中都有对应条目。发布版本发布在 GitHub 上。
+`npm run build` 把静态站点写入 `dist/`；`Dockerfile` 用 Node 26 构建并用 nginx（`nginx/`）提供。版本记录在 `package.json`、`armor.project.json` 和 README 徽章中（读取自清单）；每个版本在 [CHANGELOG.md](CHANGELOG.md) 中都有对应条目。发布版本发布在 GitHub 上。
 
 ## 🩺 故障排除
 

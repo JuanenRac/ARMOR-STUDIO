@@ -274,7 +274,7 @@ python -I tools/armor_ci_validate.py
 
 ## 🏗️ ビルドとリリース
 
-`npm run build` は静的サイトを `dist/` に書き出します。`Dockerfile` は Node 22 でビルドし、nginx（`nginx/`）で配信します。バージョンは `package.json`、`armor.project.json`、README のバッジ（マニフェストから読み取り）にあり、各バージョンには [CHANGELOG.md](CHANGELOG.md) にエントリーがあります。リリースは GitHub で公開されます。
+`npm run build` は静的サイトを `dist/` に書き出します。`Dockerfile` は Node 26 でビルドし、nginx（`nginx/`）で配信します。バージョンは `package.json`、`armor.project.json`、README のバッジ（マニフェストから読み取り）にあり、各バージョンには [CHANGELOG.md](CHANGELOG.md) にエントリーがあります。リリースは GitHub で公開されます。
 
 ## 🩺 トラブルシューティング
 

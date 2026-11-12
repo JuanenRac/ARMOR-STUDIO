@@ -248,7 +248,7 @@ jobs:
               "schema": "armor-build/1", "repository": os.environ["GITHUB_REPOSITORY"], "project": "studio", "version": os.environ["VERSION"],
               "commit": os.environ["SHA"], "built_on": "github-actions", "run_id": os.environ["GITHUB_RUN_ID"],
               "run_url": f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
-              "toolchain": "Node 22, npm ci --ignore-scripts, vite build; gzip level 9 without a time stamp, entries dated at the commit; built twice with the same bytes",
+              "toolchain": "Node 26, npm ci --ignore-scripts, vite build; gzip level 9 without a time stamp, entries dated at the commit; built twice with the same bytes",
               "package_format": "armor-pkg/1 (unsigned)", "reproducible": True, "signed": False, "files": files,
           }, open("build-manifest.json", "w", encoding="utf-8"), indent=2)
           PY

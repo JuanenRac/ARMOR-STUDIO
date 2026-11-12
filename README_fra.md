@@ -274,7 +274,7 @@ Le test du TLS natif de l'hôte statique demande `openssl` installé. `npm run l
 
 ## 🏗️ Compilation et publication
 
-`npm run build` écrit le site statique dans `dist/` ; le `Dockerfile` le construit avec Node 22 et le sert avec nginx (`nginx/`). La version se trouve dans `package.json`, dans `armor.project.json` et dans le badge du README (lu depuis le manifeste) ; chaque version a son entrée dans [CHANGELOG.md](CHANGELOG.md). Les versions sont publiées sur GitHub.
+`npm run build` écrit le site statique dans `dist/` ; le `Dockerfile` le construit avec Node 26 et le sert avec nginx (`nginx/`). La version se trouve dans `package.json`, dans `armor.project.json` et dans le badge du README (lu depuis le manifeste) ; chaque version a son entrée dans [CHANGELOG.md](CHANGELOG.md). Les versions sont publiées sur GitHub.
 
 ## 🩺 Dépannage
 

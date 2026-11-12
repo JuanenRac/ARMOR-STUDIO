@@ -274,7 +274,7 @@ La prueba del TLS nativo del host estático necesita `openssl` instalado. `npm r
 
 ## 🏗️ Compilación y publicación
 
-`npm run build` escribe el sitio estático en `dist/`; el `Dockerfile` lo construye con Node 22 y lo sirve con nginx (`nginx/`). La versión vive en `package.json`, en `armor.project.json` y en la insignia del README (leída del manifiesto); cada versión tiene su entrada en [CHANGELOG.md](CHANGELOG.md). Las versiones se publican en GitHub.
+`npm run build` escribe el sitio estático en `dist/`; el `Dockerfile` lo construye con Node 26 y lo sirve con nginx (`nginx/`). La versión vive en `package.json`, en `armor.project.json` y en la insignia del README (leída del manifiesto); cada versión tiene su entrada en [CHANGELOG.md](CHANGELOG.md). Las versiones se publican en GitHub.
 
 ## 🩺 Resolución de problemas
 
