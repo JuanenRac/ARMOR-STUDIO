@@ -129,6 +129,8 @@ const rows: Row[] = [
   ["readIgnoreZones", () => api.readIgnoreZones(O, ODD), "GET", `/api/v1/cameras/${ENC}/ignore-zones`],
   ["readCountLines", () => api.readCountLines(O, ODD), "GET", `/api/v1/cameras/${ENC}/count-lines`],
   ["saveCountLines", () => api.saveCountLines(O, "c1", [{ id: "gate", a: [0.3, 0.7], b: [0.9, 0.7] }]), "PUT", "/api/v1/cameras/c1/count-lines", { lines: [{ id: "gate", a: [0.3, 0.7], b: [0.9, 0.7] }] }],
+  ["readDetectionZones", () => api.readDetectionZones(O, ODD), "GET", `/api/v1/cameras/${ENC}/detection-zones`],
+  ["saveDetectionZones", () => api.saveDetectionZones(O, "c1", { zones: [], profiles: {} }), "PUT", "/api/v1/cameras/c1/detection-zones", { zones: [], profiles: {} }],
   ["saveIgnoreZones", () => api.saveIgnoreZones(O, "c1", [{ x: 0, y: 0, w: 0.5, h: 0.5 }]), "PUT", "/api/v1/cameras/c1/ignore-zones", { zones: [{ x: 0, y: 0, w: 0.5, h: 0.5 }] }],
 ];
 

@@ -55,3 +55,6 @@
 .lc-lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .lc-line { stroke: #ffd24a; stroke-width: 3; stroke-linecap: round; }
 .lc-line.draft { stroke-dasharray: 6 4; opacity: .7; }
+.dz-poly { stroke: #4ad0ff; stroke-width: 2; fill: rgba(74, 208, 255, .18); }
+.dz-poly.alert { stroke: #ff7a4a; fill: rgba(255, 122, 74, .2); }
+.dz-poly.draft { stroke-dasharray: 6 4; fill: none; }

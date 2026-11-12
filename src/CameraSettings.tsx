@@ -7,6 +7,7 @@ import type { CameraTraits } from "./api/cameras";
 import { PasswordInput } from "./components/PasswordInput";
 import { IgnoreZonesEditor } from "./IgnoreZonesEditor";
 import { CountLinesEditor } from "./CountLinesEditor";
+import { DetectionZonesEditor } from "./DetectionZonesEditor";
 import { askConfirm } from "./askConfirm";
 import { errorText } from "./apiErrorText";
 import { snapshotHasLogin } from "./snapshotLogin";
@@ -219,5 +220,6 @@ export function CameraSettings(props: Props) {
     </article>
     {form.id && <IgnoreZonesEditor t={t} origin={props.origin} cameraId={form.id} isAdmin={Boolean(props.isAdmin)} />}
     {form.id && <CountLinesEditor t={t} origin={props.origin} cameraId={form.id} isAdmin={Boolean(props.isAdmin)} />}
+    {form.id && <DetectionZonesEditor t={t} origin={props.origin} cameraId={form.id} isAdmin={Boolean(props.isAdmin)} />}
   </div>;
 }

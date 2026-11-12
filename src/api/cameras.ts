@@ -138,6 +138,13 @@ export const readIgnoreZones = (origin: string, id: string) => userCall<{ camera
 export type CountLine = { id: string; a: number[]; b: number[]; labels?: string[] };
 export const readCountLines = (origin: string, id: string) => userCall<{ camera_id: string; lines: CountLine[] }>(origin, "GET", `/api/v1/cameras/${encodeURIComponent(id)}/count-lines`);
 export const saveCountLines = (origin: string, id: string, lines: CountLine[]) => userCall<{ camera_id: string; lines: CountLine[] }>(origin, "PUT", `/api/v1/cameras/${encodeURIComponent(id)}/count-lines`, { lines });
+/** A polygon where an object counts, and what each arming mode does with the zones of a camera. */
+export type DetectionSensitivity = "low" | "normal" | "high";
+export type DetectionZone = { id: string; name: string; points: Array<[number, number]>; kind: "alert" | "detection"; labels: string[]; min_frames: number; min_seconds: number };
+export type DetectionProfile = { watch: string[]; sensitivity: DetectionSensitivity; notify: boolean };
+export type DetectionZonesBody = { zones: DetectionZone[]; profiles: Partial<Record<"away" | "home" | "night" | "disarmed", DetectionProfile>> };
+export const readDetectionZones = (origin: string, id: string) => userCall<DetectionZonesBody & { camera_id: string }>(origin, "GET", `/api/v1/cameras/${encodeURIComponent(id)}/detection-zones`);
+export const saveDetectionZones = (origin: string, id: string, body: DetectionZonesBody) => userCall<DetectionZonesBody & { camera_id: string }>(origin, "PUT", `/api/v1/cameras/${encodeURIComponent(id)}/detection-zones`, body);
 export const saveIgnoreZones = (origin: string, id: string, zones: IgnoreZone[]) => userCall<{ camera_id: string; zones: IgnoreZone[] }>(origin, "PUT", `/api/v1/cameras/${encodeURIComponent(id)}/ignore-zones`, { zones });
 export const readCaptureSettings = (origin: string) => userCall<{ settings: CaptureSettings; recent: CaptureRecord[] }>(origin, "GET", "/api/v1/capture-settings");
 export const saveCaptureSettings = (origin: string, settings: CaptureSettings) => userCall<{ settings: CaptureSettings }>(origin, "PUT", "/api/v1/capture-settings", settings);
