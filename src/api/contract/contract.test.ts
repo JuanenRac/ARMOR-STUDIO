@@ -89,7 +89,7 @@ type Checked = {
   FirmwareUpload: Fits<Rest.FirmwareUpload, ClientFirmwareUpload>;
   CountLine: Fits<Rest.CountLine, ClientCountLine>;
   IgnoreZone: Fits<Rest.IgnoreZone, ClientIgnoreZone>;
-  DetectionZone: Fits<Rest.DetectionZone, ClientDetectionZone>;
+  DetectionZone: Within<ClientDetectionZone, Rest.DetectionZone>;
   MediaItem: Fits<Rest.MediaItem, ClientMediaItem>;
   NodeControlAllRequest: Fits<Rest.NodeControlAllRequest, ClientNodeControlAllRequest>;
   NodeControlLine: Fits<Rest.NodeControlLine, ClientNodeControlLine>;
