@@ -5360,6 +5360,7 @@ const catalogue: Record<string, string> = {
 "cl_never": "nunca",
 "lc_title": "Líneas de conteo",
 "lc_help": "Dibuja una línea por los sitios donde quieras contar quién pasa (una puerta, un portón, un camino). El servicio de observación cuenta cada cruce, en los dos sentidos, de los objetos que sigue. El vídeo, las fotos y las grabaciones se quedan enteros.",
+"lc_sync_help": "Las líneas llegan solas al servicio de observación cuando este ejecuta `python -m armor_vision sync-context` (una vez, o cada pocos segundos con `--interval`) con la dirección del servidor y el fichero del token del servicio; sin él, reinicia el servicio para que tome una línea cambiada.",
 "lc_draw": "Arrastra sobre la imagen para dibujar una línea.",
 "lc_none": "En esta cámara no se cuenta ninguna línea.",
 "lc_line": "Línea",

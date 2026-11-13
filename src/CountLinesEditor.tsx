@@ -71,6 +71,7 @@ export function CountLinesEditor({ t, origin, cameraId, isAdmin }: Props) {
   return <article className="stack-card iz-card">
     <h3>{t("lc_title")}</h3>
     <p className="muted">{t("lc_help")}</p>
+    <p className="muted" data-testid="lc-sync-help">{t("lc_sync_help")}</p>
     <div className={`iz-picture ${isAdmin ? "drawable" : ""}`} ref={box}
       onPointerDown={event => { if (!isAdmin || lines.length >= MAX_LINES) return; event.currentTarget.setPointerCapture(event.pointerId); const from = point(event); setDrawing({ from, to: from }); }}
       onPointerMove={event => { if (drawing) setDrawing({ from: drawing.from, to: point(event) }); }}

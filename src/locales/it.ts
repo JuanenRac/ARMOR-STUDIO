@@ -5323,6 +5323,7 @@ const catalogue: Record<string, string> = {
 "cl_never": "mai",
 "lc_title": "Linee di conteggio",
 "lc_help": "Disegna una linea attraverso i punti in cui vuoi contare chi passa (un cancello, una porta, un sentiero). Il servizio di osservazione conta ogni attraversamento, nei due sensi, degli oggetti che segue. Il video, le foto e le registrazioni restano intatti.",
+"lc_sync_help": "Le linee arrivano da sole al servizio di osservazione quando esegue `python -m armor_vision sync-context` (una volta, o ogni pochi secondi con `--interval`) con l'indirizzo del server e il file del token del servizio; senza, riavvia il servizio per fargli leggere una linea modificata.",
 "lc_draw": "Trascina sull'immagine per disegnare una linea.",
 "lc_none": "In questa telecamera non si conta nessuna linea.",
 "lc_line": "Linea",

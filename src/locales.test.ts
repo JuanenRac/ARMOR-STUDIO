@@ -26,7 +26,7 @@ describe("the language tables the console loads (src/locales, written by tools/b
   });
 
   it("carry the counting lines of a camera in the eight languages from their own source", () => {
-    for (const locale of locales) for (const key of ["lc_title", "lc_help", "lc_draw", "lc_none", "lc_line", "lc_remove", "lc_clear", "lc_save", "lc_saved", "lc_error"]) expect(sourceCatalogues[locale][key], `${locale}:${key}`).toBeTruthy();
+    for (const locale of locales) for (const key of ["lc_title", "lc_help", "lc_sync_help", "lc_draw", "lc_none", "lc_line", "lc_remove", "lc_clear", "lc_save", "lc_saved", "lc_error"]) expect(sourceCatalogues[locale][key], `${locale}:${key}`).toBeTruthy();
   });
 
   it("have every phrase of English in every language (a language that lacks one would show it in English)", () => {
