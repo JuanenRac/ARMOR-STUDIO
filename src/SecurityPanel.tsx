@@ -248,7 +248,7 @@ function TrustedHours({ t, state, apply, busy }: { t: (key: string) => string; s
   </fieldset>;
 }
 
-type OptionKey = Exclude<keyof SecurityOptions, "voice.panic_cooldown_s" | "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute" | "client.trusted_session_h" | "media.retention_snapshot_days" | "media.retention_recording_days" | "vision.semantic_search" | "vision.plates" | "vision.faces" | "vision.semantic_search_ack" | "vision.plates_ack" | "vision.faces_ack">;
+type OptionKey = Exclude<keyof SecurityOptions, "voice.panic_cooldown_s" | "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute" | "client.trusted_session_h" | "media.retention_snapshot_days" | "media.retention_recording_days" | "vision.timeline_days" | "vision.semantic_search" | "vision.plates" | "vision.faces" | "vision.semantic_search_ack" | "vision.plates_ack" | "vision.faces_ack">;
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
 const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean; optional?: boolean }> = [
   { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN", node: true },
@@ -265,6 +265,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "media.rtsp_proxy", id: "rtsp", values: [true, false] },
   { key: "network.login_secure_only", id: "netlogin", values: [true, false] },
   { key: "network.lan_ca", id: "lanca", values: [false, true], optional: true },   // off by default; on lets an administrator download the public certificate of the local CA, so it asks first
+  { key: "vision.timeline", id: "vtimeline", values: [false, true], optional: true },   // off by default; on keeps a record of what the cameras saw, so it asks first
   { key: "network.public_access", id: "publicaccess", values: [false, true], optional: true },   // off by default; on lets the server take requests from outside the house, so it asks first
   { key: "login.country_alert", id: "country", values: [true, false] },
   { key: "electrical.set_aside_old_readings", id: "oldread", values: [true, false] },
@@ -479,6 +480,7 @@ function VisionPersonal({ t, state, apply, busy }: { t: (key: string) => string;
 export const RETENTION_LIMITS = {
   "media.retention_snapshot_days": { min: 0, max: 3650, id: "snapshot" },
   "media.retention_recording_days": { min: 0, max: 3650, id: "recording" },
+  "vision.timeline_days": { min: 1, max: 3650, id: "timeline" },
 } as const;
 type RetentionKey = keyof typeof RETENTION_LIMITS;
 /** The whole number of days a field holds, or undefined when it is not one inside the range. */
@@ -566,7 +568,7 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
     })}
     {typeof state.settings["alarm_audio.custom_sounds"] === "boolean" && <AlarmSounds t={t} origin={origin} spokenOn={state.settings["alarm_audio.spoken"] === true} customOn={state.settings["alarm_audio.custom_sounds"]} />}
     {typeof state.settings["voice.turn_max_bytes"] === "number" && <VoiceLimits t={t} state={state} apply={applyLimits} busy={busy} />}
-    {typeof state.settings["media.retention_snapshot_days"] === "number" && <RetentionLimits t={t} state={state} apply={applyLimits} busy={busy} />}
+    {(typeof state.settings["media.retention_snapshot_days"] === "number" || typeof state.settings["vision.timeline_days"] === "number") && <RetentionLimits t={t} state={state} apply={applyLimits} busy={busy} />}
     {typeof state.settings["vision.semantic_search"] === "boolean" && <VisionPersonal t={t} state={state} apply={applyLimits} busy={busy} />}
     {state.settings["network.lan_ca"] === true && <p><a href={`${origin}/api/v1/security/lan-ca`} download="armor-lan-ca.crt" data-testid="security-lanca-download">{t("sec_lanca_download")}</a></p>}
     {typeof state.settings["vision.service_url"] === "string" && <VisionService t={t} state={state} apply={applyLimits} busy={busy} />}

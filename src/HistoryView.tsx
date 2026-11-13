@@ -6,6 +6,7 @@
 import { downloadText } from "./download";
 import { ViewTabs } from "./components/ViewTabs";
 import { ReportsPanel } from "./views/ReportsPanel";
+import { TimelinePanel } from "./views/TimelinePanel";
 import { useViewActive } from "./viewSlots";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { deleteHistory, listConnections, listHistory, readHistorySummary, readRules, saveRules, type ArmorEvent, type ConnectionClient, type EventType, type HistorySummary, type Rules, type Zone } from "./api";
@@ -319,11 +320,11 @@ function RulesEditor({ origin, t }: { origin: string; t: Translate }) {
   </div>;
 }
 
-export function HistoryView({ origin, t, reports }: { origin: string; t: Translate; /** The reports of the server (the summary of a day and the heat map): given only to administrators and operators. */ reports?: { language: string; cameras: Array<{ id: string; name: string }> } }) {
+export function HistoryView({ origin, t, reports }: { origin: string; t: Translate; /** The reports of the server (the summary of a day and the heat map): given only to administrators and operators. */ reports?: { language: string; cameras: Array<{ id: string; name: string }>; canDelete: boolean } }) {
   // The event log and the alert rules are two jobs: one at a time, each with the whole screen.
-  const [tab, setTab] = useState<"events" | "rules" | "reports">("events");
+  const [tab, setTab] = useState<"events" | "rules" | "reports" | "review">("events");
   return <section className="history-workspace">
-    <ViewTabs tabs={[["events", t("history")], ["rules", t("rules")], ...(reports ? [["reports", t("rep_tab")] as const] : [])]} active={tab} onChange={setTab} />
-    {tab === "events" ? <EventPanel origin={origin} t={t} /> : tab === "reports" && reports ? <ReportsPanel t={t} origin={origin} language={reports.language} cameras={reports.cameras} /> : <RulesEditor origin={origin} t={t} />}
+    <ViewTabs tabs={[["events", t("history")], ["rules", t("rules")], ...(reports ? [["reports", t("rep_tab")] as const, ["review", t("tl_tab")] as const] : [])]} active={tab} onChange={setTab} />
+    {tab === "events" ? <EventPanel origin={origin} t={t} /> : tab === "review" && reports ? <TimelinePanel t={t} origin={origin} cameras={reports.cameras} canDelete={reports.canDelete} /> : tab === "reports" && reports ? <ReportsPanel t={t} origin={origin} language={reports.language} cameras={reports.cameras} /> : <RulesEditor origin={origin} t={t} />}
   </section>;
 }
