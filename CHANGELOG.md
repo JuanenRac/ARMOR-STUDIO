@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A review screen for the timeline of the vision service (History > Review):** the events of the alert zones and the detection zones, newest first, with the camera, the zone, the alarm it raised and the names of the photo and the recording taken; filters by date and time, kind of zone and camera; an administrator deletes one entry or all of them (the evidence stays in its library). Two security options in Configuration > Security: the timeline itself (off by default, it asks first) and the days an entry is kept (1 to 3650). Texts in the eight languages and tests.
 - **A switch for the port opened to the Internet (Configuration > Security):** "Requests from outside the house" (`network.public_access`, off by default, asks first and a new proof of identity because turning it on is a loss of protection), with its help and warning in the eight languages; the server then still demands TLS and strong secrets for a request from outside.
 - **The generated readers and REST types follow the contract again:** `armor-parsers.ts` and `armor-rest.ts` are the files the shared contract generates now (the track number ceiling, the public access and local authority options and the vision timeline).
 - **The help of the counting lines says how they reach the observation service:** under the lines of a camera, a sentence (in the eight languages) names `python -m armor_vision sync-context`, once or with `--interval`, and tells to restart the service when it does not run.
