@@ -264,6 +264,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "server.zone_feed_signature", id: "sign", values: [true, false], node: true },
   { key: "media.rtsp_proxy", id: "rtsp", values: [true, false] },
   { key: "network.login_secure_only", id: "netlogin", values: [true, false] },
+  { key: "session.rotate_id", id: "rotateid", values: [true, false], calm: true, optional: true },   // off by default; hardening, so only turning it off asks first
   { key: "network.lan_ca", id: "lanca", values: [false, true], optional: true },   // off by default; on lets an administrator download the public certificate of the local CA, so it asks first
   { key: "vision.timeline", id: "vtimeline", values: [false, true], optional: true },   // off by default; on keeps a record of what the cameras saw, so it asks first
   { key: "network.public_access", id: "publicaccess", values: [false, true], optional: true },   // off by default; on lets the server take requests from outside the house, so it asks first
