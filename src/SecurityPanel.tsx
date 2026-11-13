@@ -248,7 +248,7 @@ function TrustedHours({ t, state, apply, busy }: { t: (key: string) => string; s
   </fieldset>;
 }
 
-type OptionKey = Exclude<keyof SecurityOptions, "voice.panic_cooldown_s" | "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute" | "client.trusted_session_h" | "media.retention_snapshot_days" | "media.retention_recording_days" | "vision.timeline_days" | "vision.semantic_search" | "vision.plates" | "vision.faces" | "vision.semantic_search_ack" | "vision.plates_ack" | "vision.faces_ack">;
+type OptionKey = Exclude<keyof SecurityOptions, "capture.on_alarm_per_min" | "voice.panic_cooldown_s" | "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute" | "client.trusted_session_h" | "media.retention_snapshot_days" | "media.retention_recording_days" | "vision.timeline_days" | "vision.semantic_search" | "vision.plates" | "vision.faces" | "vision.semantic_search_ack" | "vision.plates_ack" | "vision.faces_ack">;
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
 const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean; optional?: boolean }> = [
   { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN", node: true },
@@ -265,6 +265,13 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "media.rtsp_proxy", id: "rtsp", values: [true, false] },
   { key: "network.login_secure_only", id: "netlogin", values: [true, false] },
   { key: "session.rotate_id", id: "rotateid", values: [true, false], calm: true, optional: true },   // off by default; hardening, so only turning it off asks first
+  { key: "capture.on_alarm", id: "captalarm", values: [false, true], optional: true },   // off by default; on makes the cameras record by themselves at every alarm, so it asks first
+  { key: "live.events", id: "livenotices", values: [true, false], calm: true, optional: true },   // on by default; turning it off only makes the consoles ask more often
+  { key: "vacation.mode", id: "vacation", values: [false, true], calm: true, optional: true },   // off by default; on lets lights switch by themselves on a schedule while the house is armed away
+  { key: "commands.require_sig", id: "cmdsig", values: [true, false], calm: true, optional: true },   // off by default; hardening, so only turning it off from on asks first
+  { key: "admin.backup", id: "backup", values: [false, true], optional: true },   // off by default; on lets an administrator write a copy of the server data anywhere, so it asks first
+  { key: "electrical.load_shedding", id: "loadshed", values: [false, true], calm: true, optional: true },   // off by default; on lets the server switch off the listed devices, so it asks first
+  { key: "electrical.balance", id: "balance", values: [false, true], calm: true, optional: true },   // off by default; it only reads and informs
   { key: "network.lan_ca", id: "lanca", values: [false, true], optional: true },   // off by default; on lets an administrator download the public certificate of the local CA, so it asks first
   { key: "vision.timeline", id: "vtimeline", values: [false, true], optional: true },   // off by default; on keeps a record of what the cameras saw, so it asks first
   { key: "network.public_access", id: "publicaccess", values: [false, true], optional: true },   // off by default; on lets the server take requests from outside the house, so it asks first
