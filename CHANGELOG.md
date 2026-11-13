@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A switch for the port opened to the Internet (Configuration > Security):** "Requests from outside the house" (`network.public_access`, off by default, asks first and a new proof of identity because turning it on is a loss of protection), with its help and warning in the eight languages; the server then still demands TLS and strong secrets for a request from outside.
 - **The generated readers and REST types follow the contract again:** `armor-parsers.ts` and `armor-rest.ts` are the files the shared contract generates now (the track number ceiling, the public access and local authority options and the vision timeline).
 - **The help of the counting lines says how they reach the observation service:** under the lines of a camera, a sentence (in the eight languages) names `python -m armor_vision sync-context`, once or with `--interval`, and tells to restart the service when it does not run.
 ## [0.8.2.4] - Vision zone editor, security switches and node stack health
