@@ -54,22 +54,22 @@ const ROWS: Record<string, Row> = {
     "视觉服务的活动事件",
   ],
   sec_opt_actevents_help: [
-    "The server takes the zone and line events that ARMOR-VISION reports (an object entered, stayed in or loitered in a zone, crossed a line). Every event is recorded; an alert zone may raise an alarm only while armed, and not when the profile of the mode says not to tell anybody. Off (the default): the server reads nothing and answers that the feature is off.",
-    "El servidor acepta los eventos de zona y de línea que informa ARMOR-VISION (un objeto entró, permaneció o merodeó en una zona, cruzó una línea). Todo evento se registra; una zona de alerta puede levantar una alarma solo con el sistema armado, y no cuando el perfil del modo dice que no se avise a nadie. Apagado (por defecto): el servidor no lee nada y responde que la función está apagada.",
-    "Der Server nimmt die Zonen- und Linienereignisse an, die ARMOR-VISION meldet (ein Objekt betrat eine Zone, blieb darin oder verweilte, überquerte eine Linie). Jedes Ereignis wird aufgezeichnet; eine Alarmzone kann nur bei scharfem System einen Alarm auslösen, und nicht, wenn das Profil des Modus sagt, dass niemand benachrichtigt wird. Aus (Standard): Der Server liest nichts und antwortet, dass die Funktion aus ist.",
-    "Le serveur accepte les événements de zone et de ligne que signale ARMOR-VISION (un objet est entré, est resté ou a rôdé dans une zone, a franchi une ligne). Chaque événement est enregistré ; une zone d'alerte peut déclencher une alarme seulement quand le système est armé, et pas quand le profil du mode dit de ne prévenir personne. Éteint (par défaut) : le serveur ne lit rien et répond que la fonction est éteinte.",
-    "Il server accetta gli eventi di zona e di linea che segnala ARMOR-VISION (un oggetto è entrato, si è fermato o ha bighellonato in una zona, ha attraversato una linea). Ogni evento viene registrato; una zona di allarme può far scattare un allarme solo a sistema armato, e non quando il profilo della modalità dice di non avvisare nessuno. Spento (predefinito): il server non legge nulla e risponde che la funzione è spenta.",
-    "サーバーは ARMOR-VISION が報告するゾーンと線のイベント（物体がゾーンに入った、留まった、うろついた、線を越えた）を受け付けます。すべてのイベントは記録され、警報ゾーンは武装中のみ、かつモードのプロファイルが通知しないとしていない場合にだけ警報を出せます。オフ（既定）：サーバーは何も読まず、機能がオフであると応答します。",
-    "服务器接收 ARMOR-VISION 报告的区域和线事件（物体进入、停留或徘徊于某区域，或越过某条线）。每个事件都会被记录；警报区域只有在布防时才能触发警报，并且当该模式的配置文件规定不通知任何人时不会触发。关闭（默认）：服务器不读取任何内容，并回复该功能已关闭。",
+    "The server takes the zone and line events that ARMOR-VISION reports (an object entered, stayed in or loitered in a zone, crossed a line). On by default. Every event is recorded; an alert zone may raise an alarm only while armed, and not when the profile of the mode says not to tell anybody. Off, the server reads nothing and the vision service raises no alarm from its zones.",
+    "El servidor acepta los eventos de zona y de línea que informa ARMOR-VISION (un objeto entró, permaneció o merodeó en una zona, cruzó una línea). Activado por defecto. Todo evento se registra; una zona de alerta puede levantar una alarma solo con el sistema armado, y no cuando el perfil del modo dice que no se avise a nadie. Desactivado, el servidor no lee nada y el servicio de visión no levanta alarmas desde sus zonas.",
+    "Der Server nimmt die Zonen- und Linienereignisse an, die ARMOR-VISION meldet (ein Objekt betrat eine Zone, blieb darin oder verweilte, überquerte eine Linie). Standardmäßig an. Jedes Ereignis wird aufgezeichnet; eine Alarmzone kann nur bei scharfem System einen Alarm auslösen, und nicht, wenn das Profil des Modus sagt, niemanden zu benachrichtigen. Aus: Der Server liest nichts und der Vision-Dienst löst aus seinen Zonen keinen Alarm aus.",
+    "Le serveur accepte les événements de zone et de ligne que signale ARMOR-VISION (un objet est entré, est resté ou a rôdé dans une zone, a franchi une ligne). Activé par défaut. Chaque événement est enregistré ; une zone d'alerte peut déclencher une alarme seulement lorsque le système est armé, et pas quand le profil du mode dit de ne prévenir personne. Désactivé, le serveur ne lit rien et le service de vision ne déclenche aucune alarme depuis ses zones.",
+    "Il server accetta gli eventi di zona e di linea che segnala ARMOR-VISION (un oggetto è entrato, si è fermato o ha bighellonato in una zona, ha attraversato una linea). Attivo per impostazione predefinita. Ogni evento viene registrato; una zona di allarme può far scattare un allarme solo a sistema armato, e non quando il profilo della modalità dice di non avvisare nessuno. Disattivato, il server non legge nulla e il servizio di visione non fa scattare allarmi dalle sue zone.",
+    "サーバーは ARMOR-VISION が報告するゾーンと線のイベント（物体がゾーンに入った、留まった、うろついた、線を越えた）を受け付けます。初期状態はオンです。すべてのイベントは記録され、警報ゾーンは武装中にだけ警報を出せ、モードのプロファイルが誰にも知らせないとしている場合は出しません。オフにすると、サーバーは何も読み取らず、ビジョンサービスはゾーンから警報を出しません。",
+    "服务器接收 ARMOR-VISION 报告的区域和线事件（物体进入、停留或徘徊于某区域，或越过某条线）。默认开启。每个事件都会被记录；警报区域只有在布防时才能触发警报，并且当该模式的配置文件规定不通知任何人时不会触发。关闭后，服务器不读取任何内容，视觉服务也不会从其区域触发警报。",
   ],
   sec_opt_actevents_warn: [
-    "Turning it on lets the vision service raise alarms in the zones marked as alert. Nothing is switched off.",
-    "Al activarlo, el servicio de visión puede levantar alarmas en las zonas marcadas como de alerta. No se desactiva nada.",
-    "Wenn Sie es einschalten, kann der Vision-Dienst in den als Alarm markierten Zonen Alarme auslösen. Nichts wird abgeschaltet.",
-    "En l'activant, le service de vision peut déclencher des alarmes dans les zones marquées comme alerte. Rien n'est désactivé.",
-    "Attivandolo, il servizio di visione può far scattare allarmi nelle zone segnate come di allarme. Non viene disattivato nulla.",
-    "オンにすると、ビジョンサービスは警報として指定されたゾーンで警報を出せます。無効になるものはありません。",
-    "开启后，视觉服务可在标记为警报的区域触发警报。不会关闭任何东西。",
+    "Turning it off stops the vision service from raising alarms in the zones marked as alert. Keep it on unless you have another way of watching those zones.",
+    "Al desactivarlo, el servicio de visión deja de levantar alarmas en las zonas marcadas como de alerta. Déjalo activado salvo que tengas otra forma de vigilar esas zonas.",
+    "Wenn Sie es ausschalten, löst der Vision-Dienst in den als Alarm markierten Zonen keine Alarme mehr aus. Lassen Sie es an, außer Sie überwachen diese Zonen anders.",
+    "En le désactivant, le service de vision ne déclenche plus d'alarmes dans les zones marquées comme alerte. Laissez-le activé sauf si vous surveillez ces zones autrement.",
+    "Disattivandolo, il servizio di visione non fa più scattare allarmi nelle zone segnate come di allarme. Lascialo attivo a meno che tu non sorvegli quelle zone in un altro modo.",
+    "オフにすると、ビジョンサービスは警報として指定されたゾーンで警報を出さなくなります。別の方法でそれらのゾーンを監視していない限り、オンのままにしてください。",
+    "关闭后，视觉服务将不再在标记为警报的区域触发警报。除非您有其他方式监视这些区域，否则请保持开启。",
   ],
 };
 
@@ -81,8 +81,8 @@ const PT: Record<string, string> = {
   sec_opt_heatmap_help: "Os administradores e operadores podem pedir ao servidor o mapa de calor de uma câmara: quanta atividade houve em cada parte da cena, feito pelo ARMOR-VISION a partir de deteções gravadas. Contam-se apenas posições, nunca imagens. Desligado, a rota responde 404.",
   sec_opt_heatmap_warn: "Ligá-lo permite que qualquer administrador ou operador veja por onde as pessoas se moveram à frente de uma câmara. Não contém nenhuma imagem, mas é informação sobre pessoas: deixe-o desligado, a não ser que precise dele.",
   sec_opt_actevents: "Eventos de atividade do serviço de visão",
-  sec_opt_actevents_help: "O servidor aceita os eventos de zona e de linha que o ARMOR-VISION comunica (um objeto entrou, ficou ou vadiou numa zona, atravessou uma linha). Todo o evento é registado; uma zona de alerta só pode levantar um alarme com o sistema armado, e não quando o perfil do modo diz para não avisar ninguém. Desligado (por omissão): o servidor não lê nada e responde que a funcionalidade está desligada.",
-  sec_opt_actevents_warn: "Ao ativá-lo, o serviço de visão pode levantar alarmes nas zonas marcadas como de alerta. Não se desativa nada.",
+  sec_opt_actevents_help: "O servidor aceita os eventos de zona e de linha que o ARMOR-VISION comunica (um objeto entrou, ficou ou vadiou numa zona, atravessou uma linha). Ligado por omissão. Todo o evento é registado; uma zona de alerta só pode levantar um alarme com o sistema armado, e não quando o perfil do modo diz para não avisar ninguém. Desligado, o servidor não lê nada e o serviço de visão não levanta alarmes a partir das suas zonas.",
+  sec_opt_actevents_warn: "Ao desligá-lo, o serviço de visão deixa de levantar alarmes nas zonas marcadas como de alerta. Deixe-o ligado, a menos que vigie essas zonas de outra forma.",
 };
 
 export const reportsCatalogues: RowCatalogues = { ...cataloguesFromRows(ROWS), pt: PT };
