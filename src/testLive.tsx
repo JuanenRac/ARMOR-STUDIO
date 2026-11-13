@@ -56,6 +56,7 @@ export async function pokeAll(host: HTMLElement): Promise<number> {
     await act(async () => {
       if (input.type === "checkbox" || input.type === "radio") input.dispatchEvent(new MouseEvent("click", { bubbles: true }));
       else if (input.type === "number" || input.type === "range") { setNative(input, String(Number(input.value || 0) + 1)); setNative(input, "0"); setNative(input, "-3"); setNative(input, ""); }
+      else if (input.type === "file") { /* a file field takes only a chosen file, never a typed value */ }
       else if (input.type === "color") setNative(input, "#336699");
       else setNative(input, "x");
     });
