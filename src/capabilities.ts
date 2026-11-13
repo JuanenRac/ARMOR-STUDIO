@@ -23,6 +23,8 @@ export type SecurityOptions = {
   "server.zone_feed_signature": boolean;
   "media.rtsp_proxy": boolean;
   "network.login_secure_only": boolean;
+  /** A session in use gets a new id and cookie each time it is renewed (off by default). */
+  "session.rotate_id": boolean;
   /** An administrator may download the public certificate of the local CA of the LAN (off by default). */
   "network.lan_ca": boolean;
   /** Requests from outside the house and the VPN are taken at all (off by default). */

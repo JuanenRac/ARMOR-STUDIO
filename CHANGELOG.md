@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A switch for a new session id on every renewal:** Configuration > Security offers `session.rotate_id` (off by default, in the 8 languages); turning it off again asks first. The text says a session also ends 30 days after it was opened.
 - **The option "Activity events of the vision service" starts on and asks before it is turned off:** the order of its values and its help and warning (in the eight languages) say that it is on by default and that turning it off stops the alarms of the alert zones.
 - **A switch for the voice commands from the phone (Configuration > Security):** "Voice commands from the phone" (`voice.mobile_turn`, off by default, asks first because turning it on lets a phone listen with its microphone), with its help and warning in the eight languages; a spoken order asks for the same confirmations as a typed one.
 - **Configuration > Security has a switch that refuses a maintenance helper that shows secrets:** `admin.require_masked_agent` (off by default; it appears only when the server announces it). On, the server refuses to open or save an environment file through a helper that does not hide the secrets itself, and the console explains the refusal (`agent_not_masking`); turning it off from on asks first. Words in the eight languages, with the types of the server contract refreshed
