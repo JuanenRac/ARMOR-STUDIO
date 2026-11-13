@@ -3021,6 +3021,7 @@ const catalogue: Record<string, string> = {
 "iz_saved": "Guardado: o serviço de observação usa-as a partir de agora.",
 "iz_error": "Não foi possível guardar as zonas.",
 "lc_title": "Linhas de contagem",
+"lc_sync_help": "As linhas chegam sozinhas ao serviço de observação quando este executa `python -m armor_vision sync-context` (uma vez, ou a cada poucos segundos com `--interval`) com o endereço do servidor e o ficheiro do token do serviço; sem ele, reinicie o serviço para que adote uma linha alterada.",
 "lc_help": "Desenhe uma linha pelos sítios onde quer contar quem passa (um portão, uma porta, um caminho). O serviço de observação conta cada passagem, nos dois sentidos, dos objetos que segue. O vídeo, as fotografias e as gravações ficam inteiros.",
 "lc_draw": "Arraste sobre a imagem para desenhar uma linha.",
 "lc_none": "Nesta câmara não se conta nenhuma linha.",
