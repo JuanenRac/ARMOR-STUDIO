@@ -129,6 +129,25 @@ describe("the security screen", () => {
     expect(isLowering([false, true], false, true)).toBe(true);
   });
 
+  it("offers the switch that refuses a maintenance helper that shows secrets, in every language and translated, and asks first when it is turned off", () => {
+    for (const id of ["sec_opt_maskedagent", "sec_opt_maskedagent_help", "sec_opt_maskedagent_warn", "adm_err_agent_not_masking"]) {
+      const words = new Set<string>();
+      for (const locale of locales) {
+        const phrase = text(locale, id);
+        expect(phrase.trim().length, `${locale} ${id}`).toBeGreaterThan(2);
+        expect(phrase, `${locale} ${id} is not the key`).not.toBe(id);
+        words.add(phrase);
+      }
+      expect(words.size, `${id} is translated, not repeated`).toBe(8);
+    }
+    // strict first: going from on to off is the loss and asks first, the other way does not
+    expect(isLowering([true, false], true, false)).toBe(true);
+    expect(isLowering([true, false], false, true)).toBe(false);
+    // an older server that does not announce the option shows no such switch
+    const t = (key: string) => text("en", key);
+    expect(renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }))).not.toContain("security-option-maskedagent");
+  });
+
   it("reads the days of retention as whole numbers inside the range, and has its words in every language", () => {
     expect(retentionValue("media.retention_snapshot_days", "0")).toBe(0);
     expect(retentionValue("media.retention_recording_days", "3650")).toBe(3650);
