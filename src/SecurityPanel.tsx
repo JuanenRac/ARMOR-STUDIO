@@ -269,6 +269,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "network.public_access", id: "publicaccess", values: [false, true], optional: true },   // off by default; on lets the server take requests from outside the house, so it asks first
   { key: "login.country_alert", id: "country", values: [true, false] },
   { key: "electrical.set_aside_old_readings", id: "oldread", values: [true, false] },
+  { key: "voice.mobile_turn", id: "mobilevoice", values: [false, true], optional: true },   // off by default; turning it on lets a phone listen with its microphone, so it asks first
   { key: "voice.wake_word", id: "wakeword", values: [false, true], optional: true },   // off by default; turning it on lets the wall panel listen for its word all the time, so it asks first
   { key: "voice.multipart_turn", id: "voiceturn", values: [false, true] },
   { key: "voice.panic_phrase", id: "panic", values: [true, false], calm: true, optional: true },   // off by default; turning it off lowers the safety, so it asks first

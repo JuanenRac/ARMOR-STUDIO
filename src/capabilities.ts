@@ -51,6 +51,8 @@ export type SecurityOptions = {
   "electrical.set_aside_old_readings": boolean;
   "voice.multipart_turn": boolean;
   "voice.wake_word": boolean;
+  /** A phone of a signed-in operator or administrator may speak to the voice gateway (off by default). */
+  "voice.mobile_turn": boolean;
   /** The secret panic phrase of each person raises the silent duress alarm (off by default), and the quiet time in seconds after one (10 to 3600, 60). */
   "voice.panic_phrase": boolean;
   "voice.panic_cooldown_s": number;
