@@ -104,7 +104,7 @@ describe("the security screen", () => {
   });
 
   it("offers the LAN CA switch and the three personal-data features of the vision service in every language, translated and not repeated", () => {
-    const ids = ["sec_opt_publicaccess", "sec_opt_publicaccess_help", "sec_opt_publicaccess_warn", "sec_opt_lanca", "sec_opt_lanca_help", "sec_opt_lanca_warn", "sec_lanca_download", "sec_vp_title", "sec_vp_help", "sec_vp_ack", "sec_vp_need_ack", "sec_vp_confirm",
+    const ids = ["sec_opt_mobilevoice", "sec_opt_mobilevoice_help", "sec_opt_mobilevoice_warn", "sec_opt_publicaccess", "sec_opt_publicaccess_help", "sec_opt_publicaccess_warn", "sec_opt_lanca", "sec_opt_lanca_help", "sec_opt_lanca_warn", "sec_lanca_download", "sec_vp_title", "sec_vp_help", "sec_vp_ack", "sec_vp_need_ack", "sec_vp_confirm",
       ...["semantic_search", "plates", "faces"].flatMap(feature => [`sec_vp_${feature}`, `sec_vp_${feature}_notice`])];
     for (const id of ids) {
       const words = new Set<string>();
