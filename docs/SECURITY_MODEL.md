@@ -60,6 +60,7 @@ Four more options of the server appear in Configuration > Security for an admini
 - `alarm.siren_fault_notice`: on by default; turning it off stops the warning that the wiring of a siren is open, shorted or unreadable.
 - `ingest.recording`: the server keeps a copy of what the nodes send in a file that the simulator can play again; it never copies the orders to the nodes or any field named like a secret.
 - `network.lan_ca`: an administrator may download the public certificate of the local CA of the LAN; the private key is never served. Off by default.
+- `admin.require_masked_agent`: the server refuses to open or save an environment file through a maintenance helper that does not hide the secrets itself (409 `agent_not_masking`), so a secret never reaches the server in clear. Off by default: an older helper keeps working and the server hides the secrets for it.
 - `vision.semantic_search`, `vision.plates`, `vision.faces`: the features of the vision service that read personal data. Each stays off until the privacy notice has been acknowledged (`..._ack`), and the notice cannot be withdrawn while the feature is on.
 
 In Configuration > Updates the card of the automatic security updates carries the switch, the rule for a reboot (never by itself, or inside the window of the night and only when nothing is armed) and, read only, how the packages are signed.
