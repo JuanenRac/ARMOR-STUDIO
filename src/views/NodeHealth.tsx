@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { ApiError, forgetNodeHealth, readInfo, readNodeControlOperation, readNodeHealth, readNodeHealthDetail, type HealthFamily, type NodeControlOperation, type NodeHealthDetail, type NodeHealthItem, type NodeHealthLevels } from "../api";
 import { askConfirm } from "../askConfirm";
 import { contractState } from "../contractNote";
+import { ContractSummary } from "./ContractSummary";
 import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
 import { causeText, fillAll, formatBytes, formatUptime, heapMeter, heapSeries, HEALTH_FAMILIES, isAbnormalReset, resetText, signalLevel, signalSeries, sparkline, statusClass, visibleNodes, warningExplanation } from "../nodeHealthModel";
@@ -54,6 +55,7 @@ export function NodeHealth({ t, origin, isAdmin, now = Date.now() }: { t: Transl
     catch (error) { setMessage({ text: error instanceof ApiError && error.status === 404 ? t("nh_forgotten") : t("nh_forget_failed"), bad: true }); }
   };
   return <article className="stack-card node-health" data-tour="sys-health" aria-label={t("nh_title")}>
+    <ContractSummary t={t} origin={origin} />
     <div className="log-head">
       <h3>{t("nh_title")}</h3>
       {data && <div className="nh-totals" aria-live="polite">
