@@ -265,6 +265,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "media.rtsp_proxy", id: "rtsp", values: [true, false] },
   { key: "network.login_secure_only", id: "netlogin", values: [true, false] },
   { key: "network.lan_ca", id: "lanca", values: [false, true], optional: true },   // off by default; on lets an administrator download the public certificate of the local CA, so it asks first
+  { key: "network.public_access", id: "publicaccess", values: [false, true], optional: true },   // off by default; on lets the server take requests from outside the house, so it asks first
   { key: "login.country_alert", id: "country", values: [true, false] },
   { key: "electrical.set_aside_old_readings", id: "oldread", values: [true, false] },
   { key: "voice.wake_word", id: "wakeword", values: [false, true], optional: true },   // off by default; turning it on lets the wall panel listen for its word all the time, so it asks first

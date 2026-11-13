@@ -2638,6 +2638,8 @@ export type SecuritySettings = {
   "network.login_secure_only"?: boolean;
   /** An administrator may download the public certificate of the local CA of the LAN (GET /api/v1/security/lan-ca); the private key is never served. Turning it on lowers the security. */
   "network.lan_ca"?: boolean;
+  /** Requests from outside the house and the VPN are taken at all (off by default; on still needs TLS and strong secrets). Turning it on lowers the security. */
+  "network.public_access"?: boolean;
   /** How many days snapshots are kept; 0 = the general limit applies. */
   "media.retention_snapshot_days"?: number;
   /** How many days recordings are kept; 0 = the general limit applies. */
