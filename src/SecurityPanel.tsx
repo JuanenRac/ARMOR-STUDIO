@@ -264,6 +264,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "server.zone_feed_signature", id: "sign", values: [true, false], node: true },
   { key: "media.rtsp_proxy", id: "rtsp", values: [true, false] },
   { key: "network.login_secure_only", id: "netlogin", values: [true, false] },
+  { key: "session.rotate_id", id: "rotateid", values: [true, false], calm: true, optional: true },   // off by default; hardening, so only turning it off asks first
   { key: "network.lan_ca", id: "lanca", values: [false, true], optional: true },   // off by default; on lets an administrator download the public certificate of the local CA, so it asks first
   { key: "vision.timeline", id: "vtimeline", values: [false, true], optional: true },   // off by default; on keeps a record of what the cameras saw, so it asks first
   { key: "network.public_access", id: "publicaccess", values: [false, true], optional: true },   // off by default; on lets the server take requests from outside the house, so it asks first
@@ -284,7 +285,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "ingest.recording", id: "recording", values: [false, true], optional: true },   // off by default; on keeps a copy of the node traffic on the server, so it asks first
   { key: "summary.daily", id: "dailysummary", values: [false, true], optional: true },
   { key: "vision.heatmap", id: "heatmap", values: [false, true], optional: true },
-  { key: "vision.activity_events", id: "actevents", values: [false, true], calm: true, optional: true },   // off by default; on lets the vision service raise alarms in the alert zones, nothing is switched off
+  { key: "vision.activity_events", id: "actevents", values: [true, false], optional: true },   // on by default; turning it off stops the alarms of the alert zones, so it asks first
   { key: "vision.service_remote", id: "visionremote", values: [false, true], optional: true },
   { key: "client.device_lock", id: "lock", values: ["always", "sensitive", "user"], calm: true },
   { key: "client.trusted_devices", id: "trusted", values: [false, true], optional: true },   // off by default; on gives a registered phone a longer session, so it asks first
