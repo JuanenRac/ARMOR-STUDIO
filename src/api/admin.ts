@@ -38,6 +38,12 @@ export const adminFirewall = (origin: string) => userCall<FirewallState>(origin,
 /** `confirmText` is the word field-http, typed again by the administrator; `code` is the code of the authenticator. */
 export const adminSetFieldHttp = (origin: string, change: { state: "on" | "off"; confirmText: string }, code: string) =>
   userCall<FirewallState & { ok: boolean; state: "on" | "off" }>(origin, "POST", "/api/v1/admin/firewall/field-http", { state: change.state, confirm: true, confirm_text: change.confirmText }, false, { "X-Armor-Maint-Totp": code });
+/** The local certificate authority of the LAN, ordered through the admin agent (the setting network.lan_ca must be on for the server to answer). */
+export type LanCaState = { enabled: boolean; installed?: boolean; approval?: "totp" | "not_enrolled"; authority?: { days_left: number; sha256: string } | null; certificate?: { days_left: number; sha256: string } | null; renew_days?: number; expiring?: Array<"authority" | "certificate"> };
+export const adminLanCa = (origin: string) => userCall<LanCaState>(origin, "GET", "/api/v1/admin/lan-ca");
+/** `confirmText` is the word lan-ca typed again; `code` is the code of the authenticator. */
+export const adminLanCaOrder = (origin: string, change: { action: "setup" | "renew" | "rotate"; ip: string; confirmText: string }, code: string) =>
+  userCall<LanCaState & { ok: boolean; action: string; devices_must_reinstall: boolean }>(origin, "POST", "/api/v1/admin/lan-ca", { action: change.action, ip: change.ip, confirm: true, confirm_text: change.confirmText }, false, { "X-Armor-Maint-Totp": code });
 export const adminServices = (origin: string) => userCall<{ services: AdminService[] }>(origin, "GET", "/api/v1/admin/services");
 export const adminServiceAction = (origin: string, id: string, action: "start" | "stop" | "restart" | "reload" | "pause" | "resume") => userCall<{ ok: boolean }>(origin, "POST", `/api/v1/admin/services/${encodeURIComponent(id)}/${action}`);
 export const adminFiles = (origin: string) => userCall<{ files: AdminFileInfo[] }>(origin, "GET", "/api/v1/admin/files");

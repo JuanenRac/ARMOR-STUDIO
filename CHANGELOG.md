@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A card to make, renew and replace the local authority of the LAN, with a warning when it ends:** under the broker settings, an administrator types the address of the machine, the one-time code of the authenticator and the word `lan-ca` and orders the authority and the certificate to be made, the certificate renewed or the authority replaced (the card says that every device must then install the new authority); it shows the days left of both and warns when either is within the renewal margin of its end. It is off until the option "Local certificate authority of the LAN" is on; the texts are in the eight languages.
 - **The help of the counting lines says how they reach the observation service:** under the lines of a camera, a sentence (in the eight languages) names `python -m armor_vision sync-context`, once or with `--interval`, and tells to restart the service when it does not run.
 ## [0.8.2.4] - Vision zone editor, security switches and node stack health
 
