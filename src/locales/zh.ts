@@ -5433,6 +5433,7 @@ const catalogue: Record<string, string> = {
 "cl_never": "从未",
 "lc_title": "计数线",
 "lc_help": "在想统计经过人数的位置（大门、门口、小路）画一条线。观测服务会统计它所跟踪的对象双向穿过这条线的每一次。视频、照片和录像保持完整。",
+"lc_sync_help": "当观测服务使用服务器地址和服务令牌文件运行 `python -m armor_vision sync-context`（运行一次，或用 `--interval` 每隔几秒运行）时，线条会自动送达；否则，请重启服务以采用修改后的线条。",
 "lc_draw": "在画面上拖动即可画一条线。",
 "lc_none": "此摄像头没有计数线。",
 "lc_line": "线",

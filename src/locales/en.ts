@@ -5458,6 +5458,7 @@ const catalogue: Record<string, string> = {
 "cl_never": "never",
 "lc_title": "Counting lines",
 "lc_help": "Draw a line across the places where you want to count who goes by (a gate, a door, a path). The observation service counts every crossing, in both directions, for the objects it follows. The video, the photos and the recordings stay whole.",
+"lc_sync_help": "The lines reach the observation service by itself when it runs `python -m armor_vision sync-context` (once, or every few seconds with `--interval`) with the server address and the token file of the service; without it, restart the service to pick up a changed line.",
 "lc_draw": "Drag on the picture to draw a line.",
 "lc_none": "No line is counted in this camera.",
 "lc_line": "Line",

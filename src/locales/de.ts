@@ -5279,6 +5279,7 @@ const catalogue: Record<string, string> = {
 "cl_never": "nie",
 "lc_title": "Zähllinien",
 "lc_help": "Zeichnen Sie eine Linie über die Stellen, an denen Sie zählen möchten, wer vorbeigeht (ein Tor, eine Tür, ein Weg). Der Beobachtungsdienst zählt jede Überquerung in beide Richtungen für die Objekte, die er verfolgt. Video, Fotos und Aufnahmen bleiben unverändert.",
+"lc_sync_help": "Die Linien erreichen den Beobachtungsdienst von selbst, wenn dieser `python -m armor_vision sync-context` ausführt (einmal oder alle paar Sekunden mit `--interval`), mit der Serveradresse und der Token-Datei des Dienstes; ohne das starten Sie den Dienst neu, damit er eine geänderte Linie übernimmt.",
 "lc_draw": "Ziehen Sie auf dem Bild, um eine Linie zu zeichnen.",
 "lc_none": "In dieser Kamera wird keine Linie gezählt.",
 "lc_line": "Linie",

@@ -5285,6 +5285,7 @@ const catalogue: Record<string, string> = {
 "cl_never": "jamais",
 "lc_title": "Lignes de comptage",
 "lc_help": "Tracez une ligne à travers les endroits où vous voulez compter qui passe (un portail, une porte, un chemin). Le service d'observation compte chaque franchissement, dans les deux sens, des objets qu'il suit. La vidéo, les photos et les enregistrements restent entiers.",
+"lc_sync_help": "Les lignes parviennent seules au service d'observation quand il exécute `python -m armor_vision sync-context` (une fois, ou toutes les quelques secondes avec `--interval`) avec l'adresse du serveur et le fichier du jeton du service ; sans cela, redémarrez le service pour qu'il prenne en compte une ligne modifiée.",
 "lc_draw": "Faites glisser sur l'image pour tracer une ligne.",
 "lc_none": "Aucune ligne n'est comptée dans cette caméra.",
 "lc_line": "Ligne",
