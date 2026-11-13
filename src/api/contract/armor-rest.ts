@@ -83,6 +83,28 @@ export type AdminFirewallChanged = {
   approval?: "totp" | "not_enrolled";
 };
 
+export type AdminLanCaChanged = AdminLanCaStatus & {
+  ok: boolean;
+  action: "setup" | "renew" | "rotate";
+  devices_must_reinstall: boolean;
+};
+
+export type AdminLanCaStatus = {
+  enabled: boolean;
+  installed?: boolean;
+  approval?: "totp" | "not_enrolled";
+  authority?: {
+    days_left?: number;
+    sha256?: string;
+  } | null;
+  certificate?: {
+    days_left?: number;
+    sha256?: string;
+  } | null;
+  renew_days?: number;
+  expiring?: ("authority" | "certificate")[];
+};
+
 export type AdminRelayChanged = {
   ok: boolean;
   relay: "battery-write" | "alarm-state-relay";
@@ -2088,6 +2110,17 @@ export type PostAdminInstallationRequest = {
   parts?: ("cameras" | "site" | "electrical" | "network" | "rules" | "automations" | "devices" | "solar_devices" | "energy_alarms" | "users")[];
 };
 
+export type PostAdminLanCaRequest = {
+  action: "setup" | "renew" | "rotate";
+  /** A private IPv4 address of the machine */
+  ip: string;
+  names?: string[];
+  /** Must be true */
+  confirm: boolean;
+  /** The word lan-ca typed again */
+  confirm_text: string;
+};
+
 export type PostAdminMachineUpdateApplyRequest = {
   project: string;
   plan_id: string;
@@ -2656,6 +2689,14 @@ export type SecuritySettings = {
   "vision.plates_ack"?: boolean;
   /** The privacy notice of face recognition was read. */
   "vision.faces_ack"?: boolean;
+  /** The server keeps the events of the vision service (an alert zone or a detection zone) in a timeline with the evidence taken when it was seen, for the review panel of Studio (GET /api/v1/vision/timeline). Off, the default, nothing is kept. */
+  "vision.timeline"?: boolean;
+  /** How many days an entry of the timeline is kept before it is pruned. */
+  "vision.timeline_days"?: number;
+  /** The notification of an alarm that a camera raised carries a small photo of the event. The photo goes through the push service of Google (FCM). It cannot be on while push.photo_ack is off, and the photo is never written to a log. Turning it on lowers the security. */
+  "push.photo"?: boolean;
+  /** The notice that the photo of a notification passes through FCM / Google was read. */
+  "push.photo_ack"?: boolean;
   /** GET /metrics answers the numbers of the server in the Prometheus text form to the bearer token ARMOR_METRICS_TOKEN (off: 404) */
   "metrics.prometheus"?: boolean;
   /** The server asks the address ARMOR_HEARTBEAT_URL every ARMOR_HEARTBEAT_INTERVAL_S seconds, so a service outside the house can tell the owner when the pings stop */
@@ -3165,6 +3206,36 @@ export type VisionCounts = {
       [key: string]: LineCount;
     };
   };
+};
+
+export type VisionTimeline = {
+  /** Whether the setting vision.timeline is on */
+  enabled: boolean;
+  /** The days an entry is kept (vision.timeline_days) */
+  days: number;
+  items: VisionTimelineItem[];
+};
+
+export type VisionTimelineDeleted = {
+  deleted: number;
+};
+
+export type VisionTimelineItem = {
+  id: string;
+  at: string;
+  camera_id: string;
+  /** alert: a zone of kind alert; detection: any other zone */
+  level: "alert" | "detection";
+  zone_id: string;
+  zone_name: string;
+  label: string;
+  confidence?: number;
+  /** The alarm this event raised, when it raised one */
+  alarm_id?: string | null;
+  /** The id of the evidence photo taken when it was seen (as in /api/v1/media), when there is one */
+  snapshot_id?: string | null;
+  /** The id of the evidence recording taken when it was seen, when there is one */
+  clip_id?: string | null;
 };
 
 export type VoiceCommandResult = {
