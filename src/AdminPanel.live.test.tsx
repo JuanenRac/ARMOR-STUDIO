@@ -30,6 +30,7 @@ const base = (extra: Record<string, unknown> = {}) => ({
   "GET /api/v1/system/connection": { active: { host: "h", port: 1, tls: false, studio_origins: [] }, mqtt_tls: { configured: true, tls: true, pinned_ca: false }, saved: {}, restart_required: false },
   "GET /api/v1/admin/mqtt/relays": { enabled: false },
   "GET /api/v1/admin/firewall": { enabled: false },
+  "GET /api/v1/admin/lan-ca": { enabled: false },
   ...extra,
 });
 

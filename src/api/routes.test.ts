@@ -59,6 +59,8 @@ const rows: Row[] = [
   ["readStaging", () => api.readStaging(O), "GET", "/api/v1/admin/maintenance/staging"],
   ["changeStaging", () => api.changeStaging(O, true), "PUT", "/api/v1/admin/maintenance/staging", { enabled: true }],
   ["adminFirewall", () => api.adminFirewall(O), "GET", "/api/v1/admin/firewall"],
+  ["adminLanCa", () => api.adminLanCa(O), "GET", "/api/v1/admin/lan-ca"],
+  ["adminLanCaOrder", () => api.adminLanCaOrder(O, { action: "setup", ip: "192.168.0.180", confirmText: "lan-ca" }, "123456"), "POST", "/api/v1/admin/lan-ca", { action: "setup", ip: "192.168.0.180", confirm: true, confirm_text: "lan-ca" }],
   ["readVisionTimeline", () => api.readVisionTimeline(O, { level: "alert", limit: 20 }), "GET", "/api/v1/vision/timeline?level=alert&limit=20"],
   ["deleteVisionTimeline", () => api.deleteVisionTimeline(O), "DELETE", "/api/v1/vision/timeline"],
   ["deleteVisionTimelineOne", () => api.deleteVisionTimeline(O, "vt-aaaaaaaa"), "DELETE", "/api/v1/vision/timeline/vt-aaaaaaaa"],
