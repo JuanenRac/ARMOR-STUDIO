@@ -8,6 +8,7 @@ export * from "./api/armingModes";
 export * from "./api/history";
 export * from "./api/users";
 export * from "./api/admin";
+export * from "./api/timeline";
 export * from "./api/maintenance";
 export * from "./api/firmware";
 export * from "./api/devices";

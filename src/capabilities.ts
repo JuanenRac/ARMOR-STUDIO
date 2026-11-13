@@ -25,6 +25,12 @@ export type SecurityOptions = {
   "network.login_secure_only": boolean;
   /** An administrator may download the public certificate of the local CA of the LAN (off by default). */
   "network.lan_ca": boolean;
+  /** Requests from outside the house and the VPN are taken at all (off by default). */
+  "network.public_access": boolean;
+  /** The server keeps the events of the zones of the vision service in a review timeline (off by default). */
+  "vision.timeline": boolean;
+  /** The days an entry of the timeline is kept (1 to 3650). */
+  "vision.timeline_days": number;
   /** How many days snapshots and recordings are kept, each kind on its own (0 to 3650; 0: the general limit of the server). */
   "media.retention_snapshot_days": number;
   "media.retention_recording_days": number;
