@@ -1,4 +1,5 @@
 import type { SystemState } from "../types";
+import type { ContractStatus } from "./contract/armor-rest";
 import { ApiError, askElevation, endpoint, localSession, refusal, timedFetch, userCall } from "./transport";
 export async function readStatus(origin: string): Promise<SystemState> {
   const response = await timedFetch(`${origin.replace(/\/$/, "")}/api/v1/status`, { headers: { Accept: "application/json" }, ...localSession, signal: AbortSignal.timeout(8_000) });
@@ -7,6 +8,8 @@ export async function readStatus(origin: string): Promise<SystemState> {
 }
 /** What the server says about itself: the version and the uptime only to a signed-in client, the rest only to an operator. */
 export type ServerInfo = { service: string; version?: string; uptime_s?: number; /** The version of the shared contracts the server was checked against (a signed-in client). */ contract?: string; mode?: "armed" | "disarmed"; live_video?: boolean; mqtt?: boolean };
+/** The version of the shared contracts of the server and the one each node says (GET /api/v1/contract; operators and Studio). */
+export const readContractStatus = (origin: string) => userCall<ContractStatus>(origin, "GET", "/api/v1/contract");
 export async function readInfo(origin: string): Promise<ServerInfo> {
   const response = await timedFetch(endpoint(origin, "/api/v1/info"), { headers: { Accept: "application/json" }, ...localSession });
   if (!response.ok) throw new Error(`Info returned ${response.status}`);
