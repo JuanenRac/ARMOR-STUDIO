@@ -25,6 +25,22 @@ export type SecurityOptions = {
   "network.login_secure_only": boolean;
   /** A session in use gets a new id and cookie each time it is renewed (off by default). */
   "session.rotate_id": boolean;
+  /** The cameras that cover a node take the photo and video of the capture settings when it raises a high alarm (off by default). */
+  "capture.on_alarm": boolean;
+  /** The most captures one minute of alarms may start in all (1 to 60). */
+  "capture.on_alarm_per_min": number;
+  /** The console channel also sends small notices of what changed (on by default). */
+  "live.events": boolean;
+  /** The automations with a schedule trigger run, armed away only (off by default). */
+  "vacation.mode": boolean;
+  /** The critical commands are published with a nonce and a signature (off by default). */
+  "commands.require_sig": boolean;
+  /** An administrator may set up and make encrypted backups of the data directory (off by default). */
+  "admin.backup": boolean;
+  /** Devices listed as not critical are switched off when the grid draw is over the limit (off by default). */
+  "electrical.load_shedding": boolean;
+  /** The server works out and watches the energy balance of the house (off by default). */
+  "electrical.balance": boolean;
   /** An administrator may download the public certificate of the local CA of the LAN (off by default). */
   "network.lan_ca": boolean;
   /** Requests from outside the house and the VPN are taken at all (off by default). */

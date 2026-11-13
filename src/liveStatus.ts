@@ -42,3 +42,30 @@ export function retryDelay(failures: number): number {
 export type LiveSocket = { onopen: (() => void) | null; onmessage: ((event: { data: unknown }) => void) | null; onclose: (() => void) | null; onerror: (() => void) | null; close(): void };
 export type SocketFactory = (url: string) => LiveSocket;
 export const browserSocket: SocketFactory = url => new WebSocket(url) as unknown as LiveSocket;
+
+/** The kinds of small notice the server sends besides the state (see the live channel in ARMOR-SERVER): something an open screen may be showing changed. */
+export const NOTICE_TYPES = ["alarm", "device", "solar", "network", "design"] as const;
+export type NoticeType = typeof NOTICE_TYPES[number];
+export type LiveNotice = { type: NoticeType; id: string; version: number };
+
+/** The notice a message of the live channel carries, or null when it is not one (the state, a kind this console does not know, anything malformed): a client ignores what it does not know. */
+export function noticeOf(data: unknown): LiveNotice | null {
+  if (typeof data !== "string" || data.length > 1024) return null;
+  let parsed: unknown;
+  try { parsed = JSON.parse(data); } catch { return null; }
+  if (typeof parsed !== "object" || parsed === null) return null;
+  const { type, id, version } = parsed as { type?: unknown; id?: unknown; version?: unknown };
+  if (typeof type !== "string" || !(NOTICE_TYPES as readonly string[]).includes(type) || typeof id !== "string" || id.length > 64 || typeof version !== "number" || !Number.isFinite(version)) return null;
+  return { type: type as NoticeType, id, version };
+}
+
+const listeners = new Set<(notice: LiveNotice) => void>();
+/** Hears every notice that arrives; returns the way to stop hearing. */
+export function onNotice(listener: (notice: LiveNotice) => void): () => void {
+  listeners.add(listener);
+  return () => { listeners.delete(listener); };
+}
+/** Hands a notice to whoever listens (a listener that fails never stops the others). */
+export function emitNotice(notice: LiveNotice): void {
+  for (const listener of [...listeners]) { try { listener(notice); } catch { /* one screen failing must not stop the rest */ } }
+}

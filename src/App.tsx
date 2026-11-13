@@ -49,7 +49,7 @@ import { NAV } from "./domain";
 
 const VIEW_ORDER = NAV.map(([key]) => key);
 import type { SiteModel } from "./designer/ops";
-import { usePolled, useFullscreen, useCameraReachability, useServerCameras, useServerInfo, useRemoteConnection, useServerStatus, useSessionUser, useStreamUrls } from "./hooks";
+import { useNoticesFlowing, usePolled, useFullscreen, useCameraReachability, useServerCameras, useServerInfo, useRemoteConnection, useServerStatus, useSessionUser, useStreamUrls } from "./hooks";
 import { ensureLocale, isLocaleLoaded, text } from "./i18n";
 import { HistoryView } from "./HistoryView";
 import { MediaLibrary } from "./MediaLibrary";
@@ -176,13 +176,15 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const connection = connectionState === "synced" ? t("serverSynchronized") : t("offlineDemo");
   const nodes = useMemo(() => Object.values(state.nodes).sort((a, b) => a.node_id.localeCompare(b.node_id)), [state]);
   const selected = cameras.find(camera => camera.id === selectedCamera) ?? cameras[0];
-  const devicePoll = usePolled(() => listDevices(origin), 2500, origin, { always: true });
-  const alarmPoll = usePolled(() => listAlarms(origin), 2000, origin, { always: true });
+  // Once notices are arriving, the screens that follow them ask far less often; with none for a minute they go back to asking as before (the option may be off).
+  const flowing = useNoticesFlowing(liveChannel);
+  const devicePoll = usePolled(() => listDevices(origin), flowing ? 15_000 : 2500, origin, { always: true, topics: ["device"] });
+  const alarmPoll = usePolled(() => listAlarms(origin), flowing ? 10_000 : 2000, origin, { always: true, topics: ["alarm"] });
   // Which cameras are recording is the server's to say: after a reload the console has to ask.
   const recordingPoll = usePolled(() => listMedia(origin).then(result => result.activeCameraIds), 15_000, origin, { always: true });
   useEffect(() => { if (recordingPoll.data) setRecordingCameraIds(recordingPoll.data); }, [recordingPoll.data]);
   const automationPoll = usePolled(() => listAutomations(origin), 5000, origin, { always: true });
-  const solarPoll = usePolled(() => listSolar(origin), 4000, origin, { always: true });
+  const solarPoll = usePolled(() => listSolar(origin), flowing ? 15_000 : 4000, origin, { always: true, topics: ["solar"] });
   const electricalPoll = usePolled(() => listElectricalReadings(origin), 4000, origin, { always: true });
   const alarmNodesPoll = usePolled(() => listAlarmNodes(origin), 3000, origin, { always: true });
   const armProfilesPoll = usePolled(() => listArmProfiles(origin), 15000, origin, { always: true });
@@ -197,7 +199,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     ids: [...nodes.map(node => node.node_id), ...(solarPoll.data?.devices ?? []).map(device => device.node_id), ...(solarPoll.data?.waiting ?? []).map(item => item.node_id), ...(electricalPoll.data?.nodes ?? []).map(item => item.node_id), ...(alarmNodesPoll.data?.nodes ?? []).map(item => item.node_id)],
     ips: nodes.flatMap(node => (node.panel ? [node.panel.ip] : [])),
   }), [nodes, solarPoll.data, electricalPoll.data, alarmNodesPoll.data]);
-  const networkPoll = usePolled(() => listNetwork(origin), 5000, origin, { always: true });
+  const networkPoll = usePolled(() => listNetwork(origin), flowing ? 20_000 : 5000, origin, { always: true, topics: ["network"] });
   // the count of every kind of node (radar, solar, electrical, alarm, hmi), from the health they report and from the radar stream
   const nodeHealthPoll = usePolled(() => readNodeHealth(origin), 10_000, origin, { always: true });
   const census = useMemo(() => nodeCensus(nodes, nodeHealthPoll.data), [nodes, nodeHealthPoll.data]);

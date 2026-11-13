@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { eventsUrl, LIVE_POLL_MS, POLL_MS, retryDelay, stateOf } from "./liveStatus";
+import { emitNotice, eventsUrl, LIVE_POLL_MS, NOTICE_TYPES, noticeOf, onNotice, POLL_MS, retryDelay, stateOf } from "./liveStatus";
 
 describe("the address of the live channel", () => {
   it("is the address of the server with ws for http and wss for https", () => {
@@ -40,5 +40,37 @@ describe("the wait before trying the live channel again", () => {
   });
   it("asks much less often while the channel is open than without it", () => {
     expect(LIVE_POLL_MS).toBeGreaterThanOrEqual(POLL_MS * 5);
+  });
+});
+
+describe("the small notices of the live channel", () => {
+  it("takes a notice of a known kind with its id and version, and nothing else", () => {
+    for (const type of NOTICE_TYPES) expect(noticeOf(JSON.stringify({ type, id: "alm-00001", version: 12 }))).toEqual({ type, id: "alm-00001", version: 12 });
+    expect(noticeOf(JSON.stringify({ type: "alarm", id: "a", version: 1, detail: "not kept" }))).toEqual({ type: "alarm", id: "a", version: 1 });
+  });
+  it("ignores the state, a kind it does not know, a notice with a missing or wrong field, text that is not JSON and a huge message", () => {
+    expect(noticeOf(JSON.stringify({ type: "state", state: {} }))).toBeNull();
+    expect(noticeOf(JSON.stringify({ type: "weather", id: "x", version: 1 }))).toBeNull();
+    for (const bad of [{ type: "alarm", version: 1 }, { type: "alarm", id: 5, version: 1 }, { type: "alarm", id: "a" }, { type: "alarm", id: "a", version: "1" }, { type: "alarm", id: "a", version: null }, { type: "alarm", id: "x".repeat(65), version: 1 }]) {
+      expect(noticeOf(JSON.stringify(bad)), JSON.stringify(bad)).toBeNull();
+    }
+    expect(noticeOf("not json")).toBeNull();
+    expect(noticeOf("null")).toBeNull();
+    expect(noticeOf(new ArrayBuffer(4))).toBeNull();
+    expect(noticeOf("x".repeat(2000))).toBeNull();
+  });
+  it("tells every listener, stops telling one that left, and one that fails does not stop the others", () => {
+    const heard: string[] = [];
+    const stopA = onNotice(notice => heard.push(`a:${notice.id}`));
+    const stopB = onNotice(() => { throw new Error("a screen that fails"); });
+    const stopC = onNotice(notice => heard.push(`c:${notice.id}`));
+    emitNotice({ type: "device", id: "lamp", version: 1 });
+    expect(heard).toEqual(["a:lamp", "c:lamp"]);
+    stopA();
+    emitNotice({ type: "device", id: "door", version: 2 });
+    expect(heard).toEqual(["a:lamp", "c:lamp", "c:door"]);
+    stopB(); stopC();
+    emitNotice({ type: "device", id: "none", version: 3 });
+    expect(heard.length).toBe(3);
   });
 });

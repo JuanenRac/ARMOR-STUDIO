@@ -9,7 +9,7 @@ import type { AnnouncedCapabilities } from "./capabilities";
 import { DEMO_STATE, type Camera } from "./domain";
 import type { SystemState } from "./types";
 import { useViewActive } from "./viewSlots";
-import { browserSocket, eventsUrl, LIVE_POLL_MS, POLL_MS, retryDelay, stateOf, type LiveSocket, type SocketFactory } from "./liveStatus";
+import { browserSocket, emitNotice, eventsUrl, LIVE_POLL_MS, onNotice, POLL_MS, retryDelay, stateOf, noticeOf, type LiveSocket, type NoticeType, type SocketFactory } from "./liveStatus";
 
 export type Connection = "synced" | "demo";
 
@@ -60,7 +60,8 @@ export function useServerStatus(origin: string, options: StatusOptions = {}): { 
       current.onopen = () => { if (cancelled) return; attempts = 0; open = true; setLive(true); schedule(); };
       current.onmessage = event => {
         const next = stateOf(event.data);
-        if (!next || cancelled) return;
+        if (!next) { const notice = noticeOf(event.data); if (notice && !cancelled) emitNotice(notice); return; }
+        if (cancelled) return;
         failures = 0; setState(next); setConnection("synced");
       };
       const lost = () => {
@@ -203,13 +204,20 @@ export function useClock(): Date {
  * against a viewer. `always` is for what the whole console needs even when nobody is looking at it (the alarms are announced from a background tab).
  * Asking starts again at once - with an immediate read - when the menu is shown or the tab comes back.
  */
-export function usePolled<T>(load: () => Promise<T>, everyMs: number, key: unknown, options: { always?: boolean } = {}): { data: T | null; reload: () => void; failed: boolean } {
+export function usePolled<T>(load: () => Promise<T>, everyMs: number, key: unknown, options: { always?: boolean; topics?: readonly NoticeType[] } = {}): { data: T | null; reload: () => void; failed: boolean } {
   const [data, setData] = useState<T | null>(null);
   const [failed, setFailed] = useState(false);
   const [tick, setTick] = useState(0);
   const viewActive = useViewActive();
   const [tabVisible, setTabVisible] = useState(() => typeof document === "undefined" || document.visibilityState !== "hidden");
   const always = options.always === true;
+  // A notice of the live channel about one of these topics asks at once (the slow asking stays as the net under it).
+  const topics = (options.topics ?? []).join(",");
+  useEffect(() => {
+    if (!topics) return;
+    const wanted = topics.split(",");
+    return onNotice(notice => { if (wanted.includes(notice.type)) setTick(value => value + 1); });
+  }, [topics]);
   useEffect(() => {
     if (always) return;
     const update = () => setTabVisible(document.visibilityState !== "hidden");
@@ -269,4 +277,17 @@ export function useSessionUser(origin: string): SessionUser {
     return () => { cancelled = true; window.clearInterval(every); if (retry) window.clearTimeout(retry); document.removeEventListener("visibilitychange", onVisible); };
   }, [origin, tick]);
   return { ...answer, refresh: () => setTick(value => value + 1) };
+}
+
+/** The notices of the live channel are coming in: one arrived within the last minute while the channel is open. Used to ask less often what the notices already tell. */
+export const NOTICE_FRESH_MS = 60_000;
+export function useNoticesFlowing(channelOpen: boolean): boolean {
+  const [flowing, setFlowing] = useState(false);
+  useEffect(() => {
+    if (!channelOpen) { setFlowing(false); return; }
+    let timer = 0;
+    const stop = onNotice(() => { setFlowing(true); window.clearTimeout(timer); timer = window.setTimeout(() => setFlowing(false), NOTICE_FRESH_MS); });
+    return () => { stop(); window.clearTimeout(timer); };
+  }, [channelOpen]);
+  return flowing;
 }
