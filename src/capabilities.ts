@@ -37,6 +37,8 @@ export type SecurityOptions = {
   "commands.require_sig": boolean;
   /** An administrator may set up and make encrypted backups of the data directory (off by default). */
   "admin.backup": boolean;
+  /** A firmware job from GitHub follows the staged rollout: channel, share of the nodes and the way back (off by default). */
+  "admin.firmware_rollout": boolean;
   /** Devices listed as not critical are switched off when the grid draw is over the limit (off by default). */
   "electrical.load_shedding": boolean;
   /** The server works out and watches the energy balance of the house (off by default). */
