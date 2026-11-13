@@ -18,6 +18,7 @@ import type { Design } from "../electrical/model";
 import { NodeFinder } from "../NodeFinder";
 import type { NetworkOverview } from "../networkModel";
 import { formatEnergy, formatPower } from "../solarModel";
+import { EnergyBalanceCard, LoadSheddingCard } from "../TandaCards";
 import "./solar.css";
 import "./electrical-live.css";
 import { NodeToolsBar, NodeToolsFooter, panelFromNetwork, useNodeTools, type NodeTools } from "./NodeTools";
@@ -86,6 +87,8 @@ export function ElectricalView({ openDevices, t, origin, readings, unreachable, 
     </>}
     <details className="bat-section"><summary><b>{t("elEnergyTitle")}</b></summary><div className="bat-section-body"><ElectricalEnergyCard t={t} origin={origin} /></div></details>
     <details className="bat-section" open={false}><summary><b>{t("elDevicesTitle")}</b></summary><div className="bat-section-body"><ElectricalDevices t={t} origin={origin} openDevices={openDevices} now={now} /></div></details>
+    <details className="bat-section" open={false}><summary><b>{t("ls_title")}</b></summary><div className="bat-section-body"><LoadSheddingCard t={t} origin={origin} isAdmin={isAdmin} /></div></details>
+    <details className="bat-section" open={false}><summary><b>{t("eb_title")}</b></summary><div className="bat-section-body"><EnergyBalanceCard t={t} origin={origin} isAdmin={isAdmin} /></div></details>
     <NodeToolsFooter t={t} tools={tools} />
   </div>;
 }
