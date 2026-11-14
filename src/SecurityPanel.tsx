@@ -270,6 +270,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "vacation.mode", id: "vacation", values: [false, true], calm: true, optional: true },   // off by default; on lets lights switch by themselves on a schedule while the house is armed away
   { key: "commands.require_sig", id: "cmdsig", values: [true, false], calm: true, optional: true },   // off by default; hardening, so only turning it off from on asks first
   { key: "admin.backup", id: "backup", values: [false, true], optional: true },   // off by default; on lets an administrator write a copy of the server data anywhere, so it asks first
+  { key: "admin.firmware_rollout", id: "fwrollout", values: [false, true], calm: true, optional: true },   // off by default; it only makes an update gentler
   { key: "electrical.load_shedding", id: "loadshed", values: [false, true], calm: true, optional: true },   // off by default; on lets the server switch off the listed devices, so it asks first
   { key: "electrical.balance", id: "balance", values: [false, true], calm: true, optional: true },   // off by default; it only reads and informs
   { key: "network.lan_ca", id: "lanca", values: [false, true], optional: true },   // off by default; on lets an administrator download the public certificate of the local CA, so it asks first
