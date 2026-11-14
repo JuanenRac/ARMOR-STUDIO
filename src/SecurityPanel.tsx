@@ -10,6 +10,7 @@ import { adminFile, adminSaveFile, adminStatus, endMySession, endOtherSessions, 
 import { askConfirm } from "./askConfirm";
 import { AlarmSounds } from "./AlarmSounds";
 import { PanicPhraseCard } from "./PanicPhraseCard";
+import { EnrolmentCard } from "./EnrolmentCard";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
 import "./security.css";
 import { errorText } from "./apiErrorText";
@@ -283,6 +284,8 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "voice.mobile_turn", id: "mobilevoice", values: [false, true], optional: true },   // off by default; turning it on lets a phone listen with its microphone, so it asks first
   { key: "voice.wake_word", id: "wakeword", values: [false, true], optional: true },   // off by default; turning it on lets the wall panel listen for its word all the time, so it asks first
   { key: "voice.multipart_turn", id: "voiceturn", values: [false, true] },
+  { key: "client.enrolment_code", id: "enrolment", values: [false, true], calm: true, optional: true },   // off by default; on lets an administrator make a QR that sets up an app (no secret in it)
+  { key: "presence.by_user", id: "presence", values: [false, true], calm: true, optional: true },   // off by default; on lets the server know who is at home, so it asks first
   { key: "client.panic_gesture", id: "panicgesture", values: [false, true], calm: true, optional: true },   // off by default; on lets anybody holding a signed-in phone raise the silent alarm, so it asks first
   { key: "voice.panic_phrase", id: "panic", values: [true, false], calm: true, optional: true },   // off by default; turning it off lowers the safety, so it asks first
   { key: "admin.field_http", id: "fieldhttp", values: [false, true], optional: true },   // off by default; turning it on lets Studio ask the admin agent to open the server's port to the field network, so it asks first
@@ -606,7 +609,7 @@ export function SecurityPanel({ t, origin, isAdmin }: Props) {
     </section>
     <section className="sec-section" data-testid="security-group-server">
       <h4 className="sec-section-title">{t("sec_group_server")}</h4>
-      <div className="sec-row"><RemoteCheckCard t={t} origin={origin} />{isAdmin && <RemoteSettings t={t} origin={origin} />}</div>
+      <div className="sec-row"><RemoteCheckCard t={t} origin={origin} />{isAdmin && <RemoteSettings t={t} origin={origin} />}{isAdmin && <EnrolmentCard t={t} origin={origin} />}</div>
     </section>
     {offersOptions && <section className="sec-section" data-testid="security-group-options"><h4 className="sec-section-title">{t("sec_group_options")}</h4><div className="sec-row"><ServerOptions t={t} origin={origin} /></div></section>}
     {isAdmin && <RemoteAccessSetup t={t} origin={origin} />}
