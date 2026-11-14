@@ -3360,8 +3360,6 @@ const catalogue: Record<string, string> = {
 "alarm_network_internet_down": "Internet est coupé et le routeur répond encore : côté fournisseur",
 "alarm_network_lan_down": "Le réseau local est tombé : le routeur ne répond pas",
 "alarm_network_dns_stale": "Le nom qui permet d'atteindre la maison depuis l'extérieur ne pointe plus vers son adresse publique",
-"alarm_network_risky_port": "Un appareil du réseau a un port à risque ouvert",
-"alarm_network_rogue_dhcp": "Un autre serveur DHCP répond sur le réseau",
 "alarm_network_degraded": "Internet est lent ou perd des paquets",
 "alarm_network_new_device": "Un appareil jamais vu a rejoint le réseau",
 "alarm_network_arp_conflict": "Deux machines répondent pour une même adresse du réseau",

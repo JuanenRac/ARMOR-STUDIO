@@ -3449,8 +3449,6 @@ const catalogue: Record<string, string> = {
 "alarm_network_internet_down": "互联网中断，但路由器仍有响应：运营商一侧",
 "alarm_network_lan_down": "本地网络中断：路由器没有响应",
 "alarm_network_dns_stale": "从外部访问住宅所用的域名不再指向其公网地址",
-"alarm_network_risky_port": "网络上的设备开放了有风险的端口",
-"alarm_network_rogue_dhcp": "网络上有另一台 DHCP 服务器在响应",
 "alarm_network_degraded": "互联网变慢或丢包",
 "alarm_network_new_device": "从未见过的设备加入了网络",
 "alarm_network_arp_conflict": "网络上有两台机器响应同一个地址",

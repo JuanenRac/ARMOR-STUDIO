@@ -3467,8 +3467,6 @@ const catalogue: Record<string, string> = {
 "alarm_network_internet_down": "The internet is down and the router still answers: the provider's side",
 "alarm_network_lan_down": "The local network is down: the router does not answer",
 "alarm_network_dns_stale": "The name used to reach the house from outside no longer points to its public address",
-"alarm_network_risky_port": "A device on the network has a risky port open",
-"alarm_network_rogue_dhcp": "Another DHCP server answers on the network",
 "alarm_network_degraded": "The internet is slow or losing packets",
 "alarm_network_new_device": "A device that was never seen has joined the network",
 "alarm_network_arp_conflict": "Two machines answer for one address on the network",

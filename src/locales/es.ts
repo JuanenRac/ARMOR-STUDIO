@@ -3403,8 +3403,6 @@ const catalogue: Record<string, string> = {
 "alarm_network_internet_down": "No hay internet y el router sigue respondiendo: es cosa del operador",
 "alarm_network_lan_down": "La red local está caída: el router no responde",
 "alarm_network_dns_stale": "El nombre con el que se llega a la casa desde fuera ya no apunta a su dirección pública",
-"alarm_network_risky_port": "Un dispositivo de la red tiene abierto un puerto de riesgo",
-"alarm_network_rogue_dhcp": "Otro servidor DHCP responde en la red",
 "alarm_network_degraded": "Internet va lento o pierde paquetes",
 "alarm_network_new_device": "Un dispositivo que nunca se había visto se ha unido a la red",
 "alarm_network_arp_conflict": "Dos máquinas responden por una misma dirección de la red",

@@ -3344,8 +3344,6 @@ const catalogue: Record<string, string> = {
 "alarm_network_internet_down": "Das Internet ist ausgefallen und der Router antwortet noch: Seite des Anbieters",
 "alarm_network_lan_down": "Das lokale Netzwerk ist ausgefallen: der Router antwortet nicht",
 "alarm_network_dns_stale": "Der Name, unter dem das Haus von außen erreichbar ist, zeigt nicht mehr auf seine öffentliche Adresse",
-"alarm_network_risky_port": "Ein Gerät im Netzwerk hat einen riskanten Port offen",
-"alarm_network_rogue_dhcp": "Ein weiterer DHCP-Server antwortet im Netzwerk",
 "alarm_network_degraded": "Das Internet ist langsam oder verliert Pakete",
 "alarm_network_new_device": "Ein nie gesehenes Gerät ist dem Netzwerk beigetreten",
 "alarm_network_arp_conflict": "Zwei Rechner antworten für dieselbe Adresse im Netzwerk",

@@ -3446,8 +3446,6 @@ const catalogue: Record<string, string> = {
 "alarm_network_internet_down": "インターネットが不通です（ルーターは応答）：プロバイダー側",
 "alarm_network_lan_down": "ローカルネットワークが停止：ルーターが応答しません",
 "alarm_network_dns_stale": "外から家に接続するための名前が、公開アドレスを指さなくなりました",
-"alarm_network_risky_port": "ネットワーク上の機器でリスクのあるポートが開いています",
-"alarm_network_rogue_dhcp": "ネットワーク上で別の DHCP サーバーが応答しています",
 "alarm_network_degraded": "インターネットが遅いかパケットが失われています",
 "alarm_network_new_device": "未確認のデバイスがネットワークに参加しました",
 "alarm_network_arp_conflict": "ネットワーク上で 1 つのアドレスに 2 台が応答しています",
