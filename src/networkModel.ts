@@ -26,8 +26,8 @@ export type NetworkNode = {
   interface: { name: string; ip: string; cidr: string; gateway?: string; rx_bps?: number; tx_bps?: number };
   internet: NetworkInternet; devices: NetworkDevice[]; scan?: { last_ms: number; hosts: number; duration_ms?: number };
 };
-export type NetworkEventKind = "new_device" | "device_online" | "device_offline" | "ip_changed" | "arp_conflict" | "port_opened" | "port_closed" | "internet_down" | "internet_up" | "gateway_down" | "gateway_up";
-export type NetworkEvent = { id: string; kind: NetworkEventKind; at_ms: number; device_id?: string; port?: number; outage_s?: number; detail?: string; node_id: string };
+export type NetworkEventKind = "new_device" | "device_online" | "device_offline" | "ip_changed" | "arp_conflict" | "port_opened" | "port_closed" | "internet_down" | "internet_up" | "gateway_down" | "gateway_up" | "risky_port" | "rogue_dhcp";
+export type NetworkEvent = { id: string; kind: NetworkEventKind; at_ms: number; device_id?: string; port?: number; outage_s?: number; server?: string; recommendation?: string; detail?: string; node_id: string };
 export type NetworkOutage = { node_id: string; kind: "internet" | "gateway"; started_ms: number; ended_ms: number; duration_s: number };
 export type NetworkOverview = {
   nodes: NetworkNode[];
@@ -100,7 +100,8 @@ export function describeEvent(event: NetworkEvent, devices: readonly NetworkDevi
   const device = event.device_id ? devices.find(item => item.id === event.device_id) : undefined;
   const name = device ? (deviceName(device) === device.ip ? device.ip : `${deviceName(device)} (${device.ip})`) : (event.device_id ?? "");
   switch (event.kind) {
-    case "port_opened": case "port_closed": return format(t(`netev_${event.kind}`), [name, event.port ?? ""]);
+    case "rogue_dhcp": return format(t("netev_rogue_dhcp"), [event.server ?? ""]);
+    case "port_opened": case "port_closed": case "risky_port": return format(t(`netev_${event.kind}`), [name, event.port ?? ""]);
     case "internet_up": return format(t("netev_internet_up"), [formatDuration(event.outage_s ?? 0)]);
     case "arp_conflict": return format(t("netev_arp_conflict"), [event.detail ?? name]);
     case "internet_down": case "gateway_down": case "gateway_up": return t(`netev_${event.kind}`);
@@ -111,7 +112,7 @@ export function describeEvent(event: NetworkEvent, devices: readonly NetworkDevi
 /** How serious an event looks: what to paint it as. */
 export function eventTone(event: NetworkEvent): "good" | "warn" | "bad" | "info" {
   switch (event.kind) {
-    case "internet_down": case "gateway_down": case "arp_conflict": return "bad";
+    case "internet_down": case "gateway_down": case "arp_conflict": case "risky_port": case "rogue_dhcp": return "bad";
     case "port_opened": return event.port !== undefined && RISKY_PORTS.has(event.port) ? "bad" : "warn";
     case "new_device": case "ip_changed": case "device_offline": return "warn";
     case "internet_up": case "gateway_up": case "device_online": return "good";
