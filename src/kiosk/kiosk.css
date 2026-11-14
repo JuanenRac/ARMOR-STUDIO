@@ -1,0 +1,20 @@
+.kiosk{min-height:100vh;display:grid;align-content:center;justify-items:center;gap:1.5rem;padding:2rem;text-align:center;background:#030c12;color:#ecffff}
+.kiosk.armed{background:radial-gradient(circle at 50% 0,#12503f 0,transparent 55%),#030c12}
+.kiosk.disarmed{background:radial-gradient(circle at 50% 0,#5a4513 0,transparent 55%),#030c12}
+.kiosk.unknown{background:#071621}
+.kiosk-clock{margin:0;font-size:clamp(1.2rem,4vw,2.2rem);color:#9ac2c8;font-variant-numeric:tabular-nums}
+.kiosk-state{margin:0;font-size:clamp(3rem,14vw,9rem);letter-spacing:-.04em;line-height:1}
+.kiosk-actions button{min-width:min(22rem,80vw);min-height:4.5rem;font-size:1.6rem;border-radius:16px}
+.kiosk-alarms{width:min(46rem,100%)}
+.kiosk-alarms h2{margin:0 0 .75rem;font-size:1.2rem;color:#c8e9eb}
+.kiosk-alarms ul{list-style:none;margin:0;padding:0;display:grid;gap:.6rem}
+.kiosk-alarms li{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.9rem 1.1rem;border:1px solid #3c8991;border-radius:12px;background:#081b25;font-size:1.2rem}
+.kiosk-alarms li.new{border-color:#d9626d;background:#3b2028}
+.kiosk-alarms li button{min-height:3rem;padding:0 1.2rem;font-size:1.05rem}
+.kiosk-banner{position:fixed;top:0;left:0;right:0;margin:0;padding:.7rem 1rem;background:#5a4513;color:#fff3d1;font-size:1.05rem}
+.kiosk-banner.failed{background:#3b2028;color:#ffd8db;top:2.6rem}
+.kiosk-note{margin:0;color:#9ac2c8}
+.kiosk-wake{margin:0;color:#5f858c;font-size:1.1rem}
+.kiosk.resting{filter:brightness(.22)}
+.kiosk.resting .kiosk-clock{font-size:clamp(4rem,18vw,12rem);color:#ecffff}
+.kiosk-signout{margin-top:1rem;opacity:.6}
