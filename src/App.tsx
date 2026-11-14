@@ -69,6 +69,9 @@ import { applyNetworkDoc } from "./network/sync";
 import { useNetworkSync } from "./network/useNetworkSync";
 import { NetworkView } from "./views/NetworkView";
 import { StudioLogin, loginLanguage } from "./StudioLogin";
+import { KioskScreen } from "./kiosk/KioskScreen";
+import { kioskWanted, readKioskFlag, storeKioskFlag } from "./kiosk/kioskModel";
+import { removeKioskWorker } from "./kiosk/worker";
 import { useSiteSync } from "./useSiteSync";
 import { AlarmsView } from "./views/AlarmsView";
 import { AutomationsView } from "./views/AutomationsView";
@@ -472,6 +475,13 @@ export default function App() {
   const [originReady, setOriginReady] = useState(Boolean(storedOrigin));
   const [checking, setChecking] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+  // The wall-panel mode is shown only when it is asked for (?kiosk=1, or the installed app that starts there); ?kiosk=0 leaves it and takes its worker away.
+  const kiosk = useMemo(() => kioskWanted(window.location.search, readKioskFlag()), []);
+  useEffect(() => {
+    const asked = new URLSearchParams(window.location.search).get("kiosk");
+    if (asked === "1") storeKioskFlag(true);
+    else if (asked === "0") { storeKioskFlag(false); void removeKioskWorker(); }
+  }, []);
   // Without a remembered address, take the one the deployment publishes.
   useEffect(() => {
     if (originReady) return;
@@ -498,5 +508,7 @@ export default function App() {
     try { window.localStorage.setItem("armor-studio-origin", next); } catch { /* Storage may be blocked. */ }
     setAuthenticated(false); setChecking(true); setOrigin(next);
   };
-  return authenticated ? <StudioConsole origin={origin} setOrigin={changeOrigin} onSignOut={() => { void closeStudioSession(origin); clearSessionMemory(); setAuthenticated(false); }} /> : <StudioLogin origin={origin} onAuthenticated={nextOrigin => { setOrigin(nextOrigin); setAuthenticated(true); }} />;
+  const signOut = () => { void closeStudioSession(origin); clearSessionMemory(); setAuthenticated(false); };
+  if (authenticated && kiosk) return <KioskScreen origin={origin} onSignOut={signOut} />;
+  return authenticated ? <StudioConsole origin={origin} setOrigin={changeOrigin} onSignOut={signOut} /> : <StudioLogin origin={origin} onAuthenticated={nextOrigin => { setOrigin(nextOrigin); setAuthenticated(true); }} />;
 }
