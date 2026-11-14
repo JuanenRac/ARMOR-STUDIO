@@ -85,6 +85,10 @@ export type SecurityOptions = {
   "client.enrolment_code": boolean;
   /** A signed-in person's phone may tell the server only the word home or away, and the automations may have a presence trigger (off by default). */
   "presence.by_user": boolean;
+  /** The observation service judges where each radar track falls in a camera's picture, from the site design (off by default). */
+  "ai.spatial": boolean;
+  /** The observation service may study the pictures while the system is disarmed and propose areas to ignore (off by default). */
+  "ai.learn": boolean;
   "voice.panic_cooldown_s": number;
   "admin.acl_relays": boolean;
   "admin.field_http": boolean;

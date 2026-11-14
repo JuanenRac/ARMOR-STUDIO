@@ -153,22 +153,56 @@ export type AgentReply = {
 
 export type AiContext = {
   mode: "armed" | "disarmed";
+  /** The options of the server that the service follows (both off when absent) */
+  options?: {
+    /** The setting ai.spatial */
+    spatial?: boolean;
+    /** The setting ai.learn */
+    learn?: boolean;
+  };
   nodes: {
     id: string;
     online: boolean;
     targets: number;
     lux: number | null;
+    /** Where the radar stands on the floor plan, when the site design places it (absent otherwise) */
+    pose?: AiPose;
+    /** The tracks the radar counts, in its own frame (x to the right of the radar, y straight ahead of it), in millimetres; absent when the radar reports none or the design cannot place it */
+    track_points?: AiTrackPoint[];
   }[];
   cameras: {
     id: string;
     name: string;
+    /** Where the camera stands on the floor plan and the way it faces, when the site design places it */
+    pose?: AiPose;
+    /** The horizontal field of view, when the design gives it */
+    fov_deg?: number;
+    /** How far the camera sees, when the design gives it */
+    range_mm?: number;
   }[];
+};
+
+export type AiIgnoreProposalResult = {
+  stored: boolean;
+  reason?: string;
 };
 
 export type AiObservationResult = {
   raised: boolean;
   alarm_id?: string;
   reason?: string;
+};
+
+/** A position on the floor plan in millimetres and the direction the device faces, in degrees clockwise from the +y axis of the plan */
+export type AiPose = {
+  x_mm: number;
+  y_mm: number;
+  yaw_deg: number;
+};
+
+export type AiTrackPoint = {
+  x_mm: number;
+  y_mm: number;
 };
 
 export type Alarm = {
@@ -1478,6 +1512,25 @@ export type HistorySummary = {
   };
 };
 
+export type IgnoreProposalDecided = {
+  camera_id: string;
+  decision: "accept" | "reject";
+  /** The areas the camera ignores after the decision */
+  zones: IgnoreZone[];
+};
+
+export type IgnoreProposalDecision = {
+  decision: "accept" | "reject";
+};
+
+export type IgnoreProposals = {
+  proposals: {
+    camera_id: string;
+    camera_name: string;
+    zones: IgnoreZone[];
+  }[];
+};
+
 /** A rectangle as fractions of the picture, from the top left */
 export type IgnoreZone = {
   x: number;
@@ -2404,6 +2457,11 @@ export type PostAiActivityEventsRequest = {
   notify?: boolean;
 };
 
+export type PostAiIgnoreProposalsRequest = {
+  camera_id: string;
+  zones: IgnoreZone[];
+};
+
 export type PostAiObservationsRequest = {
   camera_id: string;
   severity: "review" | "high";
@@ -2900,6 +2958,10 @@ export type SecuritySettings = {
   "vision.faces_ack"?: boolean;
   /** The server keeps the events of the vision service (an alert zone or a detection zone) in a timeline with the evidence taken when it was seen, for the review panel of Studio (GET /api/v1/vision/timeline). Off, the default, nothing is kept. */
   "vision.timeline"?: boolean;
+  /** The observation service judges where each radar track falls in a camera's picture, from the places the site design gives the radars and cameras (off: a radar track anywhere in the area a camera covers counts for that camera). It is told in the context (options.spatial). */
+  "ai.spatial"?: boolean;
+  /** The observation service may study the pictures of the cameras while the system is disarmed and propose parts of the picture to ignore (a tree, a road). Nothing is applied until an administrator accepts a proposal. It is told in the context (options.learn). */
+  "ai.learn"?: boolean;
   /** How many days an entry of the timeline is kept before it is pruned. */
   "vision.timeline_days"?: number;
   /** The notification of an alarm that a camera raised carries a small photo of the event. The photo goes through the push service of Google (FCM). It cannot be on while push.photo_ack is off, and the photo is never written to a log. Turning it on lowers the security. */

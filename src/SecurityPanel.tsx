@@ -12,6 +12,7 @@ import { AlarmSounds } from "./AlarmSounds";
 import { PanicPhraseCard } from "./PanicPhraseCard";
 import { EnrolmentCard } from "./EnrolmentCard";
 import { PresenceCard } from "./PresenceCard";
+import { IgnoreProposalsCard } from "./IgnoreProposalsCard";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
 import "./security.css";
 import { errorText } from "./apiErrorText";
@@ -287,6 +288,8 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "voice.multipart_turn", id: "voiceturn", values: [false, true] },
   { key: "client.enrolment_code", id: "enrolment", values: [false, true], calm: true, optional: true },   // off by default; on lets an administrator make a QR that sets up an app (no secret in it)
   { key: "presence.by_user", id: "presence", values: [false, true], calm: true, optional: true },   // off by default; on lets the server know who is at home, so it asks first
+  { key: "ai.spatial", id: "aispatial", values: [false, true], calm: true, optional: true },   // off by default; on lets the observation service place the radar tracks in the picture from the site design, so it asks first
+  { key: "ai.learn", id: "ailearn", values: [false, true], optional: true },   // off by default; on lets the observation service study the pictures of the cameras while the system is disarmed, so it asks first
   { key: "client.panic_gesture", id: "panicgesture", values: [false, true], calm: true, optional: true },   // off by default; on lets anybody holding a signed-in phone raise the silent alarm, so it asks first
   { key: "voice.panic_phrase", id: "panic", values: [true, false], calm: true, optional: true },   // off by default; turning it off lowers the safety, so it asks first
   { key: "admin.field_http", id: "fieldhttp", values: [false, true], optional: true },   // off by default; turning it on lets Studio ask the admin agent to open the server's port to the field network, so it asks first
@@ -610,7 +613,7 @@ export function SecurityPanel({ t, origin, isAdmin }: Props) {
     </section>
     <section className="sec-section" data-testid="security-group-server">
       <h4 className="sec-section-title">{t("sec_group_server")}</h4>
-      <div className="sec-row"><RemoteCheckCard t={t} origin={origin} />{isAdmin && <RemoteSettings t={t} origin={origin} />}{isAdmin && <EnrolmentCard t={t} origin={origin} />}{isAdmin && <PresenceCard t={t} origin={origin} />}</div>
+      <div className="sec-row"><RemoteCheckCard t={t} origin={origin} />{isAdmin && <RemoteSettings t={t} origin={origin} />}{isAdmin && <EnrolmentCard t={t} origin={origin} />}{isAdmin && <PresenceCard t={t} origin={origin} />}{isAdmin && <IgnoreProposalsCard t={t} origin={origin} />}</div>
     </section>
     {offersOptions && <section className="sec-section" data-testid="security-group-options"><h4 className="sec-section-title">{t("sec_group_options")}</h4><div className="sec-row"><ServerOptions t={t} origin={origin} /></div></section>}
     {isAdmin && <RemoteAccessSetup t={t} origin={origin} />}
