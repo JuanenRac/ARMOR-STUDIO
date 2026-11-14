@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The copies of the shared contract include the system summary of a solar gateway:** `armor-contracts.ts` and `armor-parsers.ts` are brought up to the shared contract, so the types and readers of the `system` message are there when a screen needs them.
 - **Two switches for the observation service and a card to decide the areas it proposes to ignore:** in Configuration > Security, "Radar tracks placed in the picture" and "Study the pictures to propose areas to ignore" (both off by default, the second asks first), and for an administrator a card that shows the rectangles proposed for each camera on a small drawing and accepts or rejects them (a rejected proposal is not made again). In the eight languages.
 - **A card shows who is at home:** in Configuration > Security an administrator sees the people whose phone told the server the word home or away in the last day, with the time of each word, and the sum the automations with a presence trigger follow (everyone away, someone home, nobody said); it reads the server every half minute and on demand, and while the option "Presence by person" is off it says how to turn it on. Only the word is shown, never a position. Twelve phrases in the eight languages.
 - **The network page shows the findings of the network node:** a risky port that is open and a second DHCP server on the network appear in the list of events (in the eight languages) as serious, and their alarms carry their own help text.
