@@ -11,6 +11,7 @@ import { askConfirm } from "./askConfirm";
 import { AlarmSounds } from "./AlarmSounds";
 import { PanicPhraseCard } from "./PanicPhraseCard";
 import { EnrolmentCard } from "./EnrolmentCard";
+import { PresenceCard } from "./PresenceCard";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
 import "./security.css";
 import { errorText } from "./apiErrorText";
@@ -609,7 +610,7 @@ export function SecurityPanel({ t, origin, isAdmin }: Props) {
     </section>
     <section className="sec-section" data-testid="security-group-server">
       <h4 className="sec-section-title">{t("sec_group_server")}</h4>
-      <div className="sec-row"><RemoteCheckCard t={t} origin={origin} />{isAdmin && <RemoteSettings t={t} origin={origin} />}{isAdmin && <EnrolmentCard t={t} origin={origin} />}</div>
+      <div className="sec-row"><RemoteCheckCard t={t} origin={origin} />{isAdmin && <RemoteSettings t={t} origin={origin} />}{isAdmin && <EnrolmentCard t={t} origin={origin} />}{isAdmin && <PresenceCard t={t} origin={origin} />}</div>
     </section>
     {offersOptions && <section className="sec-section" data-testid="security-group-options"><h4 className="sec-section-title">{t("sec_group_options")}</h4><div className="sec-row"><ServerOptions t={t} origin={origin} /></div></section>}
     {isAdmin && <RemoteAccessSetup t={t} origin={origin} />}
