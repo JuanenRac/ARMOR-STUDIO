@@ -280,6 +280,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "voice.mobile_turn", id: "mobilevoice", values: [false, true], optional: true },   // off by default; turning it on lets a phone listen with its microphone, so it asks first
   { key: "voice.wake_word", id: "wakeword", values: [false, true], optional: true },   // off by default; turning it on lets the wall panel listen for its word all the time, so it asks first
   { key: "voice.multipart_turn", id: "voiceturn", values: [false, true] },
+  { key: "client.panic_gesture", id: "panicgesture", values: [false, true], calm: true, optional: true },   // off by default; on lets anybody holding a signed-in phone raise the silent alarm, so it asks first
   { key: "voice.panic_phrase", id: "panic", values: [true, false], calm: true, optional: true },   // off by default; turning it off lowers the safety, so it asks first
   { key: "admin.field_http", id: "fieldhttp", values: [false, true], optional: true },   // off by default; turning it on lets Studio ask the admin agent to open the server's port to the field network, so it asks first
   { key: "admin.acl_relays", id: "aclrelays", values: [false, true], optional: true },   // off by default; turning it on lets Studio ask the admin agent for two switches of the broker rules, so it asks first
