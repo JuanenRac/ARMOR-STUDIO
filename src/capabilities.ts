@@ -73,6 +73,8 @@ export type SecurityOptions = {
   "voice.mobile_turn": boolean;
   /** The secret panic phrase of each person raises the silent duress alarm (off by default), and the quiet time in seconds after one (10 to 3600, 60). */
   "voice.panic_phrase": boolean;
+  /** The hidden panic gesture of the apps raises the silent duress alarm (off by default). */
+  "client.panic_gesture": boolean;
   "voice.panic_cooldown_s": number;
   "admin.acl_relays": boolean;
   "admin.field_http": boolean;
