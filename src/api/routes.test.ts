@@ -68,6 +68,7 @@ const rows: Row[] = [
   ["verifyBackup named", () => api.verifyBackup(O, "armor-backup-20260101T000000Z.armorbk"), "POST", "/api/v1/admin/backup/verify", { name: "armor-backup-20260101T000000Z.armorbk" }],
   ["readLoadShedding", () => api.readLoadShedding(O), "GET", "/api/v1/electrical/load-shedding"],
   ["saveLoadShedding", () => api.saveLoadShedding(O, { loads: ["heater"] }), "PUT", "/api/v1/electrical/load-shedding", { loads: ["heater"] }],
+  ["readNodeKey", () => api.readNodeKey(O, "alarm-1"), "GET", "/api/v1/admin/nodes/alarm-1/token"],
   ["readEnergyBalance", () => api.readEnergyBalance(O), "GET", "/api/v1/electrical/balance"],
   ["saveEnergyBalance", () => api.saveEnergyBalance(O, { allow_export: false }), "PUT", "/api/v1/electrical/balance", { allow_export: false }],
   ["readVisionTimeline", () => api.readVisionTimeline(O, { level: "alert", limit: 20 }), "GET", "/api/v1/vision/timeline?level=alert&limit=20"],

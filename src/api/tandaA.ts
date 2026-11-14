@@ -18,3 +18,7 @@ export const saveLoadShedding = (origin: string, settings: LoadSheddingSettings)
 /** Answers a 404 `balance_off` while the option is off. */
 export const readEnergyBalance = (origin: string) => userCall<EnergyBalance>(origin, "GET", "/api/v1/electrical/balance");
 export const saveEnergyBalance = (origin: string, settings: EnergyBalanceSettings) => userCall<EnergyBalance>(origin, "PUT", "/api/v1/electrical/balance", settings);
+
+/** The token of one node and, while the option commands.require_sig is on, the key it checks the signature of the critical commands with. An administrator only. */
+export type NodeKeyAnswer = { node_id: string; token: string; strict: boolean; command_key?: string };
+export const readNodeKey = (origin: string, nodeId: string) => userCall<NodeKeyAnswer>(origin, "GET", `/api/v1/admin/nodes/${encodeURIComponent(nodeId)}/token`);
