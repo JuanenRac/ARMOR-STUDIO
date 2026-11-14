@@ -39,6 +39,10 @@ export type SecurityOptions = {
   "admin.backup": boolean;
   /** A firmware job from GitHub follows the staged rollout: channel, share of the nodes and the way back (off by default). */
   "admin.firmware_rollout": boolean;
+  /** The account of a wall panel may read the check before arming (off by default). */
+  "panel.preflight": boolean;
+  /** The account of a wall panel may read a still picture of a camera (off by default). */
+  "panel.camera_view": boolean;
   /** Devices listed as not critical are switched off when the grid draw is over the limit (off by default). */
   "electrical.load_shedding": boolean;
   /** The server works out and watches the energy balance of the house (off by default). */
