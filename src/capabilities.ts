@@ -81,6 +81,10 @@ export type SecurityOptions = {
   "voice.panic_phrase": boolean;
   /** The hidden panic gesture of the apps raises the silent duress alarm (off by default). */
   "client.panic_gesture": boolean;
+  /** An administrator may make a code of one use and five minutes for the QR that sets up an app (off by default). */
+  "client.enrolment_code": boolean;
+  /** A signed-in person's phone may tell the server only the word home or away, and the automations may have a presence trigger (off by default). */
+  "presence.by_user": boolean;
   "voice.panic_cooldown_s": number;
   "admin.acl_relays": boolean;
   "admin.field_http": boolean;
