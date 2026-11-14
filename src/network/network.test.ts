@@ -377,3 +377,15 @@ describe("tying an element to a device", () => {
     expect(design.elements[0].name).toBe("cam-garage");
   });
 });
+
+describe("the findings of the network node", () => {
+  it("writes a risky port and a second DHCP server in the language of the menu", () => {
+    const devices = [{ ...router, note: { name: "Main router", updated_at: "" } }, phone];
+    const event = (patch: Partial<NetworkEvent>): NetworkEvent => ({ id: "e1", kind: "new_device", at_ms: 1, node_id: "network-1", ...patch });
+    const t = (key: string) => ({ netev_risky_port: "{0} has port {1} open, which is risky", netev_rogue_dhcp: "Another DHCP server answers: {0}" } as Record<string, string>)[key] ?? key;
+    expect(describeEvent(event({ kind: "risky_port", device_id: router.id, port: 23 }), devices, t)).toBe("Main router (192.168.0.1) has port 23 open, which is risky");
+    expect(describeEvent(event({ kind: "rogue_dhcp", device_id: undefined, server: "192.168.0.77" }), devices, t)).toBe("Another DHCP server answers: 192.168.0.77");
+    expect(eventTone(event({ kind: "risky_port", port: 23 }))).toBe("bad");
+    expect(eventTone(event({ kind: "rogue_dhcp" }))).toBe("bad");
+  });
+});
