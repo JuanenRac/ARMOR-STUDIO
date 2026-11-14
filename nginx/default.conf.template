@@ -53,6 +53,22 @@ server {
         proxy_read_timeout 1h;
     }
 
+    # The service worker of the wall-panel mode: always asked again, so a new version is seen at once, and allowed to control the whole site.
+    location = /sw.js {
+        default_type application/javascript;
+        include /etc/nginx/snippets/security_headers.conf;
+        add_header Cache-Control "no-cache" always;
+        add_header Service-Worker-Allowed "/" always;
+        try_files $uri =404;
+    }
+
+    location = /manifest.webmanifest {
+        default_type application/manifest+json;
+        include /etc/nginx/snippets/security_headers.conf;
+        add_header Cache-Control "no-cache" always;
+        try_files $uri =404;
+    }
+
     location /assets/ {
         include /etc/nginx/snippets/security_headers.conf;
         expires 1y;

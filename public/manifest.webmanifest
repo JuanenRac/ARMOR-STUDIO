@@ -1,0 +1,13 @@
+{
+  "name": "A.R.M.O.R. Studio",
+  "short_name": "A.R.M.O.R.",
+  "description": "Wall panel of the A.R.M.O.R. perimeter system",
+  "start_url": "/?kiosk=1",
+  "scope": "/",
+  "display": "fullscreen",
+  "background_color": "#030c12",
+  "theme_color": "#07131b",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

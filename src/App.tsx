@@ -49,7 +49,7 @@ import { NAV } from "./domain";
 
 const VIEW_ORDER = NAV.map(([key]) => key);
 import type { SiteModel } from "./designer/ops";
-import { usePolled, useFullscreen, useCameraReachability, useServerCameras, useServerInfo, useRemoteConnection, useServerStatus, useSessionUser, useStreamUrls } from "./hooks";
+import { useNoticesFlowing, usePolled, useFullscreen, useCameraReachability, useServerCameras, useServerInfo, useRemoteConnection, useServerStatus, useSessionUser, useStreamUrls } from "./hooks";
 import { ensureLocale, isLocaleLoaded, text } from "./i18n";
 import { HistoryView } from "./HistoryView";
 import { MediaLibrary } from "./MediaLibrary";
@@ -69,6 +69,9 @@ import { applyNetworkDoc } from "./network/sync";
 import { useNetworkSync } from "./network/useNetworkSync";
 import { NetworkView } from "./views/NetworkView";
 import { StudioLogin, loginLanguage } from "./StudioLogin";
+import { KioskScreen } from "./kiosk/KioskScreen";
+import { kioskWanted, readKioskFlag, storeKioskFlag } from "./kiosk/kioskModel";
+import { removeKioskWorker } from "./kiosk/worker";
 import { useSiteSync } from "./useSiteSync";
 import { AlarmsView } from "./views/AlarmsView";
 import { AutomationsView } from "./views/AutomationsView";
@@ -176,13 +179,15 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   const connection = connectionState === "synced" ? t("serverSynchronized") : t("offlineDemo");
   const nodes = useMemo(() => Object.values(state.nodes).sort((a, b) => a.node_id.localeCompare(b.node_id)), [state]);
   const selected = cameras.find(camera => camera.id === selectedCamera) ?? cameras[0];
-  const devicePoll = usePolled(() => listDevices(origin), 2500, origin, { always: true });
-  const alarmPoll = usePolled(() => listAlarms(origin), 2000, origin, { always: true });
+  // Once notices are arriving, the screens that follow them ask far less often; with none for a minute they go back to asking as before (the option may be off).
+  const flowing = useNoticesFlowing(liveChannel);
+  const devicePoll = usePolled(() => listDevices(origin), flowing ? 15_000 : 2500, origin, { always: true, topics: ["device"] });
+  const alarmPoll = usePolled(() => listAlarms(origin), flowing ? 10_000 : 2000, origin, { always: true, topics: ["alarm"] });
   // Which cameras are recording is the server's to say: after a reload the console has to ask.
   const recordingPoll = usePolled(() => listMedia(origin).then(result => result.activeCameraIds), 15_000, origin, { always: true });
   useEffect(() => { if (recordingPoll.data) setRecordingCameraIds(recordingPoll.data); }, [recordingPoll.data]);
   const automationPoll = usePolled(() => listAutomations(origin), 5000, origin, { always: true });
-  const solarPoll = usePolled(() => listSolar(origin), 4000, origin, { always: true });
+  const solarPoll = usePolled(() => listSolar(origin), flowing ? 15_000 : 4000, origin, { always: true, topics: ["solar"] });
   const electricalPoll = usePolled(() => listElectricalReadings(origin), 4000, origin, { always: true });
   const alarmNodesPoll = usePolled(() => listAlarmNodes(origin), 3000, origin, { always: true });
   const armProfilesPoll = usePolled(() => listArmProfiles(origin), 15000, origin, { always: true });
@@ -197,7 +202,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
     ids: [...nodes.map(node => node.node_id), ...(solarPoll.data?.devices ?? []).map(device => device.node_id), ...(solarPoll.data?.waiting ?? []).map(item => item.node_id), ...(electricalPoll.data?.nodes ?? []).map(item => item.node_id), ...(alarmNodesPoll.data?.nodes ?? []).map(item => item.node_id)],
     ips: nodes.flatMap(node => (node.panel ? [node.panel.ip] : [])),
   }), [nodes, solarPoll.data, electricalPoll.data, alarmNodesPoll.data]);
-  const networkPoll = usePolled(() => listNetwork(origin), 5000, origin, { always: true });
+  const networkPoll = usePolled(() => listNetwork(origin), flowing ? 20_000 : 5000, origin, { always: true, topics: ["network"] });
   // the count of every kind of node (radar, solar, electrical, alarm, hmi), from the health they report and from the radar stream
   const nodeHealthPoll = usePolled(() => readNodeHealth(origin), 10_000, origin, { always: true });
   const census = useMemo(() => nodeCensus(nodes, nodeHealthPoll.data), [nodes, nodeHealthPoll.data]);
@@ -470,6 +475,13 @@ export default function App() {
   const [originReady, setOriginReady] = useState(Boolean(storedOrigin));
   const [checking, setChecking] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+  // The wall-panel mode is shown only when it is asked for (?kiosk=1, or the installed app that starts there); ?kiosk=0 leaves it and takes its worker away.
+  const kiosk = useMemo(() => kioskWanted(window.location.search, readKioskFlag()), []);
+  useEffect(() => {
+    const asked = new URLSearchParams(window.location.search).get("kiosk");
+    if (asked === "1") storeKioskFlag(true);
+    else if (asked === "0") { storeKioskFlag(false); void removeKioskWorker(); }
+  }, []);
   // Without a remembered address, take the one the deployment publishes.
   useEffect(() => {
     if (originReady) return;
@@ -496,5 +508,7 @@ export default function App() {
     try { window.localStorage.setItem("armor-studio-origin", next); } catch { /* Storage may be blocked. */ }
     setAuthenticated(false); setChecking(true); setOrigin(next);
   };
-  return authenticated ? <StudioConsole origin={origin} setOrigin={changeOrigin} onSignOut={() => { void closeStudioSession(origin); clearSessionMemory(); setAuthenticated(false); }} /> : <StudioLogin origin={origin} onAuthenticated={nextOrigin => { setOrigin(nextOrigin); setAuthenticated(true); }} />;
+  const signOut = () => { void closeStudioSession(origin); clearSessionMemory(); setAuthenticated(false); };
+  if (authenticated && kiosk) return <KioskScreen origin={origin} onSignOut={signOut} />;
+  return authenticated ? <StudioConsole origin={origin} setOrigin={changeOrigin} onSignOut={signOut} /> : <StudioLogin origin={origin} onAuthenticated={nextOrigin => { setOrigin(nextOrigin); setAuthenticated(true); }} />;
 }

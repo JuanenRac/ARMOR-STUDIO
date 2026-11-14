@@ -25,3 +25,5 @@ export * from "./api/network";
 export * from "./api/solar";
 export * from "./api/battery";
 export { ApiError, setElevationAsker } from "./api/transport";
+export * from "./api/tandaA";
+export * from "./api/tandaA";

@@ -11,8 +11,8 @@ import { nodeKindOf } from "./nodeKind";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { CopyButton } from "./components/CopyButton";
 import {
-  ApiError, firmwareJob, firmwareProbe, firmwareRelease, firmwareStart, firmwareUpload,
-  type FirmwareJob, type FirmwareKind, type FirmwareProbe, type FirmwareRelease, type FirmwareTarget,
+  ApiError, firmwareJob, firmwareProbe, firmwareRelease, firmwareRollout, firmwareStart, firmwareUpload, setFirmwareRollout,
+  type FirmwareRolloutView, type FirmwareJob, type FirmwareKind, type FirmwareProbe, type FirmwareRelease, type FirmwareTarget,
 } from "./api";
 import { ConfirmDialog } from "./components/chrome";
 import type { NetworkOverview } from "./networkModel";
@@ -99,6 +99,21 @@ export function FirmwarePanel({ t, origin, isAdmin, network }: Props) {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState<"" | "probe" | "release" | "file">("");
   const [confirming, setConfirming] = useState(false);
+  // The staged rollout: its settings and whether the security option is on (only an administrator reads them).
+  const [rollout, setRollout] = useState<FirmwareRolloutView | null>(null);
+  const [rolloutNote, setRolloutNote] = useState("");
+  useEffect(() => {
+    if (!isAdmin) return undefined;
+    let cancelled = false;
+    void firmwareRollout(origin).then(state => { if (!cancelled) setRollout(state); }).catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [origin, isAdmin]);
+  const saveRollout = async () => {
+    if (!rollout) return;
+    setRolloutNote("");
+    try { setRollout(await setFirmwareRollout(origin, rollout.settings)); setRolloutNote(t("fwr_saved")); } catch (error) { setRolloutNote(explain(t, error)); }
+  };
+  const changeRollout = (change: Partial<FirmwareRolloutView["settings"]>) => setRollout(current => (current ? { ...current, settings: { ...current.settings, ...change } } : current));
   const [job, setJob] = useKept<FirmwareJob | null>("job", null);
   const jobId = useRef(String(KEPT.get("jobId") ?? ""));
 
@@ -206,6 +221,23 @@ export function FirmwarePanel({ t, origin, isAdmin, network }: Props) {
             <input type="file" accept=".bin,application/octet-stream" disabled={running} onChange={event => setFile(event.target.files?.[0] ?? null)} /></label></div>}
         </article>
 
+        {isAdmin && rollout && <article className="stack-card camera-form fw-card" aria-label={t("fwr_title")}>
+          <h3>{t("fwr_title")}</h3>
+          <p className="muted small">{t("fwr_help")}</p>
+          {!rollout.enabled && <p className="notice">{t("fwr_off")}</p>}
+          <div className="camera-field"><label><span>{t("fwr_channel")}</span>
+            <select value={rollout.settings.channel} onChange={event => changeRollout({ channel: event.target.value === "beta" ? "beta" : "stable" })} disabled={running}>
+              <option value="stable">{t("fwr_channel_stable")}</option><option value="beta">{t("fwr_channel_beta")}</option>
+            </select></label></div>
+          <div className="camera-field"><label><span>{t("fwr_percent")}</span>
+            <input type="number" min={1} max={100} value={rollout.settings.percent} onChange={event => changeRollout({ percent: Math.max(1, Math.min(100, Math.round(Number(event.target.value) || 1))) })} disabled={running} /></label></div>
+          <div className="camera-field fw-choice">
+            <label><input type="checkbox" checked={rollout.settings.rollback} onChange={event => changeRollout({ rollback: event.target.checked })} disabled={running} /> {t("fwr_rollback")}</label>
+            <label><input type="checkbox" checked={rollout.settings.halt_on_failure} onChange={event => changeRollout({ halt_on_failure: event.target.checked })} disabled={running} /> {t("fwr_halt")}</label>
+          </div>
+          <div className="camera-form-actions"><button type="button" onClick={() => void saveRollout()} disabled={running}>{t("fwr_save")}</button>{rolloutNote && <span className="notice" role="status">{rolloutNote}</span>}</div>
+        </article>}
+
         <article className="stack-card camera-form fw-card" aria-label={t("fw_sec_login")}>
           <h3>{t("fw_sec_login")}</h3>
           <p className="muted small">{t("fw_login_help")}</p>
@@ -236,11 +268,15 @@ export function FirmwarePanel({ t, origin, isAdmin, network }: Props) {
       <div className="log-head"><span /><CopyButton t={t} text={() => [`${job.kind ?? ""} ${job.version ?? ""} ${job.state}${job.error ? " " + job.error : ""}`.trim(), ...job.targets.map(target => `${target.address} ${target.state} ${Math.round(target.progress ?? 0)}% ${describeStep(t, target, job.version)}${target.error ? " " + target.error : ""}`)].join("\n")} /></div>
       <div className="fw-overall"><span>{t("fw_overall")}: {done} {t("fw_of")} {job.targets.length} {t("fw_overall_count")}</span><b>{Math.round(overall)}%</b></div>
       <Bar percent={job.state === "done" ? 100 : overall} state={job.state === "done" ? "done" : job.state === "failed" ? "failed" : "working"} />
+      {job.rollout && <p className="muted small" role="status">
+        {job.rollout.deferred.length > 0 && <>{fill(t("fwr_deferred"), job.rollout.deferred.length)} </>}{job.rollout.halted && t("fwr_halted")}
+      </p>}
       <div className="fw-targets">
         {job.targets.map(target => <section key={target.address} className={`fw-target ${target.state}`}>
           <header><strong>{target.node_id ?? target.address}</strong><small>{[target.address, target.version_before || target.version_after ? `${target.version_before ?? "?"} → ${target.version_after ?? "?"}` : ""].filter(Boolean).join(" · ")}</small><span className="fw-badge">{t(`fw_state_${target.state}`)}</span></header>
           <Bar percent={target.state === "done" ? 100 : target.progress ?? 0} state={target.state === "done" ? "done" : target.state === "failed" ? "failed" : "working"} />
           <p className={target.state === "failed" ? "err" : "muted small"}>{describeStep(t, target, job.version)}</p>
+          {(target.skipped || target.rolled_back || target.rollback_error) && <p className="muted small">{target.rolled_back ? t("fwr_rolled_back") : target.rollback_error ? fill(t("fwr_rollback_failed"), target.rollback_error) : t("fwr_skipped")}</p>}
         </section>)}
       </div>
     </article>}

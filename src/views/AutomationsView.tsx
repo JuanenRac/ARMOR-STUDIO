@@ -35,6 +35,7 @@ export function AutomationsView({ t, origin, automations, reload, devices, now }
     if (trigger.type === "device" && typeof trigger.equals === "number") { const device = byId(trigger.device_id); return `${device?.name ?? trigger.device_id}: ${t(`th_f_${trigger.field}`)} ${t(trigger.op === "lt" ? "th_below" : "th_above")} ${trigger.equals}`; }
     if (trigger.type === "device") { const device = byId(trigger.device_id); return `${device?.name ?? trigger.device_id} ${t("becomes")} ${stateWord(trigger.field, trigger.equals, t)}`; }
     if (trigger.type === "mode") return t(trigger.mode === "armed" ? "modeArmedNotice" : "modeDisarmedNotice");
+    if (trigger.type === "schedule") return `${trigger.at}${trigger.jitter_min ? ` ±${trigger.jitter_min} min` : ""}${trigger.days ? ` · ${trigger.days.map(day => t(`sched_day${day}`)).join(" ")}` : ""}`;
     const parts = [t("trigger_alarm")];
     if (trigger.severity) parts.push(t(`severity_${trigger.severity}`));
     if (trigger.source_type) parts.push(t(SOURCE_LABEL[trigger.source_type]));
@@ -89,8 +90,8 @@ export function AutomationsView({ t, origin, automations, reload, devices, now }
 
       <div className="automation-row">
         <span className="step">{t("whenLabel")}</span>
-        <label>{t("whenLabel")}<select value={trigger?.type === "device" && typeof trigger.equals === "number" ? "threshold" : trigger?.type} onChange={event => setTrigger(event.target.value === "threshold" ? { type: "device", device_id: devices[0]?.id ?? "", field: "temperature", equals: 25, op: "gt" } : event.target.value === "device" ? { type: "device", device_id: binary[0]?.id ?? "", field: MAIN_FIELD[binary[0]?.kind ?? "door"] ?? "open", equals: true } : event.target.value === "alarm" ? { type: "alarm" } : { type: "mode", mode: "armed" })}>
-          <option value="device">{t("trigger_device")}</option><option value="threshold">{t("trigger_threshold")}</option><option value="alarm">{t("trigger_alarm")}</option><option value="mode">{t("trigger_mode")}</option></select></label>
+        <label>{t("whenLabel")}<select value={trigger?.type === "device" && typeof trigger.equals === "number" ? "threshold" : trigger?.type} onChange={event => setTrigger(event.target.value === "threshold" ? { type: "device", device_id: devices[0]?.id ?? "", field: "temperature", equals: 25, op: "gt" } : event.target.value === "device" ? { type: "device", device_id: binary[0]?.id ?? "", field: MAIN_FIELD[binary[0]?.kind ?? "door"] ?? "open", equals: true } : event.target.value === "alarm" ? { type: "alarm" } : event.target.value === "schedule" ? { type: "schedule", at: "20:00", jitter_min: 20 } : { type: "mode", mode: "armed" })}>
+          <option value="device">{t("trigger_device")}</option><option value="threshold">{t("trigger_threshold")}</option><option value="alarm">{t("trigger_alarm")}</option><option value="mode">{t("trigger_mode")}</option><option value="schedule">{t("trigger_schedule")}</option></select></label>
         {trigger?.type === "device" && typeof trigger.equals === "number" && <>
           <label>{t("devices")}<select value={trigger.device_id} onChange={event => setTrigger({ ...trigger, device_id: event.target.value })}>
             <option value="">{t("chooseDevice")}</option>{devices.map(device => <option key={device.id} value={device.id}>{device.name}</option>)}</select></label>
@@ -107,6 +108,12 @@ export function AutomationsView({ t, origin, automations, reload, devices, now }
         {trigger?.type === "alarm" && <>
           <label>{t("anySeverity")}<select value={trigger.severity ?? ""} onChange={event => setTrigger({ ...trigger, severity: (event.target.value || undefined) as Trigger extends { severity?: infer S } ? S : never })}><option value="">{t("anySeverity")}</option>{(["critical", "high", "warning"] as const).map(item => <option key={item} value={item}>{t(`severity_${item}`)}</option>)}</select></label>
           <label>{t("anySource")}<select value={trigger.source_type ?? ""} onChange={event => setTrigger({ ...trigger, source_type: (event.target.value || undefined) as AlarmSourceType | undefined })}><option value="">{t("anySource")}</option>{(Object.keys(SOURCE_LABEL) as AlarmSourceType[]).map(item => <option key={item} value={item}>{t(SOURCE_LABEL[item])}</option>)}</select></label>
+        </>}
+        {trigger?.type === "schedule" && <>
+          <label>{t("sched_time")}<input type="time" value={trigger.at} onChange={event => setTrigger({ ...trigger, at: event.target.value || "20:00" })} /></label>
+          <label>{t("sched_jitter")}<input type="number" min={0} max={120} step={1} value={trigger.jitter_min ?? 0} onChange={event => setTrigger({ ...trigger, jitter_min: Math.max(0, Math.min(120, Math.round(Number(event.target.value) || 0))) })} /></label>
+          <fieldset><legend>{t("sched_days")}</legend>{[0, 1, 2, 3, 4, 5, 6].map(day => <label key={day}><input type="checkbox" checked={!trigger.days || trigger.days.includes(day)} onChange={event => { const now = trigger.days ?? [0, 1, 2, 3, 4, 5, 6]; const next = event.target.checked ? [...new Set([...now, day])].sort() : now.filter(item => item !== day); setTrigger({ ...trigger, days: next.length === 7 || next.length === 0 ? undefined : next }); }} />{t(`sched_day${day}`)}</label>)}</fieldset>
+          <p className="muted">{t("sched_help")}</p>
         </>}
         {trigger?.type === "mode" && <label>{t("trigger_mode")}<select value={trigger.mode} onChange={event => setTrigger({ type: "mode", mode: event.target.value as "armed" | "disarmed" })}><option value="armed">{t("modeArmedNotice")}</option><option value="disarmed">{t("modeDisarmedNotice")}</option></select></label>}
       </div>

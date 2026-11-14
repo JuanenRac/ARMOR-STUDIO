@@ -14,6 +14,8 @@ import { ConfirmDialog } from "./components/chrome";
 import { RelaysCard } from "./AdminRelays";
 import { FieldHttpCard } from "./FieldHttpCard";
 import { LanCaCard } from "./LanCaCard";
+import { BackupCard } from "./TandaCards";
+import { NodeKeyCard } from "./NodeKeyCard";
 import { ActionIcon, actionsFor, type ServiceAction } from "./views/ServicesView";
 import { askConfirm } from "./askConfirm";
 import { readConnection, type MqttTlsView, type ServiceState } from "./api";
@@ -257,6 +259,8 @@ export function BrokerPanel({ t, origin, isAdmin }: Props) {
     <RelaysCard t={t} origin={origin} />
     <FieldHttpCard t={t} origin={origin} />
     <LanCaCard t={t} origin={origin} />
+    <BackupCard t={t} origin={origin} isAdmin={isAdmin} />
+    <NodeKeyCard t={t} origin={origin} isAdmin={isAdmin} />
     {files.map(info => <FileEditor key={info.id} t={t} origin={origin} info={info} />)}
     {removing && <ConfirmDialog t={t} danger title={t("adm_remove")} text={`${removing.user} - ${t("adm_remove_ask")}`} confirmLabel={t("adm_remove")} cancel={() => setRemoving(null)} confirm={() => void remove(removing)} />}
   </div>;

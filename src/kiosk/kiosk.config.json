@@ -1,0 +1,5 @@
+{
+  "idle_after_s": 120,
+  "alarm_poll_ms": 4000,
+  "wake_lock": true
+}

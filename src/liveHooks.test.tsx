@@ -8,8 +8,8 @@ const api = vi.hoisted(() => ({
 }));
 vi.mock("./api", () => api);
 
-import { useNow, useServerStatus } from "./hooks";
-import type { LiveSocket } from "./liveStatus";
+import { useNoticesFlowing, useNow, usePolled, useServerStatus } from "./hooks";
+import { emitNotice, type LiveSocket } from "./liveStatus";
 import { ViewSlot } from "./viewSlots";
 
 let root: Root | null = null;
@@ -154,5 +154,71 @@ describe("the time of a menu", () => {
     act(() => { root!.render(createElement(ViewSlot, { active: true, children: createElement(Probe) })); });
     await advance(2000);
     expect(value - first).toBeGreaterThanOrEqual(5000);
+  });
+});
+
+describe("the notices of the live channel", () => {
+  it("are handed to whoever listens and do not touch the state", async () => {
+    api.readStatus.mockResolvedValue(state(1));
+    const heard: string[] = [];
+    const { onNotice } = await import("./liveStatus");
+    const stop = onNotice(notice => heard.push(`${notice.type}:${notice.id}`));
+    const hook = mount(() => useServerStatus("http://s", live));
+    await flush();
+    const socket = FakeSocket.all[0];
+    socket.open();
+    socket.say({ type: "alarm", id: "alm-00001", version: 4 });
+    socket.say({ type: "weather", id: "x", version: 1 });
+    expect(heard).toEqual(["alarm:alm-00001"]);
+    expect(hook.current().state.revision).toBe(1);
+    socket.say({ type: "state", state: state(9) });
+    expect(hook.current().state.revision).toBe(9);
+    stop();
+    await hook.unmount();
+  });
+
+  it("make a polled screen ask at once, only for its own topic", async () => {
+    const load = vi.fn().mockResolvedValue("x");
+    const hook = mount(() => usePolled(load, 60_000, "k", { always: true, topics: ["alarm"] }));
+    await flush();
+    expect(load).toHaveBeenCalledTimes(1);
+    act(() => { emitNotice({ type: "device", id: "lamp", version: 1 }); });
+    await flush();
+    expect(load).toHaveBeenCalledTimes(1);
+    act(() => { emitNotice({ type: "alarm", id: "alm-00002", version: 2 }); });
+    await flush();
+    expect(load).toHaveBeenCalledTimes(2);
+    await hook.unmount();
+    act(() => { emitNotice({ type: "alarm", id: "alm-00003", version: 3 }); });
+    expect(load).toHaveBeenCalledTimes(2);
+  });
+
+  it("make a screen that follows no topic ignore them", async () => {
+    const load = vi.fn().mockResolvedValue("x");
+    const hook = mount(() => usePolled(load, 60_000, "k", { always: true }));
+    await flush();
+    act(() => { emitNotice({ type: "alarm", id: "a", version: 1 }); });
+    await flush();
+    expect(load).toHaveBeenCalledTimes(1);
+    await hook.unmount();
+  });
+
+  it("are flowing for a minute after the last one while the channel is open, and not otherwise", async () => {
+    let open = false;
+    const hook = mount(() => useNoticesFlowing(open));
+    expect(hook.current()).toBe(false);
+    act(() => { emitNotice({ type: "alarm", id: "a", version: 1 }); });
+    expect(hook.current()).toBe(false);
+    await hook.unmount();
+    open = true;
+    const second = mount(() => useNoticesFlowing(open));
+    await flush();
+    act(() => { emitNotice({ type: "alarm", id: "a", version: 1 }); });
+    expect(second.current()).toBe(true);
+    await advance(59_000);
+    expect(second.current()).toBe(true);
+    await advance(2_000);
+    expect(second.current()).toBe(false);
+    await second.unmount();
   });
 });

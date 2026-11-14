@@ -464,6 +464,71 @@ export type AutomationTrigger = {
 } | {
   type: "mode";
   mode: "armed" | "disarmed";
+} | {
+  type: "schedule";
+  /** Time of day, HH:MM, the clock of the server */
+  at: string;
+  /** 0 is Sunday; all days when absent */
+  days?: number[];
+  /** Up to this many minutes either way, repeatable from the seed and the day */
+  jitter_min?: number;
+  seed?: string;
+};
+
+export type BackupInfo = {
+  name: string;
+  bytes: number;
+  at: string;
+};
+
+export type BackupResult = {
+  ok: boolean;
+  at: string;
+  file?: string;
+  bytes?: number;
+  files?: number;
+  error?: string;
+};
+
+export type BackupSettings = {
+  schedule: boolean;
+  every_h: number;
+  keep: number;
+  /** An absolute path under /media, /mnt, /run/media or the data directory; empty is the folder backups of the data directory */
+  destination: string;
+  /** The destination must be on another device than the data */
+  require_mount: boolean;
+  include_media: boolean;
+  max_mb: number;
+};
+
+export type BackupSettingsRequest = {
+  schedule?: boolean;
+  every_h?: number;
+  keep?: number;
+  destination?: string;
+  require_mount?: boolean;
+  include_media?: boolean;
+  max_mb?: number;
+  /** Makes the key for the next backups; never returned or kept */
+  passphrase?: string;
+};
+
+export type BackupState = {
+  /** The option admin.backup */
+  enabled: boolean;
+  settings: BackupSettings;
+  key_set: boolean;
+  running: boolean;
+  last: BackupResult | null;
+  last_verify: BackupResult | null;
+  backups: BackupInfo[];
+};
+
+export type BackupVerifyRequest = {
+  name?: string;
+  /** For a backup made under another passphrase than the one the server holds */
+  passphrase?: string;
 };
 
 export type BatteryArmRequest = {
@@ -1210,6 +1275,45 @@ export type EnergyAlarmSettings = {
   health_low_percent: number;
 };
 
+export type EnergyBalance = {
+  enabled: boolean;
+  settings: EnergyBalanceSettings;
+  balance: {
+    production_w: number | null;
+    /** Production plus grid draw minus battery charge */
+    consumption_w: number | null;
+    import_w: number | null;
+    export_w: number | null;
+    battery_charge_w: number | null;
+    self_consumption_pct: number | null;
+    autarky_pct: number | null;
+    /** The load the inverters report, to compare with consumption_w */
+    reported_load_w: number | null;
+  };
+  findings: EnergyBalanceFinding[];
+};
+
+export type EnergyBalanceFinding = {
+  code: "grid_export_unexpected" | "meter_mismatch" | "consumption_appliance_stopped" | "consumption_standby_high" | "consumption_phase_down";
+  key: string;
+  source: string;
+  detail: {
+    [key: string]: number | string;
+  };
+};
+
+export type EnergyBalanceSettings = {
+  /** The installation may feed the grid; off: an export above export_alert_w for hold_s is told */
+  allow_export?: boolean;
+  export_alert_w?: number;
+  hold_s?: number;
+  mismatch_pct?: number;
+  mismatch_min_w?: number;
+  stopped_h?: number;
+  /** node/channel of the channels whose history is looked at */
+  watch_channels?: string[];
+};
+
 /** A signed statement of what a file was, with the chain of what was done to it */
 export type EvidenceProof = {
   version: 1;
@@ -1275,6 +1379,24 @@ export type FirmwareRelease = {
   bytes: number;
   /** Whether the release carries the checksum of its image */
   checksum: boolean;
+};
+
+/** How a firmware job from GitHub is spread over the nodes while the option admin.firmware_rollout is on. The nodes are ordered by a hash of their id and the version, so the same nodes go first for a version and a larger percent only adds nodes. */
+export type FirmwareRolloutSettings = {
+  /** stable takes the latest release; beta takes the newest release, a pre-release included */
+  channel?: "stable" | "beta";
+  /** The share of the nodes of a job that take the version now (at least one node); the others are listed as deferred until the job is started again with a larger percent */
+  percent?: number;
+  /** A node that took the image and did not come back with it is asked to start from its previous slot again */
+  rollback?: boolean;
+  /** After a node failed, the nodes that were still to come are deferred and not touched */
+  halt_on_failure?: boolean;
+};
+
+export type FirmwareRolloutState = {
+  /** The option admin.firmware_rollout */
+  enabled: boolean;
+  settings: FirmwareRolloutSettings;
 };
 
 export type FirmwareUpload = {
@@ -1487,6 +1609,37 @@ export type JobStarted = {
 export type LineCount = {
   to_left: number;
   to_right: number;
+};
+
+export type LoadShedding = {
+  /** The option electrical.load_shedding */
+  enabled: boolean;
+  settings: LoadSheddingSettings;
+  /** The devices switched off by this module and not yet switched on again */
+  shed: string[];
+  grid_w: number | null;
+  log: LoadSheddingLogEntry[];
+};
+
+export type LoadSheddingLogEntry = {
+  at: string;
+  action: "shed" | "restore" | "refused" | "failed" | "released";
+  device: string;
+  grid_w: number | null;
+  detail?: string;
+};
+
+export type LoadSheddingSettings = {
+  /** Shed above this grid draw, in watts */
+  limit_w?: number;
+  /** Switch on again below this draw; at least 100 W under limit_w */
+  restore_w?: number;
+  /** How long the draw must stay beyond a limit before anything is done */
+  hold_s?: number;
+  /** The least time between two actions */
+  step_s?: number;
+  /** The ids of the devices that may be shed, the first is the first to be shed */
+  loads?: string[];
 };
 
 export type MachineUpdatePreview = {
@@ -1950,6 +2103,8 @@ export type NodeToken = {
   node_id: string;
   token: string;
   strict: boolean;
+  /** The key this node checks the signature of the critical commands with (HMAC-SHA256 of node| and its id under the master key of the server); only while the option commands.require_sig is on. Given once to the node; never cached. */
+  command_key?: string;
 };
 
 export type NotificationChannels = {
@@ -1998,6 +2153,11 @@ export type OperatorSessionOpened = {
 
 export type PanelSummary = {
   mode: "armed" | "disarmed";
+  /** Present only while a countdown runs: the time left to leave the house after arming (exit) or to disarm after a door opened (entry); the panel shows it big and sounds it */
+  delay?: {
+    phase: "exit" | "entry";
+    remaining_s: number;
+  };
   revision: number;
   time_ms: number;
   nodes: {
@@ -2714,6 +2874,8 @@ export type SecuritySettings = {
   /** The wall panel may send short chunks of audio to the voice gateway to hear its wake word (on this machine; off - the route answers 403 and nothing is passed on) */
   "voice.wake_word"?: boolean;
   "voice.panic_phrase"?: boolean;
+  /** The hidden gesture of the apps (POST /api/v1/alarm/panic-gesture) raises the silent duress alarm. Off: the route answers 404 and the apps do not offer the gesture. */
+  "client.panic_gesture"?: boolean;
   "voice.panic_cooldown_s"?: number;
   /** Studio may ask the admin agent to open or close the two switches of the broker rules that no install turns on (off - the routes answer 403 - each change also needs two confirmations and the one-time code of the authenticator) */
   "admin.acl_relays"?: boolean;
@@ -2722,6 +2884,28 @@ export type SecuritySettings = {
   /** The server refuses the text of an environment file from a maintenance agent that does not hide the secrets itself (off - an older agent is accepted and the server hides them; on - the answer is 409 agent_not_masking and no secret is relayed) */
   "admin.require_masked_agent"?: boolean;
   "panel.live_events"?: boolean;
+  /** The account of a wall panel may read the check before arming (GET /api/v1/preflight) to show what is wrong when the person presses Arm. Off: it answers 403 and the panel arms as before. */
+  "panel.preflight"?: boolean;
+  /** The account of a wall panel may read a still picture of a camera (GET /api/v1/cameras/{id}/snapshot), at most one every two seconds for each camera. Off: it answers 403. */
+  "panel.camera_view"?: boolean;
+  /** When a node or an alarm panel raises a high or critical alarm (or a node alert level goes to high), the cameras that the site design says cover it take the photo and video of the capture settings. Off: only the vision service starts a capture. */
+  "capture.on_alarm"?: boolean;
+  /** The most captures one minute of alarms may start in all. */
+  "capture.on_alarm_per_min"?: number;
+  /** Besides the whole state, the console channel /api/v1/events sends {type, id, version} notices when an alarm, a device, a solar device, a network node or a design changes. Off: the state only. */
+  "live.events"?: boolean;
+  /** The automations with a schedule trigger run, only while the system is armed away (presence simulation). Off: no schedule ever runs. */
+  "vacation.mode"?: boolean;
+  /** The critical commands (alarm_command, electrical_command) are published with a nonce and an HMAC-SHA256 signature of this installation. Off: unsigned. */
+  "commands.require_sig"?: boolean;
+  /** An administrator may set up encrypted, scheduled backups of the data directory and make or prove one (the /api/v1/admin/backup routes). Off: they answer 403 backup_disabled. */
+  "admin.backup"?: boolean;
+  /** A firmware job from GitHub follows the staged rollout of the settings (/api/v1/admin/firmware/rollout): the channel stable or beta, a percent of the nodes at a time, and the way back for a node that does not come back. Off: a job updates every node it was given with the latest release, as always. */
+  "admin.firmware_rollout"?: boolean;
+  /** When the grid draw is over the limit, the devices listed as not critical are switched off one at a time and on again below the restore level. Off: nothing is ever shed. */
+  "electrical.load_shedding"?: boolean;
+  /** The server works out the energy balance of the house and watches it for information (GET /api/v1/electrical/balance). Off: 404 and nothing is watched. */
+  "electrical.balance"?: boolean;
   "client.device_lock"?: "user" | "sensitive" | "always";
   "client.trusted_devices"?: boolean;
   "client.trusted_session_h"?: number;
