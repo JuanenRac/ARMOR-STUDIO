@@ -67,6 +67,7 @@ def render_template(web_port: int, upstream: str, page_root: Path, headers_file:
         ("include /etc/nginx/snippets/security_headers.conf;", f"include {headers_file.as_posix()};"),
         ("${ARMOR_PUBLIC_ORIGIN}", "same-origin"),
         ("${ARMOR_SERVER_UPSTREAM}", upstream),
+        ("${ARMOR_STUDIO_OUTER_TLS_PROXY}", "1"),   # the default of the image: the protocol header of a proxy in front is passed on
     ]
     for old, new in changes:
         if old not in text:
