@@ -86,6 +86,8 @@ export type SecurityOptions = {
   /** The secret panic phrase of each person raises the silent duress alarm (off by default), and the quiet time in seconds after one (10 to 3600, 60). */
   "voice.panic_phrase": boolean;
   /** The hidden panic gesture of the apps raises the silent duress alarm (off by default). */
+  /** A disarm with the duress PIN leaves the trace of a normal disarm and the session that disarmed sees no alarm (off by default). */
+  "alarm.duress_hide_trail": boolean;
   "client.panic_gesture": boolean;
   /** An administrator may make a code of one use and five minutes for the QR that sets up an app (off by default). */
   "client.enrolment_code": boolean;
