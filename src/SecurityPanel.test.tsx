@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ElevationDialog } from "./ElevationHost";
-import { retentionValue, envValue, isLowering, SecurityPanel, TRUSTED_HOURS, trustedHoursValue, setEnvLines, REPORT_LIMITS, reportLimitValue, VOICE_LIMITS, visionServiceUrlValue, voiceLimitValue } from "./SecurityPanel";
+import { retentionValue, envValue, isLowering, SecurityPanel, TRUSTED_HOURS, trustedHoursValue, setEnvLines, REPORT_LIMITS, reportLimitValue, NODE_MAINTENANCE_LIMIT, nodeMaintenanceValue, VOICE_LIMITS, visionServiceUrlValue, voiceLimitValue } from "./SecurityPanel";
 import { RemoteAccessSetup } from "./RemoteAccessSetup";
 import { SessionUserContext } from "./sessionContext";
 import { locales, requiredUiKeys, text } from "./i18n";
@@ -24,6 +24,21 @@ describe("the security screen", () => {
     const wanted = requiredUiKeys.filter(key => key.startsWith("sec_") || key.startsWith("rem_") || key.startsWith("login_totp_") || key === "tabSecurity");
     expect(wanted.length).toBeGreaterThan(130);
     for (const locale of locales) for (const key of wanted) expect(text(locale, key).trim().length, `${locale} ${key}`).toBeGreaterThan(0);
+  });
+
+  it("holds the cap of the node maintenance to the range of the server, shows the value in force and has every phrase in all eight languages", () => {
+    expect(NODE_MAINTENANCE_LIMIT).toEqual({ min: 60, max: 86_400 });
+    expect([nodeMaintenanceValue("600"), nodeMaintenanceValue(" 60 "), nodeMaintenanceValue("86400")]).toEqual([600, 60, 86_400]);
+    for (const bad of ["59", "86401", "", "abc", "12.5", "-5", "1e3", "000600000"]) expect(nodeMaintenanceValue(bad), bad).toBeUndefined();
+    for (const locale of locales) for (const id of ["sec_nmc_title", "sec_nmc_help", "sec_nmc_label", "sec_nmc_now", "sec_nmc_warn", "sec_nmc_confirm"]) {
+      const words = text(locale, id);
+      expect(words.trim().length, `${locale} ${id}`).toBeGreaterThan(3);
+      expect(words, `${locale} ${id} is not the key`).not.toBe(id);
+    }
+    for (const locale of locales) expect(text(locale, "sec_nmc_now"), locale).toContain("{value}");
+    expect(text("pt", "sec_nmc_title")).toBe("Manutenção que um nó pode anunciar");
+    const t = (key: string) => text("en", key);
+    expect(renderToStaticMarkup(createElement(SecurityPanel, { t, origin: "http://127.0.0.1:8080", isAdmin: false }))).not.toContain("security-node-maintenance");
   });
 
   it("offers the security options of the server only to an administrator of a server that announces them, and asks before one is lowered", () => {
