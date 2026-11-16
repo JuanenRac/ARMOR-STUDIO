@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The copy of the server contract knows six more security options and the record of duress:** `panel.proxy_http`, `remote.gate_by_route`, `admin.firmware_refuse_downgrade`, `server.alarm_state_signature_node_only`, `cameras.allow_public_hosts` and `alarm.duress_hide_trail`, and `GET /api/v1/alarm/duress-log`, copied from the generated REST types of ARMOR-COMMON.
 - **A deployment with nothing in front of the container can stop trusting the protocol header of the client:** `ARMOR_STUDIO_OUTER_TLS_PROXY` (default `1`, as before: the `X-Forwarded-Proto` of a proxy in front is passed on) set to `0` makes nginx always send the scheme of its own connection to the server, so a client cannot claim to have come over HTTPS.
 - **The cap on the maintenance a node may announce is a setting in Configuration > Security:** `nodes.maintenance_max_s` (60 to 86400 seconds, default 600, in the eight languages) with the value in force shown beside the field; a node maintenance report longer than the cap is cut to the cap (default 600 s, configurable in Studio). Raising the cap asks first.
 - **The README says exactly when the Weather menu reaches other services:** searching for a place sends the typed text to the Open-Meteo geocoding before anything is saved, and an account with a saved place loads the forecast and map services; the README and its seven translations now say both.
