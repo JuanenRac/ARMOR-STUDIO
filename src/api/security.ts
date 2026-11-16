@@ -19,6 +19,6 @@ export const elevateSession = (origin: string, proof: { password?: string; code?
 export const remoteCheck = (origin: string) => userCall<RemoteCheck>(origin, "GET", "/api/v1/remote/check");
 
 // ---- the security options of the server (an administrator) -----------------------------------------------------------------------------------------------
-export type SecurityOptionsState = { settings: SecurityOptions; stored: SecurityOptions; defaults: SecurityOptions; locked: string[] };
+export type SecurityOptionsState = { settings: SecurityOptions; stored: SecurityOptions; defaults: SecurityOptions; locked: string[]; ingest_shared_token_nodes?: Array<{ node_id: string; last_seen: string; messages: number }> };
 export const readSecurityOptions = (origin: string) => userCall<SecurityOptionsState>(origin, "GET", "/api/v1/security/settings");
 export const changeSecurityOptions = (origin: string, change: Partial<SecurityOptions>) => userCall<SecurityOptionsState>(origin, "PUT", "/api/v1/security/settings", change);

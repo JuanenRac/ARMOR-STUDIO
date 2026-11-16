@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The strict ingest mode, the writing to batteries and the update of the machine are switches in Configuration > Security:** "Each node needs its own token", "Writing to the batteries" and "Update this machine from Studio" (all off by default and shown only when the server announces them, in the eight languages); turning the first one off, or the other two on, asks first. When some nodes still speak with the shared token, a line under the switches names them so each can be given its own token before the strict mode is turned on.
 ## [0.8.2.5] - Wall panel app, backups and rollout cards, local CA, vision review and security switches
 
 - **The copies of the shared contract include the system summary of a solar gateway:** `armor-contracts.ts` and `armor-parsers.ts` are brought up to the shared contract, so the types and readers of the `system` message are there when a screen needs them.

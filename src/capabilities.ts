@@ -35,6 +35,12 @@ export type SecurityOptions = {
   "vacation.mode": boolean;
   /** The critical commands are published with a nonce and a signature (off by default). */
   "commands.require_sig": boolean;
+  /** The shared ingest token is no longer accepted from the nodes: each one holds its own (off by default). */
+  "nodes.ingest_strict": boolean;
+  /** The server may order a gateway node to write to a Pylontech battery (off by default). */
+  "solar.battery_write": boolean;
+  /** Studio and the phone may ask the maintenance agent to update the programs of this machine (off by default). */
+  "admin.cm5_update": boolean;
   /** An administrator may set up and make encrypted backups of the data directory (off by default). */
   "admin.backup": boolean;
   /** A firmware job from GitHub follows the staged rollout: channel, share of the nodes and the way back (off by default). */

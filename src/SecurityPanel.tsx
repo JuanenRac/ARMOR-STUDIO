@@ -268,6 +268,9 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "media.rtsp_proxy", id: "rtsp", values: [true, false] },
   { key: "network.login_secure_only", id: "netlogin", values: [true, false] },
   { key: "session.rotate_id", id: "rotateid", values: [true, false], calm: true, optional: true },   // off by default; hardening, so only turning it off asks first
+  { key: "nodes.ingest_strict", id: "ingeststrict", values: [true, false], calm: true, optional: true },   // off by default so the boards in the field keep working; hardening, so only turning it off from on asks first
+  { key: "solar.battery_write", id: "batterywrite", values: [false, true], optional: true },   // off by default; on lets an administrator order writes to a battery, so it asks first
+  { key: "admin.cm5_update", id: "cm5update", values: [false, true], optional: true },   // off by default; on lets an administrator replace the programs of this machine from the app, so it asks first
   { key: "capture.on_alarm", id: "captalarm", values: [false, true], optional: true },   // off by default; on makes the cameras record by themselves at every alarm, so it asks first
   { key: "live.events", id: "livenotices", values: [true, false], calm: true, optional: true },   // on by default; turning it off only makes the consoles ask more often
   { key: "vacation.mode", id: "vacation", values: [false, true], calm: true, optional: true },   // off by default; on lets lights switch by themselves on a schedule while the house is armed away
@@ -587,6 +590,7 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
         {fixed && <p className="muted">{t("sec_opt_fixed").replace("ARMOR_DISARM_PIN", option.fixedBy ?? "ARMOR_DISARM_PIN")}</p>}
       </fieldset>;
     })}
+    {(state.ingest_shared_token_nodes ?? []).length > 0 && <p className="notice" role="status" data-testid="security-shared-token-nodes">{fill(t("sec_opt_ingeststrict_nodes"), { nodes: (state.ingest_shared_token_nodes ?? []).map(item => item.node_id).join(", ") })}</p>}
     {typeof state.settings["alarm_audio.custom_sounds"] === "boolean" && <AlarmSounds t={t} origin={origin} spokenOn={state.settings["alarm_audio.spoken"] === true} customOn={state.settings["alarm_audio.custom_sounds"]} />}
     {typeof state.settings["voice.turn_max_bytes"] === "number" && <VoiceLimits t={t} state={state} apply={applyLimits} busy={busy} />}
     {(typeof state.settings["media.retention_snapshot_days"] === "number" || typeof state.settings["vision.timeline_days"] === "number") && <RetentionLimits t={t} state={state} apply={applyLimits} busy={busy} />}
