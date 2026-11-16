@@ -35,7 +35,9 @@ describe("the nginx of the container", () => {
   });
   it("trusts the protocol that a proxy in front announces by default and ignores it with ARMOR_STUDIO_OUTER_TLS_PROXY=0", () => {
     // The map is read the way nginx reads it: the first regular expression that matches wins, otherwise the default.
-    const rows = [...source.matchAll(/^\s+(default|"~[^"]*")\s+(\S+);/gm)].map((row) => [row[1], row[2]]);
+    const block = /map "\$\{ARMOR_STUDIO_OUTER_TLS_PROXY\}:\$http_x_forwarded_proto" \$forwarded_proto \{([^}]*)\}/.exec(source)?.[1] ?? "";
+    expect(block, "the map is in the template").not.toBe("");
+    const rows = [...block.matchAll(/^\s+(default|"~[^"]*")\s+(\S+);/gm)].map((row) => [row[1], row[2]]);
     const forwarded = (outer: string, header: string): string => {
       const key = `${outer}:${header}`;
       for (const [pattern, value] of rows) {
