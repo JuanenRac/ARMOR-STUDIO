@@ -109,7 +109,7 @@ Studio es la ventana del operador a todo el sistema. Nunca habla con un nodo: to
 |---|---|---|
 | ARMOR-SERVER | HTTP, WebSocket y MJPEG con la sesión HttpOnly | todo: estado, órdenes, diseños, cámaras |
 | El panel propio de cada nodo | un enlace, a través del proxy del servidor | la única excepción a "nunca habla con un nodo" |
-| Servicios del tiempo | Open-Meteo, RainViewer, EUMETSAT, ArcGIS | solo el menú del Tiempo, al buscar un lugar o si la cuenta tiene un lugar guardado |
+| Servicios del tiempo | Open-Meteo, RainViewer, EUMETSAT, ArcGIS | solo el menú del Tiempo, solo con lugar guardado |
 | ARMOR-DEVOPS | instala la pila en el banco de la CM5 | despliegue |
 
 ## 🏛️ Arquitectura
@@ -210,7 +210,7 @@ Capturadas en un banco de pruebas con datos de ejemplo inventados y sin ninguna 
 | Órdenes peligrosas a los nodos | Solo administradores; se teclea de nuevo el nombre del nodo (o RESTART, PAUSE, STANDBY para todos) y se pide otra vez la contraseña; no hay orden de borrado, restablecimiento de fábrica ni apagado |
 | Roles | Administrador, operador, visor (solo mira) y panel de pared (su cuenta no puede usar Studio); las `capabilities` de la sesión deciden qué se muestra y el servidor vuelve a comprobar |
 
-**Solo el menú del Tiempo llega a otros servicios.** Las fuentes son locales y nada más pide algo a un tercero. El menú del Tiempo, y solo cuando se busca un lugar (el texto escrito va a la geocodificación de Open-Meteo) o la cuenta tiene un lugar guardado, carga Open-Meteo (previsión, geocodificación, calidad del aire), RainViewer (radar), EUMETSAT (nubes) y ArcGIS (teselas del mapa). El servidor estático envía `Content-Security-Policy: default-src 'self'` limitada al servidor configurado y a esos servicios, `frame-ancestors 'none'`, `nosniff` y `no-referrer`.
+**Solo el menú del Tiempo llega a otros servicios.** Las fuentes son locales y nada más pide algo a un tercero. El menú del Tiempo, y solo con una cuenta que tenga un lugar guardado, carga Open-Meteo (previsión, geocodificación, calidad del aire), RainViewer (radar), EUMETSAT (nubes) y ArcGIS (teselas del mapa). El servidor estático envía `Content-Security-Policy: default-src 'self'` limitada al servidor configurado y a esos servicios, `frame-ancestors 'none'`, `nosniff` y `no-referrer`.
 
 **Interruptores.** *Configuración > Seguridad* tiene un control para cada una de las 17 protecciones que ARMOR-SERVER deja ajustar a un administrador (PIN de desarme, silenciar por voz, firma del diseño de alarma, aviso de zonas, túnel de cámaras, accesos de red, el aviso de un acceso desde un país nuevo, apartar lecturas eléctricas viejas, eventos en vivo del panel de pared, bloqueo de dispositivo, cifrado del almacenamiento de nodos y los límites de audio), cada una con un valor por defecto conservador; el servidor deja en su auditoría que se baje una. Detalles en [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). No ha habido revisión de seguridad independiente.
 
