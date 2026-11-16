@@ -23,6 +23,16 @@ export type SecurityOptions = {
   "server.zone_feed_signature": boolean;
   "media.rtsp_proxy": boolean;
   "network.login_secure_only": boolean;
+  /** The proxy of the node panels may open a panel registered over plain http (off by default). */
+  "panel.proxy_http": boolean;
+  /** From outside the house, every administrator route is closed by the route itself under the policies operate and view (on by default). */
+  "remote.gate_by_route": boolean;
+  /** With the signed copy of the alarm states on, only states the panel itself said are signed (off by default). */
+  "server.alarm_state_signature_node_only": boolean;
+  /** A firmware job from GitHub refuses a version older than the one a node runs, and an image of another kind (on by default). */
+  "admin.firmware_refuse_downgrade": boolean;
+  /** The server may connect to a camera at any address, not only one of the house (on by default). */
+  "cameras.allow_public_hosts": boolean;
   /** A session in use gets a new id and cookie each time it is renewed (off by default). */
   "session.rotate_id": boolean;
   /** The cameras that cover a node take the photo and video of the capture settings when it raises a high alarm (off by default). */

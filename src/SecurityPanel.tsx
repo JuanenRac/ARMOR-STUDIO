@@ -267,6 +267,11 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "server.zone_feed_signature", id: "sign", values: [true, false], node: true },
   { key: "media.rtsp_proxy", id: "rtsp", values: [true, false] },
   { key: "network.login_secure_only", id: "netlogin", values: [true, false] },
+  { key: "panel.proxy_http", id: "proxyhttp", values: [false, true], optional: true },   // off by default; on opens node panels over plain http, whose scripts run with the session of the administrator, so it asks first
+  { key: "remote.gate_by_route", id: "remotegate", values: [true, false], optional: true },   // on by default; turning it off leaves administering from outside to the older list of paths, so it asks first
+  { key: "server.alarm_state_signature_node_only", id: "alarmsignnode", values: [true, false], calm: true, optional: true },   // off by default; hardening, so only turning it off from on asks first
+  { key: "admin.firmware_refuse_downgrade", id: "fwdowngrade", values: [true, false], optional: true },   // on by default; turning it off lets a release that moved back install an older firmware, so it asks first
+  { key: "cameras.allow_public_hosts", id: "camhosts", values: [false, true], optional: true },   // on by default, as it always was; the warning shows while it is on
   { key: "session.rotate_id", id: "rotateid", values: [true, false], calm: true, optional: true },   // off by default; hardening, so only turning it off asks first
   { key: "nodes.ingest_strict", id: "ingeststrict", values: [true, false], calm: true, optional: true },   // off by default so the boards in the field keep working; hardening, so only turning it off from on asks first
   { key: "solar.battery_write", id: "batterywrite", values: [false, true], optional: true },   // off by default; on lets an administrator order writes to a battery, so it asks first
