@@ -109,7 +109,7 @@ Studio is the operator's window on the whole system. It never talks to a node: e
 |---|---|---|
 | ARMOR-SERVER | HTTP, WebSocket and MJPEG with the HttpOnly session | everything: state, orders, designs, cameras |
 | Each node's own panel | a link, through the server's proxy | the only exception to "it never talks to a node" |
-| Weather services | Open-Meteo, RainViewer, EUMETSAT, ArcGIS | only the Weather menu, only with a saved place |
+| Weather services | Open-Meteo, RainViewer, EUMETSAT, ArcGIS | only the Weather menu, when a place is searched for or an account has a saved place |
 | ARMOR-DEVOPS | installs the stack on the CM5 test bench | deployment |
 
 ## 🏛️ Architecture
@@ -210,7 +210,7 @@ Captured on a test bench with made-up sample data and no real installation behin
 | Dangerous orders to the nodes | Administrators only; the node's name (or RESTART, PAUSE, STANDBY for all) is typed again and the password is asked again; there is no erase, factory reset or power-off order |
 | Roles | Administrator, operator, viewer (only looks) and wall panel (its account cannot use Studio); the `capabilities` of the session decide what is shown, and the server checks again |
 
-**Only the Weather menu reaches other services.** Fonts are local stacks and nothing else asks a third party for anything. The Weather menu, and only for an account with a saved place, loads Open-Meteo (forecast, geocoding, air quality), RainViewer (radar), EUMETSAT (clouds) and ArcGIS (map tiles). The static host sends `Content-Security-Policy: default-src 'self'` limited to the configured server and those services, `frame-ancestors 'none'`, `nosniff` and `no-referrer`.
+**Only the Weather menu reaches other services.** Fonts are local stacks and nothing else asks a third party for anything. The Weather menu, and only when a person searches for a place (the typed text goes to the Open-Meteo geocoding) or the account has a saved place, loads Open-Meteo (forecast, geocoding, air quality), RainViewer (radar), EUMETSAT (clouds) and ArcGIS (map tiles). The static host sends `Content-Security-Policy: default-src 'self'` limited to the configured server and those services, `frame-ancestors 'none'`, `nosniff` and `no-referrer`.
 
 **Switches.** *Configuration > Security* has a control for each of the 17 protections that ARMOR-SERVER lets an administrator tune (disarm PIN, silencing by voice, signature of the alarm design, zone feed, camera tunnel, network logins, the alert of a sign-in from a new country, setting aside old electrical readings, wall-panel live events, device lock, node storage encryption and the audio limits), with a conservative default; the server keeps lowering one in its audit. Details in [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). There has been no independent security review.
 

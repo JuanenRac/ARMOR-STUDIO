@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The README says exactly when the Weather menu reaches other services:** searching for a place sends the typed text to the Open-Meteo geocoding before anything is saved, and an account with a saved place loads the forecast and map services; the README and its seven translations now say both.
 - **The strict ingest mode, the writing to batteries and the update of the machine are switches in Configuration > Security:** "Each node needs its own token", "Writing to the batteries" and "Update this machine from Studio" (all off by default and shown only when the server announces them, in the eight languages); turning the first one off, or the other two on, asks first. When some nodes still speak with the shared token, a line under the switches names them so each can be given its own token before the strict mode is turned on.
 ## [0.8.2.5] - Wall panel app, backups and rollout cards, local CA, vision review and security switches
 

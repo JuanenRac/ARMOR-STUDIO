@@ -109,7 +109,7 @@ O Studio é a janela do operador para todo o sistema. Nunca fala com um nó: tud
 |---|---|---|
 | ARMOR-SERVER | HTTP, WebSocket e MJPEG com a sessão HttpOnly | tudo: estado, ordens, desenhos, câmaras |
 | O painel próprio de cada nó | uma ligação, através do proxy do servidor | a única exceção a "nunca fala com um nó" |
-| Serviços do tempo | Open-Meteo, RainViewer, EUMETSAT, ArcGIS | só o menu do Tempo, só com local guardado |
+| Serviços do tempo | Open-Meteo, RainViewer, EUMETSAT, ArcGIS | só o menu do Tempo, ao pesquisar um local ou se a conta tiver um local guardado |
 | ARMOR-DEVOPS | instala a pilha na bancada do CM5 | implantação |
 
 ## 🏛️ Arquitetura
@@ -210,7 +210,7 @@ Capturadas numa bancada de testes com dados de exemplo inventados e sem qualquer
 | Ordens perigosas aos nós | Só administradores; o nome do nó (ou RESTART, PAUSE, STANDBY para todos) é escrito de novo e a palavra-passe pedida outra vez; não há ordem de apagar, repor de fábrica nem desligar |
 | Funções | Administrador, operador, visualizador (só vê) e painel de parede (a sua conta não pode usar o Studio); as `capabilities` da sessão decidem o que se mostra e o servidor volta a verificar |
 
-**Só o menu do Tempo chega a outros serviços.** Os tipos de letra são locais e nada mais pede algo a terceiros. O menu do Tempo, e só numa conta com um local guardado, carrega Open-Meteo (previsão, geocodificação, qualidade do ar), RainViewer (radar), EUMETSAT (nuvens) e ArcGIS (mosaicos do mapa). O servidor estático envia `Content-Security-Policy: default-src 'self'` limitado ao servidor configurado e a esses serviços, `frame-ancestors 'none'`, `nosniff` e `no-referrer`.
+**Só o menu do Tempo chega a outros serviços.** Os tipos de letra são locais e nada mais pede algo a terceiros. O menu do Tempo, e só ao pesquisar um local (o texto escrito vai para a geocodificação do Open-Meteo) ou se a conta tiver um local guardado, carrega Open-Meteo (previsão, geocodificação, qualidade do ar), RainViewer (radar), EUMETSAT (nuvens) e ArcGIS (mosaicos do mapa). O servidor estático envia `Content-Security-Policy: default-src 'self'` limitado ao servidor configurado e a esses serviços, `frame-ancestors 'none'`, `nosniff` e `no-referrer`.
 
 **Interruptores.** *Configuração > Segurança* tem um controlo para cada uma das 17 proteções que o ARMOR-SERVER deixa um administrador ajustar (PIN de desarme, silenciar por voz, assinatura do desenho de alarme, feed de zonas, túnel das câmaras, credenciais de rede, aviso de início de sessão de um novo país, pôr de parte leituras elétricas antigas, eventos em direto do painel de parede, bloqueio de dispositivo, cifra do armazenamento dos nós e os limites de áudio), cada uma com um valor predefinido conservador; o servidor deixa na auditoria que se baixe uma. Detalhes em [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). Não houve revisão de segurança independente.
 
