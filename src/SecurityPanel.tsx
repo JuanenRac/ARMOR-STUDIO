@@ -251,7 +251,7 @@ function TrustedHours({ t, state, apply, busy }: { t: (key: string) => string; s
   </fieldset>;
 }
 
-type OptionKey = Exclude<keyof SecurityOptions, "capture.on_alarm_per_min" | "voice.panic_cooldown_s" | "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute" | "client.trusted_session_h" | "media.retention_snapshot_days" | "media.retention_recording_days" | "vision.timeline_days" | "vision.semantic_search" | "vision.plates" | "vision.faces" | "vision.semantic_search_ack" | "vision.plates_ack" | "vision.faces_ack">;
+type OptionKey = Exclude<keyof SecurityOptions, "capture.on_alarm_per_min" | "voice.panic_cooldown_s" | "voice.turn_max_bytes" | "voice.reply_audio_max_bytes" | "vision.service_url" | "vision.service_token_set" | "summary.log_days" | "nodes.maintenance_max_s" | "summary.reading_every_s" | "summary.power_every_s" | "summary.false_alarm_s" | "reports.timeout_s" | "reports.queue_max" | "reports.requests_per_minute" | "client.trusted_session_h" | "media.retention_snapshot_days" | "media.retention_recording_days" | "vision.timeline_days" | "vision.semantic_search" | "vision.plates" | "vision.faces" | "vision.semantic_search_ack" | "vision.plates_ack" | "vision.faces_ack">;
 /** How each option is offered: its words (`sec_opt_<id>`), its values from the safest to the least safe (the last is the one that gets the warning), and the environment variable that can fix it. */
 const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolean>; fixedBy?: string; node?: boolean; calm?: boolean; optional?: boolean }> = [
   { key: "alarm.disarm_pin", id: "pin", values: ["always", "if_set", "never"], fixedBy: "ARMOR_DISARM_PIN", node: true },
@@ -549,6 +549,45 @@ function RetentionLimits({ t, state, apply, busy }: { t: (key: string) => string
   </fieldset>;
 }
 
+/** The most seconds a node may hold back its offline alerts by announcing maintenance: the range the server holds the cap to. A longer report of a node is cut to the cap. */
+export const NODE_MAINTENANCE_LIMIT = { min: 60, max: 86_400 } as const;
+/** The whole number of seconds a field holds, or undefined when it is not one inside the range. */
+export function nodeMaintenanceValue(text: string): number | undefined {
+  const trimmed = text.trim();
+  if (!/^\d{1,5}$/.test(trimmed)) return undefined;
+  const value = Number(trimmed);
+  return value >= NODE_MAINTENANCE_LIMIT.min && value <= NODE_MAINTENANCE_LIMIT.max ? value : undefined;
+}
+/** The cap on the maintenance a node may announce, with the value in force; raising it asks first because a node can stay silent longer. */
+function NodeMaintenanceLimit({ t, state, apply, busy }: { t: (key: string) => string; state: SecurityOptionsState; apply: (change: Partial<SecurityOptions>, raising: boolean, confirmText?: string) => Promise<boolean>; busy: boolean }) {
+  const current = Number(state.settings["nodes.maintenance_max_s"]);
+  const [typed, setTyped] = useState<string | undefined>(undefined);
+  const [invalid, setInvalid] = useState(false);
+  const shown = typed ?? String(current);
+  const value = nodeMaintenanceValue(shown);
+  const save = async (event: FormEvent) => {
+    event.preventDefault();
+    if (value === undefined) { setInvalid(true); return; }
+    setInvalid(false);
+    if (value === current) return;
+    if (await apply({ "nodes.maintenance_max_s": value } as Partial<SecurityOptions>, value > current, `${t("sec_nmc_confirm")}\n${t("sec_nmc_warn")}`)) setTyped(undefined);
+  };
+  const locked = state.locked.includes("nodes.maintenance_max_s" as never);
+  return <fieldset className="sec-option" data-testid="security-node-maintenance" disabled={busy || locked}>
+    <legend>{t("sec_nmc_title")}</legend>
+    <p className="muted">{t("sec_nmc_help")}</p>
+    <form onSubmit={event => void save(event)}>
+      <label>{t("sec_nmc_label")}
+        <input inputMode="numeric" value={shown} aria-invalid={value === undefined} data-testid="security-node-maintenance-input" onChange={event => { setInvalid(false); setTyped(event.target.value.replace(/\D/g, "")); }} />
+        <span className="muted">{fill(t("sec_rep_range"), { min: NODE_MAINTENANCE_LIMIT.min, max: NODE_MAINTENANCE_LIMIT.max })}</span>
+      </label>
+      <p className="muted" data-testid="security-node-maintenance-now">{fill(t("sec_nmc_now"), { value: current })}</p>
+      {invalid && <p className="notice bad" role="alert">{t("sec_rep_invalid")}</p>}
+      <button className="primary" disabled={busy}>{t("sec_rep_save")}</button>
+    </form>
+  </fieldset>;
+}
+
 function ServerOptions({ t, origin }: { t: (key: string) => string; origin: string }) {
   const [state, setState] = useState<SecurityOptionsState | null>(null);
   const [message, setMessage] = useState({ text: "", bad: false });
@@ -598,6 +637,7 @@ ${t(`sec_opt_${option.id}_warn`)}`, t))) return;
     {state.settings["network.lan_ca"] === true && <p><a href={`${origin}/api/v1/security/lan-ca`} download="armor-lan-ca.crt" data-testid="security-lanca-download">{t("sec_lanca_download")}</a></p>}
     {typeof state.settings["vision.service_url"] === "string" && <VisionService t={t} state={state} apply={applyLimits} busy={busy} />}
     {state.settings["client.trusted_devices"] === true && typeof state.settings["client.trusted_session_h"] === "number" && <TrustedHours t={t} state={state} apply={applyLimits} busy={busy} />}
+    {typeof state.settings["nodes.maintenance_max_s"] === "number" && <NodeMaintenanceLimit t={t} state={state} apply={applyLimits} busy={busy} />}
     {typeof state.settings["reports.timeout_s"] === "number" && <ReportLimits t={t} state={state} apply={applyLimits} busy={busy} />}
     </div>
     <p className="muted">{t("sec_opt_node_pending")}</p>

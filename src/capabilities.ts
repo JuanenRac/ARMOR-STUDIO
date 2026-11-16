@@ -124,6 +124,8 @@ export type SecurityOptions = {
   "vision.service_token_set": boolean;
   /** What the summary of a day is made from: the days of readings kept, how often a sensor and the house power are logged, and the seconds within which a disarm makes an intrusion a false alarm. */
   "summary.log_days": number;
+  /** The most seconds a node may hold back its own offline alerts by announcing maintenance; the server cuts a longer report to this (60 to 86400). */
+  "nodes.maintenance_max_s": number;
   "summary.reading_every_s": number;
   "summary.power_every_s": number;
   "summary.false_alarm_s": number;
