@@ -298,6 +298,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "presence.by_user", id: "presence", values: [false, true], calm: true, optional: true },   // off by default; on lets the server know who is at home, so it asks first
   { key: "ai.spatial", id: "aispatial", values: [false, true], calm: true, optional: true },   // off by default; on lets the observation service place the radar tracks in the picture from the site design, so it asks first
   { key: "ai.learn", id: "ailearn", values: [false, true], optional: true },   // off by default; on lets the observation service study the pictures of the cameras while the system is disarmed, so it asks first
+  { key: "alarm.duress_hide_trail", id: "duresstrail", values: [true, false], calm: true, optional: true },   // off by default; hardening for the person who is forced, so only turning it off from on asks first
   { key: "client.panic_gesture", id: "panicgesture", values: [false, true], calm: true, optional: true },   // off by default; on lets anybody holding a signed-in phone raise the silent alarm, so it asks first
   { key: "voice.panic_phrase", id: "panic", values: [true, false], calm: true, optional: true },   // off by default; turning it off lowers the safety, so it asks first
   { key: "admin.field_http", id: "fieldhttp", values: [false, true], optional: true },   // off by default; turning it on lets Studio ask the admin agent to open the server's port to the field network, so it asks first
