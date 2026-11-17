@@ -210,7 +210,7 @@ flowchart LR
 | 对节点的危险指令 | 仅限管理员；需再次输入节点名称（全部节点则输入 RESTART、PAUSE、STANDBY）并再次输入密码；没有擦除、恢复出厂或关机指令 |
 | 角色 | 管理员、操作员、查看者（只看）和壁挂面板（其账户不能使用 Studio）；会话的 `capabilities` 决定显示内容，服务器会再次校验 |
 
-**只有天气菜单会访问其他服务。** 字体来自本地，其余部分不向第三方请求任何内容。天气菜单仅在账户保存了地点时才会加载 Open-Meteo（预报、地理编码、空气质量）、RainViewer（雷达）、EUMETSAT（云图）和 ArcGIS（地图瓦片）。静态主机发送限于所配置服务器和这些服务的 `Content-Security-Policy: default-src 'self'`、`frame-ancestors 'none'`、`nosniff` 和 `no-referrer`。
+**只有天气菜单会访问其他服务。** 字体来自本地，其余部分不向第三方请求任何内容。天气菜单仅在账户保存了地点时才会加载 Open-Meteo（预报、地理编码、空气质量）、RainViewer（雷达）、EUMETSAT（云图）和 ArcGIS（地图瓦片）。地点搜索会在点击“搜索”时把输入的文字发送给 Open-Meteo，即使尚未保存地点。静态主机发送限于所配置服务器和这些服务的 `Content-Security-Policy: default-src 'self'`、`frame-ancestors 'none'`、`nosniff` 和 `no-referrer`。
 
 **开关。** *配置 > 安全* 为 ARMOR-SERVER 允许管理员调整的 17 项保护各提供一个控件（撤防 PIN、语音静音、报警设计签名、区域推送、摄像头隧道、网络登录、来自新国家的登录提醒、搁置过旧的电气读数、壁挂面板实时事件、设备锁、节点存储加密和音频限制），默认值都很保守；调低任何一项服务器都会写入审计。详见 [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md)。没有独立的安全审查。
 
