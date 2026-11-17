@@ -82,6 +82,19 @@ describe("the security screen", () => {
     expect(text("en", "sec_opt_node_pending")).not.toContain("will act on them");
   });
 
+  it("offers the options that close node panels over http, administering from outside, unsigned alarm states, older firmware and cameras outside the house, in every language", () => {
+    const ids = ["proxyhttp", "remotegate", "alarmsignnode", "fwdowngrade", "camhosts"].flatMap(id => [`sec_opt_${id}`, `sec_opt_${id}_help`, `sec_opt_${id}_warn`]);
+    for (const id of ids) {
+      const english = text("en", id);
+      for (const locale of locales) {
+        const words = text(locale, id);
+        expect(words.trim().length, `${locale} ${id}`).toBeGreaterThan(8);
+        expect(words, `${locale} ${id} is not the key`).not.toBe(id);
+        if (locale !== "en") expect(words, `${locale} ${id} is not the English text`).not.toBe(english);
+      }
+    }
+  });
+
   it("offers the activity events of the vision service in every language, translated and not repeated", () => {
     for (const suffix of ["", "_help", "_warn"]) {
       const words = new Set<string>();
