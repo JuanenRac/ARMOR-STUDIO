@@ -9,6 +9,8 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { ddnsRemove, ddnsSetup, ddnsUpdate, listNodePanels, remoteTls, nodePanelFingerprint, nodePanelUrl, remoteSetupState, removeNodePanel, saveNodePanel, vpnAddPeer, vpnRemovePeer,
   vpnSetup, vpnShowPeer, type DdnsInput, type NodePanel, type RemoteSetupState, type RemoteTls, type VpnPeerConfig } from "./api";
 import { askConfirm } from "./askConfirm";
+import { askTotp } from "./askTotp";
+import { withTotp } from "./api/withTotp";
 import { errorText } from "./apiErrorText";
 
 type T = (key: string) => string;
@@ -56,11 +58,11 @@ function Vpn({ t, origin, state, reload }: Props & { state: RemoteSetupState; re
   };
   const add = (event: FormEvent) => {
     event.preventDefault();
-    void run(async () => { setView(await vpnAddPeer(origin, name.trim(), full)); setName(""); setFull(false); });
+    void run(async () => { setView(await withTotp(headers => vpnAddPeer(origin, name.trim(), full, headers), wrong => askTotp(t, wrong))); setName(""); setFull(false); });
   };
   const remove = async (peer: string) => {
     if (!(await askConfirm(t("rem_vpn_remove_confirm"), t))) return;
-    void run(async () => { await vpnRemovePeer(origin, peer); setView(current => (current?.name === peer ? null : current)); });
+    void run(async () => { await withTotp(headers => vpnRemovePeer(origin, peer, headers), wrong => askTotp(t, wrong)); setView(current => (current?.name === peer ? null : current)); });
   };
 
   return <article className="stack-card sec-card" data-testid="remote-vpn">
@@ -114,7 +116,7 @@ function Ddns({ t, origin, state, reload }: Props & { state: RemoteSetupState; r
     {!dyn.script ? <p className="muted">{t("rem_unavailable")}</p> : dyn.configured ? <>
       <p className="notice">{fill(t("rem_ddns_state"), dyn.name || "-", dyn.provider ?? "", dyn.last_address || "-")}</p>
       <p>
-        <button type="button" disabled={busy} onClick={() => void run(async () => { await ddnsUpdate(origin); })}>{t("rem_ddns_update")}</button>{" "}
+        <button type="button" disabled={busy} onClick={() => void run(async () => { await withTotp(headers => ddnsUpdate(origin, headers), wrong => askTotp(t, wrong)); })}>{t("rem_ddns_update")}</button>{" "}
         <button type="button" className="danger" disabled={busy} onClick={() => void run(async () => { await ddnsRemove(origin); })}>{t("rem_ddns_stop")}</button>
       </p>
     </> : <form onSubmit={save}>

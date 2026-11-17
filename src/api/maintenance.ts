@@ -11,7 +11,7 @@ export type MaintJob = { id: string; kind: string; label: string; state: "runnin
 export const maintenanceStatus = (origin: string) => userCall<{ available: boolean; console?: boolean; reason?: string; hint?: string }>(origin, "GET", "/api/v1/admin/maintenance/status");
 export const readUpdates = (origin: string, force = false) => userCall<MaintOverview>(origin, "GET", `/api/v1/admin/updates${force ? "?force=1" : ""}`);
 export const startUpdates = (origin: string, components: string[], force = false) => userCall<MaintJob>(origin, "POST", "/api/v1/admin/updates", { components, force });
-export const rollbackUpdate = (origin: string, component: string) => userCall<MaintJob>(origin, "POST", `/api/v1/admin/updates/${encodeURIComponent(component)}/rollback`);
+export const rollbackUpdate = (origin: string, component: string, headers?: Record<string, string>) => userCall<MaintJob>(origin, "POST", `/api/v1/admin/updates/${encodeURIComponent(component)}/rollback`, undefined, false, headers);
 export type AutoUpdatesSettings = { enabled: boolean; reboot: "never" | "disarmed"; window_start: string; window_end: string };
 export type AutoUpdatesChange = Partial<AutoUpdatesSettings>;
 export type AutoUpdates = { settings: AutoUpdatesSettings; package: boolean; applied: Array<{ at: string; packages: string[]; state: "started" | "installed" | "failed" }>; reboot_required: boolean; reboot_note: string; last_reboot: number;
