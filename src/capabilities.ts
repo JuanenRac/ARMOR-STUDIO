@@ -45,6 +45,8 @@ export type SecurityOptions = {
   "vacation.mode": boolean;
   /** The critical commands are published with a nonce and a signature (off by default). */
   "commands.require_sig": boolean;
+  /** The orders to the nodes themselves, the battery orders and the policy of the alarm panels are published with a nonce and a signature (off by default). */
+  "commands.sign_node_orders": boolean;
   /** The shared ingest token is no longer accepted from the nodes: each one holds its own (off by default). */
   "nodes.ingest_strict": boolean;
   /** The server may order a gateway node to write to a Pylontech battery (off by default). */
