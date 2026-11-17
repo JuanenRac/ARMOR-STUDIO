@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Configuration > Security has the switch for signing the orders to the nodes, in the 8 languages:** `commands.sign_node_orders` (off by default; only turning it off from on asks first) makes the server sign the orders to the nodes themselves, the battery orders and the alarm policy with the key of each node.
+
 - The search of a place in the Weather menu now says, under the box and in eight languages, that the typed text is sent to Open-Meteo and that nothing is sent until Search is pressed.
 
 - A change that the maintenance agent guards with the code of the authenticator (adding, showing or removing a VPN peer, refreshing the dynamic DNS name, putting a previous version back) now asks for the six-digit code in a dialog and sends it on, in eight languages; an installation with no authenticator is not asked.
