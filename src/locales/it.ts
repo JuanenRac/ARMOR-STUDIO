@@ -2959,6 +2959,7 @@ const catalogue: Record<string, string> = {
 "svcAtBoot": "Parte all'avvio",
 "svcNotAtBoot": "Non all'avvio",
 "svcPort": "Porta",
+"wxSearchNote": "La ricerca invia il testo digitato a Open-Meteo per trovare il luogo; non viene inviato nulla finché non premi Cerca. Con le coordinate non viene inviato nulla finché non salvi il luogo.",
 "weather": "Meteo",
 "weatherTitle": "METEO",
 "weatherHelp": "Il meteo dove si trova l'impianto: adesso, le prossime ore e giorni, la pioggia della prossima ora, l'aria e il polline, e un radar dal vivo di pioggia e nuvole.",

@@ -2942,6 +2942,7 @@ const catalogue: Record<string, string> = {
 "svcLastSeen": "Dernier signal",
 "svcAtBoot": "Démarre au boot",
 "svcNotAtBoot": "Pas au boot",
+"wxSearchNote": "La recherche envoie le texte saisi à Open-Meteo pour trouver le lieu ; rien n'est envoyé avant d'appuyer sur Rechercher. Avec des coordonnées, rien n'est envoyé avant d'enregistrer le lieu.",
 "weather": "Météo",
 "weatherTitle": "MÉTÉO",
 "weatherHelp": "La météo là où se trouve l'installation : maintenant, les prochaines heures et jours, la pluie de l'heure à venir, l'air et le pollen, et un radar en direct de la pluie et des nuages.",

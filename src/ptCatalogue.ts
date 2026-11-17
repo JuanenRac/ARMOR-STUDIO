@@ -2152,6 +2152,7 @@ export const PT_CATALOGUE: Record<string, string> = {
  "weatherTitle": "METEOROLOGIA",
  "weatherHelp": "O tempo no local da instalação: agora, nas próximas horas e dias, a chuva da próxima hora, o ar e o pólen, e um radar em direto de chuva e nuvens.",
  "wxConsentTitle": "Ativar a meteorologia",
+ "wxSearchNote": "A pesquisa envia o texto que escreve ao Open-Meteo para encontrar o lugar; nada é enviado até premir Pesquisar. Com coordenadas, nada é enviado até guardar o lugar.",
  "wxConsentBody": "Este menu consulta serviços meteorológicos públicos pela Internet, e só enquanto está aberto: Open-Meteo (previsão, ar e pólen), RainViewer (radar de chuva), EUMETSAT (imagem de satélite das nuvens) e um mapa da Esri. O que recebem são as coordenadas do local que escolher e o seu endereço de Internet, como em qualquer página web. Nada mais da instalação sai.",
  "wxDisable": "Desativar e esquecer o local",
  "wxPlace": "Local",

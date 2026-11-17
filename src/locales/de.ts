@@ -2926,6 +2926,7 @@ const catalogue: Record<string, string> = {
 "svcLastSeen": "Zuletzt gehört",
 "svcAtBoot": "Startet beim Booten",
 "svcNotAtBoot": "Nicht beim Booten",
+"wxSearchNote": "Die Suche sendet den eingegebenen Text an Open-Meteo, um den Ort zu finden; vor dem Klick auf Suchen wird nichts gesendet. Bei Koordinaten wird erst beim Speichern des Ortes etwas gesendet.",
 "weather": "Wetter",
 "weatherTitle": "WETTER",
 "weatherHelp": "Das Wetter am Standort der Anlage: jetzt, die nächsten Stunden und Tage, der Regen der nächsten Stunde, Luft und Pollen sowie ein Live-Radar für Regen und Wolken.",

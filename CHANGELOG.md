@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- The search of a place in the Weather menu now says, under the box and in eight languages, that the typed text is sent to Open-Meteo and that nothing is sent until Search is pressed.
+
 - A change that the maintenance agent guards with the code of the authenticator (adding, showing or removing a VPN peer, refreshing the dynamic DNS name, putting a previous version back) now asks for the six-digit code in a dialog and sends it on, in eight languages; an installation with no authenticator is not asked.
 
 - **The copy of the REST types of the shared contract includes the stable identifier of an activity event:** `armor-rest.ts` is the file the shared contract generates, so the optional `event_id` of the activity events is typed.
