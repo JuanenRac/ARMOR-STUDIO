@@ -7,6 +7,8 @@
 import { parseReleaseNotes } from "./releaseNotes";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { askConfirm } from "./askConfirm";
+import { askTotp } from "./askTotp";
+import { withTotp } from "./api/withTotp";
 import {
   ApiError, clearUpdateHistory, type UpgradeMode, maintenanceStatus, readMaintJob, readUpdates, rollbackUpdate, startUpdates, systemAction,
   type MaintComponent, type MaintJob, type MaintOverview,
@@ -136,7 +138,7 @@ export function UpdatesPanel({ t, origin, isAdmin }: Props) {
   };
   const rollback = async (item: MaintComponent) => {
     if (running || !(await askConfirm(`${t("mt_confirm_rollback")} ${label(item.id)}`, t))) return;
-    try { begin(await rollbackUpdate(origin, item.id)); setMessage(""); }
+    try { begin(await withTotp(headers => rollbackUpdate(origin, item.id, headers), wrong => askTotp(t, wrong))); setMessage(""); }
     catch (error) { setMessage(explainMaintenance(t, error)); }
   };
   const system = async (action: "check" | "upgrade" | "reboot", mode: UpgradeMode = "upgrade") => {

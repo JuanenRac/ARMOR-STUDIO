@@ -13,11 +13,12 @@ export type RemoteTls = { present: boolean; pin?: string; text?: string; subject
 export const remoteTls = (origin: string, host: string) => userCall<RemoteTls>(origin, "GET", `/api/v1/admin/remote/tls${host ? `?host=${encodeURIComponent(host)}` : ""}`);
 export const remoteSetupState = (origin: string) => userCall<RemoteSetupState>(origin, "GET", "/api/v1/admin/remote");
 export const vpnSetup = (origin: string, input: { endpoint: string; port?: number; lan?: string; route_lan?: string }) => userCall<RemoteSetupState>(origin, "POST", "/api/v1/admin/remote/wireguard/setup", input);
-export const vpnAddPeer = (origin: string, name: string, fullTunnel: boolean) => userCall<VpnPeerConfig>(origin, "POST", "/api/v1/admin/remote/wireguard/peers", { name, full_tunnel: fullTunnel });
-export const vpnShowPeer = (origin: string, name: string) => userCall<VpnPeerConfig>(origin, "GET", `/api/v1/admin/remote/wireguard/peers/${encodeURIComponent(name)}`);
-export const vpnRemovePeer = (origin: string, name: string) => userCall<{ ok: true }>(origin, "DELETE", `/api/v1/admin/remote/wireguard/peers/${encodeURIComponent(name)}`);
+/** The calls the maintenance agent may ask the code of the authenticator for take the header it is sent in (see withTotp). */
+export const vpnAddPeer = (origin: string, name: string, fullTunnel: boolean, headers?: Record<string, string>) => userCall<VpnPeerConfig>(origin, "POST", "/api/v1/admin/remote/wireguard/peers", { name, full_tunnel: fullTunnel }, false, headers);
+export const vpnShowPeer = (origin: string, name: string, headers?: Record<string, string>) => userCall<VpnPeerConfig>(origin, "GET", `/api/v1/admin/remote/wireguard/peers/${encodeURIComponent(name)}`, undefined, false, headers);
+export const vpnRemovePeer = (origin: string, name: string, headers?: Record<string, string>) => userCall<{ ok: true }>(origin, "DELETE", `/api/v1/admin/remote/wireguard/peers/${encodeURIComponent(name)}`, undefined, false, headers);
 export const ddnsSetup = (origin: string, input: DdnsInput) => userCall<RemoteSetupState>(origin, "POST", "/api/v1/admin/remote/ddns/setup", input);
-export const ddnsUpdate = (origin: string) => userCall<RemoteSetupState>(origin, "POST", "/api/v1/admin/remote/ddns/update", {});
+export const ddnsUpdate = (origin: string, headers?: Record<string, string>) => userCall<RemoteSetupState>(origin, "POST", "/api/v1/admin/remote/ddns/update", {}, false, headers);
 export const ddnsRemove = (origin: string) => userCall<RemoteSetupState>(origin, "POST", "/api/v1/admin/remote/ddns/remove", {});
 export const listNodePanels = (origin: string) => userCall<{ panels: NodePanel[] }>(origin, "GET", "/api/v1/admin/node-panels");
 export const saveNodePanel = (origin: string, panel: { id: string; address: string; scheme: "http" | "https"; port?: number; label?: string }) => userCall<NodePanel>(origin, "PUT", `/api/v1/admin/node-panels/${encodeURIComponent(panel.id)}`, panel);
