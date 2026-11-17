@@ -1147,7 +1147,7 @@ const catalogue: Record<string, string> = {
 "sec_opt_fwdowngrade": "拒绝较旧的固件版本",
 "sec_opt_fwdowngrade_help": "来自 GitHub 的固件任务不会给节点安装比其当前运行版本更旧的版本，除非任务明确允许；发布的镜像必须是该节点类型的镜像。",
 "sec_opt_fwdowngrade_warn": "关闭后，回退到旧的、签名有效的固件的发布版本将被安装到节点上。",
-"sec_opt_camhosts": "任意地址的摄像头",
+"sec_opt_camhosts": "允许连接任意地址的摄像头",
 "sec_opt_camhosts_help": "关闭后，摄像头必须位于住宅内的地址（10.x、172.16-31.x、192.168.x），服务器只连接这些地址。开启（与以往一样）时，操作员可以把摄像头指向任何地址。",
 "sec_opt_camhosts_warn": "服务器会使用保存的摄像头登录信息连接操作员输入的任何地址，包括本机、周围的网络或互联网。",
 "sec_opt_country": "从新国家登录时发出提醒",
