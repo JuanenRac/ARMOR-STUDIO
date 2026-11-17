@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The copy of the REST types of the shared contract includes the stable identifier of an activity event:** `armor-rest.ts` is the file the shared contract generates, so the optional `event_id` of the activity events is typed.
+
 - **Five switches of the server are in Configuration > Security, in the eight languages:** node panels over plain http (`panel.proxy_http`), administering from outside closed by route (`remote.gate_by_route`), signing only the alarm states the panel itself said (`server.alarm_state_signature_node_only`), refusing older firmware versions (`admin.firmware_refuse_downgrade`) and cameras at any address (`cameras.allow_public_hosts`). Each shows its explanation and, when it is on the less safe side, its warning; a server that does not have an option does not show it.
 - **A switch for the disarm under duress is in Configuration > Security:** "Disarm under duress leaves no trace" (`alarm.duress_hide_trail`, off by default, in the eight languages) makes the server write a disarm with the duress PIN exactly like a normal disarm and show the alarm only to the wall panels and the other sessions; the help says what stays visible and the warning that a wall panel shows the alarm to whoever stands in front of it. Turning it off again asks first.
 - **The copy of the server contract knows six more security options and the record of duress:** `panel.proxy_http`, `remote.gate_by_route`, `admin.firmware_refuse_downgrade`, `server.alarm_state_signature_node_only`, `cameras.allow_public_hosts` and `alarm.duress_hide_trail`, and `GET /api/v1/alarm/duress-log`, copied from the generated REST types of ARMOR-COMMON.
