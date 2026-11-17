@@ -3019,6 +3019,7 @@ const catalogue: Record<string, string> = {
 "svcAtBoot": "Starts at boot",
 "svcNotAtBoot": "Not at boot",
 "svcPort": "Port",
+"wxSearchNote": "The search sends the text you type to Open-Meteo to find the place; nothing is sent until you press Search. With coordinates nothing is sent until you save the place.",
 "weather": "Weather",
 "weatherTitle": "WEATHER",
 "weatherHelp": "The weather where the installation is: now, the next hours and days, the rain of the next hour, the air and the pollen, and a live radar of rain and clouds.",

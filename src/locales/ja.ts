@@ -3001,6 +3001,7 @@ const catalogue: Record<string, string> = {
 "svcAtBoot": "起動時に開始",
 "svcNotAtBoot": "起動時は開始しない",
 "svcPort": "ポート",
+"wxSearchNote": "検索では、入力した文字を場所の特定のために Open-Meteo へ送信します。検索を押すまで何も送信されません。座標で指定した場合は、場所を保存するまで何も送信されません。",
 "weather": "天気",
 "weatherTitle": "天気",
 "weatherHelp": "設置場所の天気：現在、これからの数時間と数日、次の1時間の雨、空気と花粉、そして雨と雲のライブレーダー。",

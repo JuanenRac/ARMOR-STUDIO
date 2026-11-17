@@ -3004,6 +3004,7 @@ const catalogue: Record<string, string> = {
 "svcAtBoot": "开机启动",
 "svcNotAtBoot": "不开机启动",
 "svcPort": "端口",
+"wxSearchNote": "搜索会把您输入的文字发送给 Open-Meteo 以查找地点；点击“搜索”之前不会发送任何内容。使用坐标时，保存地点之前不会发送任何内容。",
 "weather": "天气",
 "weatherTitle": "天气",
 "weatherHelp": "安装地点的天气：现在、未来数小时和数天、下一小时的降雨、空气与花粉，以及雨和云的实时雷达。",

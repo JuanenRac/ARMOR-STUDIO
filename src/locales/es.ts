@@ -2972,6 +2972,7 @@ const catalogue: Record<string, string> = {
 "svcAtBoot": "Arranca con el equipo",
 "svcNotAtBoot": "No arranca con el equipo",
 "svcPort": "Puerto",
+"wxSearchNote": "La búsqueda envía el texto que escribes a Open-Meteo para encontrar el lugar; no se envía nada hasta que pulses Buscar. Con coordenadas no se envía nada hasta guardar el lugar.",
 "weather": "Meteorología",
 "weatherTitle": "METEOROLOGÍA",
 "weatherHelp": "El tiempo donde está la instalación: ahora, las próximas horas y días, la lluvia de la próxima hora, el aire y el polen, y un radar en directo de lluvia y nubes.",

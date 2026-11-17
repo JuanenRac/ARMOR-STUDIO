@@ -225,6 +225,7 @@ function PlaceSearch({ t, query, setQuery, search, searching, results, onPick }:
       <button className="primary" type="submit" disabled={searching || query.trim().length < 2}>{t("wxSearch")}</button>
     </form>
     {results !== null && results.length === 0 && <p className="wx-note">{t("wxNoResults")}</p>}
+    <small className="muted" data-testid="wx-search-note">{t("wxSearchNote")}</small>
     <CoordinateEntry t={t} onPick={onPick} />
     {results && results.length > 0 && <ul className="wx-results">{results.map(place => <li key={`${place.latitude},${place.longitude}`}><button onClick={() => onPick(place)}><b>{place.name}</b> <small>{[place.region, place.country].filter(Boolean).join(", ")} · {place.latitude.toFixed(2)}, {place.longitude.toFixed(2)}</small></button></li>)}</ul>}
   </div>;
