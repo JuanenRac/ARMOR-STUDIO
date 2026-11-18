@@ -67,6 +67,30 @@ describe("the icon buttons of a field node", () => {
     expect(editAddress).toHaveBeenCalledTimes(2);
   });
 
+  it("opens the panel through the server with a ticket, in a tab opened inside the click, and says why when the server refuses", async () => {
+    const tab = { opener: {} as unknown, location: { href: "" }, close: vi.fn() };
+    const open = vi.spyOn(window, "open").mockReturnValue(tab as unknown as Window);
+    const answers = [new Response(JSON.stringify({ url: "http://srv:8081/enter/abc", origin: "http://srv:8081", expires_in_s: 30 }), { status: 201, headers: { "Content-Type": "application/json" } }),
+      new Response(JSON.stringify({ error: "could not", code: "panel_origin_unavailable" }), { status: 503, headers: { "Content-Type": "application/json" } })];
+    const calls: Array<{ url: string; method: string }> = [];
+    vi.stubGlobal("fetch", vi.fn(async (url: string, init: RequestInit = {}) => { calls.push({ url, method: init.method ?? "GET" }); return answers.shift()!; }));
+    try {
+      const view = await draw({});
+      const link = view.querySelector(`a[aria-label="${t("rn_configure")}"]`) as HTMLElement;
+      expect(link.getAttribute("href")).toBe("http://srv:8080/api/v1/nodes/r1/panel/");
+      await act(async () => { link.click(); });
+      expect(calls).toEqual([{ url: "http://srv:8080/api/v1/admin/node-panels/r1/ticket", method: "POST" }]);
+      expect(open).toHaveBeenCalledWith("about:blank", "_blank");
+      expect(tab.location.href).toBe("http://srv:8081/enter/abc");
+      expect(tab.opener).toBeNull();
+      expect(view.querySelector(".nt-refused")).toBeNull();
+      // the server cannot open the second origin: the tab is closed and the person is told
+      await act(async () => { link.click(); });
+      expect(tab.close).toHaveBeenCalledTimes(1);
+      expect(view.querySelector(".nt-refused")?.textContent?.length).toBeGreaterThan(0);
+    } finally { vi.unstubAllGlobals(); open.mockRestore(); }
+  });
+
   it("lets an administrator forget a node that still answers", async () => {
     const forget = vi.fn();
     const view = await draw({ silent: false, forget });

@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Configuration > Security has the switch that gives the panels of the nodes an origin of their own, in the 8 languages:** `panel.separate_origin` (off by default; only turning it off from on asks first) serves the panel of a node from a second address instead of the address of the API. The buttons that open a node panel (the list of nodes and Remote access) ask the server for a ticket of one use and open the address it gives in a new tab; with the switch off they open the panel through the API as before.
+
 - **Configuration > Security has the switch for signing the orders to the nodes, in the 8 languages:** `commands.sign_node_orders` (off by default; only turning it off from on asks first) makes the server sign the orders to the nodes themselves, the battery orders and the alarm policy with the key of each node.
 
 - The search of a place in the Weather menu now says, under the box and in eight languages, that the typed text is sent to Open-Meteo and that nothing is sent until Search is pressed.
