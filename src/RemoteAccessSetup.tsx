@@ -6,7 +6,7 @@
  */
 import { PasswordInput } from "./components/PasswordInput";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { ddnsRemove, ddnsSetup, ddnsUpdate, listNodePanels, remoteTls, nodePanelFingerprint, nodePanelUrl, remoteSetupState, removeNodePanel, saveNodePanel, vpnAddPeer, vpnRemovePeer,
+import { ddnsRemove, ddnsSetup, ddnsUpdate, listNodePanels, remoteTls, nodePanelFingerprint, nodePanelUrl, openNodePanel, remoteSetupState, removeNodePanel, saveNodePanel, vpnAddPeer, vpnRemovePeer,
   vpnSetup, vpnShowPeer, type DdnsInput, type NodePanel, type RemoteSetupState, type RemoteTls, type VpnPeerConfig } from "./api";
 import { askConfirm } from "./askConfirm";
 import { askTotp } from "./askTotp";
@@ -177,7 +177,7 @@ function NodePanels({ t, origin }: Props) {
       {panels.map(panel => <li key={panel.id}>
         <b>{panel.id}</b> <span className="muted">{panel.scheme}://{panel.address}{panel.port === (panel.scheme === "https" ? 443 : 80) ? "" : `:${panel.port}`}</span>{" "}
         {panel.scheme === "https" && <span className={panel.fingerprint ? "badge ok" : "badge warn"}>{panel.fingerprint ? t("rem_np_pinned") : t("rem_np_unpinned")}</span>}{" "}
-        {(panel.scheme === "http" || panel.fingerprint) && <a className="button" href={nodePanelUrl(origin, panel.id)} target="_blank" rel="noopener noreferrer">{t("rem_np_open")}</a>}{" "}
+        {(panel.scheme === "http" || panel.fingerprint) && <a className="button" href={nodePanelUrl(origin, panel.id)} target="_blank" rel="noopener noreferrer" onClick={event => { event.preventDefault(); void run(async () => { await openNodePanel(origin, panel.id); }); }}>{t("rem_np_open")}</a>}{" "}
         {panel.scheme === "https" && <button type="button" disabled={busy} onClick={() => void run(async () => { const reply = await nodePanelFingerprint(origin, panel.id, false); setSeen(current => ({ ...current, [panel.id]: { fingerprint: reply.fingerprint, changed: reply.changed } })); })}>{t("rem_np_trust")}</button>}{" "}
         <button type="button" className="danger" disabled={busy} onClick={() => void (async () => { if (await askConfirm(t("rem_np_remove_confirm"), t)) await run(async () => { await removeNodePanel(origin, panel.id); }); })()}>{t("rem_vpn_remove")}</button>
         {seen[panel.id] && <div className="notice">

@@ -1,4 +1,5 @@
-import { userCall } from "./transport";
+import type { NodePanelTicket } from "./contract/armor-rest";
+import { ApiError, userCall } from "./transport";
 // ---- the way in from outside the house: the VPN, the dynamic DNS name and the panels of the nodes through the server -------------------------------------
 export type VpnPeer = { name: string; address: string; full_tunnel: "yes" | "no" };
 export type RemoteSetupState = {
@@ -25,3 +26,24 @@ export const saveNodePanel = (origin: string, panel: { id: string; address: stri
 export const removeNodePanel = (origin: string, id: string) => userCall<void>(origin, "DELETE", `/api/v1/admin/node-panels/${encodeURIComponent(id)}`);
 export const nodePanelFingerprint = (origin: string, id: string, trust: boolean) => userCall<{ fingerprint: string; trusted: boolean; previous: string | null; changed: boolean }>(origin, "POST", `/api/v1/admin/node-panels/${encodeURIComponent(id)}/fingerprint`, { trust });
 export const nodePanelUrl = (origin: string, id: string) => `${origin.replace(/\/$/, "")}/api/v1/nodes/${encodeURIComponent(id)}/panel/`;
+/** A ticket of one use for the panel of a node, when the server serves the panels from an origin of their own (panel.separate_origin). */
+export const nodePanelTicket = (origin: string, id: string) => userCall<NodePanelTicket>(origin, "POST", `/api/v1/admin/node-panels/${encodeURIComponent(id)}/ticket`, {});
+/** Where to open the panel of a node: the address a ticket gives while the server keeps the panels on their own origin, and the address through the API when it does not (it answers 409 panel_origin_off). */
+export async function nodePanelAddress(origin: string, id: string): Promise<string> {
+  try { return (await nodePanelTicket(origin, id)).url; }
+  catch (error) {
+    if (error instanceof ApiError && error.code === "panel_origin_off") return nodePanelUrl(origin, id);
+    throw error;
+  }
+}
+/**
+ * Opens the panel of a node in a new tab. The tab is opened at once, inside the click, so that a blocker lets it be, and sent to the address when the server has given it; if the server
+ * refuses, the tab is closed and the refusal is thrown for the caller to say. The tab does not keep a link to this page.
+ */
+export async function openNodePanel(origin: string, id: string, win: Pick<Window, "open"> = window): Promise<void> {
+  const tab = win.open("about:blank", "_blank");
+  try {
+    const address = await nodePanelAddress(origin, id);
+    if (tab) { tab.opener = null; tab.location.href = address; } else win.open(address, "_blank", "noopener,noreferrer");
+  } catch (error) { tab?.close(); throw error; }
+}

@@ -47,6 +47,8 @@ export type SecurityOptions = {
   "commands.require_sig": boolean;
   /** The orders to the nodes themselves, the battery orders and the policy of the alarm panels are published with a nonce and a signature (off by default). */
   "commands.sign_node_orders": boolean;
+  /** The panels of the nodes are served from a second origin and entered with a ticket of one use, so their scripts run without the session of the administrator (off by default). */
+  "panel.separate_origin": boolean;
   /** The shared ingest token is no longer accepted from the nodes: each one holds its own (off by default). */
   "nodes.ingest_strict": boolean;
   /** The server may order a gateway node to write to a Pylontech battery (off by default). */

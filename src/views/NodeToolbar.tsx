@@ -4,9 +4,10 @@
  * and forget it.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { ControlOperationName, NodeHealthItem } from "../api";
-import { nodePanelUrl } from "../api";
+import { nodePanelUrl, openNodePanel } from "../api";
+import { errorText } from "../apiErrorText";
 import type { Translate } from "../components/camera";
 import { actionsFor, type NodeAction } from "../nodeControlModel";
 import { panelUrl } from "../panelUrl";
@@ -51,21 +52,26 @@ export type ToolbarProps = {
 };
 
 function IconButton({ label, icon, onClick, href, tone = "", pressed }: { label: string; icon: ReactNode; onClick?: () => void; href?: string; tone?: string; pressed?: boolean }) {
-  if (href) return <a className={`nt-btn ${tone}`} href={href} target="_blank" rel="noopener noreferrer" title={label} aria-label={label}>{icon}</a>;
+  // a link that also has an action keeps its address (for the middle button and for a reader of the screen) and does the action on the plain click
+  if (href) return <a className={`nt-btn ${tone}`} href={href} target="_blank" rel="noopener noreferrer" title={label} aria-label={label} onClick={onClick ? event => { event.preventDefault(); onClick(); } : undefined}>{icon}</a>;
   return <button type="button" className={`nt-btn ${tone}`} title={label} aria-label={label} aria-pressed={pressed} onClick={onClick}>{icon}</button>;
 }
 
 export function NodeToolbar({ t, origin, id, panel = null, silent, registered, editAddress, settings, health = null, isAdmin, detailsOpen, toggleDetails, control, forget }: ToolbarProps) {
   const orders = health && !health.stale ? actionsFor(health).filter(action => QUICK.includes(action.operation)) : [];
+  const [refused, setRefused] = useState("");
+  // the panel through the server: with the panels on an origin of their own the server gives a ticket and the tab goes to the address it gives
+  const openThroughServer = () => { setRefused(""); void openNodePanel(origin, id).catch((error: unknown) => setRefused(errorText(t, error, "sec_err_"))); };
   return <div className="nt-bar" role="group" aria-label={id}>
     {panel && <IconButton label={t("rn_open_direct")} icon={NODE_ICONS.open} href={panelUrl(panel)} />}
     {isAdmin && (registered
-      ? <IconButton label={t("rn_configure")} icon={NODE_ICONS.configure} href={nodePanelUrl(origin, id)} />
+      ? <IconButton label={t("rn_configure")} icon={NODE_ICONS.configure} href={nodePanelUrl(origin, id)} onClick={openThroughServer} />
       : <IconButton label={t("rn_configure_register")} icon={NODE_ICONS.configure} onClick={editAddress} tone="warn" />)}
     {isAdmin && <IconButton label={t("rn_edit_address")} icon={NODE_ICONS.address} onClick={editAddress} />}
     {isAdmin && settings && <IconButton label={t("ns_open")} icon={NODE_ICONS.settings} onClick={settings} />}
     {health && <IconButton label={detailsOpen ? t("nh_hide") : t("nh_details")} icon={NODE_ICONS.details} onClick={toggleDetails} pressed={detailsOpen} />}
     {isAdmin && orders.map(action => <IconButton key={action.operation} label={t(action.label)} icon={NODE_ICONS[action.operation]} onClick={() => control(action)} tone={action.operation === "restart" || action.operation === "standby" ? "warn" : ""} />)}
     {isAdmin && <IconButton label={t("forgetNode")} icon={NODE_ICONS.forget} onClick={forget} tone={silent ? "danger" : "warn"} />}
+    {refused && <span className="nt-refused" role="alert">{refused}</span>}
   </div>;
 }

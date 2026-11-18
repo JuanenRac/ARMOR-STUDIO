@@ -280,6 +280,7 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "live.events", id: "livenotices", values: [true, false], calm: true, optional: true },   // on by default; turning it off only makes the consoles ask more often
   { key: "vacation.mode", id: "vacation", values: [false, true], calm: true, optional: true },   // off by default; on lets lights switch by themselves on a schedule while the house is armed away
   { key: "commands.sign_node_orders", id: "ordersig", values: [true, false], calm: true, optional: true },   // off by default; hardening, so only turning it off from on asks first
+  { key: "panel.separate_origin", id: "panelorigin", values: [true, false], calm: true, optional: true },   // off by default; hardening, so only turning it off from on asks first
   { key: "commands.require_sig", id: "cmdsig", values: [true, false], calm: true, optional: true },   // off by default; hardening, so only turning it off from on asks first
   { key: "admin.backup", id: "backup", values: [false, true], optional: true },   // off by default; on lets an administrator write a copy of the server data anywhere, so it asks first
   { key: "admin.firmware_rollout", id: "fwrollout", values: [false, true], calm: true, optional: true },   // off by default; it only makes an update gentler

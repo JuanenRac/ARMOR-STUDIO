@@ -10,4 +10,5 @@
 .nt-bar .nt-btn:not(#ui):hover, .nt-bar .nt-btn:not(#ui):focus-visible { color: #031318; background: var(--c); border-color: var(--c); transform: none; }
 .nt-bar .nt-btn:not(#ui):focus-visible { outline: 2px solid var(--c); outline-offset: 2px; }
 .nt-bar .nt-btn[aria-pressed="true"]:not(#ui) { color: #031318; background: var(--c); }
+.nt-refused:not(#ui) { color: #ff6f79; font-size: .85rem; align-self: center; }
 .nt-detail { grid-column: 1 / -1; margin-top: .4rem; }
