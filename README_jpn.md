@@ -289,7 +289,7 @@ python -I tools/armor_ci_validate.py
 ## 📂 リポジトリの構成
 
 <p align="center">
-  <img src="images/repository-structure.svg" alt="Repository structure of ARMOR-STUDIO" width="100%">
+  <img src="images/repository-structure.svg" alt="ARMOR-STUDIO のリポジトリ構造" width="100%">
 </p>
 
 <details>

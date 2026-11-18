@@ -289,7 +289,7 @@ O teste do TLS nativo do anfitrião estático precisa de `openssl` instalado. `n
 ## 📂 Estrutura do repositório
 
 <p align="center">
-  <img src="images/repository-structure.svg" alt="Repository structure of ARMOR-STUDIO" width="100%">
+  <img src="images/repository-structure.svg" alt="Estrutura do repositório de ARMOR-STUDIO" width="100%">
 </p>
 
 <details>
