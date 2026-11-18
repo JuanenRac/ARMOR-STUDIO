@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The shared tools of the manifest and the status lights gain an opt-in strict check of the evidence:** `sync_manifests.py` and `status_lights.py` take `--strict-evidence` (off by default; `ARMOR_STRICT_EVIDENCE=1` switches it on for `armor_ci_validate.py`).
+- **The manifest says simulator evidence until the record of a test on real hardware is kept:** it said bench with no record, so the Hardware and Integration lights go down to orange in the eight READMEs (a person raises them again with the record).
+- **The README describes the node panels on an origin of their own:** a bullet in the eight languages about the switch in Configuration > Security, and the test count follows the repository.
 - **Configuration > Security has the switch that gives the panels of the nodes an origin of their own, in the 8 languages:** `panel.separate_origin` (off by default; only turning it off from on asks first) serves the panel of a node from a second address instead of the address of the API. The buttons that open a node panel (the list of nodes and Remote access) ask the server for a ticket of one use and open the address it gives in a new tab; with the switch off they open the panel through the API as before.
 
 - **Configuration > Security has the switch for signing the orders to the nodes, in the 8 languages:** `commands.sign_node_orders` (off by default; only turning it off from on asks first) makes the server sign the orders to the nodes themselves, the battery orders and the alarm policy with the key of each node.

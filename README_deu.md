@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Sprache">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Sprachen">
-  <img src="https://img.shields.io/badge/Tests-1672%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-1866%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.2.5-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Reifegrad">
 </p>
 
 ---
 
-**Ehrlichkeitsprüfung - was heute läuft:** Studio spricht mit [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) und wird von 1672 Unit-Tests abgedeckt (Einstellungen lesen, Kameras zusammenführen, die Arithmetik der Solardiagramme, Geometrie und Prüfungen der Entwurfswerkzeuge, der Alarmansager, das Wörterbuch des Assistenten, jedes Menü in den acht Sprachen, der statische Host) sowie durch Browsertests. Es läuft im täglichen Einsatz am CM5-Testaufbau mit dem echten Server, echten IP-Kameras und einem Radarknoten auf seiner Platine; die Bilder der Hilfe entstehen mit Beispieldaten. **Nicht** bewiesen sind Livevideo und PTZ mit allen möglichen Kameras, die Menüs für Solar, Elektro, Alarmzentralen und Touchpanel mit echten Geräten (es gibt nur den Radarknoten) sowie eine formale Prüfung auf Barrierefreiheit oder Bedienbarkeit. Solange der Server nicht erreichbar ist, zeigt Studio Demodaten und sagt das in der oberen Leiste.
+**Ehrlichkeitsprüfung - was heute läuft:** Studio spricht mit [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) und wird von 1866 Unit-Tests abgedeckt (Einstellungen lesen, Kameras zusammenführen, die Arithmetik der Solardiagramme, Geometrie und Prüfungen der Entwurfswerkzeuge, der Alarmansager, das Wörterbuch des Assistenten, jedes Menü in den acht Sprachen, der statische Host) sowie durch Browsertests. Es läuft im täglichen Einsatz am CM5-Testaufbau mit dem echten Server, echten IP-Kameras und einem Radarknoten auf seiner Platine; die Bilder der Hilfe entstehen mit Beispieldaten. **Nicht** bewiesen sind Livevideo und PTZ mit allen möglichen Kameras, die Menüs für Solar, Elektro, Alarmzentralen und Touchpanel mit echten Geräten (es gibt nur den Radarknoten) sowie eine formale Prüfung auf Barrierefreiheit oder Bedienbarkeit. Solange der Server nicht erreichbar ist, zeigt Studio Demodaten und sagt das in der oberen Leiste.
 
 ---
 
@@ -41,7 +41,7 @@
 | Reifegrad | Etabliert |
 | Rolle | Bedien- und Entwurfskonsole der Familie |
 | Technik | React 19, TypeScript, Vite, Three.js, Leaflet |
-| Tests | 1672 (`npm test`, Vitest) und Browser-Tests (Playwright) |
+| Tests | 1866 (`npm test`, Vitest) und Browser-Tests (Playwright) |
 | Vertrag | Spricht nur mit ARMOR-SERVER (HTTP `/api/v1/*` mit HttpOnly-Sitzung, WebSocket `/api/v1/events`) |
 | Lauscht auf | `127.0.0.1:5178` (`tools/serve.mjs`) |
 | Läuft auf | Ein Browser; die Dateien liefert `tools/serve.mjs` oder das nginx des Containers |
@@ -59,11 +59,11 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Software | 🟢 | Die Konsole läuft täglich gegen den echten Server des CM5-Prüfstands. |
-| Tests | 🟢 | 1672 Unit-Tests bestehen (`npm test`) und die Browser-Tests laufen: Einstellungen, Zusammenführen der Kameras, Solardiagramme, Geometrie und Prüfungen der Designer, Alarm-Ansager, Wörterbuch des Assistenten und jedes Menü in den acht Sprachen. |
+| Tests | 🟢 | 1866 Unit-Tests bestehen (`npm test`) und die Browser-Tests laufen: Einstellungen, Zusammenführen der Kameras, Solardiagramme, Geometrie und Prüfungen der Designer, Alarm-Ansager, Wörterbuch des Assistenten und jedes Menü in den acht Sprachen. |
 | Oberfläche | 🟡 | Live-Video und PTZ sind nicht mit jeder möglichen Kamera belegt, es gab keine formale Prüfung der Barrierefreiheit oder Bedienbarkeit, und die Bilder der Hilfe entstehen mit Beispieldaten. |
-| Hardware | 🟡 | Er wird täglich mit dem echten Server, echten IP-Kameras und einem echten Radar-Knoten genutzt; die Menüs für Solar, Elektrik, Alarmzentrale und Touch-Panel warten auf echte Knoten. |
+| Hardware | 🟠 | Er wird täglich mit dem echten Server, echten IP-Kameras und einem echten Radar-Knoten genutzt; die Menüs für Solar, Elektrik, Alarmzentrale und Touch-Panel warten auf echte Knoten. |
 | Sicherheit | 🟡 | Sitzungen, Rollen und die Ablehnung von Kamera-Zugangsdaten in Adressen sind durch Tests abgedeckt; es gab keine unabhängige Prüfung. |
-| Integration | 🟡 | Solange der Server nicht erreichbar ist, zeigt Studio Demodaten und sagt das in der oberen Leiste. |
+| Integration | 🟠 | Solange der Server nicht erreichbar ist, zeigt Studio Demodaten und sagt das in der oberen Leiste. |
 | Dokumentation | 🟢 | Acht Sprachen, die eingebaute Hilfe und die geführten Rundgänge, die Sicherheitshinweise und das Änderungsprotokoll sind aktuell. |
 
 ## 🎯 Überblick
@@ -98,6 +98,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 * **Entwurfshilfen, standardmäßig aus:** Wer unter Konfiguration > Einstellungen die *Entwurfshilfen* einschaltet, erhält im Alarmplaner drei Vorlagen (Wohnung, Laden und Halle mit Außenschutz, jeweils eine Datendatei, die gegen ein Schema geprüft wird) und im Lageplan eine *Abdeckungs*-Prüfung: die Gebäudeteile, die kein Radar erfasst, die Türen und Fenster, die nichts überwacht, die Stellen, die zwei Radare zugleich beobachten, jeweils mit einer Position für ein Radar, die blinden Flecken im Plan und den Bericht als JSON oder CSV. Sie ist eine flache Hilfe, die nur zählt, was sicher erfasst ist (Wände versperren die Sicht und jedes Radar wird um einen selbst gesetzten Abstand verkleinert), kein Beweis, dass ein Gebäude geschützt ist; siehe [docs/DESIGN_AIDS.md](docs/DESIGN_AIDS.md).
 * **Abdeckungsprüfung nach Stockwerk, nach Höhe und mit Grundrissvorlagen (drei Optionen unter Einstellungen > Entwurfshilfen, standardmäßig aus):** Ein Radar hat ein optionales Stockwerk, die Prüfung kann jedes Stockwerk eines Gebäudes einzeln betrachten und Höhe und Neigung der Radare berücksichtigen, die blinden Felder neben einem Radar lassen sich nur dort einfärben, wo sie niemand sieht (die Zahlen bleiben so vorsichtig wie zuvor), und die Abdeckungskarte fügt ein Gebäude mit eigenem Grundriss und seinen Radaren auf den jeweiligen Stockwerken hinzu. Siehe `docs/DESIGN_AIDS.md`.
 * **Scharfschaltmodi des Systems (Abwesend, Zuhause, Nacht):** Schaltet ein Administrator unter Konfiguration > Sicherheit *Scharfschaltmodi Zuhause und Nacht* ein, öffnet die Schaltfläche zum Scharfschalten einen Dialog, um in einem Modus scharf zu schalten, zwischen ihnen zu wechseln oder unscharf zu schalten; ein Modus ohne Schutzobjekte verlangt eine Bestätigung, und ein Wechsel zu einem Modus mit weniger Schutz verlangt die PIN wie das Unscharfschalten. Der Alarm-Designer erhält einen Reiter *Modi*, um für Zuhause und Nacht ganze Zonen (die Orte der Geräte), Sensoren, Radarknoten und Kameras zu markieren (sie beginnen leer) sowie Ausgangs- und Eingangsverzögerung und einen Zeitplan. Drei weitere Optionen (die PIN für den Wechsel zu einem Modus mit weniger Schutz, der Zeitplan und ob er den Schutz verringern darf) stehen unter Konfiguration > Sicherheit. Standardmäßig aus: bei ausgeschalteter Option schaltet die Konsole genau wie bisher scharf und unscharf.
+* **Knoten-Panels mit eigenem Ursprung:** Schaltet ein Administrator unter Konfiguration > Sicherheit *Knoten-Panels mit eigenem Ursprung* ein (`panel.separate_origin`, standardmäßig aus), verlangen die Schaltflächen, die ein Knoten-Panel öffnen, vom Server ein Einmal-Ticket mit 30 Sekunden Gültigkeit und öffnen das Panel in einem neuen Tab auf dem zweiten Ursprung des Servers; so laufen die Skripte eines Knotens nie mit der Sitzung von Studio. Der Server muss diesen zweiten Port (oder Namen) ebenfalls bereitstellen. Bisher lief es nur in den automatischen Tests, nicht gegen den echten Server, und die Telefon-Apps öffnen das Panel weiterhin über den Server, was bei eingeschalteter Option nicht mehr funktioniert.
 * **Sicherere Anmeldung sowie angenehmere Formulare und Tastatur:** Die Anmeldung prüft die Serveradresse, bevor etwas gesendet wird, warnt vor unverschlüsseltem http außerhalb des lokalen Netzes (oder lehnt es mit einem Schalter in den Einstellungen ab) und sagt, ob das Passwort falsch war, es zu viele Versuche gab, der Server ausfiel oder nicht erreichbar war; jedes Passwortfeld warnt bei aktiver Feststelltaste; neue Passwörter und PINs werden beim Tippen geprüft; es gibt einen Sprunglink zum Inhalt, die Ein-Tasten-Kürzel `?` (Hilfe) und `B` (Menü) mit Schalter, einen Tab-Titel und eine Ansage für Screenreader, die dem offenen Menü folgen, und eine Rückfrage beim Schließen des Tabs mit einer noch nicht beim Server angekommenen Zeichnung. Die Grenzwerte stehen in einer Konfigurationsdatei (`src/ux/ux.config.json`). Acht Sprachen, einschließlich europäischem Portugiesisch.
 * **Programme der Maschine vom Handy aus, in Studio angezeigt:** Konfiguration > Updates hat eine Karte, die sagt, ob die Programme der Maschine vom Handy aus aktualisiert werden können (an oder aus, und warum), wie man es einschaltet (`ARMOR_CM5_UPDATE` auf dem Server und `ARMOR_MAINT_UPDATER` beim Helfer), welche Programme es umfasst, ob eine Signatur verlangt wird und die jüngste Aktivität des Audit-Protokolls. Die Karte zeigt nur an: Die Schalter liegen in der Umgebung des Servers.
 
@@ -245,7 +246,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 gegen einen Server auf 127.0.0.1:18080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # die Tabelle jeder Sprache nach einer Änderung schreiben
-npm test                                                                       # 1672 Tests
+npm test                                                                       # 1866 Tests
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # den Build ausliefern
 ```
