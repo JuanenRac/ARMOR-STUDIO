@@ -289,7 +289,7 @@ La prueba del TLS nativo del host estático necesita `openssl` instalado. `npm r
 ## 📂 Estructura del repositorio
 
 <p align="center">
-  <img src="images/repository-structure.svg" alt="Repository structure of ARMOR-STUDIO" width="100%">
+  <img src="images/repository-structure.svg" alt="Estructura del repositorio de ARMOR-STUDIO" width="100%">
 </p>
 
 <details>

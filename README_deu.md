@@ -289,7 +289,7 @@ Der Test des nativen TLS des statischen Hosts braucht installiertes `openssl`. `
 ## 📂 Struktur des Repositorys
 
 <p align="center">
-  <img src="images/repository-structure.svg" alt="Repository structure of ARMOR-STUDIO" width="100%">
+  <img src="images/repository-structure.svg" alt="Repository-Struktur von ARMOR-STUDIO" width="100%">
 </p>
 
 <details>
