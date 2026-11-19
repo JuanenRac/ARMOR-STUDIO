@@ -62,7 +62,7 @@ Cada linha é uma parte deste repositório e a luz diz até onde chega hoje. É 
 | Testes | 🟢 | Passam 1866 testes unitários (`npm test`) e correm os testes de navegador: definições, fusão das câmaras, gráficos solares, geometria e verificações dos desenhadores, anunciador de alarmes, dicionário do assistente e cada menu nos oito idiomas. |
 | Interface | 🟡 | O vídeo em direto e o PTZ não estão provados com todas as câmaras possíveis, não houve uma revisão formal de acessibilidade ou usabilidade, e as imagens da Ajuda são feitas com dados de exemplo. |
 | Hardware | 🟠 | É usada todos os dias com o servidor real, câmaras IP reais e um nó radar real; os menus solar, elétrico, de painel de alarme e de painel tátil esperam nós reais. |
-| Segurança | 🟡 | As sessões, os papéis e a recusa de credenciais de câmara nos endereços estão cobertos por testes; não houve revisão independente. |
+| Segurança | 🟠 | As sessões, os papéis e a recusa de credenciais de câmara nos endereços estão cobertos por testes; não houve revisão independente. |
 | Integração | 🟠 | Enquanto o servidor não puder ser alcançado, o Studio mostra dados de demonstração e di-lo na barra superior. |
 | Documentação | 🟢 | Oito idiomas, a Ajuda integrada e os percursos guiados, as notas de segurança e o registo de alterações estão atualizados. |
 

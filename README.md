@@ -62,7 +62,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Tests | 🟢 | 1866 unit tests pass (`npm test`) and the browser tests run: settings, camera merging, the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary and every menu in the eight languages. |
 | Interface | 🟡 | Live video and PTZ are not proven against every possible camera, there has been no formal accessibility or usability review, and the pictures of the Help are made with example data. |
 | Hardware | 🟠 | It is used daily with the real server, real IP cameras and a real radar node; the solar, electrical, alarm-panel and touch-panel menus wait for real nodes. |
-| Security | 🟡 | Sessions, roles and the refusal of camera logins in addresses are covered by tests; there has been no independent review. |
+| Security | 🟠 | Sessions, roles and the refusal of camera logins in addresses are covered by tests; there has been no independent review. |
 | Integration | 🟠 | While the server cannot be reached Studio shows demonstration data and says so in the top bar. |
 | Documentation | 🟢 | Eight languages, the in-app Help and guided tours, the security notes and the changelog are up to date. |
 
