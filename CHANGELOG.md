@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The screenshots of the README can be taken on a GitHub runner:** the manual workflow `screenshots.yml` (started by hand only, read-only token, no secrets) builds Studio and the server, takes every screen of `docs/screenshots.json` against made-up data and keeps the pictures as an artifact; `docs/SCREENSHOTS.md` says how to start it and use them.
+
 ## [0.8.2.6] - Security switches for panel origins, signed node orders, duress disarm and maintenance caps in eight languages
 
 - **The structure generator can write a figure read from the code:** `tools/make_structure.py` resolves `{{fact:NAME|LAST}}` in the descriptions of `docs/structure.json` where the documentation tools are next to the repository, and writes LAST (the figure it had when last written) everywhere else, so a repository still builds on its own.
