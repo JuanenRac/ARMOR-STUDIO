@@ -4,24 +4,20 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.2.6] - Security switches for panel origins, signed node orders, duress disarm and maintenance caps in eight languages
+
 - **The structure generator can write a figure read from the code:** `tools/make_structure.py` resolves `{{fact:NAME|LAST}}` in the descriptions of `docs/structure.json` where the documentation tools are next to the repository, and writes LAST (the figure it had when last written) everywhere else, so a repository still builds on its own.
 - **The Security and Updates lights of the Project status table follow the evidence ceiling:** they cannot be above what the Hardware row may show for the evidence of the manifest, and Security is never green; the rows that were higher are now orange in the eight READMEs, and `tools/status_lights.py` is the new shared copy.
-
 - **The file tree of the README is drawn from the structure source:** the text tree in the eight READMEs is generated from `docs/structure.json`, the file that also draws the picture, so the two cannot disagree.
 - **The Architecture picture rounds its coordinates to two decimals:** the legend positions no longer carry floating-point noise such as 399.9999999999999, so `make_architecture.py --check` gives the same answer on every machine; the shared tool is the one of ARMOR-COMMON.
 - **The shared tools of the manifest and the status lights gain an opt-in strict check of the evidence:** `sync_manifests.py` and `status_lights.py` take `--strict-evidence` (off by default; `ARMOR_STRICT_EVIDENCE=1` switches it on for `armor_ci_validate.py`).
 - **The manifest says simulator evidence until the record of a test on real hardware is kept:** it said bench with no record, so the Hardware and Integration lights go down to orange in the eight READMEs (a person raises them again with the record).
 - **The README describes the node panels on an origin of their own:** a bullet in the eight languages about the switch in Configuration > Security, and the test count follows the repository.
 - **Configuration > Security has the switch that gives the panels of the nodes an origin of their own, in the 8 languages:** `panel.separate_origin` (off by default; only turning it off from on asks first) serves the panel of a node from a second address instead of the address of the API. The buttons that open a node panel (the list of nodes and Remote access) ask the server for a ticket of one use and open the address it gives in a new tab; with the switch off they open the panel through the API as before.
-
 - **Configuration > Security has the switch for signing the orders to the nodes, in the 8 languages:** `commands.sign_node_orders` (off by default; only turning it off from on asks first) makes the server sign the orders to the nodes themselves, the battery orders and the alarm policy with the key of each node.
-
 - The search of a place in the Weather menu now says, under the box and in eight languages, that the typed text is sent to Open-Meteo and that nothing is sent until Search is pressed.
-
 - A change that the maintenance agent guards with the code of the authenticator (adding, showing or removing a VPN peer, refreshing the dynamic DNS name, putting a previous version back) now asks for the six-digit code in a dialog and sends it on, in eight languages; an installation with no authenticator is not asked.
-
 - **The copy of the REST types of the shared contract includes the stable identifier of an activity event:** `armor-rest.ts` is the file the shared contract generates, so the optional `event_id` of the activity events is typed.
-
 - **Five switches of the server are in Configuration > Security, in the eight languages:** node panels over plain http (`panel.proxy_http`), administering from outside closed by route (`remote.gate_by_route`), signing only the alarm states the panel itself said (`server.alarm_state_signature_node_only`), refusing older firmware versions (`admin.firmware_refuse_downgrade`) and cameras at any address (`cameras.allow_public_hosts`). Each shows its explanation and, when it is on the less safe side, its warning; a server that does not have an option does not show it.
 - **A switch for the disarm under duress is in Configuration > Security:** "Disarm under duress leaves no trace" (`alarm.duress_hide_trail`, off by default, in the eight languages) makes the server write a disarm with the duress PIN exactly like a normal disarm and show the alarm only to the wall panels and the other sessions; the help says what stays visible and the warning that a wall panel shows the alarm to whoever stands in front of it. Turning it off again asks first.
 - **The copy of the server contract knows six more security options and the record of duress:** `panel.proxy_http`, `remote.gate_by_route`, `admin.firmware_refuse_downgrade`, `server.alarm_state_signature_node_only`, `cameras.allow_public_hosts` and `alarm.duress_hide_trail`, and `GET /api/v1/alarm/duress-log`, copied from the generated REST types of ARMOR-COMMON.
@@ -29,6 +25,7 @@ All notable changes to this project are documented here.
 - **The cap on the maintenance a node may announce is a setting in Configuration > Security:** `nodes.maintenance_max_s` (60 to 86400 seconds, default 600, in the eight languages) with the value in force shown beside the field; a node maintenance report longer than the cap is cut to the cap (default 600 s, configurable in Studio). Raising the cap asks first.
 - **The README says exactly when the Weather menu reaches other services:** searching for a place sends the typed text to the Open-Meteo geocoding before anything is saved, and an account with a saved place loads the forecast and map services; the README and its seven translations now say both.
 - **The strict ingest mode, the writing to batteries and the update of the machine are switches in Configuration > Security:** "Each node needs its own token", "Writing to the batteries" and "Update this machine from Studio" (all off by default and shown only when the server announces them, in the eight languages); turning the first one off, or the other two on, asks first. When some nodes still speak with the shared token, a line under the switches names them so each can be given its own token before the strict mode is turned on.
+
 ## [0.8.2.5] - Wall panel app, backups and rollout cards, local CA, vision review and security switches
 
 - **The copies of the shared contract include the system summary of a solar gateway:** `armor-contracts.ts` and `armor-parsers.ts` are brought up to the shared contract, so the types and readers of the `system` message are there when a screen needs them.
