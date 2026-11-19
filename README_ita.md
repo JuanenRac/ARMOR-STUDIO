@@ -62,7 +62,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Test | 🟢 | Superano 1866 test unitari (`npm test`) e girano i test nel browser: impostazioni, fusione delle telecamere, grafici solari, geometria e controlli dei progettisti, annunciatore di allarmi, dizionario dell'assistente e ogni menu nelle otto lingue. |
 | Interfaccia | 🟡 | Il video dal vivo e il PTZ non sono provati con ogni telecamera possibile, non c'è stata una revisione formale di accessibilità o usabilità e le immagini della Guida sono fatte con dati di esempio. |
 | Hardware | 🟠 | È usato ogni giorno con il server reale, telecamere IP reali e un nodo radar reale; i menu solare, elettrico, della centralina d'allarme e del pannello touch attendono nodi reali. |
-| Sicurezza | 🟡 | Sessioni, ruoli e rifiuto delle credenziali delle telecamere negli indirizzi sono coperti da test; non c'è stata una revisione indipendente. |
+| Sicurezza | 🟠 | Sessioni, ruoli e rifiuto delle credenziali delle telecamere negli indirizzi sono coperti da test; non c'è stata una revisione indipendente. |
 | Integrazione | 🟠 | Finché il server non è raggiungibile, Studio mostra dati dimostrativi e lo dice nella barra superiore. |
 | Documentazione | 🟢 | Otto lingue, la Guida integrata e i percorsi guidati, le note di sicurezza e il registro delle modifiche sono aggiornati. |
 

@@ -62,7 +62,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Tests | 🟢 | 1866 tests unitaires réussissent (`npm test`) et les tests de navigateur s'exécutent : réglages, fusion des caméras, graphiques solaires, géométrie et contrôles des concepteurs, annonceur d'alarmes, dictionnaire de l'assistant et chaque menu dans les huit langues. |
 | Interface | 🟡 | La vidéo en direct et le PTZ ne sont pas prouvés avec toutes les caméras possibles, il n'y a pas eu de revue formelle d'accessibilité ou d'utilisabilité, et les images de l'aide sont faites avec des données d'exemple. |
 | Matériel | 🟠 | Il est utilisé chaque jour avec le vrai serveur, de vraies caméras IP et un vrai nœud radar ; les menus solaire, électrique, de centrale d'alarme et de panneau tactile attendent de vrais nœuds. |
-| Sécurité | 🟡 | Les sessions, les rôles et le refus des identifiants de caméra dans les adresses sont couverts par des tests ; il n'y a pas eu de revue indépendante. |
+| Sécurité | 🟠 | Les sessions, les rôles et le refus des identifiants de caméra dans les adresses sont couverts par des tests ; il n'y a pas eu de revue indépendante. |
 | Intégration | 🟠 | Tant que le serveur est injoignable, Studio affiche des données de démonstration et le dit dans la barre du haut. |
 | Documentation | 🟢 | Huit langues, l'aide intégrée et les visites guidées, les notes de sécurité et le journal des modifications sont à jour. |
 
