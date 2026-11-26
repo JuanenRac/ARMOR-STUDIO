@@ -86,3 +86,36 @@ describe("the charts by battery and cell", () => {
     await view.unmount();
   });
 });
+
+describe("the small chart of each cell", () => {
+  const current: BatteryView = {
+    node_id: "solar-1", device: "pack", kind: "battery", received_at: "2026-01-01T12:00:00.000Z", stale: false,
+    reading: { kind: "battery", node_id: "solar-1", device: "pack", timestamp_ms: 0, modules: 1, stack: [{ n: 1, present: true, model: "US2000C", cells_v: [3.3, 3.72] }] },
+  };
+  const at = Date.parse("2026-01-01T12:00:00Z");
+  const answer = { node_id: "solar-1", device: "pack", minutes: 60, module: 1, every_s: 60, retention_days: 30, samples: [{ t: at - 120_000, cell1: 3.29, cell2: 3.4 }, { t: at - 60_000, cell1: 3.3, cell2: 3.7 }] };
+  const open = async () => {
+    fakeServer({ "GET /api/v1/solar/history": answer });
+    const view = await mount(createElement(BatteryCharts, { t, origin: O, stacks: [current], current, now: at, history: [], minutes: 60, setMinutes: () => undefined, levels: SOLAR_THRESHOLDS.levels }));
+    await view.click([...view.host.querySelectorAll("button")].find(button => button.textContent === t("solx_scope_cells")) ?? null);
+    await view.settle();
+    return view;
+  };
+  afterEach(() => { window.localStorage.clear(); });
+
+  it("is not drawn until asked for, then draws one per cell, blinks the faulty one and is remembered", async () => {
+    const view = await open();
+    expect(view.host.querySelector("[data-testid=cell-multiples]")).toBeNull();
+    await view.click(view.host.querySelector("input[type='checkbox']"));
+    await view.settle();
+    const charts = [...view.host.querySelectorAll(".sl-multiple")];
+    expect(charts.length).toBe(2);
+    expect(charts[0].classList.contains("sl-blink-fault")).toBe(false);
+    expect(charts[1].classList.contains("sl-blink-fault")).toBe(true);
+    expect(charts[1].textContent).toContain(t("solx_fault_cell_over"));
+    await view.unmount();
+    const again = await open();
+    expect(again.host.querySelectorAll(".sl-multiple").length).toBe(2);
+    await again.unmount();
+  });
+});

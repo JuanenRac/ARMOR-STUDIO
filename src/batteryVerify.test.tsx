@@ -75,6 +75,27 @@ describe("verify a figure of a battery", () => {
     await view.unmount();
   });
 
+  it("offers no write when the new reading of the battery says the counter is already zero", async () => {
+    const calls = fakeServer({
+      "GET /api/v1/solar/battery-ops/catalog": { enabled: true, catalog },
+      "POST /api/v1/solar/battery-ops": { ...armed, snapshot_before: "## stat\nBat OV Times : 0\n" },
+    });
+    const view = await mount(createElement(BatteryVerify, props(counter)));
+    await view.settle();
+    const serial = view.host.querySelectorAll("input")[1];
+    const { act } = await import("react");
+    await act(async () => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(serial, "HPTCR03261B14030");
+      serial.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await view.click(byText(view.host, t("solx_read_battery")));
+    expect(view.host.textContent).toContain(t("solx_fresh_gone").replace("{0}", "0"));
+    expect(view.host.querySelector("input[type='checkbox']")).toBeNull();
+    expect((byText(view.host, t("solx_clear_button")) as HTMLButtonElement).disabled).toBe(true);
+    expect(calls.filter(call => call.path.endsWith("/execute"))).toEqual([]);
+    await view.unmount();
+  });
+
   it("lists a cell fault with its place, an icon and words, and hands it to verify", async () => {
     const verify = vi.fn();
     const view = await mount(createElement(FaultList, { t, faults: bankFaults([stack], SOLAR_THRESHOLDS.levels), verify, choose: () => undefined }));

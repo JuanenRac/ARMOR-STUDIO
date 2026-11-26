@@ -5951,6 +5951,8 @@ const catalogue: Record<string, string> = {
 "solx_history_old": "此服务器尚未保存按电池和单体划分的历史：请更新 ARMOR-SERVER。",
 "solx_chart_help": "在图表上拖动可放大，双击还原；点击图例名称可隐藏曲线。",
 "solx_zoom_reset": "取消缩放",
+"solx_cells_small": "每个单体一张小图",
+"solx_cells_small_note": "所有小图使用相同的刻度；虚线是单体的报警值。",
 "solx_csv": "导出 CSV",
 "solx_min": "最小",
 "solx_max": "最大",

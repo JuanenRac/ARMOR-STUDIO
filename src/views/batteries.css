@@ -64,6 +64,14 @@ button.bat-row:not(#ui):focus-visible { outline: 2px solid #4be2e9; outline-offs
 .bat-history { padding: .7rem 1rem .8rem; }
 .bat-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(21rem, 1fr)); gap: .6rem 1.1rem; }
 .bat-charts .sl-chart, .bat-charts .sl-chart-empty { margin-top: 0; }
+.sl-multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); gap: .5rem; margin: 0 0 .7rem; }
+.sl-multiple { margin: 0; padding: .35rem .5rem; border: 1px solid #193341; border-radius: 10px; min-width: 0; }
+.sl-multiple.faulty { border: 2px solid #ff4d5e; }
+.sl-multiple figcaption { display: flex; flex-wrap: wrap; gap: .2rem .5rem; align-items: baseline; font-size: .78rem; }
+.sl-multiple figcaption em { font-style: normal; color: #ffb5bd; font-size: .72rem; }
+.sl-multiple svg { display: block; width: 100%; height: 3.6rem; margin: .25rem 0; }
+.sl-multiple small { color: #8ea7b2; font-size: .68rem; }
+.sl-multiple .sl-chart-empty { margin: .25rem 0 0; font-size: .72rem; }
 
 /* a short screen (768p) or a narrower window: everything closer, nothing dropped */
 @media (max-height: 820px), (max-width: 1400px) {

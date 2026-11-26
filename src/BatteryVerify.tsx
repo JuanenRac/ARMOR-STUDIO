@@ -92,9 +92,9 @@ function ClearCounters({ t, origin, target }: { t: Translate; origin: string; ta
       {operation.stage === "armed" && <>
         <p role="status">{fresh === null ? t("solx_fresh_unknown") : fill(t(fresh > 0 ? "solx_fresh_real" : "solx_fresh_gone"), fresh)}</p>
         {operation.snapshot_before && <details><summary>{t("bm_read_title")}</summary><pre className="mono solar-verify-text">{operation.snapshot_before}</pre></details>}
-        <label><input type="checkbox" checked={understood} onChange={event => setUnderstood(event.target.checked)} /> {t("solx_clear_confirm")}</label>
+        {fresh !== 0 && <label><input type="checkbox" checked={understood} onChange={event => setUnderstood(event.target.checked)} /> {t("solx_clear_confirm")}</label>}
         <div className="confirm-actions">
-          <button type="button" className="danger-button" disabled={busy || !understood} onClick={() => void run(() => batteryExecute(origin, operation.id, serial.trim()))}>{t("solx_clear_button")}</button>
+          <button type="button" className="danger-button" disabled={busy || !understood || fresh === 0} onClick={() => void run(() => batteryExecute(origin, operation.id, serial.trim()))}>{t("solx_clear_button")}</button>
           <button type="button" disabled={busy} onClick={() => void run(() => batteryCancel(origin, operation.id))}>{t("bm_withdraw")}</button>
         </div>
       </>}
