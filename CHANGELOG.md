@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.2.9] - The new solar protocols and a small chart per battery cell
+
 - **More solar protocols when equipment is declared:** PI00 / PI16 (older inverters asked without CRC), PI17, the VE.Direct Phoenix inverter and the monitor in hexadecimal mode; the likely protocol is now also found for Modbus and VE.Direct inverters.
 - **A small chart for each cell, if you want it:** in the charts by cell of the Batteries menu, a tick (off until used, remembered by the browser) draws one small chart per cell on a common scale, with its latest, lowest and highest voltage and the alarm levels; a cell in fault blinks and says what is wrong.
 - **Nothing is offered to clear when the battery already answers zero:** after reading a statistics counter again from the battery, the clearing stays disabled if the battery says the counter is zero.
