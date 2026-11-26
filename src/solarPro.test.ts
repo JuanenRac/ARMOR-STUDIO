@@ -167,7 +167,7 @@ describe("the protocols a node speaks", () => {
     expect(new Set(SOLAR_PROTOCOLS.map(item => item.id)).size).toBe(15);
     expect(protocolsFor("inverter").map(item => item.id)).toEqual(["pi30", "pi30-revo", "pi18", "pi41", "pi34", "modbus-smg2", "modbus-srne-hybrid", "modbus-srne-mppt", "vedirect-mppt"]);
     expect(protocolsFor("battery").map(item => item.id)).toEqual(["vedirect-monitor", "pylontech-console", "ant-bms", "daly-uart", "jbd", "jk-rs485"]);
-    expect(protocolsFor("battery", [{ id: "x", port: "x", dialect: "", baud: 1, message: "battery" }]).map(item => item.id)).toEqual(["x"]);
+    expect(protocolsFor("battery", [{ id: "x", port_kind: "x", dialect: "", baud: 1, message: "battery" }]).map(item => item.id)).toEqual(["x"]);
   });
 
   it("proposes one only when the model tells", () => {

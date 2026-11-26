@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 - **The copy of the HTTP contract is the one ARMOR-COMMON generates now:** the types gain the catalogue of the equipment protocols (`catalog.protocols`).
 
+- **The protocol table a server hands out is read with its own names:** the console looked for `port` and `name` where the server sends `port_kind` and `label`, so with that table the protocol was not suggested for a battery or an inverter and the port setting it showed was empty.
+
 - **Every protocol a solar node speaks can be looked up when declaring equipment:** inverters, solar chargers and battery management systems, with the port type, variant and speed to choose on the node; a table served by the server replaces the built-in one. A protocol works only with a node firmware that includes it.
 
 - **Battery totals computed battery by battery:** with several sockets of Pylontech batteries, the charge left, the full capacity and the energy come from the same batteries of each stack, the state of charge is weighted by capacity, and a sum that is incomplete or estimated says so (also in the capacity bar of the chosen stack).
