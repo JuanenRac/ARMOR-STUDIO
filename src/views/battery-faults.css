@@ -1,0 +1,39 @@
+/* Faults of batteries and cells: a blink of one second (1 Hz, under the 2 Hz that photosensitive people can be asked to bear), always with an icon and words beside the colour,
+   and a still, heavier border when the person asked for less motion. */
+.sl-blink-fault { animation: sl-fault-blink 1s ease-in-out infinite; }
+@keyframes sl-fault-blink { 0%, 100% { box-shadow: 0 0 0 1px #ff4d5e55; } 50% { box-shadow: 0 0 0 2px #ff4d5e, 0 0 18px #ff4d5e88; } }
+.sl-cell.faulty { border: 2px solid #ff4d5e; }
+.sl-cell.faulty .sl-cell-volts { color: #ffb5bd; font-weight: 700; }
+button.bat-row.sl-blink-fault:not(#ui) { animation: sl-fault-blink 1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .sl-blink-fault, button.bat-row.sl-blink-fault:not(#ui) { animation: none; box-shadow: 0 0 0 2px #ff4d5e; }
+}
+
+.bat-faults ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
+.bat-faults li { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .7rem; padding: .35rem .7rem; border: 1px solid #8a6a1c; border-radius: 10px; color: #ffe0a3; font-size: .84rem; }
+.bat-faults li.fault { border-color: #8a3540; color: #ffc9cf; }
+.bat-faults li button { min-height: 0; padding: .15rem .6rem; font-size: .76rem; }
+.bat-faults li .bat-fault-place { text-decoration: underline; background: transparent; border: 0; color: inherit; }
+.bat-faults li button:last-child:not(.bat-fault-place) { margin-left: auto; }
+.bat-fault-icon { font-size: 1rem; }
+.bat-all-ok { border-color: #2f8c78; color: #5df0c4; }
+
+.bat-bank-facts dd small { display: block; font-size: .68rem; color: #8ea7b2; overflow-wrap: anywhere; }
+.bat-verify-row { display: flex; flex-wrap: wrap; gap: .35rem; margin: 0 0 .4rem; }
+.solar-verify-reads { display: flex; flex-wrap: wrap; gap: .4rem; list-style: none; padding: 0; }
+.solar-verify-reads li { padding: .15rem .6rem; border: 1px solid #2f8c78; border-radius: 8px; }
+.solar-verify-reads li.bad { border-color: #ff4d5e; color: #ffb5bd; }
+.solar-verify-text { white-space: pre-wrap; max-height: 16rem; overflow: auto; }
+
+.sl-pro { margin: .6rem 0 0; min-width: 0; }
+.sl-pro-head { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .8rem; font-size: .82rem; }
+.sl-pro-head em { font-style: normal; color: #79a3b0; }
+.sl-pro-tools { margin-left: auto; display: flex; gap: .3rem; }
+.sl-pro-tools button, .sl-pro-key:not(#ui) { min-height: 0; padding: .1rem .5rem; font-size: .72rem; border: 1px solid #193341; border-radius: 999px; background: #0a1a23; color: #9bb4c0; box-shadow: none; transform: none; cursor: pointer; }
+.sl-pro-key[aria-pressed="false"] { opacity: .4; text-decoration: line-through; }
+.sl-pro-key small { color: #6b8792; }
+.sl-pro-level { font-size: .72rem; color: #ffc85a; } .sl-pro-level.bad { color: #ff8d98; }
+.sl-pro svg { touch-action: pan-y; cursor: crosshair; }
+.sl-threshold { stroke: #ffb020; stroke-width: 1.2; stroke-dasharray: 6 4; } .sl-threshold.bad { stroke: #ff4d5e; }
+.sl-zoom { fill: #4be2e933; stroke: #4be2e9; }
+.sl-pro-pick { display: inline-flex; align-items: center; gap: .5rem; }

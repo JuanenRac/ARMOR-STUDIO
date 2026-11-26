@@ -11,7 +11,8 @@ import type { NetworkOverview } from "./networkModel";
 import { NodeToolsBar, NodeToolsFooter, panelFromNetwork, useNodeTools } from "./views/NodeTools";
 
 export type SolarNodeState = "reporting" | "example" | "stale" | "waiting";
-export type SolarNodeSummary = { id: string; inverters: number; batteries: number; reporting: number; lastMs: number | null; state: SolarNodeState };
+/** `batteries` counts the sockets (stacks) and `modules` the batteries inside them that are there. */
+export type SolarNodeSummary = { id: string; inverters: number; batteries: number; modules: number; reporting: number; lastMs: number | null; state: SolarNodeState };
 
 /** The nodes behind the declared equipment and the readings, each with what it reads and how it is doing. */
 export function summariseNodes(devices: readonly SolarDeviceView[], registrations: readonly SolarRegistration[]): SolarNodeSummary[] {
@@ -21,8 +22,9 @@ export function summariseNodes(devices: readonly SolarDeviceView[], registration
   const nodes = new Map<string, SolarNodeSummary & { fresh: number; examples: number }>();
   for (const [key, item] of equipment) {
     const id = key.slice(0, key.indexOf("/"));
-    const node = nodes.get(id) ?? { id, inverters: 0, batteries: 0, reporting: 0, lastMs: null, state: "waiting" as SolarNodeState, fresh: 0, examples: 0 };
+    const node = nodes.get(id) ?? { id, inverters: 0, batteries: 0, modules: 0, reporting: 0, lastMs: null, state: "waiting" as SolarNodeState, fresh: 0, examples: 0 };
     if (item.kind === "inverter") node.inverters += 1; else node.batteries += 1;
+    if (item.reading?.reading.kind === "battery") node.modules += item.reading.reading.stack.filter(module => module.present).length;
     if (item.reading) {
       node.reporting += 1;
       if (item.reading.example) node.examples += 1; else if (!item.reading.stale) node.fresh += 1;
@@ -53,7 +55,7 @@ export function SolarNodes({ t, origin, isAdmin = false, network = null, devices
         <span className="solar-node-chip" aria-hidden="true">⌁</span>
         <div>
           <strong>{node.id}</strong>
-          <small>{[node.inverters ? `${node.inverters} ${t("solarNodeInverters")}` : "", node.batteries ? `${node.batteries} ${t("solarNodeBatteries")}` : ""].filter(Boolean).join(" · ")}</small>
+          <small>{[node.inverters ? `${node.inverters} ${t("solarNodeInverters")}` : "", node.batteries ? `${node.batteries} ${t("solarNodeBatteries")}` : "", node.modules ? `${t("solx_batteries")}: ${node.modules}` : ""].filter(Boolean).join(" · ")}</small>
         </div>
         <span className="solar-node-state">{t(`solarNodeState_${node.state}`)}{node.lastMs !== null && node.state !== "waiting" ? ` · ${since(node.lastMs, now)}` : ""}</span>
         <NodeToolsBar t={t} tools={tools} id={node.id} panel={panelFromNetwork(network, node.id)} silent={node.state === "stale" || node.state === "waiting"} />

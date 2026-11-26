@@ -10,6 +10,8 @@ import type { Translate } from "./components/camera";
 import { CONNECTION_LABEL, modelName, type SolarCatalog, type SolarDeviceView, type SolarKind, type SolarRegistration } from "./solarModel";
 import { InverterLogo, BatteryLogo } from "./solarGraphics";
 import { NodeFinder } from "./NodeFinder";
+import { fill } from "./FirmwarePanel";
+import { likelyProtocol, protocolsFor } from "./solarProtocols";
 import type { NetworkOverview } from "./networkModel";
 import "./views/devices.css";
 
@@ -32,6 +34,10 @@ export function SolarEquipment({ kind, t, origin, catalog, registrations, report
   const models = catalog ? (kind === "inverter" ? catalog.inverter_models : catalog.battery_models) : [];
   const connections = catalog?.connections ?? ["rs232", "rs485", "usb", "can", "wifi", "other"];
   const dialect = form && kind === "inverter" ? catalog?.inverter_dialects?.[form.model] : undefined;
+  // which setting the port of the node needs; it only guides, the declaration does not carry it
+  const [asked, setAsked] = useState("");
+  const protocols = protocolsFor(kind, catalog?.protocols);
+  const protocol = protocols.find(item => item.id === asked) ?? (form ? likelyProtocol(kind, form.model, dialect, protocols) : undefined);
   const say = (text: string, bad = false) => setMessage({ text, bad });
   const edit = (patch: Partial<Form>) => setForm(current => current && { ...current, ...patch });
 
@@ -65,8 +71,10 @@ export function SolarEquipment({ kind, t, origin, catalog, registrations, report
       <h3>{form.editing ? t("solarEditDevice") : kind === "inverter" ? t("solarAddInverter") : t("solarAddBattery")}</h3>
       <div className="device-form-grid">
         <label>{t("solarName")}<input value={form.name} maxLength={60} required autoFocus onChange={event => edit({ name: event.target.value })} placeholder={kind === "inverter" ? "Axpert 5 kW" : "US3000C"} /></label>
-        <label>{t("solarModelLabel")}<select value={form.model} onChange={event => edit({ model: event.target.value })}>{models.map(model => <option key={model} value={model}>{modelName(model, catalog) ?? t("solarOther")}</option>)}</select></label>
+        <label>{t("solarModelLabel")}<select value={form.model} onChange={event => { setAsked(""); edit({ model: event.target.value }); }}>{models.map(model => <option key={model} value={model}>{modelName(model, catalog) ?? t("solarOther")}</option>)}</select></label>
         {kind === "inverter" && dialect && <p className="muted small wide">{t("solarDialectHint")} {dialect === "auto" ? t("solarDialectAuto") : dialect.toUpperCase()}</p>}
+        <label>{t("solx_protocol")}<select value={protocol?.id ?? ""} onChange={event => setAsked(event.target.value)}><option value="">—</option>{protocols.map(item => <option key={item.id} value={item.id}>{item.name ?? item.id}</option>)}</select></label>
+        {protocol && <p className="muted small wide" data-testid="protocol-setting">{fill(t("solx_protocol_hint"), protocol.port, protocol.dialect || "-", protocol.baud)}</p>}
         <label>{t("solarConnection")}<select value={form.connection} onChange={event => edit({ connection: event.target.value })}>{connections.map(item => <option key={item} value={item}>{label(t, item, CONNECTION_LABEL)}</option>)}</select></label>
         <label>{t("solarNode")}<input value={form.node_id} readOnly={form.editing} maxLength={64} required pattern="[a-z0-9][a-z0-9_\-]*" onChange={event => edit({ node_id: event.target.value })} /></label>
         <p className="muted small wide">{t("solarNodeHelp")}</p>

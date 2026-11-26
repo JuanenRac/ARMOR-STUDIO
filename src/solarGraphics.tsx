@@ -190,14 +190,16 @@ export function LineChart({ samples, series, from, to, t, empty, decimals = 0 }:
 // ---- the cells of a module --------------------------------------------------------------------------------------------------------------
 
 /** One bar per cell: its height is the voltage, its colour how far it is from its neighbours, and the lowest and highest cell are marked. */
-export function CellBars({ cells, t }: { cells: readonly number[]; t: Translate }) {
+export function CellBars({ cells, t, faults, blink = false }: { cells: readonly number[]; t: Translate; /** What is wrong with a cell, by its number counted from 1. */ faults?: ReadonlyMap<number, string>; blink?: boolean }) {
   const stats = cellStats(cells);
   if (!stats) return null;
   return <div className="sl-cells" role="group" aria-label={t("solarCells")}>
     {cells.map((v, i) => {
-      const tone = cellTone(v, stats.mean);
-      return <div key={i} className={`sl-cell ${tone} ${i === stats.minIndex && stats.spreadMv > 0 ? "lowest" : ""} ${i === stats.maxIndex && stats.spreadMv > 0 ? "highest" : ""}`} title={`${i + 1}: ${v.toFixed(3)} V`}>
-        <span className="sl-cell-volts">{v.toFixed(3)}</span>
+      const wrong = faults?.get(i + 1);
+      const tone = wrong ? "bad" : cellTone(v, stats.mean);
+      const words = `${i + 1}: ${v.toFixed(3)} V${wrong ? ` - ${wrong}` : ""}`;
+      return <div key={i} className={`sl-cell ${tone} ${i === stats.minIndex && stats.spreadMv > 0 ? "lowest" : ""} ${i === stats.maxIndex && stats.spreadMv > 0 ? "highest" : ""} ${wrong ? "faulty" : ""} ${wrong && blink ? "sl-blink-fault" : ""}`} title={words} {...(wrong ? { role: "img", "aria-label": words } : {})}>
+        <span className="sl-cell-volts">{wrong && <b aria-hidden="true">✖ </b>}{v.toFixed(3)}</span>
         <span className="sl-cell-track"><i style={{ height: `${Math.round(cellFill(v) * 100)}%`, background: TONE_COLOUR[tone] }} /></span>
         <span className="sl-cell-n">{i + 1}</span>
       </div>;
