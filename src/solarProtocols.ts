@@ -4,24 +4,25 @@
  * (also a solar charger's) or the battery's.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-export type SolarProtocol = { id: string; port: string; dialect: string; baud: number; message: "inverter" | "battery"; name?: string };
+/** The fields are the ones of the shared table (catalog.protocols of the HTTP contract). */
+export type SolarProtocol = { id: string; port_kind: string; dialect: string; baud: number; message: "inverter" | "battery"; label?: string };
 
 export const SOLAR_PROTOCOLS: readonly SolarProtocol[] = [
-  { id: "pi30", port: "voltronic", dialect: "pi30", baud: 2400, message: "inverter", name: "PI30 (Axpert, PIP)" },
-  { id: "pi30-revo", port: "voltronic", dialect: "revo", baud: 2400, message: "inverter", name: "PI30 REVO" },
-  { id: "pi18", port: "voltronic", dialect: "pi18", baud: 2400, message: "inverter", name: "PI18 (InfiniSolar V)" },
-  { id: "pi41", port: "voltronic", dialect: "pi41", baud: 2400, message: "inverter", name: "PI41" },
-  { id: "pi34", port: "voltronic", dialect: "pi34", baud: 2400, message: "inverter", name: "PI34 (MPPT)" },
-  { id: "modbus-smg2", port: "modbus", dialect: "smg2", baud: 9600, message: "inverter", name: "Modbus SMG II" },
-  { id: "modbus-srne-hybrid", port: "modbus", dialect: "srne-hybrid", baud: 9600, message: "inverter", name: "Modbus SRNE hybrid" },
-  { id: "modbus-srne-mppt", port: "modbus", dialect: "srne-mppt", baud: 9600, message: "inverter", name: "Modbus SRNE MPPT" },
-  { id: "vedirect-mppt", port: "vedirect", dialect: "mppt", baud: 19200, message: "inverter", name: "VE.Direct MPPT" },
-  { id: "vedirect-monitor", port: "vedirect", dialect: "monitor", baud: 19200, message: "battery", name: "VE.Direct monitor" },
-  { id: "pylontech-console", port: "pylontech", dialect: "", baud: 115200, message: "battery", name: "Pylontech console" },
-  { id: "ant-bms", port: "ant", dialect: "", baud: 19200, message: "battery", name: "ANT-BMS" },
-  { id: "daly-uart", port: "daly", dialect: "", baud: 9600, message: "battery", name: "Daly UART" },
-  { id: "jbd", port: "jbd", dialect: "", baud: 9600, message: "battery", name: "JBD" },
-  { id: "jk-rs485", port: "jk", dialect: "", baud: 115200, message: "battery", name: "JK RS485" },
+  { id: "pi30", port_kind: "voltronic", dialect: "pi30", baud: 2400, message: "inverter", label: "PI30 (Axpert, PIP)" },
+  { id: "pi30-revo", port_kind: "voltronic", dialect: "revo", baud: 2400, message: "inverter", label: "PI30 REVO" },
+  { id: "pi18", port_kind: "voltronic", dialect: "pi18", baud: 2400, message: "inverter", label: "PI18 (InfiniSolar V)" },
+  { id: "pi41", port_kind: "voltronic", dialect: "pi41", baud: 2400, message: "inverter", label: "PI41" },
+  { id: "pi34", port_kind: "voltronic", dialect: "pi34", baud: 2400, message: "inverter", label: "PI34 (MPPT)" },
+  { id: "modbus-smg2", port_kind: "modbus", dialect: "smg2", baud: 9600, message: "inverter", label: "Modbus SMG II" },
+  { id: "modbus-srne-hybrid", port_kind: "modbus", dialect: "srne-hybrid", baud: 9600, message: "inverter", label: "Modbus SRNE hybrid" },
+  { id: "modbus-srne-mppt", port_kind: "modbus", dialect: "srne-mppt", baud: 9600, message: "inverter", label: "Modbus SRNE MPPT" },
+  { id: "vedirect-mppt", port_kind: "vedirect", dialect: "mppt", baud: 19200, message: "inverter", label: "VE.Direct MPPT" },
+  { id: "vedirect-monitor", port_kind: "vedirect", dialect: "monitor", baud: 19200, message: "battery", label: "VE.Direct monitor" },
+  { id: "pylontech-console", port_kind: "pylontech", dialect: "", baud: 115200, message: "battery", label: "Pylontech console" },
+  { id: "ant-bms", port_kind: "ant", dialect: "", baud: 19200, message: "battery", label: "ANT-BMS" },
+  { id: "daly-uart", port_kind: "daly", dialect: "", baud: 9600, message: "battery", label: "Daly UART" },
+  { id: "jbd", port_kind: "jbd", dialect: "", baud: 9600, message: "battery", label: "JBD" },
+  { id: "jk-rs485", port_kind: "jk", dialect: "", baud: 115200, message: "battery", label: "JK RS485" },
 ];
 
 /** The protocols that give readings of a kind of equipment, from the server's table when it has one. */
@@ -31,7 +32,7 @@ export function protocolsFor(kind: "inverter" | "battery", served?: readonly Sol
 
 /** The protocol a model is likely to need: by the dialect the server names for an inverter family, by the make for a battery; undefined when nothing tells (the person chooses). */
 export function likelyProtocol(kind: "inverter" | "battery", model: string, dialect: string | undefined, list: readonly SolarProtocol[]): SolarProtocol | undefined {
-  if (kind === "inverter") return dialect && dialect !== "auto" ? list.find(item => item.port === "voltronic" && item.dialect === dialect) : undefined;
+  if (kind === "inverter") return dialect && dialect !== "auto" ? list.find(item => item.port_kind === "voltronic" && item.dialect === dialect) : undefined;
   const port = /^pylontech/.test(model) ? "pylontech" : /^ant-bms/.test(model) ? "ant" : /^daly/.test(model) ? "daly" : /^jbd/.test(model) ? "jbd" : /^jk/.test(model) ? "jk" : undefined;
-  return list.find(item => item.port === port);
+  return list.find(item => item.port_kind === port);
 }
