@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The shared project tool is the current one:** the copy follows the shared repository, which now knows the new solar panel node.
+
 - **The copy of the HTTP contract is the one ARMOR-COMMON generates now:** the types gain the catalogue of the equipment protocols (`catalog.protocols`).
 
 - **The protocol table a server hands out is read with its own names:** the console looked for `port` and `name` where the server sends `port_kind` and `label`, so with that table the protocol was not suggested for a battery or an inverter and the port setting it showed was empty.
