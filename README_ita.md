@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Linguaggio">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Lingue">
-  <img src="https://img.shields.io/badge/Tests-1915%20passing-2ea44f.svg" alt="Test">
+  <img src="https://img.shields.io/badge/Tests-1933%20passing-2ea44f.svg" alt="Test">
   <img src="https://img.shields.io/badge/Version-0.8.2.7-0f6cbd.svg" alt="Versione">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturità">
 </p>
 
 ---
 
-**Controllo di onestà - cosa funziona oggi:** Studio dialoga con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) ed è coperto da 1915 test unitari (lettura delle impostazioni, fusione delle telecamere, aritmetica dei grafici solari, geometria e controlli dei progettisti, annunciatore degli allarmi, dizionario dell'assistente, ogni menu reso nelle otto lingue, host statico) e da test nel browser. Funziona in uso quotidiano contro il banco di prova CM5 con il vero server, vere telecamere IP e un nodo radar sulla sua scheda; le immagini della Guida sono fatte con dati di esempio. Ciò che **non** è stato provato è il video dal vivo e il PTZ con tutte le telecamere possibili, i menu solare, elettrico, centrali d'allarme e pannello touch con apparecchi reali (esiste solo il nodo radar) e una revisione formale di accessibilità o usabilità. Finché il server non è raggiungibile, Studio mostra dati dimostrativi e lo dice nella barra superiore.
+**Controllo di onestà - cosa funziona oggi:** Studio dialoga con [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) ed è coperto da 1933 test unitari (lettura delle impostazioni, fusione delle telecamere, aritmetica dei grafici solari, geometria e controlli dei progettisti, annunciatore degli allarmi, dizionario dell'assistente, ogni menu reso nelle otto lingue, host statico) e da test nel browser. Funziona in uso quotidiano contro il banco di prova CM5 con il vero server, vere telecamere IP e un nodo radar sulla sua scheda; le immagini della Guida sono fatte con dati di esempio. Ciò che **non** è stato provato è il video dal vivo e il PTZ con tutte le telecamere possibili, i menu solare, elettrico, centrali d'allarme e pannello touch con apparecchi reali (esiste solo il nodo radar) e una revisione formale di accessibilità o usabilità. Finché il server non è raggiungibile, Studio mostra dati dimostrativi e lo dice nella barra superiore.
 
 ---
 
@@ -41,7 +41,7 @@
 | Maturità | Consolidato |
 | Ruolo | Console di operatività e progettazione della famiglia |
 | Tecnologia | React 19, TypeScript, Vite, Three.js, Leaflet |
-| Test | 1915 (`npm test`, Vitest) e test nel browser (Playwright) |
+| Test | 1933 (`npm test`, Vitest) e test nel browser (Playwright) |
 | Contratto | Parla solo con ARMOR-SERVER (HTTP `/api/v1/*` con sessione HttpOnly, WebSocket `/api/v1/events`) |
 | In ascolto su | `127.0.0.1:5178` (`tools/serve.mjs`) |
 | Gira su | Un browser; i file li serve `tools/serve.mjs` o il nginx del container |
@@ -59,7 +59,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Area | Stato | Cosa significa qui |
 |---|---|---|
 | Software | 🟢 | La console funziona ogni giorno contro il server reale del banco di prova CM5. |
-| Test | 🟢 | Superano 1915 test unitari (`npm test`) e girano i test nel browser: impostazioni, fusione delle telecamere, grafici solari, geometria e controlli dei progettisti, annunciatore di allarmi, dizionario dell'assistente e ogni menu nelle otto lingue. |
+| Test | 🟢 | Superano 1933 test unitari (`npm test`) e girano i test nel browser: impostazioni, fusione delle telecamere, grafici solari, geometria e controlli dei progettisti, annunciatore di allarmi, dizionario dell'assistente e ogni menu nelle otto lingue. |
 | Interfaccia | 🟡 | Il video dal vivo e il PTZ non sono provati con ogni telecamera possibile, non c'è stata una revisione formale di accessibilità o usabilità e le immagini della Guida sono fatte con dati di esempio. |
 | Hardware | 🟠 | È usato ogni giorno con il server reale, telecamere IP reali e un nodo radar reale; i menu solare, elettrico, della centralina d'allarme e del pannello touch attendono nodi reali. |
 | Sicurezza | 🟠 | Sessioni, ruoli e rifiuto delle credenziali delle telecamere negli indirizzi sono coperti da test; non c'è stata una revisione indipendente. |
@@ -102,6 +102,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 * **Pannelli dei nodi su un'origine propria:** quando un amministratore attiva *Pannelli dei nodi su un'origine propria* in Configurazione > Sicurezza (`panel.separate_origin`, spento di default), i pulsanti che aprono un pannello di nodo chiedono al server un biglietto monouso valido 30 secondi e aprono il pannello sulla seconda origine del server in una nuova scheda, così gli script di un nodo non girano mai con la sessione di Studio. Anche il server deve pubblicare questa seconda porta (o nome). Finora ha girato solo nei test automatici, non contro il server reale, e le app del telefono aprono ancora il pannello tramite il server, cosa che smette di funzionare finché l'opzione è attiva.
 * **Accesso più sicuro, moduli e tastiera più gentili:** l'accesso controlla l'indirizzo del server prima di inviare qualsiasi cosa, avvisa (o, con un interruttore nelle Preferenze, rifiuta) l'http non cifrato fuori dalla rete locale e dice se la password era sbagliata, c'erano troppi tentativi, il server ha avuto un guasto o non era raggiungibile; ogni campo password avvisa quando il blocco maiuscole è attivo; le nuove password e i PIN vengono controllati mentre si scrive; c'è un link per saltare al contenuto, le scorciatoie a un tasto `?` (Guida) e `B` (menu) con interruttore, un titolo della scheda e un annuncio per lettori di schermo che seguono il menu aperto, e una conferma alla chiusura della scheda con un disegno non ancora arrivato al server. I limiti sono in un file di configurazione (`src/ux/ux.config.json`). Otto lingue, portoghese del Portogallo incluso.
 * **Programmi della macchina dal telefono, visti in Studio:** Configurazione > Aggiornamenti ha una scheda che dice se i programmi della macchina si possono aggiornare dal telefono (attivo o no, e perché), come accenderlo (`ARMOR_CM5_UPDATE` sul server e `ARMOR_MAINT_UPDATER` sull'assistente), quali programmi copre, se è richiesta la firma e l'attività recente del registro di audit. La scheda si limita a mostrare: gli interruttori stanno nell'ambiente del server.
+* **Grafici delle batterie dal server e un codice per la console da fuori:** i grafici per batteria e cella mostrano ciò che ARMOR-SERVER ha registrato, quindi non ripartono vuoti a ogni apertura di Studio, e da fuori casa la console di manutenzione chiede un codice del secondo fattore oltre alla password. Finora provato solo nei test automatici.
 
 ## 🧩 Ruolo in A.R.M.O.R.
 
@@ -214,7 +215,7 @@ Catturate su un banco di prova con dati di esempio inventati e senza alcuna inst
 
 **Solo il menu Meteo raggiunge altri servizi.** I caratteri sono locali e nient'altro chiede qualcosa a terzi. Il menu Meteo, e solo per un account con un luogo salvato, carica Open-Meteo (previsioni, geocodifica, qualità dell'aria), RainViewer (radar), EUMETSAT (nuvole) e ArcGIS (tessere della mappa). La ricerca di un luogo invia a Open-Meteo il testo digitato quando premi Cerca, anche prima di salvare un luogo. L'host statico invia `Content-Security-Policy: default-src 'self'` limitata al server configurato e a quei servizi, `frame-ancestors 'none'`, `nosniff` e `no-referrer`.
 
-**Interruttori.** *Configurazione > Sicurezza* ha un controllo per ciascuna delle 65 protezioni che ARMOR-SERVER lascia regolare a un amministratore (PIN di disarmo, silenziamento a voce, firma del progetto di allarme, flusso delle zone, tunnel delle telecamere, accessi di rete, avviso di accesso da un nuovo paese, messa da parte delle letture elettriche vecchie, eventi dal vivo del pannello a muro, blocco del dispositivo, cifratura dell'archivio dei nodi e limiti audio), ciascuna con un default prudente; il server registra nell'audit che se ne abbassa una. Dettagli in [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). Non c'è stata una revisione di sicurezza indipendente.
+**Interruttori.** *Configurazione > Sicurezza* ha un controllo per ciascuna delle 66 protezioni che ARMOR-SERVER lascia regolare a un amministratore (PIN di disarmo, silenziamento a voce, firma del progetto di allarme, flusso delle zone, tunnel delle telecamere, accessi di rete, avviso di accesso da un nuovo paese, messa da parte delle letture elettriche vecchie, eventi dal vivo del pannello a muro, blocco del dispositivo, cifratura dell'archivio dei nodi e limiti audio), ciascuna con un default prudente; il server registra nell'audit che se ne abbassa una. Dettagli in [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). Non c'è stata una revisione di sicurezza indipendente.
 
 ## 🔌 Interfacce
 
@@ -247,7 +248,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 con un server su 127.0.0.1:18080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # scrive la tabella di ogni lingua dopo aver cambiato una frase
-npm test                                                                       # 1915 test
+npm test                                                                       # 1933 test
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # serve la build
 ```
