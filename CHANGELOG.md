@@ -4,6 +4,28 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Every protocol a solar node speaks can be looked up when declaring equipment:** inverters, solar chargers and battery management systems, with the port type, variant and speed to choose on the node; a table served by the server replaces the built-in one. A protocol works only with a node firmware that includes it.
+
+- **Battery totals computed battery by battery:** with several sockets of Pylontech batteries, the charge left, the full capacity and the energy come from the same batteries of each stack, the state of charge is weighted by capacity, and a sum that is incomplete or estimated says so (also in the capacity bar of the chosen stack).
+
+- **The whole bank in figures:** sockets, batteries, cells read, total current and power, temperature range and the sockets left out for having no recent data; a solar node card also says how many batteries are behind its sockets.
+
+- **Lowest and highest cell of the bank with their place:** the socket, battery and cell of each extreme and the spread between them; examples stay out of every sum while something real reports.
+
+- **List of faults at the top of Batteries:** cell voltage out of the window (lithium iron phosphate batteries), impossible readings, cells the battery marks as not normal, cell spread, temperatures, worn battery, protection and stack alarm, each with its battery and cell.
+
+- **Faults blink where they are:** the row of the stack, the battery tile and the faulty cell blink once a second with an icon and words besides the colour; with reduced motion they stay still with a heavier border.
+
+- **Charts by bank, pack, battery and cell:** voltage, current, power, state of charge, temperature, cell range and spread; the bank adds up only the moments every stack reported. By battery and cell they show what the browser has read since Studio was opened.
+
+- **Charts that can be explored:** drag to zoom, a legend that hides curves, lowest, highest and value under the pointer, and the alarm levels drawn as dashed lines.
+
+- **The samples on screen can be saved as CSV** from every battery chart.
+
+- **Verify a measured value:** the next five readings of the battery say whether it is real, a misread or intermittent.
+
+- **Verify a statistics counter:** the battery is read again (nothing is written) before anything else, and only the documented `statc` command is offered, for the first battery of a stack, to an administrator, with the server switch that is off by default, a typed serial number, an explicit confirmation and the usual record. Cell health counts and measured values show why nothing can be cleared. Never tried on a real battery.
+
 - **The screenshots of the README can be taken on a GitHub runner:** the manual workflow `screenshots.yml` (started by hand only, read-only token, no secrets) builds Studio and the server, takes every screen of `docs/screenshots.json` against made-up data and keeps the pictures as an artifact; `docs/SCREENSHOTS.md` says how to start it and use them.
 
 ## [0.8.2.6] - Security switches for panel origins, signed node orders, duress disarm and maintenance caps in eight languages

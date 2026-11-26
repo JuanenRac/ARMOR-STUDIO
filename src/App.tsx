@@ -3,6 +3,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D)
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+import { solarRecorder } from "./solarRecorder";
 import { downloadText } from "./download";
 import { ConfirmHost } from "./askConfirm";
 import { TotpHost } from "./askTotp";
@@ -189,6 +190,8 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   useEffect(() => { if (recordingPoll.data) setRecordingCameraIds(recordingPoll.data); }, [recordingPoll.data]);
   const automationPoll = usePolled(() => listAutomations(origin), 5000, origin, { always: true });
   const solarPoll = usePolled(() => listSolar(origin), flowing ? 15_000 : 4000, origin, { always: true, topics: ["solar"] });
+  // the browser keeps the history of each battery and cell while it is open (the server keeps that of a whole stack only)
+  useEffect(() => { if (solarPoll.data) solarRecorder.record(solarPoll.data.devices); }, [solarPoll.data]);
   const electricalPoll = usePolled(() => listElectricalReadings(origin), 4000, origin, { always: true });
   const alarmNodesPoll = usePolled(() => listAlarmNodes(origin), 3000, origin, { always: true });
   const armProfilesPoll = usePolled(() => listArmProfiles(origin), 15000, origin, { always: true });

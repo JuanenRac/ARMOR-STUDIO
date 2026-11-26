@@ -5,6 +5,8 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 
+import type { SolarProtocol } from "./solarProtocols";
+
 export type SolarMode = "power_on" | "standby" | "line" | "battery" | "fault" | "power_saving" | "shutdown" | "unknown";
 export type SolarInverterReading = {
   kind: "inverter"; node_id: string; device: string; timestamp_ms: number; mode: SolarMode;
@@ -77,7 +79,7 @@ export type SolarKind = "inverter" | "battery";
 /** A device an operator declared: what it is, how it is connected and which gateway node reads it. */
 export type SolarRegistration = { node_id: string; device: string; kind: SolarKind; name: string; model: string; connection: string; notes: string; created_at: string };
 /** What the server offers when equipment is declared: the models (with their names and, for inverters, the serial dialect each answers in) and the connections. */
-export type SolarCatalog = { inverter_models: string[]; battery_models: string[]; connections: string[]; labels?: Record<string, string>; inverter_dialects?: Record<string, string> };
+export type SolarCatalog = { inverter_models: string[]; battery_models: string[]; connections: string[]; labels?: Record<string, string>; inverter_dialects?: Record<string, string>; /** The shared table of the protocols a node speaks, when the server hands it out. */ protocols?: SolarProtocol[] };
 /** The extremes of the cells of a battery today, per module (the server's day): the lowest and highest cell with its number and the moment, and the widest gap. */
 export type CellReach = { v: number; cell: number; at: number };
 export type ModuleDayCells = { n: number; min: CellReach; max: CellReach; delta_v: number };
