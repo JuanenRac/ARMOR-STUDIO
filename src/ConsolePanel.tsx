@@ -1,6 +1,6 @@
 /**
  * Configuration > Console: commands as root on the machine, for the day something is wrong and there is no other way in. It is shut twice: the maintenance helper has it off unless it
- * was turned on in its environment, and here the administrator gives the password again before the first command (and again after ten minutes without use). One command at a time,
+ * was turned on in its environment, and here the administrator gives the password again (from outside the house, also a code of the second factor) before the first command (and again after ten minutes without use). One command at a time,
  * with a time limit; the folder is remembered from one command to the next; the output comes in as it is printed; a running command can be stopped. Every command is in the audit trail.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
@@ -36,6 +36,7 @@ const timeText = (seconds: number) => (seconds >= 3600 ? "1 h" : seconds >= 60 ?
 export function ConsolePanel({ t, origin, isAdmin }: Props) {
   const [state, setState] = useState<ConsoleState | null>(null);
   const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
   const [entries, setEntries] = useState<Entry[]>(() => (memory.origin === origin ? memory.entries : []));
   const [line, setLine] = useState("");
@@ -82,10 +83,17 @@ export function ConsolePanel({ t, origin, isAdmin }: Props) {
 
   const unlock = async (event: FormEvent) => {
     event.preventDefault();
-    try { await unlockConsole(origin, password); setPassword(""); setMessage(""); await refresh(); window.setTimeout(() => input.current?.focus(), 50); }
+    try { await unlockConsole(origin, password, state.second_factor ? code.trim() : undefined); setPassword(""); setCode(""); setMessage(""); await refresh(); window.setTimeout(() => input.current?.focus(), 50); }
     catch (error) {
+      const why = error instanceof ApiError ? error.code : "";
+      setCode("");
+      // the server asks for a code the form did not offer yet: the state is read again so that the field appears, and what was typed stays
+      if (why === "totp_required") { setMessage(t("mc_code_help")); await refresh(); return; }
       setPassword("");
-      setMessage(error instanceof ApiError && error.status === 429 ? t("mc_too_many") : t("mc_wrong"));
+      if (why === "totp_setup_required") setMessage(t("mc_code_setup"));
+      else if (why === "wrong_code") setMessage(t("mc_code_wrong"));
+      else if (why === "totp_locked") setMessage(t("mc_code_locked"));
+      else setMessage(error instanceof ApiError && error.status === 429 ? t("mc_too_many") : t("mc_wrong"));
     }
   };
   const close = async () => { try { await lockConsole(origin); } catch { setMessage(t("mc_lock_title")); } finally { await refresh(); } };
@@ -117,7 +125,11 @@ export function ConsolePanel({ t, origin, isAdmin }: Props) {
       <h4>{t("mc_lock_title")}</h4>
       <p className="muted">{t("mc_lock_help")}</p>
       <label>{t("mc_password")}<PasswordInput t={t} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} autoFocus /></label>
-      <button className="primary" type="submit" disabled={password === ""}>{t("mc_unlock")}</button>
+      {state.second_factor && <>
+        <p className="muted">{t("mc_code_help")}</p>
+        <label>{t("mc_code")}<input name="code" autoComplete="one-time-code" value={code} onChange={event => setCode(event.target.value)} /></label>
+      </>}
+      <button className="primary" type="submit" disabled={password === "" || (state.second_factor === true && code.trim() === "")}>{t("mc_unlock")}</button>
     </form>
     {message && <p className="notice" role="alert">{message}</p>}
   </article>;

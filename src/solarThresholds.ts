@@ -15,9 +15,6 @@ export const SOLAR_THRESHOLDS = {
   /** How many new readings "Verify" waits for, and for how long. */
   verifySamples: 5,
   verifyTimeoutMs: 180_000,
-  /** What the browser keeps of each battery and cell while Studio is open: one point at most in this time, and this many points. */
-  recordEveryMs: 10_000,
-  recordKeep: 8640,
 } as const;
 
 export type SolarLevels = { cell_spread_mv: number; battery_temp_high_c: number; battery_temp_low_c: number; health_low_percent: number; soc_low: number };
