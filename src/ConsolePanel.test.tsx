@@ -42,6 +42,16 @@ describe("the root console", () => {
     await view.unmount();
   });
 
+  it("asks for a code of the second factor when the server says so, and sends it", async () => {
+    const calls = fakeServer({ "GET /api/v1/admin/console": { available: true, enabled: true, unlocked_until: 0, second_factor: true } });
+    const view = await mount(createElement(ConsolePanel, { t, origin: O, isAdmin: true }));
+    expect(view.host.textContent).toContain(t("mc_code"));
+    await pokeAll(view.host);
+    const sent = calls.find(call => call.path === "/api/v1/admin/console/unlock")?.body as { code?: string } | undefined;
+    expect(sent?.code).toBeTruthy();
+    await view.unmount();
+  });
+
   it("runs a command once unlocked, shows its output and offers the quick commands and the time limits", async () => {
     const calls = fakeServer({
       "GET /api/v1/admin/console": { available: true, enabled: true, unlocked_until: Date.now() + 600_000 },

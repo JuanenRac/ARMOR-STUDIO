@@ -4,8 +4,11 @@ import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createElement } from "react";
 import type { BatteryCatalog, BatteryOperation } from "./api/battery";
+import { BatteryCharts } from "./BatteryCharts";
 import { BatteryMaintenance } from "./BatteryMaintenance";
 import { text } from "./i18n";
+import { SOLAR_THRESHOLDS } from "./solarThresholds";
+import type { BatteryView } from "./solarTotals";
 import { fakeServer, mount, pokeAll } from "./testLive";
 
 const O = "http://armor.local:18080/";
@@ -53,5 +56,33 @@ describe("the battery maintenance screen, mounted whole", () => {
     await down.settle();
     expect(down.host.textContent?.length).toBeGreaterThan(5);
     await down.unmount();
+  });
+});
+
+describe("the charts by battery and cell", () => {
+  const current: BatteryView = {
+    node_id: "solar-1", device: "pack", kind: "battery", received_at: "2026-01-01T12:00:00.000Z", stale: false,
+    reading: { kind: "battery", node_id: "solar-1", device: "pack", timestamp_ms: 0, modules: 1, stack: [{ n: 2, present: true, voltage_v: 50, cells_v: [3.3, 3.31] }] },
+  };
+  const open = async (answer: Record<string, unknown>) => {
+    const calls = fakeServer({ "GET /api/v1/solar/history": answer });
+    const view = await mount(createElement(BatteryCharts, { t, origin: O, stacks: [current], current, now: Date.parse("2026-01-01T12:00:00Z"), history: [], minutes: 60, setMinutes: () => undefined, levels: SOLAR_THRESHOLDS.levels }));
+    await view.click([...view.host.querySelectorAll("button")].find(button => button.textContent === t("solx_scope_battery")) ?? null);
+    await view.settle();
+    return { calls, view };
+  };
+  const base = { node_id: "solar-1", device: "pack", minutes: 60, samples: [] };
+
+  it("asks the server for the battery and says what it records", async () => {
+    const { calls, view } = await open({ ...base, module: 2, every_s: 60, retention_days: 30 });
+    expect(calls.filter(call => call.path === "/api/v1/solar/history").length).toBeGreaterThan(0);
+    expect(view.host.querySelector("[data-testid=battery-history-note]")?.textContent).toBe(t("solx_recorded_note").replace("{0}", "60").replace("{1}", "30"));
+    await view.unmount();
+  });
+
+  it("says when the server is from before this history", async () => {
+    const { view } = await open(base);
+    expect(view.host.querySelector("[data-testid=battery-history-note]")?.textContent).toBe(t("solx_history_old"));
+    await view.unmount();
   });
 });

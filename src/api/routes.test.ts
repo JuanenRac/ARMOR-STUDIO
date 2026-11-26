@@ -137,6 +137,7 @@ const rows: Row[] = [
   ["listSolar", () => api.listSolar(O), "GET", "/api/v1/solar"],
   ["deleteSolarDevice", () => api.deleteSolarDevice(O, ODD, ODD), "DELETE", `/api/v1/solar/devices/${ENC}/${ENC}`],
   ["solarHistory", () => api.solarHistory(O, "n 1", "d/1", 30), "GET", "/api/v1/solar/history?node=n+1&device=d%2F1&minutes=30"],
+  ["batteryHistory", () => api.batteryHistory(O, "n 1", "d/1", 2, 30), "GET", "/api/v1/solar/history?node=n+1&device=d%2F1&minutes=30&module=2"],
   ["solarEnergy", () => api.solarEnergy(O, 14), "GET", "/api/v1/solar/energy?days=14"],
   ["saveEnergyAlarms", () => api.saveEnergyAlarms(O, {}), "PUT", "/api/v1/solar/alarms", {}],
   ["readConnection", () => api.readConnection(O), "GET", "/api/v1/system/connection"],

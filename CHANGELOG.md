@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The charts by battery and cell come from the server:** ARMOR-SERVER keeps the history of each battery and cell, so the charts reach back as far as it does and no longer start empty each time Studio is opened; the browser records nothing. With a server from before this, the menu says so.
+- **The root console asks for a code from outside the house:** the lock form of the console gains the code of the second factor when the server asks for it, and the security options gain its switch (on by default).
+
 ## [0.8.2.7] - A detailed battery menu with charts, blinking faults and checks, and every solar protocol
 
 - **The shared project tool is the current one:** the copy follows the shared repository, which now knows the new solar panel node.
