@@ -5949,6 +5949,7 @@ const catalogue: Record<string, string> = {
 "solx_stale_left_out": "Sockets without recent data, left out of these sums: {0}",
 "solx_partial": "Some battery does not say its capacity: the capacity and energy sums are incomplete.",
 "solx_estimated": "The charge left of some battery is worked out from its state of charge.",
+"solx_full_estimated": "Some battery has not said its capacity yet: it is counted as the others, which are all the same.",
 "solx_attention": "Needs attention: {0} faults and {1} warnings",
 "solx_all_ok": "No fault in any battery or cell that reports.",
 "solx_severity_fault": "Fault",

@@ -5850,6 +5850,7 @@ const catalogue: Record<string, string> = {
 "solx_stale_left_out": "Tomas sin datos recientes, fuera de estas sumas: {0}",
 "solx_partial": "Alguna batería no dice su capacidad: las sumas de capacidad y energía están incompletas.",
 "solx_estimated": "La carga restante de alguna batería se calcula a partir de su estado de carga.",
+"solx_full_estimated": "Alguna batería aún no ha dicho su capacidad: se cuenta como las demás, que son todas iguales.",
 "solx_attention": "Requiere atención: {0} fallos y {1} avisos",
 "solx_all_ok": "Ningún fallo en las baterías y celdas que informan.",
 "solx_severity_fault": "Fallo",

@@ -48,8 +48,21 @@ describe("the sums of several sockets of batteries", () => {
     const silent = socket("old", [module(1, 80, { capacity_ah: undefined, full_capacity_ah: undefined })], {}, { capacity_ah: undefined, full_capacity_ah: 50, energy_kwh: undefined });
     expect(stackFigures(silent.reading as SolarBatteryReading)).toMatchObject({ capacity_ah: null, full_capacity_ah: 50, energy_kwh: null });
     expect(bankSummary([silent]).partial).toBe(true);
-    const half = socket("half", [module(1, 80), module(2, 80, { full_capacity_ah: undefined })]);
+    const half = socket("half", [module(1, 80), module(2, 80, { full_capacity_ah: undefined, model: "US3000C" })]);
     expect(stackFigures(half.reading as SolarBatteryReading)).toMatchObject({ capacity_ah: 40, full_capacity_ah: 50, partial: true });
+  });
+
+  it("count a battery that has not said its capacity as the others when they are all alike: 2 of 8 and 7 of 8", () => {
+    const pack = (device: string, sheets: number[]) => {
+      const stack = Array.from({ length: 8 }, (_, i) => module(i + 1, 100, sheets.includes(i + 1) ? {} : { full_capacity_ah: undefined, model: undefined }));
+      // what an older node adds up: only the batteries that said their capacity
+      return socket(device, stack, {}, { capacity_ah: 400, full_capacity_ah: 50 * sheets.length, energy_kwh: 20 });
+    };
+    const bank = bankSummary([pack("bank-a", [1, 2]), pack("bank-b", [1, 2, 3, 4, 5, 6, 8])]);
+    expect([bank.capacity_ah, bank.full_capacity_ah, bank.energy_kwh]).toEqual([800, 800, 40]);
+    expect([bank.fullEstimated, bank.partial, bank.estimated]).toEqual([true, false, false]);
+    const mixed = socket("mixed", [module(1, 100), module(2, 100, { full_capacity_ah: 74 }), module(3, 100, { full_capacity_ah: undefined })]);
+    expect(stackFigures(mixed.reading as SolarBatteryReading)).toMatchObject({ full_capacity_ah: 124, partial: true, fullEstimated: false });
   });
 
   it("find the lowest and highest cell with their place, and leave out stale sockets and examples", () => {

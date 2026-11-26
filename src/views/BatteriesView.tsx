@@ -57,7 +57,7 @@ export function BatteriesView({ t, origin, devices, totals, now, unreachable, wa
       {totals && <div className="solar-totals" data-tour="bat-totals">
         <Tile colour={bank.soc_percent === null ? SOLAR_COLOURS.muted : TONE[levelTone(bank.soc_percent)]} label={t("solarSoc")} value={bank.soc_percent === null ? "–" : `${bank.soc_percent} %`} />
         <Tile colour={SOLAR_COLOURS.battery} label="kWh" value={bank.energy_kwh === null ? "–" : formatEnergy(bank.energy_kwh)} />
-        <Tile colour={SOLAR_COLOURS.load} label="Ah" value={bank.capacity_ah === null ? "–" : `${bank.capacity_ah.toFixed(0)}${bank.full_capacity_ah === null ? "" : ` / ${bank.full_capacity_ah.toFixed(0)}`}${capacity === null ? "" : ` (${capacity} %)`}`} />
+        <Tile colour={SOLAR_COLOURS.load} label="Ah" value={bank.capacity_ah === null ? "–" : `${bank.partial || bank.estimated || bank.fullEstimated ? "≈ " : ""}${bank.capacity_ah.toFixed(0)}${bank.full_capacity_ah === null ? "" : ` / ${bank.full_capacity_ah.toFixed(0)}`}${capacity === null ? "" : ` (${capacity} %)`}`} />
         <Tile colour={SOLAR_COLOURS.pv} label={t("solarBatteryPower")} value={bank.power_w === null ? "–" : formatPower(bank.power_w)} />
       </div>}
     </header>
@@ -172,7 +172,7 @@ function StackPanel({ t, origin, stacks, stack, now, history, minutes, setMinute
           <Fact label={t("solarModules")} value={`${r.stack.filter(module => module.present).length} / ${r.stack.length}`} />
         </dl>
         {held !== undefined && whole !== undefined && <div className="solar-capacity" data-tour="bat-capacity">
-        <div className="solar-capacity-head"><span>{t("solarCapacity")}</span><b>{figures.partial || figures.estimated ? "≈ " : ""}{held.toFixed(1)} / {whole.toFixed(1)} Ah{remaining === null ? "" : ` · ${remaining} %`}</b></div>
+        <div className="solar-capacity-head"><span>{t("solarCapacity")}</span><b title={figures.fullEstimated ? t("solx_full_estimated") : undefined}>{figures.partial || figures.estimated || figures.fullEstimated ? "≈ " : ""}{held.toFixed(1)} / {whole.toFixed(1)} Ah{remaining === null ? "" : ` · ${remaining} %`}</b></div>
         <div className="solar-bar"><i style={{ width: `${remaining ?? 0}%`, background: TONE[levelTone(remaining ?? 0)] }} /></div>
       </div>}
         </div>

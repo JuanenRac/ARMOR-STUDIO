@@ -5924,6 +5924,7 @@ const catalogue: Record<string, string> = {
 "solx_stale_left_out": "没有近期数据、未计入合计的接口：{0}",
 "solx_partial": "有电池未报告容量：容量和电量合计不完整。",
 "solx_estimated": "部分电池的剩余容量由其电量状态推算。",
+"solx_full_estimated": "有电池尚未报告容量：按其余完全相同的电池计算。",
 "solx_attention": "需要关注：{0} 个故障，{1} 个警告",
 "solx_all_ok": "有数据的电池和单体均无故障。",
 "solx_severity_fault": "故障",

@@ -5920,6 +5920,7 @@ const catalogue: Record<string, string> = {
 "solx_stale_left_out": "最近のデータがなく合計から除外した接続口: {0}",
 "solx_partial": "容量を返さないバッテリーがあるため、容量と電力量の合計は不完全です。",
 "solx_estimated": "一部のバッテリーの残量は充電率から計算しています。",
+"solx_full_estimated": "容量をまだ返していないバッテリーは、すべて同じである他のバッテリーと同じ容量として数えます。",
 "solx_attention": "要確認: 異常 {0} 件、警告 {1} 件",
 "solx_all_ok": "応答しているバッテリーとセルに異常はありません。",
 "solx_severity_fault": "異常",
