@@ -5876,6 +5876,8 @@ const catalogue: Record<string, string> = {
 "solx_history_old": "Este servidor todavía no guarda el histórico por batería y celda: actualiza ARMOR-SERVER.",
 "solx_chart_help": "Arrastra sobre una gráfica para ampliar y haz doble clic para volver; un nombre de la leyenda oculta su curva.",
 "solx_zoom_reset": "Quitar zoom",
+"solx_cells_small": "Una gráfica pequeña por cada celda",
+"solx_cells_small_note": "Todas las gráficas pequeñas usan la misma escala; las líneas discontinuas son los niveles de alarma de las celdas.",
 "solx_csv": "Exportar CSV",
 "solx_min": "mín",
 "solx_max": "máx",

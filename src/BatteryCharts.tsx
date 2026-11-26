@@ -8,6 +8,7 @@ import { batteryHistory, solarHistory } from "./api";
 import type { Translate } from "./components/camera";
 import { usePolled } from "./hooks";
 import type { Threshold } from "./solarChartData";
+import { CellMultiples, useSmallCellCharts } from "./solarCellMultiples";
 import { ProChart } from "./solarCharts";
 import { isLfp } from "./solarFaults";
 import { SOLAR_THRESHOLDS, type SolarLevels } from "./solarThresholds";
@@ -27,6 +28,7 @@ type Props = { t: Translate; origin: string; stacks: BatteryView[]; current: Bat
 export function BatteryCharts({ t, origin, stacks, current, now, history, minutes, setMinutes, levels }: Props) {
   const [scope, setScope] = useState<Scope>("stack");
   const [chosen, setChosen] = useState(0);
+  const [small, setSmall] = useSmallCellCharts();
   const key = stackKey(current);
   const modules = presentModules(current);
   const module = modules.find(item => item.n === chosen) ?? modules[0];
@@ -62,9 +64,11 @@ export function BatteryCharts({ t, origin, stacks, current, now, history, minute
     </div>
     {(scope === "battery" || scope === "cells") && <>
       <label className="sl-pro-pick">{t("solarModule")} <select value={module?.n ?? 0} onChange={event => setChosen(Number(event.target.value))}>{modules.map(item => <option key={item.n} value={item.n}>{item.n}</option>)}</select></label>
+      {scope === "cells" && <label className="sl-pro-pick"><input type="checkbox" checked={small} onChange={event => setSmall(event.target.checked)} /> {t("solx_cells_small")}</label>}
       {note && <p className="muted small" data-testid="battery-history-note">{note}</p>}
     </>}
     <p className="muted small">{t("solx_chart_help")}</p>
+    {scope === "cells" && small && <CellMultiples t={t} samples={samples} cells={module?.cells_v ?? []} from={from} to={now} thresholds={cellLevels} lfp={lfp} />}
     <div className="bat-charts" key={`${scope}/${key}/${module?.n ?? 0}/${minutes}`}>
       {scope === "cells" ? <>
         <ProChart {...common} title={t("solarCells")} decimals={3} thresholds={cellLevels} csvName={name("cells")}

@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A small chart for each cell, if you want it:** in the charts by cell of the Batteries menu, a tick (off until used, remembered by the browser) draws one small chart per cell on a common scale, with its latest, lowest and highest voltage and the alarm levels; a cell in fault blinks and says what is wrong.
+- **Nothing is offered to clear when the battery already answers zero:** after reading a statistics counter again from the battery, the clearing stays disabled if the battery says the counter is zero.
+
 ## [0.8.2.8] - Whole battery totals, battery charts from the server and a code for the console
 
 - **The Batteries menu totals a stack whose batteries have not all said their capacity:** when every battery of a stack that told its full capacity told the same one and no two name different models, the others count as those and the figures carry an approximately-equal sign with the reason, in the eight languages; this also corrects what an older node adds up. With different capacities or models the sum stays incomplete, as before.

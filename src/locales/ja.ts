@@ -5947,6 +5947,8 @@ const catalogue: Record<string, string> = {
 "solx_history_old": "このサーバーはまだバッテリーとセルごとの履歴を保存しません。ARMOR-SERVER を更新してください。",
 "solx_chart_help": "グラフ上をドラッグすると拡大、ダブルクリックで戻ります。凡例の名前で線を隠せます。",
 "solx_zoom_reset": "拡大を解除",
+"solx_cells_small": "セルごとの小さなグラフ",
+"solx_cells_small_note": "小さなグラフはすべて同じ目盛りです。破線はセルの警報レベルです。",
 "solx_csv": "CSVで保存",
 "solx_min": "最小",
 "solx_max": "最大",

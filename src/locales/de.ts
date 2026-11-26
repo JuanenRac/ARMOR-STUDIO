@@ -5791,6 +5791,8 @@ const catalogue: Record<string, string> = {
 "solx_history_old": "Dieser Server speichert den Verlauf je Batterie und Zelle noch nicht: aktualisieren Sie ARMOR-SERVER.",
 "solx_chart_help": "Zum Zoomen über ein Diagramm ziehen, Doppelklick hebt auf; ein Name in der Legende blendet die Kurve aus.",
 "solx_zoom_reset": "Zoom aufheben",
+"solx_cells_small": "Ein kleines Diagramm je Zelle",
+"solx_cells_small_note": "Alle kleinen Diagramme haben dieselbe Skala; die gestrichelten Linien sind die Alarmschwellen der Zellen.",
 "solx_csv": "CSV speichern",
 "solx_delta": "Zellspreizung",
 "solx_level_high": "oberer Grenzwert",
