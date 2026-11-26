@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The Batteries menu totals a stack whose batteries have not all said their capacity:** when every battery of a stack that told its full capacity told the same one and no two name different models, the others count as those and the figures carry an approximately-equal sign with the reason, in the eight languages; this also corrects what an older node adds up. With different capacities or models the sum stays incomplete, as before.
+
 ## [0.8.2.7] - A detailed battery menu with charts, blinking faults and checks, and every solar protocol
 
 - **The shared project tool is the current one:** the copy follows the shared repository, which now knows the new solar panel node.

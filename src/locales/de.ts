@@ -5757,6 +5757,7 @@ const catalogue: Record<string, string> = {
 "solx_stale_left_out": "Anschlüsse ohne aktuelle Daten, nicht in diesen Summen: {0}",
 "solx_partial": "Eine Batterie nennt ihre Kapazität nicht: die Summen für Kapazität und Energie sind unvollständig.",
 "solx_estimated": "Die Restladung einer Batterie wird aus ihrem Ladezustand berechnet.",
+"solx_full_estimated": "Eine Batterie hat ihre Kapazität noch nicht genannt: sie wird wie die anderen gezählt, die alle gleich sind.",
 "solx_attention": "Aufmerksamkeit nötig: {0} Fehler und {1} Warnungen",
 "solx_all_ok": "Kein Fehler in den meldenden Batterien und Zellen.",
 "solx_severity_fault": "Fehler",

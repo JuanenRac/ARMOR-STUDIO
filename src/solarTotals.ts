@@ -16,17 +16,33 @@ export type StackFigures = {
   partial: boolean;
   /** Some battery's charge left was worked out from its state of charge. */
   estimated: boolean;
+  /** Some battery has not said its full capacity and is counted as the others. */
+  fullEstimated: boolean;
 };
 
+/**
+ * The full capacity to take for a battery that has not said its own: that of the others of the stack, only when every one that said it said the same and no two batteries name different
+ * models. null: nothing is assumed. The node counts its own total the same way (ARMOR-NODE-SOLAR core/pylontech.hpp, shared_capacity); an older node does not.
+ */
+export function sharedCapacity(present: ReadonlyArray<{ model?: string; full_capacity_ah?: number }>): number | null {
+  const models = new Set(present.map(module => module.model).filter(model => model !== undefined && model !== ""));
+  const said = present.map(module => module.full_capacity_ah).filter((value): value is number => value !== undefined);
+  if (models.size > 1 || said.length === 0 || said.some(value => Math.abs(value - said[0]) > 0.005)) return null;
+  return said[0];
+}
+
 export function stackFigures(reading: SolarBatteryReading): StackFigures {
-  const present = reading.stack.filter(module => module.present);
+  const listed = reading.stack.filter(module => module.present);
+  const each = sharedCapacity(listed);
+  const fullEstimated = each !== null && listed.some(module => module.full_capacity_ah === undefined);
+  const present: SolarModuleReading[] = fullEstimated ? listed.map(module => (module.full_capacity_ah === undefined ? { ...module, full_capacity_ah: each as number } : module)) : listed;
   const counts = { present: present.length, slots: reading.stack.length, cells: present.reduce((sum, module) => sum + (module.cells_v?.length ?? 0), 0) };
   const judged = present.filter(module => module.full_capacity_ah !== undefined && (module.capacity_ah !== undefined || module.soc_percent !== undefined));
   // the node's own pair is only wrong when some battery says one side and not the other; otherwise it is kept
   const mismatched = present.some(module => (module.capacity_ah === undefined) !== (module.full_capacity_ah === undefined));
-  if (!mismatched || judged.length === 0) {
+  if ((!mismatched && !fullEstimated) || judged.length === 0) {
     const some = present.some(module => module.capacity_ah !== undefined) && present.some(module => module.capacity_ah === undefined);
-    return { ...counts, capacity_ah: reading.capacity_ah ?? null, full_capacity_ah: reading.full_capacity_ah ?? null, energy_kwh: reading.energy_kwh ?? null, partial: some, estimated: false };
+    return { ...counts, capacity_ah: reading.capacity_ah ?? null, full_capacity_ah: reading.full_capacity_ah ?? null, energy_kwh: reading.energy_kwh ?? null, partial: some, estimated: false, fullEstimated: false };
   }
   let remaining = 0, full = 0, estimated = false;
   for (const module of judged) {
@@ -37,7 +53,7 @@ export function stackFigures(reading: SolarBatteryReading): StackFigures {
   }
   const partial = judged.length < present.length;
   const energy = !partial && !estimated && reading.energy_kwh !== undefined ? reading.energy_kwh : reading.voltage_v !== undefined ? remaining * reading.voltage_v / 1000 : null;
-  return { ...counts, capacity_ah: remaining, full_capacity_ah: full, energy_kwh: energy, partial, estimated };
+  return { ...counts, capacity_ah: remaining, full_capacity_ah: full, energy_kwh: energy, partial, estimated, fullEstimated };
 }
 
 /** Where an extreme is: its value, the stack ("node/device"), the battery and, for a cell, the cell (counted from 1). */
@@ -51,7 +67,7 @@ export type BankSummary = {
   current_a: number | null; power_w: number | null;
   cell_min: Where | null; cell_max: Where | null; delta_mv: number | null;
   temperature_min: Where | null; temperature_max: Where | null;
-  partial: boolean; estimated: boolean; examples: boolean;
+  partial: boolean; estimated: boolean; fullEstimated: boolean; examples: boolean;
 };
 
 export const stackKey = (view: Pick<SolarDeviceView, "node_id" | "device">): string => `${view.node_id}/${view.device}`;
@@ -68,7 +84,7 @@ export function bankSummary(devices: readonly SolarDeviceView[]): BankSummary {
   const live = stacks.filter(view => !view.stale && view.reading.modules > 0);
   const sum: BankSummary = {
     sockets: stacks.length, live: live.length, stale: stacks.filter(view => view.stale).length, batteries: 0, slots: 0, cells: 0, soc_percent: null, capacity_ah: null, full_capacity_ah: null,
-    energy_kwh: null, current_a: null, power_w: null, cell_min: null, cell_max: null, delta_mv: null, temperature_min: null, temperature_max: null, partial: false, estimated: false,
+    energy_kwh: null, current_a: null, power_w: null, cell_min: null, cell_max: null, delta_mv: null, temperature_min: null, temperature_max: null, partial: false, estimated: false, fullEstimated: false,
     examples: stacks.length > 0 && stacks.every(view => view.example),
   };
   const add = (total: number | null, value: number | null): number | null => (value === null ? total : (total ?? 0) + value);
@@ -79,7 +95,7 @@ export function bankSummary(devices: readonly SolarDeviceView[]): BankSummary {
     const reading = view.reading, key = stackKey(view), figures = stackFigures(reading);
     sum.batteries += figures.present; sum.slots += figures.slots; sum.cells += figures.cells;
     sum.capacity_ah = add(sum.capacity_ah, figures.capacity_ah); sum.full_capacity_ah = add(sum.full_capacity_ah, figures.full_capacity_ah); sum.energy_kwh = add(sum.energy_kwh, figures.energy_kwh);
-    sum.partial = sum.partial || figures.partial || figures.capacity_ah === null; sum.estimated = sum.estimated || figures.estimated;
+    sum.partial = sum.partial || figures.partial || figures.capacity_ah === null; sum.estimated = sum.estimated || figures.estimated; sum.fullEstimated = sum.fullEstimated || figures.fullEstimated;
     sum.current_a = add(sum.current_a, reading.current_a ?? null);
     sum.power_w = add(sum.power_w, reading.voltage_v !== undefined && reading.current_a !== undefined ? reading.voltage_v * reading.current_a : null);
     if (reading.soc_percent !== undefined) charges.push({ soc: reading.soc_percent, full: figures.full_capacity_ah, modules: figures.present });

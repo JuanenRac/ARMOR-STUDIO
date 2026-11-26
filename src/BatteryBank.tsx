@@ -17,7 +17,7 @@ export function BankPanel({ t, bank, stacks }: { t: Translate; bank: BankSummary
     const view = stacks.find(item => stackKey(item) === at.stack);
     return [view ? displayName(view) : at.stack, at.module === undefined ? null : `${t("solarModule")} ${at.module}`, at.cell === undefined ? null : `${t("solarCellWord")} ${at.cell}`].filter(Boolean).join(" · ");
   };
-  const about = bank.estimated || bank.partial ? "≈ " : "";
+  const about = bank.estimated || bank.partial || bank.fullEstimated ? "≈ " : "";
   const fact = (label: string, value: string, note?: string, tone?: string) => <div className={`solar-fact ${tone ?? ""}`}><dt>{label}</dt><dd>{value}{note && <small>{note}</small>}</dd></div>;
   return <section className="solar-card bat-bank" data-testid="bank-summary" aria-label={t("solx_bank_title")}>
     <div className="solar-card-head"><h3>{t("solx_bank_title")}</h3></div>
@@ -38,6 +38,7 @@ export function BankPanel({ t, bank, stacks }: { t: Translate; bank: BankSummary
     {bank.stale > 0 && <p className="solar-notice bad">{fill(t("solx_stale_left_out"), bank.stale)}</p>}
     {bank.partial && <p className="muted small">{t("solx_partial")}</p>}
     {bank.estimated && <p className="muted small">{t("solx_estimated")}</p>}
+    {bank.fullEstimated && <p className="muted small">{t("solx_full_estimated")}</p>}
   </section>;
 }
 

@@ -5763,6 +5763,7 @@ const catalogue: Record<string, string> = {
 "solx_stale_left_out": "Prises sans données récentes, hors de ces sommes : {0}",
 "solx_partial": "Une batterie n'indique pas sa capacité : les sommes de capacité et d'énergie sont incomplètes.",
 "solx_estimated": "La charge restante d'une batterie est calculée à partir de son état de charge.",
+"solx_full_estimated": "Une batterie n'a pas encore indiqué sa capacité : elle est comptée comme les autres, qui sont toutes identiques.",
 "solx_attention": "À surveiller : {0} défauts et {1} avertissements",
 "solx_all_ok": "Aucun défaut dans les batteries et cellules qui répondent.",
 "solx_severity_fault": "Défaut",
