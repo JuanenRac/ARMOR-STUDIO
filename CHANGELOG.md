@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.2.7] - A detailed battery menu with charts, blinking faults and checks, and every solar protocol
+
 - **The shared project tool is the current one:** the copy follows the shared repository, which now knows the new solar panel node.
 
 - **The copy of the HTTP contract is the one ARMOR-COMMON generates now:** the types gain the catalogue of the equipment protocols (`catalog.protocols`).
