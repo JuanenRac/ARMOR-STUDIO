@@ -162,9 +162,12 @@ describe("verify", () => {
 
 describe("the protocols a node speaks", () => {
   it("lists every protocol of the shared catalogue once, by the message it becomes, and follows the server's table when there is one", () => {
-    expect(new Set(SOLAR_PROTOCOLS.map(item => item.id)).size).toBe(15);
-    expect(protocolsFor("inverter").map(item => item.id)).toEqual(["pi30", "pi30-revo", "pi18", "pi41", "pi34", "modbus-smg2", "modbus-srne-hybrid", "modbus-srne-mppt", "vedirect-mppt"]);
-    expect(protocolsFor("battery").map(item => item.id)).toEqual(["vedirect-monitor", "pylontech-console", "ant-bms", "daly-uart", "jbd", "jk-rs485"]);
+    expect(new Set(SOLAR_PROTOCOLS.map(item => item.id)).size).toBe(19);
+    expect(likelyProtocol("inverter", "voltronic-no-crc", "pi00", SOLAR_PROTOCOLS)?.id).toBe("pi00");
+    expect(likelyProtocol("inverter", "infinisolar-lv6k-wp", "pi17", SOLAR_PROTOCOLS)?.id).toBe("pi17");
+    expect(likelyProtocol("inverter", "victron-phoenix", "inverter", SOLAR_PROTOCOLS)?.id).toBe("vedirect-inverter");
+    expect(protocolsFor("inverter").map(item => item.id)).toEqual(["pi30", "pi00", "pi17", "pi30-revo", "pi18", "pi41", "pi34", "modbus-smg2", "modbus-srne-hybrid", "modbus-srne-mppt", "vedirect-mppt", "vedirect-inverter"]);
+    expect(protocolsFor("battery").map(item => item.id)).toEqual(["vedirect-monitor", "vedirect-monitor-hex", "pylontech-console", "ant-bms", "daly-uart", "jbd", "jk-rs485"]);
     expect(protocolsFor("battery", [{ id: "x", port_kind: "x", dialect: "", baud: 1, message: "battery" }]).map(item => item.id)).toEqual(["x"]);
   });
 
