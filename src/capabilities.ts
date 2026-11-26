@@ -27,6 +27,8 @@ export type SecurityOptions = {
   "panel.proxy_http": boolean;
   /** From outside the house, every administrator route is closed by the route itself under the policies operate and view (on by default). */
   "remote.gate_by_route": boolean;
+  /** From outside the house, unlocking the root console asks for a code of the second factor besides the password (on by default). */
+  "remote.console_second_factor": boolean;
   /** With the signed copy of the alarm states on, only states the panel itself said are signed (off by default). */
   "server.alarm_state_signature_node_only": boolean;
   /** A firmware job from GitHub refuses a version older than the one a node runs, and an image of another kind (on by default). */

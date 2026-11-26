@@ -1,16 +1,15 @@
 /**
- * The history of the Batteries menu at four depths: the whole bank, one socket's stack, one battery and its cells. The bank and the stack come from the server's history; the server keeps
- * none by battery or cell, so those two show what this browser has seen since Studio was opened.
+ * The history of the Batteries menu at four depths: the whole bank, one socket's stack, one battery and its cells. All of them come from the server's history, which also keeps each
+ * battery and its cells.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useState } from "react";
-import { solarHistory } from "./api";
+import { batteryHistory, solarHistory } from "./api";
 import type { Translate } from "./components/camera";
 import { usePolled } from "./hooks";
 import type { Threshold } from "./solarChartData";
 import { ProChart } from "./solarCharts";
 import { isLfp } from "./solarFaults";
-import { solarRecorder } from "./solarRecorder";
 import { SOLAR_THRESHOLDS, type SolarLevels } from "./solarThresholds";
 import { SOLAR_COLOURS } from "./solarGraphics";
 import { displayName, type ChartSeries, type SolarSample } from "./solarModel";
@@ -35,8 +34,17 @@ export function BatteryCharts({ t, origin, stacks, current, now, history, minute
   const bank = usePolled(
     () => (scope === "bank" ? Promise.all(stacks.map(stack => solarHistory(origin, stack.node_id, stack.device, minutes).then(answer => answer.samples))) : Promise.resolve(null)),
     30_000, `${scope === "bank" ? everyStack : ""}/${minutes}/${origin}`);
+  const wanted = scope === "battery" || scope === "cells" ? module?.n : undefined;
+  const recorded = usePolled(
+    () => (wanted === undefined ? Promise.resolve(null) : batteryHistory(origin, current.node_id, current.device, wanted, minutes)),
+    30_000, `${wanted ?? ""}/${key}/${minutes}/${origin}`);
+  // an answer that is still about another battery or range is not drawn
+  const mine = recorded.data && recorded.data.node_id === current.node_id && recorded.data.device === current.device && recorded.data.minutes === minutes ? recorded.data : null;
+  const answer = mine && mine.module === wanted ? mine : null;
+  const note = answer ? (answer.retention_days === 0 ? t("solx_history_off") : t("solx_recorded_note").replace("{0}", String(answer.every_s)).replace("{1}", String(answer.retention_days)))
+    : mine && mine.module === undefined ? t("solx_history_old") : "";
   const from = now - minutes * 60_000;
-  const samples: SolarSample[] = scope === "bank" ? mergeBank(bank.data ?? [], bankBucketMs(minutes)) : scope === "stack" ? derivedSamples(history) : module ? solarRecorder.samples(key, module.n) : [];
+  const samples: SolarSample[] = scope === "bank" ? mergeBank(bank.data ?? [], bankBucketMs(minutes)) : scope === "stack" ? derivedSamples(history) : answer?.samples ?? [];
   const lfp = module ? isLfp(module, current.registered?.model) : false;
   const cellLevels: Threshold[] = scope !== "bank" && lfp ? [{ value: SOLAR_THRESHOLDS.lfpCellHighV, label: t("solx_level_high"), tone: "bad" }, { value: SOLAR_THRESHOLDS.lfpCellLowV, label: t("solx_level_low"), tone: "bad" }] : [];
   const deltaLevels: Threshold[] = [{ value: levels.cell_spread_mv, label: t("solx_level_high"), tone: "warn" }];
@@ -54,7 +62,7 @@ export function BatteryCharts({ t, origin, stacks, current, now, history, minute
     </div>
     {(scope === "battery" || scope === "cells") && <>
       <label className="sl-pro-pick">{t("solarModule")} <select value={module?.n ?? 0} onChange={event => setChosen(Number(event.target.value))}>{modules.map(item => <option key={item.n} value={item.n}>{item.n}</option>)}</select></label>
-      <p className="muted small">{t("solx_recorded_note")}</p>
+      {note && <p className="muted small" data-testid="battery-history-note">{note}</p>}
     </>}
     <p className="muted small">{t("solx_chart_help")}</p>
     <div className="bat-charts" key={`${scope}/${key}/${module?.n ?? 0}/${minutes}`}>

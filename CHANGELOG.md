@@ -5,6 +5,8 @@ All notable changes to this project are documented here.
 ## [Unreleased]
 
 - **The Batteries menu totals a stack whose batteries have not all said their capacity:** when every battery of a stack that told its full capacity told the same one and no two name different models, the others count as those and the figures carry an approximately-equal sign with the reason, in the eight languages; this also corrects what an older node adds up. With different capacities or models the sum stays incomplete, as before.
+- **The charts by battery and cell come from the server:** ARMOR-SERVER keeps the history of each battery and cell, so the charts reach back as far as it does and no longer start empty each time Studio is opened; the browser records nothing. With a server from before this, the menu says so.
+- **The root console asks for a code from outside the house:** the lock form of the console gains the code of the second factor when the server asks for it, and the security options gain its switch (on by default).
 
 ## [0.8.2.7] - A detailed battery menu with charts, blinking faults and checks, and every solar protocol
 

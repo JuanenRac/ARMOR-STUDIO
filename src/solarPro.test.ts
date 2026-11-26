@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 import { samplesToCsv, seriesStats, thresholdsInView } from "./solarChartData";
 import { bankFaults, blinking, cellFault, isLfp, moduleFaults } from "./solarFaults";
 import type { SolarBatteryReading, SolarDeviceView, SolarModuleReading, SolarSample } from "./solarModel";
-import { SolarRecorder } from "./solarRecorder";
 import { likelyProtocol, protocolsFor, SOLAR_PROTOCOLS } from "./solarProtocols";
 import { SOLAR_THRESHOLDS } from "./solarThresholds";
 import { bankBucketMs, bankSummary, derivedSamples, mergeBank, stackFigures } from "./solarTotals";
@@ -88,20 +87,6 @@ describe("the histories", () => {
     expect(merged[0]).toMatchObject({ t: 0, current_a: 5, power_w: 256, voltage_v: 51, soc_percent: 70, cell_min_v: 3.2, cell_max_v: 3.32, delta_mv: 120 });
     expect(derivedSamples(a)[0]).toMatchObject({ power_w: 100, delta_mv: 20 });
     expect([bankBucketMs(60), bankBucketMs(43_200)]).toEqual([60_000, 4_320_000]);
-  });
-
-  it("keep each battery and cell of what the browser read, once per reading, and start again when a real reading replaces an example", () => {
-    const recorder = new SolarRecorder({ everyMs: 1000, keep: 2 });
-    const at = (ms: number, example = false) => [socket("bank-a", [module(1, 50)], { received_at: new Date(ms).toISOString(), example })];
-    recorder.record(at(NOW, true));
-    recorder.record(at(NOW + 5000));
-    recorder.record(at(NOW + 5000));
-    recorder.record(at(NOW + 5100));
-    expect(recorder.samples("solar-1/bank-a", 1)).toHaveLength(1);
-    expect(recorder.samples("solar-1/bank-a", 1)[0]).toMatchObject({ cell1: 3.3, cell15: 3.3, power_w: -49.5, delta_mv: 0 });
-    recorder.record(at(NOW + 10_000));
-    recorder.record(at(NOW + 20_000));
-    expect(recorder.samples("solar-1/bank-a", 1).map(sample => sample.t)).toEqual([NOW + 10_000, NOW + 20_000]);
   });
 
   it("write CSV, measure a series and draw only the levels near the data", () => {
