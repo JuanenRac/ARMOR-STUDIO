@@ -22,7 +22,9 @@ export function stackFigures(reading: SolarBatteryReading): StackFigures {
   const present = reading.stack.filter(module => module.present);
   const counts = { present: present.length, slots: reading.stack.length, cells: present.reduce((sum, module) => sum + (module.cells_v?.length ?? 0), 0) };
   const judged = present.filter(module => module.full_capacity_ah !== undefined && (module.capacity_ah !== undefined || module.soc_percent !== undefined));
-  if (judged.length === 0) {
+  // the node's own pair is only wrong when some battery says one side and not the other; otherwise it is kept
+  const mismatched = present.some(module => (module.capacity_ah === undefined) !== (module.full_capacity_ah === undefined));
+  if (!mismatched || judged.length === 0) {
     const some = present.some(module => module.capacity_ah !== undefined) && present.some(module => module.capacity_ah === undefined);
     return { ...counts, capacity_ah: reading.capacity_ah ?? null, full_capacity_ah: reading.full_capacity_ah ?? null, energy_kwh: reading.energy_kwh ?? null, partial: some, estimated: false };
   }
