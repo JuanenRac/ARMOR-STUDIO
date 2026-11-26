@@ -18,6 +18,7 @@ import { ActionMenu, ControlDialog, GroupActions, OperationView, type DialogRequ
 import "./electrical-live.css";
 import "./node-health.css";
 import "./node-control.css";
+import type { PortProblem } from "../api/nodeHealth";
 
 const sinceIso = (iso: string, now: number, t: Translate): string => {
   const seconds = Math.max(0, Math.round((now - Date.parse(iso)) / 1000));
@@ -100,6 +101,7 @@ export function NodeCard({ t, node, serverContract, levels, now, opened, toggle,
     </header>
     {chips.length > 0 && <div className="nc-chips" data-testid={`nc-chips-${node.node_id}`}>{chips.map(chip => <span key={chip.id} className={`el-pill nc-chip ${chip.id}`}>{chip.text}</span>)}</div>}
     {node.warnings.length > 0 && <ul className="nh-warnings">{node.warnings.map(warning => <li key={warning.code}>{t(`nh_warn_${warning.code}`)}{warningExplanation(warning, t) && <small className="nh-warning-why">{warningExplanation(warning, t)}</small>}</li>)}</ul>}
+    {node.port_problems && node.port_problems.length > 0 && <PortProblems t={t} problems={node.port_problems} />}
     <dl className="nh-facts">
       <div><dt>{t("nh_firmware")}</dt><dd>{node.firmware}{node.board ? ` · ${node.board}` : ""}{contractState(report.contract, serverContract) === "different" && <span className="contract-warning" title={t("ct_help")} data-testid={`nh-contract-${node.node_id}`}>{` · ⚠ ${t("ct_differs").replace("{node}", report.contract ?? "").replace("{server}", serverContract ?? "")}`}</span>}</dd></div>
       <div><dt>{t("nh_uptime")}</dt><dd>{formatUptime(report.uptime_s, t)}</dd></div>
@@ -129,6 +131,18 @@ export function NodeCard({ t, node, serverContract, levels, now, opened, toggle,
     </div>
     {opened && <Detail t={t} origin={origin} node={node} />}
   </section>;
+}
+
+/** The serial ports of a solar node that hear bytes and read nothing: what the bytes look like and the settings of the line. */
+function PortProblems({ t, problems }: { t: Translate; problems: PortProblem[] }) {
+  return <div className="nh-ports" data-testid="nh-ports">
+    <strong>{t("solx_port_title")}</strong>
+    <ul className="nh-warnings">{problems.map(item => <li key={item.port}>
+      {t(`solx_port_${item.cause}`)}
+      <small className="nh-warning-why">{[String(item.port), String(item.baud), String(item.rx), String(item.tx), t(item.inverted ? "solx_port_inverted" : "solx_port_normal"), String(item.bytes_heard), item.sample || "–"]
+        .reduce((text, value, index) => text.replace(`{${index}}`, value), t("solx_port_line"))}</small>
+    </li>)}</ul>
+  </div>;
 }
 
 function Line({ title, values, unit, none }: { title: string; values: number[]; unit: string; none: string }) {

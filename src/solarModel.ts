@@ -153,6 +153,15 @@ export function compositionWarnings(stack: SolarModuleReading[]): CompositionWar
   return out;
 }
 
+/**
+ * A battery of a console stack that is there and has told nothing about itself, while others of the same stack have: the node asked its data sheet with the first reading and got no
+ * answer. (A stack where no battery has a sheet says nothing: there is no telling it from a battery board that has none.)
+ */
+export function sheetUnanswered(module: SolarModuleReading, stack: readonly SolarModuleReading[]): boolean {
+  const silent = (item: SolarModuleReading): boolean => item.model === undefined && item.full_capacity_ah === undefined && item.cycles === undefined && item.counters === undefined && item.soft_version === undefined;
+  return module.present && (module.cells_v?.length ?? 0) > 0 && silent(module) && stack.some(item => item.present && (item.board_version !== undefined || item.soft_version !== undefined || item.console_baud !== undefined));
+}
+
 /** The cells (counted from 1, as a person counts them) the battery's console calls abnormal in its state of health. */
 export const abnormalCells = (module: Pick<SolarModuleReading, "soh_abnormal">): number[] => (module.soh_abnormal ?? []).map(cell => cell + 1);
 

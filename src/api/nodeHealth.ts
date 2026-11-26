@@ -38,9 +38,13 @@ export type MaintenanceReason = "restart" | "pause" | "standby" | "update" | "up
 export type MaintenanceWindow = { source: "node" | "operator" | "both"; reason: MaintenanceReason; remaining_s: number; requested_by?: string; at_ms?: number };
 /** What the server knows of the control state of a node (its own report, or what the orders left it in) and its maintenance window. */
 export type NodeControlView = { state: ControlState; maintenance: boolean; since_ms?: number; by?: string; until_s?: number; maintenance_until_s?: number; window?: MaintenanceWindow; source: "node" | "server" };
+/** A serial port of a solar gateway node that hears bytes and reads nothing, as the server read it back from the node's error line. */
+export type PortProblem = { port: number; cause: "flat" | "echo" | "noise" | "text" | "frames"; baud: number; rx: number; tx: number; inverted: boolean; bytes_heard: number; sample: string; said_at: string };
 export type NodeHealthItem = {
   node_id: string; family: HealthFamily; firmware: string; board?: string; report: NodeHealthReport; received_at: string; stale: boolean; status: "ok" | "warning" | "stale";
   warnings: HealthWarning[]; restarts_24h: number; last_restart?: HealthRestart; control?: NodeControlView;
+  /** Absent when there is none, and with an older server. */
+  port_problems?: PortProblem[];
 };
 export type HealthSample = { at: number; heap_free: number; heap_min: number; heap_internal_free?: number; heap_internal_largest?: number; rssi_dbm?: number; link_up: boolean; uptime_s: number; broker_reconnects: number };
 export type NodeHealthDetail = NodeHealthItem & { samples: HealthSample[]; restarts: HealthRestart[] };
