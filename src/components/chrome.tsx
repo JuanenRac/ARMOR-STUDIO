@@ -2,6 +2,7 @@
  * The Studio shell: sidebar, top bar, and the About and Help dialogs.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
+import "../views/battery-quiet.css";
 import { PasswordInput } from "./PasswordInput";
 import { useState } from "react";
 import { useDialogFocus } from "./useDialogFocus";
@@ -24,8 +25,8 @@ import { DialogLogo } from "../menuLogos";
 
 const NAV_CLOSED_KEY = "armor-studio-nav-closed";
 
-export function Sidebar({ view, setView, sidebarOpen, toggle, alarmBadge, t }: {
-  view: View; setView: (view: View) => void; sidebarOpen: boolean; toggle: () => void; /** Alarms waiting for a person. */ alarmBadge: number; t: Translate;
+export function Sidebar({ view, setView, sidebarOpen, toggle, alarmBadge, batteryMark, t }: {
+  view: View; setView: (view: View) => void; sidebarOpen: boolean; toggle: () => void; /** Alarms waiting for a person. */ alarmBadge: number; /** A discreet battery mark. */ batteryMark?: "new" | "known"; t: Translate;
 }) {
   // The groups can be folded; which ones are folded is remembered in this browser. The group of the screen you are on never hides it.
   const [closed, setClosed] = useState<ReadonlySet<string>>(() => { try { return new Set<string>(JSON.parse(window.localStorage.getItem(NAV_CLOSED_KEY) ?? "[]") as string[]); } catch { return new Set<string>(); } });
@@ -48,7 +49,7 @@ export function Sidebar({ view, setView, sidebarOpen, toggle, alarmBadge, t }: {
         <button type="button" className="nav-group-title" aria-expanded={!folded} title={folded ? t("navGroupUnfold") : t("navGroupFold")} onClick={() => flip(group.title)}>
           <i aria-hidden="true">{folded ? "▸" : "▾"}</i><strong className="nav-group-name">{t(group.title)}</strong>{folded && waiting > 0 && <b className="nav-badge">{waiting}</b>}
         </button>
-        <div className="nav-items">{group.items.map(([key, icon]) => <button key={key} data-tour={`nav-${key}`} className={view === key ? "active" : ""} onClick={() => setView(key)} title={t(key)}><span className="nav-icon">{icon}</span><em>{t(key)}</em>{key === "alarms" && alarmBadge > 0 && <b className="nav-badge">{alarmBadge}</b>}</button>)}</div>
+        <div className="nav-items">{group.items.map(([key, icon]) => <button key={key} data-tour={`nav-${key}`} className={view === key ? "active" : ""} onClick={() => setView(key)} title={t(key)}><span className="nav-icon">{icon}</span><em>{t(key)}</em>{key === "alarms" && alarmBadge > 0 && <b className="nav-badge">{alarmBadge}</b>}{key === "batteries" && batteryMark && <i className={`nav-battery-mark ${batteryMark}`} role="img" aria-label={t(`batn_mark_${batteryMark}`)} title={t(`batn_mark_${batteryMark}`)}>ⓘ</i>}</button>)}</div>
       </div>;
     })}</nav>
   </aside>;

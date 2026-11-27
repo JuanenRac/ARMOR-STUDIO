@@ -45,7 +45,7 @@ export function OverviewView({ t, origin, mode, toggleMode, demo, nodes, cameras
   const system = usePolled(() => readSystem(origin), 6000, origin).data;
   const [mapMode, setMapMode] = useMapMode("armor-studio-overview-map");
   const feed = usePolled(() => listHistory(origin, { limit: 12 }), 5000, origin).data?.events ?? [];
-  const active = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at);
+  const active = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at && !alarm.quiet);
   const critical = active.some(alarm => alarm.severity === "critical");
   const tracks = nodes.reduce((sum, node) => sum + (node.online && !node.stale ? node.target_count : 0), 0);
   const nodesOnline = nodes.filter(node => node.online && !node.stale).length;

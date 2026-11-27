@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Battery alarms no longer turn the console into a fair:** with "once and discreet" (the default, in Batteries) a battery alarm makes no sound, voice, pop-up, notification, blinking title or red count: only a mark by Batteries and its entry in Alarms, lit again only when it gets worse or another appears. "As until now" keeps the old behaviour. A battery or one module can be silenced and unsilenced, with the list in sight. Needs a server that sends `quiet`. Tested on a computer.
+- **Today's widest cell gap says where it came from:** the time, module and cell, the readings left out and a button that starts the day again.
 - **The solar equipment lists are in order:** adding an inverter or a battery, the models and the protocols show Voltronic or Pylontech first, then by name, and *other* last. The same entries and values as before.
 - **Firmware of a whole battery stack:** *Battery maintenance* walks a stack one module at a time, with the console cable moved to each battery: the list of modules, a check that writes nothing, the serial number typed to confirm, the result of each one, a stop at the first failure that can be taken up later, and the cable returned at the end. A doubtful chip or an image that does not fit blocks it with no way to force it. The single update can be tried again on a battery left in its bootloader. Writing stays off unless turned on in the node and the server. Tested on a computer with invented data; not tried on a battery.
 

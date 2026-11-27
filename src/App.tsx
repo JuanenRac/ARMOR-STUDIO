@@ -233,7 +233,10 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   // the menu the person is in is remembered for "open where I was"; the first visit starts the welcome tour
   useEffect(() => { if (getPrefs().lastView !== view) setPrefs({ lastView: view }); }, [view]);
   useEffect(() => { if (!shouldAutoStart()) return undefined; const timer = window.setTimeout(() => { if (shouldAutoStart()) startTour("welcome"); }, 1400); return () => window.clearTimeout(timer); }, []);
-  const alarmsPending = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at).length;
+  const alarmsPending = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at && !alarm.quiet).length;
+  // a battery problem is only a mark by its menu: lit while a new (or worse) one waits, dim for the ones already told; a silenced battery shows nothing
+  const batteryWaiting = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at && (alarm.quiet === "new" || alarm.quiet === "known"));
+  const batteryMark = batteryWaiting.some(alarm => alarm.quiet === "new") ? "new" : batteryWaiting.length > 0 ? "known" : undefined;
   const cameraNames = useMemo(() => Object.fromEntries(cameras.map(camera => [camera.id, camera.name])), [cameras]);
 
   useEffect(() => {
@@ -431,7 +434,7 @@ function StudioConsole({ origin, setOrigin, onSignOut }: { origin: string; setOr
   // A wall-panel account is for the panels (ARMOR-NODE-ALARM, ARMOR-NODE-HMI), not for Studio: every menu would answer it with a refusal.
   if (sessionUser.user?.role === "panel") return <main className="studio-login-shell"><div className="studio-login-card"><h1>A.R.M.O.R. Studio</h1><p role="alert">{t("panel_account_notice")}</p><button className="primary" onClick={onSignOut}>{t("signOut")}</button></div></main>;
   return <SessionUserContext.Provider value={sessionUser}><KnownNodesContext.Provider value={knownNodes}><StreamRenewContext.Provider value={renewStream}><div className="studio-frame"><a className="skip-link" href="#studio-main" onClick={event => { event.preventDefault(); document.getElementById("studio-main")?.focus(); }}>{t("ux_skip")}</a><main className={`studio-shell ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
-    <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} alarmBadge={alarmsPending} t={t} />
+    <Sidebar view={view} setView={setView} sidebarOpen={sidebarOpen} toggle={() => setSidebarOpen(value => !value)} alarmBadge={alarmsPending} batteryMark={batteryMark} t={t} />
     <section className="main-stage" data-tour="stage" id="studio-main" tabIndex={-1}>
       <p className="ux-sr" role="status" aria-live="polite" data-testid="view-announcement">{t("ux_now_showing").replace("{0}", t(view))}</p>
       <TopBar view={view} revision={state.revision} mode={state.mode} armingMode={modesOn ? state.arming_mode : undefined} demo={connectionState === "demo"} siteStatus={siteSync.status} fullScreen={fullScreen} isFullScreen={fullscreen.active} openAbout={() => setAboutOpen(true)} openHelp={() => setHelpOpen(true)} toggleMode={toggleMode} readOnly={cannotToggle} checkPerimeter={() => setCheckOpen(true)} remote={remoteConnection} t={t} />

@@ -7,6 +7,8 @@ export type Alarm = {
   false_alarm?: boolean; false_alarm_by?: string;
   /** The facts the server attached (which device, which port, what the numbers were). */
   detail?: Record<string, string | number | boolean>;
+  /** Battery alarms only: it must not call for attention (no sound, voice, pop-up, blinking or red), only a discreet mark. */
+  quiet?: "new" | "known" | "silenced";
 };
 /** Where an alarm can come from: the same closed list as the server and the contract. */
 export type AlarmSourceType = "node" | "camera" | "device" | "solar" | "electrical" | "network" | "alarm";

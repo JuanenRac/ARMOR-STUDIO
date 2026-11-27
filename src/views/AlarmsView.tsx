@@ -71,7 +71,7 @@ export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mo
   const recent = [...(alarms?.recent ?? []), ...everyActive.filter(alarm => alarm.acknowledged_at)].sort((a, b) => b.raised_at.localeCompare(a.raised_at));
   const pending = active.filter(alarm => !alarm.acknowledged_at).length;
   const stateOf = (alarm: Alarm) => !alarm.acknowledged_at ? (alarm.cleared_at ? "ended" : "active") : "going";
-  const worst = active.some(alarm => alarm.severity === "critical" && !alarm.acknowledged_at) ? "critical" : active.some(alarm => !alarm.acknowledged_at) ? "warning" : "clear";
+  const worst = active.some(alarm => alarm.severity === "critical" && !alarm.quiet) ? "critical" : active.some(alarm => !alarm.quiet) ? "warning" : "clear";
 
   /** Do something to the alarms, then refresh the list; if it fails, say why (the real status), not one sentence for everything. */
   const act = async (work: () => Promise<unknown>, done?: (result: unknown) => string) => {
@@ -135,8 +135,8 @@ export function AlarmsView({ t, origin, alarms, reload, devices, cameraNames, mo
     </div>
 
     <div className="alarm-list" data-tour="al-list">
-      {shownActive.map(alarm => <article key={alarm.id} className={`alarm-card ${alarm.severity} ${stateOf(alarm)}`}>
-        <span className={`severity-chip ${alarm.severity}`}>{t(`severity_${alarm.severity}`)}</span>
+      {shownActive.map(alarm => <article key={alarm.id} className={`alarm-card ${alarm.quiet ? "quiet" : alarm.severity} ${stateOf(alarm)}`}>
+        {alarm.quiet ? <span className={`severity-chip quiet ${alarm.quiet}`}><span aria-hidden="true">{alarm.quiet === "silenced" ? "🔕 " : "ⓘ "}</span>{t(`batn_mark_${alarm.quiet}`)}</span> : <span className={`severity-chip ${alarm.severity}`}>{t(`severity_${alarm.severity}`)}</span>}
         <div className="alarm-body">
           <strong>{t(`alarm_${alarm.code}`)}</strong>
           <span className="alarm-source"><AlarmSource alarm={alarm} devices={devices} cameraNames={cameraNames} t={t} /></span>

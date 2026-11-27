@@ -1,0 +1,11 @@
+/* Battery alarms told once and discreet (or a silenced battery): nothing blinks and nothing is a big red block; the words and figures stay. */
+.bat-discreet .sl-blink-fault, .bat-discreet .sl-blink-fault * { animation: none !important; box-shadow: none !important; }
+.bat-discreet .is-fault, .bat-discreet .bat-module.abnormal, .bat-discreet .bat-faults li.fault { border-color: var(--line, #5a6470) !important; background: transparent !important; }
+.bat-discreet .solar-pill.bad, .bat-discreet .bat-faults li.fault strong, .bat-discreet .bat-faults li.fault .bat-fault-icon, .bat-discreet .solar-fact.bad dd { background: transparent !important; color: inherit !important; border-color: currentColor !important; }
+.bat-silence { font-size: 0.8rem; }
+.bat-notices ul, .bat-day-note ul { padding-left: 1.2rem; }
+.bat-day-note { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.nav-battery-mark { margin-left: auto; font-style: normal; opacity: 0.5; }
+.nav-battery-mark.new { opacity: 1; color: #d9a441; }
+.alarm-card.quiet { opacity: 0.85; }
+.severity-chip.quiet { background: transparent; border: 1px solid currentColor; }
