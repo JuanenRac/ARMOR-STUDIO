@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { samplesToCsv, seriesStats, thresholdsInView } from "./solarChartData";
 import { bankFaults, blinking, cellFault, isLfp, moduleFaults } from "./solarFaults";
 import type { SolarBatteryReading, SolarDeviceView, SolarModuleReading, SolarSample } from "./solarModel";
-import { likelyProtocol, protocolsFor, SOLAR_PROTOCOLS } from "./solarProtocols";
+import { inSelectOrder, likelyProtocol, protocolsFor, SOLAR_PROTOCOLS } from "./solarProtocols";
 import { SOLAR_THRESHOLDS } from "./solarThresholds";
 import { bankBucketMs, bankSummary, derivedSamples, mergeBank, stackFigures } from "./solarTotals";
 import { checkLive, clearingFor, parseStatCounter, verdictOf, type VerifyTarget } from "./solarVerify";
@@ -169,6 +169,13 @@ describe("the protocols a node speaks", () => {
     expect(protocolsFor("inverter").map(item => item.id)).toEqual(["pi30", "pi00", "pi17", "pi30-revo", "pi18", "pi41", "pi34", "modbus-smg2", "modbus-srne-hybrid", "modbus-srne-mppt", "vedirect-mppt", "vedirect-inverter"]);
     expect(protocolsFor("battery").map(item => item.id)).toEqual(["vedirect-monitor", "vedirect-monitor-hex", "pylontech-console", "ant-bms", "daly-uart", "jbd", "jk-rs485"]);
     expect(protocolsFor("battery", [{ id: "x", port_kind: "x", dialect: "", baud: 1, message: "battery" }]).map(item => item.id)).toEqual(["x"]);
+  });
+
+  it("orders a list for a person without losing an entry: the usual make first, then by name, the others last", () => {
+    const ordered = inSelectOrder(SOLAR_PROTOCOLS, item => item.id, item => item.label ?? item.id).map(item => item.id);
+    expect([...ordered].sort()).toEqual(SOLAR_PROTOCOLS.map(item => item.id).sort());
+    expect(ordered.slice(0, 2)).toEqual(["pi30", "pylontech-console"]);
+    expect(inSelectOrder(["other", "jk", "ant", "voltronic"], id => id, id => id)).toEqual(["voltronic", "ant", "jk", "other"]);
   });
 
   it("proposes one only when the model tells", () => {
