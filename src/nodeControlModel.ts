@@ -163,7 +163,7 @@ export function stateChips(node: Pick<NodeHealthItem, "report" | "received_at"> 
 
 // ---- the errors of the server and the refusals of the nodes -----------------------------------------------------------------------------------
 
-export const REFUSAL_CODES: readonly string[] = ["not_armed", "invalid_token", "token_expired", "rate_limited", "already_restarting", "already_in_state", "busy_update", "busy_upload", "busy_slot_copy", "busy_battery", "unavailable"];
+export const REFUSAL_CODES: readonly string[] = ["not_armed", "invalid_token", "token_expired", "rate_limited", "already_restarting", "already_in_state", "busy_update", "busy_upload", "busy_slot_copy", "busy_battery", "busy_guarding", "unavailable"];
 /** The key that tells a node's refusal in words (a code nobody knows is "refused for a reason this version does not know"). */
 export const refusalKey = (code: string | undefined): string => (code && REFUSAL_CODES.includes(code) ? `nc_refusal_${code}` : "nc_refusal_unknown");
 

@@ -4726,6 +4726,7 @@ const catalogue: Record<string, string> = {
 "nc_refusal_busy_upload": "Der Knoten empfängt gerade einen Upload. Warten Sie, bis er fertig ist.",
 "nc_refusal_busy_slot_copy": "Der Knoten kopiert gerade einen Firmware-Slot. Warten Sie, bis er fertig ist.",
 "nc_refusal_busy_battery": "Der Knoten führt gerade einen Batterievorgang aus. Warten Sie, bis er fertig ist.",
+"nc_refusal_busy_guarding": "Die Anlage ist scharf oder läutet: zuerst unscharf schalten.",
 "nc_refusal_unavailable": "Der Knoten kann diesen Befehl nicht ausführen.",
 "nc_refusal_unknown": "Der Knoten hat den Befehl aus einem Grund abgelehnt, den diese Version nicht kennt.",
 "nc_err_invalid_request": "Der Server hat den Befehl nicht akzeptiert: Prüfen Sie den eingegebenen Namen oder das Wort und die Dauer.",

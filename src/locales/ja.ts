@@ -4862,6 +4862,7 @@ const catalogue: Record<string, string> = {
 "nc_refusal_busy_upload": "ノードはアップロードを受信中です。完了するまでお待ちください。",
 "nc_refusal_busy_slot_copy": "ノードはファームウェアスロットをコピー中です。完了するまでお待ちください。",
 "nc_refusal_busy_battery": "ノードはバッテリー操作を実行中です。完了するまでお待ちください。",
+"nc_refusal_busy_guarding": "パネルは警戒中または鳴動中です。先に解除してください。",
 "nc_refusal_unavailable": "このノードはこの操作を実行できません。",
 "nc_refusal_unknown": "ノードはこのバージョンが把握していない理由で操作を拒否しました。",
 "nc_err_invalid_request": "サーバーが操作を受け付けませんでした。入力した名前や単語と長さを確認してください。",

@@ -4741,6 +4741,7 @@ const catalogue: Record<string, string> = {
 "nc_refusal_busy_upload": "Le nœud reçoit un envoi de fichier. Attendez la fin.",
 "nc_refusal_busy_slot_copy": "Le nœud copie un emplacement de micrologiciel. Attendez la fin.",
 "nc_refusal_busy_battery": "Le nœud effectue une opération sur une batterie. Attendez la fin.",
+"nc_refusal_busy_guarding": "La centrale est armée ou sonne : désarmez-la d'abord.",
 "nc_refusal_unavailable": "Le nœud ne peut pas exécuter cet ordre.",
 "nc_refusal_unknown": "Le nœud a refusé l'ordre pour une raison que cette version ne connaît pas.",
 "nc_err_invalid_request": "Le serveur n'a pas accepté l'ordre : vérifiez le nom ou le mot saisi et la durée.",
