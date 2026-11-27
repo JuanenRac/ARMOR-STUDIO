@@ -87,6 +87,7 @@ export function KioskScreen({ origin, onSignOut }: { origin: string; onSignOut: 
       </div>
       <section className="kiosk-alarms" aria-label={t("kiosk_alarms")}>
         <h2>{shown.length ? t("kiosk_alarms") : t("kiosk_no_alarms")}</h2>
+        {(alarms.data?.active ?? []).some(alarm => alarm.quiet === "new" && !alarm.cleared_at && !alarm.acknowledged_at) && <p className="kiosk-note"><span aria-hidden="true">ⓘ </span>{t("batn_mark_new")}</p>}
         <ul>{shown.map(alarm => <li key={alarm.id} className={alarm.acknowledged_at ? "seen" : "new"}>
           <span>{alarmWords(language, alarm.code)}</span>
           {!alarm.acknowledged_at && canAcknowledge && <button type="button" onClick={() => acknowledge(alarm.id)}>{t("kiosk_ack")}</button>}

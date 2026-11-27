@@ -4,12 +4,12 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useState } from "react";
-import { readBatteryNotices, resetDayCells, saveBatteryNotices, silenceBattery, type BatteryNotices } from "./api/solar";
+import { readBatteryNotices, resetDayCells, saveBatteryNotices, silenceBattery, type NoticesState } from "./api/solar";
 import { usePolled } from "./hooks";
 import type { DayCells } from "./solarModel";
 
 type Translate = (key: string) => string;
-export type Notices = { data: BatteryNotices | null; failed: boolean; setMode: (mode: "once" | "classic") => void; silence: (id: string, silenced: boolean) => void };
+export type Notices = { data: NoticesState | null; failed: boolean; setMode: (mode: "once" | "classic") => void; silence: (id: string, silenced: boolean) => void };
 
 export function useBatteryNotices(origin: string): Notices {
   const poll = usePolled(async () => readBatteryNotices(origin), 30_000, origin);

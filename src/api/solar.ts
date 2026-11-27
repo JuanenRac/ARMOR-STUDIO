@@ -37,8 +37,8 @@ export async function solarHistory(origin: string, node: string, device: string,
 }
 
 /** How battery alarms call for attention and which batteries are silenced (kept by the server). */
-export type BatteryNotices = { settings: { mode?: "once" | "classic"; forget_after_h?: number; cell_min_plausible_v?: number; cell_max_plausible_v?: number }; silenced: Array<{ id: string; since: string; by: string }> };
-export const readBatteryNotices = (origin: string) => userCall<BatteryNotices>(origin, "GET", "/api/v1/solar/battery-notices");
-export const saveBatteryNotices = (origin: string, settings: BatteryNotices["settings"]) => userCall<BatteryNotices>(origin, "PUT", "/api/v1/solar/battery-notices", settings);
-export const silenceBattery = (origin: string, id: string, silenced: boolean) => userCall<BatteryNotices>(origin, "POST", "/api/v1/solar/battery-notices/silence", { id, silenced });
+export type NoticesState = { settings: { mode?: "once" | "classic"; forget_after_h?: number; cell_min_plausible_v?: number; cell_max_plausible_v?: number }; silenced: Array<{ id: string; since: string; by: string }> };
+export const readBatteryNotices = (origin: string) => userCall<NoticesState>(origin, "GET", "/api/v1/solar/battery-notices");
+export const saveBatteryNotices = (origin: string, settings: NoticesState["settings"]) => userCall<NoticesState>(origin, "PUT", "/api/v1/solar/battery-notices", settings);
+export const silenceBattery = (origin: string, id: string, silenced: boolean) => userCall<NoticesState>(origin, "POST", "/api/v1/solar/battery-notices/silence", { id, silenced });
 export const resetDayCells = (origin: string, node: string, device: string) => userCall<{ reset: boolean }>(origin, "POST", `/api/v1/solar/devices/${encodeURIComponent(node)}/${encodeURIComponent(device)}/day-cells/reset`);
