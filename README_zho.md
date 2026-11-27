@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-1948%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-1942%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.3.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**诚实性检查 - 今天真正能运行的部分：** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，由 1948 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、设计器的几何与检查、报警播报器、助手的词典、八种语言的每个菜单、静态主机），并有浏览器测试。它在 CM5 测试台上日常运行，配有真实的服务器、真实的 IP 摄像头和板上的雷达节点；帮助中的图片使用示例数据制作。**尚未**证明的是：所有可能摄像头的实时视频和 PTZ、使用真实设备的太阳能、电气、报警主机和触摸屏菜单（目前只有雷达节点），以及正式的无障碍或可用性评审。当无法连接服务器时，Studio 会显示演示数据，并在顶部栏说明。
+**诚实性检查 - 今天真正能运行的部分：** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，由 1942 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、设计器的几何与检查、报警播报器、助手的词典、八种语言的每个菜单、静态主机），并有浏览器测试。它在 CM5 测试台上日常运行，配有真实的服务器、真实的 IP 摄像头和板上的雷达节点；帮助中的图片使用示例数据制作。**尚未**证明的是：所有可能摄像头的实时视频和 PTZ、使用真实设备的太阳能、电气、报警主机和触摸屏菜单（目前只有雷达节点），以及正式的无障碍或可用性评审。当无法连接服务器时，Studio 会显示演示数据，并在顶部栏说明。
 
 ---
 
@@ -41,7 +41,7 @@
 | 成熟度 | 成熟 |
 | 角色 | 家族的运维与设计控制台 |
 | 技术栈 | React 19, TypeScript, Vite, Three.js, Leaflet |
-| 测试 | 1948 项（`npm test`，Vitest）和浏览器测试（Playwright） |
+| 测试 | 1942 项（`npm test`，Vitest）和浏览器测试（Playwright） |
 | 契约 | 只与 ARMOR-SERVER 通信（带 HttpOnly 会话的 HTTP `/api/v1/*`、WebSocket `/api/v1/events`） |
 | 监听地址 | `127.0.0.1:5178`（`tools/serve.mjs`） |
 | 运行位置 | 浏览器；文件由 `tools/serve.mjs` 或容器中的 nginx 提供 |
@@ -59,7 +59,7 @@
 | 领域 | 状态 | 在这里的含义 |
 |---|---|---|
 | 软件 | 🟢 | 控制台每天都对 CM5 测试台的真实服务器运行。 |
-| 测试 | 🟢 | 1948 项单元测试通过（`npm test`）并运行浏览器测试：设置、摄像头合并、光伏图表、设计器的几何与检查、报警播报、助手词典以及八种语言的每个菜单。 |
+| 测试 | 🟢 | 1942 项单元测试通过（`npm test`）并运行浏览器测试：设置、摄像头合并、光伏图表、设计器的几何与检查、报警播报、助手词典以及八种语言的每个菜单。 |
 | 界面 | 🟡 | 实时视频和云台并未对所有可能的摄像头验证过，也没有做过正式的无障碍或可用性评审，帮助中的图片使用的是示例数据。 |
 | 硬件 | 🟠 | 每天与真实服务器、真实 IP 摄像头和真实雷达节点一起使用；光伏、电气、报警面板和触摸面板菜单在等待真实节点。 |
 | 安全 | 🟠 | 会话、角色以及拒绝在地址中携带摄像头登录信息均有测试覆盖；没有经过独立审查。 |
@@ -217,7 +217,7 @@ flowchart LR
 
 **只有天气菜单会访问其他服务。** 字体来自本地，其余部分不向第三方请求任何内容。天气菜单仅在账户保存了地点时才会加载 Open-Meteo（预报、地理编码、空气质量）、RainViewer（雷达）、EUMETSAT（云图）和 ArcGIS（地图瓦片）。地点搜索会在点击“搜索”时把输入的文字发送给 Open-Meteo，即使尚未保存地点。静态主机发送限于所配置服务器和这些服务的 `Content-Security-Policy: default-src 'self'`、`frame-ancestors 'none'`、`nosniff` 和 `no-referrer`。
 
-**开关。** *配置 > 安全* 为 ARMOR-SERVER 允许管理员调整的 66 项保护各提供一个控件（撤防 PIN、语音静音、报警设计签名、区域推送、摄像头隧道、网络登录、来自新国家的登录提醒、搁置过旧的电气读数、壁挂面板实时事件、设备锁、节点存储加密和音频限制），默认值都很保守；调低任何一项服务器都会写入审计。详见 [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md)。没有独立的安全审查。
+**开关。** *配置 > 安全* 为 ARMOR-SERVER 允许管理员调整的 68 项保护各提供一个控件（撤防 PIN、语音静音、报警设计签名、区域推送、摄像头隧道、网络登录、来自新国家的登录提醒、搁置过旧的电气读数、壁挂面板实时事件、设备锁、节点存储加密和音频限制），默认值都很保守；调低任何一项服务器都会写入审计。详见 [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md)。没有独立的安全审查。
 
 ## 🔌 接口
 
@@ -250,7 +250,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 连接 127.0.0.1:18080 上的服务器
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # 修改文案后写出每种语言的表
-npm test                                                                       # 1948 项
+npm test                                                                       # 1942 项
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # 提供构建
 ```
