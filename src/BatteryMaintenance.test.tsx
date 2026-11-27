@@ -72,7 +72,7 @@ describe("the values the person types", () => {
     expect(buildParams(fixture, "clear_data", { ...form, which: "history" })).toEqual({ ok: true, params: { which: "history" } });
     expect(buildParams(fixture, "output_set", { ...form, output: "heat", state: "on" })).toEqual({ ok: true, params: { output: "heat", state: "on" } });
     expect(buildParams(fixture, "write_barcode", { ...form, label: "short" })).toEqual({ ok: false, problem: "bm_prob_label" });
-    expect(buildParams(fixture, "write_barcode", { ...form, label: " H221014C32213244 " })).toEqual({ ok: true, params: { serial: "H221014C32213244" } });
+    expect(buildParams(fixture, "write_barcode", { ...form, label: " H000000C30000001 " })).toEqual({ ok: true, params: { serial: "H000000C30000001" } });
     expect(buildParams(fixture, "expert_command", form)).toEqual({ ok: false, problem: "bm_prob_line" });
     expect(buildParams(fixture, "expert_command", { ...form, line: "pwr" })).toEqual({ ok: true, params: { line: "pwr" } });
     expect(buildParams(fixture, "expert_command", { ...form, line: "x".repeat(49) })).toEqual({ ok: false, problem: "bm_prob_line" });
@@ -102,7 +102,7 @@ describe("the values the person types", () => {
   });
 
   it("accepts a serial number the way the node does, and NOSERIAL", () => {
-    expect(serialLooksRight(fixture, "PPTBH02200409223")).toBe(true);
+    expect(serialLooksRight(fixture, "PPTBH00000000001")).toBe(true);
     expect(serialLooksRight(fixture, "NOSERIAL")).toBe(true);
     for (const bad of ["", "short", "has space 12345", "x".repeat(30)]) expect(serialLooksRight(fixture, bad)).toBe(false);
   });
