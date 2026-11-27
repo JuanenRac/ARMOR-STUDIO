@@ -17,7 +17,7 @@ import { usePolled } from "../hooks";
 import { BatteryGraphic, BatteryLogo, CellBars, SOLAR_COLOURS } from "../solarGraphics";
 import {
   abnormalCells, capacityPercent, cellStats, compositionWarnings, counterLines, repeatedEvents, deltaMv, formatReach, displayName, formatAmps, formatEnergy, formatPower, formatVolts, healthTone, levelTone, spreadTone,
-  type LoggedSolarEvent, type ModuleDayCells, type SolarBatteryReading, type SolarCatalog, type SolarDeviceView, type SolarModuleReading, type SolarRegistration, type SolarTotals,
+  type LoggedSolarEvent, type ModuleDayCells, type SolarBatteryReading, type SolarCatalog, type SolarDeviceView, type SolarModuleReading, type SolarRegistration, type SolarTotals, sheetUnanswered,
 } from "../solarModel";
 import { SolarEquipment } from "../SolarEquipment";
 import { EnergyAlarmsCard, EnergyCard } from "./InvertersView";
@@ -196,6 +196,7 @@ function ModuleCard({ t, module, stack, levels, verify, today, open }: { t: Tran
   const remaining = capacityPercent(module.capacity_ah, module.full_capacity_ah);
   if (!module.present) return <div className="bat-module absent"><div className="bat-module-sum"><b>{t("solarModule")} {module.n}</b><span className="solar-pill">{t("solarModuleAbsent")}</span></div></div>;
   const found = moduleFaults(module, levels, isLfp(module, stack.registered?.model));
+  const noSheet = sheetUnanswered(module, stack.reading.stack);
   const faulty = found.some(item => item.severity === "fault");
   const abnormal = abnormalCells(module).length > 0 || faulty;
   const cellFaults = new Map(found.filter(item => item.cell !== undefined).map(item => [item.cell as number, t(`solx_fault_${item.code}`)]));
@@ -205,6 +206,7 @@ function ModuleCard({ t, module, stack, levels, verify, today, open }: { t: Tran
       <b>{t("solarModule")} {module.n}</b>
       {found.length > 0 && <span className={`solar-pill ${faulty ? "bad" : "warn"}`}><span aria-hidden="true">{faulty ? "✖" : "⚠"} </span>{t(`solx_fault_${found[0].code}`)}{found.length > 1 ? ` +${found.length - 1}` : ""}</span>}
       {module.state && <span className="solar-pill">{module.state}</span>}
+      {noSheet && <span className="solar-pill warn" title={t("solx_no_sheet")}>{t("solx_no_sheet_pill")}</span>}
       {module.soc_percent !== undefined && <span className={`solar-pill ${levelTone(module.soc_percent)}`}>{module.soc_percent} %</span>}
       {cells && <span className={`solar-pill ${spreadTone(cells.spreadMv)}`}>Δ {cells.spreadMv} mV</span>}
       {module.voltage_v !== undefined && <span className="bat-mini">{formatVolts(module.voltage_v, 2)}</span>}
@@ -213,6 +215,7 @@ function ModuleCard({ t, module, stack, levels, verify, today, open }: { t: Tran
       {module.soc_percent !== undefined && <span className="solar-bar bat-mini-bar"><i style={{ width: `${module.soc_percent}%`, background: TONE[levelTone(module.soc_percent)] }} /></span>}
     </summary>
     <div className="bat-module-body">
+    {noSheet && <p className="muted small" data-testid="no-sheet">{t("solx_no_sheet")}</p>}
     <dl className="solar-facts compact">
       {module.voltage_v !== undefined && <Fact label={t("solarVoltage")} value={formatVolts(module.voltage_v, 3)} />}
       {module.current_a !== undefined && <Fact label={t("solarCurrent")} value={formatAmps(module.current_a)} />}
