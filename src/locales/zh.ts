@@ -2220,6 +2220,8 @@ const catalogue: Record<string, string> = {
 "fact_by": "选择者",
 "fact_cell": "电芯",
 "fact_cells": "受影响电芯数",
+"fact_bms_word": "电池原文",
+"fact_column": "项目",
 "fact_counter": "计数器",
 "fact_current_a": "电流 (A)",
 "fact_device": "设备",

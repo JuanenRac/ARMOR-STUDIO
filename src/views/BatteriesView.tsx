@@ -18,7 +18,7 @@ import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
 import { BatteryGraphic, BatteryLogo, CellBars, SOLAR_COLOURS } from "../solarGraphics";
 import {
-  abnormalCells, capacityPercent, cellStats, compositionWarnings, counterLines, repeatedEvents, deltaMv, formatReach, displayName, formatAmps, formatEnergy, formatPower, formatVolts, healthTone, levelTone, spreadTone,
+  abnormalCells, makerText, capacityPercent, cellStats, compositionWarnings, counterLines, repeatedEvents, deltaMv, formatReach, displayName, formatAmps, formatEnergy, formatPower, formatVolts, healthTone, levelTone, spreadTone,
   type LoggedSolarEvent, type ModuleDayCells, type SolarBatteryReading, type SolarCatalog, type SolarDeviceView, type SolarModuleReading, type SolarRegistration, type SolarTotals, sheetUnanswered, refusedBatteries,
 } from "../solarModel";
 import { SolarEquipment } from "../SolarEquipment";
@@ -155,9 +155,10 @@ function StackPanel({ t, origin, stacks, stack, now, history, minutes, setMinute
   const stateText = stateWord(r.state, t);
   const [unfolded, setUnfolded] = useState<"all" | "none" | null>(null);
   return <>
-    <section className={`solar-card bat-detail ${stack.stale ? "is-stale" : ""} ${r.alarm || faults.some(fault => fault.stack === key && fault.severity === "fault") ? "is-fault" : ""} ${blinking(faults, key) ? "sl-blink-fault" : ""}`}>
+    <section className={`solar-card bat-detail ${faults.some(fault => fault.stack === key && fault.code === "bms_fault") ? "bat-bms-fault" : ""} ${stack.stale ? "is-stale" : ""} ${r.alarm || faults.some(fault => fault.stack === key && fault.severity === "fault") ? "is-fault" : ""} ${blinking(faults, key) ? "sl-blink-fault" : ""}`}>
       <div className="solar-card-head">
-        <h3>{displayName(stack)} <small>{stack.node_id}{r.model ? ` · ${r.model}` : ""}</small></h3>
+        <h3>{displayName(stack)} <small>{stack.node_id}{r.model ? ` · ${r.model}` : ""}{r.manufacturer ? ` · ${makerText(r, t("solx_deduced"))}` : ""}</small></h3>
+        {faults.some(fault => fault.stack === key && fault.code === "bms_fault") && <span className="solar-pill bad bat-bms-pill"><span aria-hidden="true">✖ </span>{t("solx_fault_bms_fault")}</span>}
         {stack.example && <span className="solar-pill warn">{t("solarExampleBadge")}</span>}
         {r.alarm && <span className="solar-pill bad">{t("solarAlarmOn")}</span>}
         <span className={`solar-pill ${r.state === "charging" ? "ok" : r.state === "discharging" ? "warn" : ""}`}>{stateText}</span>
@@ -213,13 +214,15 @@ function ModuleCard({ t, module, stack, levels, verify, today, open, notices }: 
   const noSheet = sheetUnanswered(module, stack.reading.stack);
   const faulty = found.some(item => item.severity === "fault");
   const abnormal = abnormalCells(module).length > 0 || faulty;
-  const cellFaults = new Map(found.filter(item => item.cell !== undefined).map(item => [item.cell as number, t(`solx_fault_${item.code}`)]));
+  const cellFaults = new Map<number, string>();
+  for (const item of found) if (item.cell !== undefined) cellFaults.set(item.cell, [cellFaults.get(item.cell), `${t(`solx_fault_${item.code}`)}${item.detail ? `: ${item.detail}` : ""}`].filter(Boolean).join(" · "));
+  const broken = found.some(item => item.code === "bms_fault");
   const where = { stack: stackKey(stack), node: stack.node_id, module: module.n };
-  return <details className={`bat-module ${abnormal ? "abnormal" : ""} ${faulty && !stack.stale ? "sl-blink-fault" : ""}`} open={open ?? (abnormal ? true : undefined)}>
+  return <details className={`bat-module ${broken ? "bat-bms-fault" : ""} ${abnormal ? "abnormal" : ""} ${faulty && !broken && !stack.stale ? "sl-blink-fault" : ""}`} open={open ?? (abnormal ? true : undefined)}>
     <summary className="bat-module-sum">
       <b>{t("solarModule")} {module.n}</b>
       <SilenceButton t={t} notices={notices} id={`${stackKey(stack)}/${module.n}`} />
-      {found.length > 0 && <span className={`solar-pill ${faulty ? "bad" : "warn"}`}><span aria-hidden="true">{faulty ? "✖" : "⚠"} </span>{t(`solx_fault_${found[0].code}`)}{found.length > 1 ? ` +${found.length - 1}` : ""}</span>}
+      {found.length > 0 && <span className={`solar-pill ${faulty ? "bad" : "warn"}${broken ? " bat-bms-pill" : ""}`}><span aria-hidden="true">{faulty ? "✖" : "⚠"} </span>{t(`solx_fault_${found[0].code}`)}{found[0].detail ? `: ${found[0].cell === undefined ? "" : `${t("solarCellWord")} ${found[0].cell} `}${found[0].detail}` : ""}{found.length > 1 ? ` +${found.length - 1}` : ""}</span>}
       {module.state && <span className="solar-pill">{module.state}</span>}
       {noSheet && <span className="solar-pill warn" title={t("solx_no_sheet")}>{t("solx_no_sheet_pill")}</span>}
       {module.soc_percent !== undefined && <span className={`solar-pill ${levelTone(module.soc_percent)}`}>{module.soc_percent} %</span>}
@@ -238,6 +241,7 @@ function ModuleCard({ t, module, stack, levels, verify, today, open, notices }: 
       {module.capacity_ah !== undefined && <Fact label={t("solarCapacity")} value={`${module.capacity_ah.toFixed(1)}${module.full_capacity_ah !== undefined ? ` / ${module.full_capacity_ah.toFixed(1)}` : ""} Ah${remaining === null ? "" : ` · ${remaining} %`}`} />}
       {today && <Fact label={t("solarCellsToday")} value={`${formatReach(today.min, t("solarCellWord"))} – ${formatReach(today.max, t("solarCellWord"))} · Δ ${deltaMv(today.delta_v)} mV`} tone={spreadTone(deltaMv(today.delta_v))} />}
       {module.model && <Fact label={t("solarModuleModel")} value={module.model} />}
+      {module.manufacturer && <Fact label={t("solx_maker")} value={makerText(module, t("solx_deduced"))} />}
       {module.serial && <Fact label={t("solx_serial")} value={module.serial} />}
       {module.chip && <Fact label={t("solx_chip")} value={t(chipKey(module.chip))} />}
       {module.board && <Fact label={t("solx_board")} value={module.board} />}

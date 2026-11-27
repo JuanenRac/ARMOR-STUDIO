@@ -2200,6 +2200,8 @@ const catalogue: Record<string, string> = {
 "fact_by": "Elegido por",
 "fact_cell": "Celda",
 "fact_cells": "Celdas afectadas",
+"fact_bms_word": "Palabra de la batería",
+"fact_column": "Columna",
 "fact_counter": "Contador",
 "fact_current_a": "Corriente (A)",
 "fact_device": "Dispositivo",

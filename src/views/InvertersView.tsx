@@ -8,7 +8,7 @@ import { readEnergyAlarms, saveEnergyAlarms, solarEnergy, solarHistory, type Ene
 import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
 import { EnergyBars, FlowDiagram, Gauge, InverterLogo, LineChart, SOLAR_COLOURS } from "../solarGraphics";
-import { displayName, flowsOf, formatEnergy, formatPower, humanize, levelTone, niceScale, ratingRows, type SolarCatalog, type SolarDeviceView, type SolarInverterReading, type SolarRegistration, type SolarTotals } from "../solarModel";
+import { displayName, makerText, flowsOf, formatEnergy, formatPower, humanize, levelTone, niceScale, ratingRows, type SolarCatalog, type SolarDeviceView, type SolarInverterReading, type SolarRegistration, type SolarTotals } from "../solarModel";
 import { SolarEquipment } from "../SolarEquipment";
 import { SolarNodes } from "../SolarNodes";
 import type { NetworkOverview } from "../networkModel";
@@ -160,16 +160,17 @@ function InverterPanel({ t, inverter, now, history, minutes, setMinutes }: { t: 
 }
 
 /** Whether the unit said anything about itself (see UnitInfoCard). */
-export const hasUnitInfo = (reading: SolarInverterReading): boolean => Boolean(reading.serial || reading.firmware || typeof reading.pv_energy_total_wh === "number" || (reading.ratings && ratingRows(reading.ratings).length > 0));
+export const hasUnitInfo = (reading: SolarInverterReading): boolean => Boolean(reading.manufacturer || reading.serial || reading.firmware || typeof reading.pv_energy_total_wh === "number" || (reading.ratings && ratingRows(reading.ratings).length > 0));
 
 /** What the unit says about itself: the serial number and the firmware, the energy the panels have made in all, and its ratings and settings. Nothing when it said none of it. */
 export function UnitInfoCard({ t, reading }: { t: Translate; reading: SolarInverterReading }) {
   const rows = reading.ratings ? ratingRows(reading.ratings) : [];
   const text = (value: string) => (value.startsWith("@") ? t(value.slice(1)) : value);
-  if (!reading.serial && !reading.firmware && typeof reading.pv_energy_total_wh !== "number" && rows.length === 0) return null;
+  if (!reading.manufacturer && !reading.serial && !reading.firmware && typeof reading.pv_energy_total_wh !== "number" && rows.length === 0) return null;
   return <section className="solar-card unit-info">
     <div className="solar-card-head"><h3>{t("solarUnitInfo")}</h3></div>
     <dl className="solar-readings">
+      {reading.manufacturer && <div><dt>{t("solx_maker")}</dt><dd>{makerText(reading, t("solx_deduced"))}</dd></div>}
       {reading.serial && <div><dt>{t("solarSerial")}</dt><dd className="mono">{reading.serial}</dd></div>}
       {reading.firmware && <div><dt>{t("solarFirmware")}</dt><dd className="mono">{reading.firmware}</dd></div>}
       {typeof reading.pv_energy_total_wh === "number" && <div><dt>{t("solarEnergyTotal")}</dt><dd>{formatEnergy(reading.pv_energy_total_wh / 1000)}</dd></div>}

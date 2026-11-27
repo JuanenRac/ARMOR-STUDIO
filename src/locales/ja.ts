@@ -2220,6 +2220,8 @@ const catalogue: Record<string, string> = {
 "fact_by": "選択した人",
 "fact_cell": "セル",
 "fact_cells": "該当セル数",
+"fact_bms_word": "バッテリーの表示語",
+"fact_column": "項目",
 "fact_counter": "カウンター",
 "fact_current_a": "電流 (A)",
 "fact_device": "デバイス",

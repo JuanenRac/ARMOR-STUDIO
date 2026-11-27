@@ -377,6 +377,8 @@ const catalogue: Record<string, string> = {
 "fact_by": "Escolhido por",
 "fact_cell": "Célula",
 "fact_cells": "Células afetadas",
+"fact_bms_word": "Palavra da bateria",
+"fact_column": "Coluna",
 "fact_counter": "Contador",
 "fact_current_a": "Corrente (A)",
 "fact_device": "Dispositivo",

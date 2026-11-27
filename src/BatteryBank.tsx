@@ -55,11 +55,11 @@ export function FaultList({ t, faults, verify, choose }: { t: Translate; faults:
   const row = (fault: Fault, index: number) => {
     const target = targetOfFault(fault);
     const value = fault.value === undefined ? "" : ` ${fault.unit === "V" ? fault.value.toFixed(3) : Number(fault.value.toFixed(1))} ${fault.unit}`;
-    return <li key={`${fault.stack}/${fault.module}/${fault.cell}/${fault.code}/${index}`} className={`${fault.severity}${fault.severity === "fault" && !fault.stale ? " sl-blink-fault" : ""}`}>
+    return <li key={`${fault.stack}/${fault.module}/${fault.cell}/${fault.code}/${index}`} className={`${fault.severity}${fault.code === "bms_fault" ? " bms" : fault.severity === "fault" && !fault.stale ? " sl-blink-fault" : ""}`}>
       <span aria-hidden="true" className="bat-fault-icon">{fault.severity === "fault" ? "✖" : "⚠"}</span>
       <strong>{t(fault.severity === "fault" ? "solx_severity_fault" : "solx_severity_warn")}</strong>
       <button type="button" className="bat-fault-place" onClick={() => choose(fault.stack)}>{fault.name}{fault.module === undefined ? "" : ` · ${t("solarModule")} ${fault.module}`}{fault.cell === undefined ? "" : ` · ${t("solarCellWord")} ${fault.cell}`}</button>
-      <span>{t(`solx_fault_${fault.code}`)}{value}{fault.stale ? ` (${t("solx_last_known")})` : ""}</span>
+      <span>{t(`solx_fault_${fault.code}`)}{fault.detail ? `: ${fault.detail}` : ""}{value}{fault.stale ? ` (${t("solx_last_known")})` : ""}</span>
       {target && <button type="button" onClick={() => verify(target)}>{t("solx_verify")}</button>}
     </li>;
   };
