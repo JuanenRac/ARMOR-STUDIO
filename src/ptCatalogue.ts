@@ -1641,6 +1641,7 @@ export const PT_CATALOGUE: Record<string, string> = {
  "ing_ignored": "Campos de um firmware mais recente que este servidor ignora",
  "ing_empty": "Nenhum nó enviou nada desde que o servidor arrancou.",
  "ing_payload": "O que foi enviado (início)",
+"ing_refused_battery": "O servidor recusa as leituras que {0} envia, por isso o que se vê está desatualizado ou em falta. Motivo: {1}. Verifique se o servidor está atualizado; o menu Sistema mostra o que foi enviado.",
  "solarRange7": "7 dias",
  "solarRange30": "30 dias",
  "enTitle": "Energia por dia",

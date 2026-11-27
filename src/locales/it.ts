@@ -2437,6 +2437,7 @@ const catalogue: Record<string, string> = {
 "ing_ignored": "Campi di un firmware più recente che questo server ignora",
 "ing_empty": "Nessun nodo ha inviato nulla da quando il server è partito.",
 "ing_payload": "Cosa è stato inviato (inizio)",
+"ing_refused_battery": "Il server rifiuta le letture inviate da {0}, quindi quello che si vede è vecchio o manca. Motivo: {1}. Controlla che il server sia aggiornato; il menu Sistema mostra cosa è stato inviato.",
 "rec_title": "Copia del traffico dei nodi",
 "rec_help": "Il file che il server scrive finché l'opzione di Configurazione > Sicurezza è attivata, per riprodurre un incidente sul banco. Non contiene mai ordini ai nodi né campi che sembrino un segreto.",
 "rec_off": "La copia è disattivata. Non viene scritto nulla e il file non si può scaricare.",

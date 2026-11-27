@@ -68,6 +68,20 @@ export type SolarEventRecord = {
   base_state?: string; voltage_state?: string; current_state?: string; temperature_state?: string; coulomb_state?: string; power_events?: string; battery_events?: string; system_fault?: string;
 };
 export type LoggedSolarEvent = { n: number; seen_at: number; event: SolarEventRecord };
+/**
+ * The battery messages the server is refusing now, from the list of what the nodes send (GET /api/v1/system/ingest): without this a stack whose message is refused only looks old or absent.
+ * A topic counts when its last refusal is newer than its last accepted message and what was refused is a battery message.
+ */
+export function refusedBatteries(topics: unknown): Array<{ name: string; error: string }> {
+  if (!Array.isArray(topics)) return [];
+  return (topics as Array<{ topic?: string; last_ok_at?: string | null; last_error?: string | null; last_error_at?: string | null; last_payload?: string | null }>).flatMap(item => {
+    const named = /^armor\/solar\/([^/]+)\/([^/]+)\/state$/.exec(item.topic ?? "");
+    if (!named || !item.last_error_at || !/"kind"\s*:\s*"battery"/.test(item.last_payload ?? "")) return [];
+    if (item.last_ok_at && item.last_ok_at >= item.last_error_at) return [];
+    return [{ name: `${named[1]} / ${named[2]}`, error: item.last_error ?? "" }];
+  });
+}
+
 export type SolarBatteryReading = {
   kind: "battery"; node_id: string; device: string; timestamp_ms: number; modules: number; stack: SolarModuleReading[];
   state?: "charging" | "discharging" | "idle"; voltage_v?: number; current_a?: number; temperature_min_c?: number; temperature_max_c?: number;

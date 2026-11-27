@@ -4,7 +4,7 @@
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { readEnergyAlarms, solarHistory } from "../api";
+import { readEnergyAlarms, readIngest, solarHistory } from "../api";
 import { BankPanel, FaultList } from "../BatteryBank";
 import { BatteryCharts } from "../BatteryCharts";
 import { BatterySerials } from "../BatterySerials";
@@ -19,7 +19,7 @@ import { usePolled } from "../hooks";
 import { BatteryGraphic, BatteryLogo, CellBars, SOLAR_COLOURS } from "../solarGraphics";
 import {
   abnormalCells, capacityPercent, cellStats, compositionWarnings, counterLines, repeatedEvents, deltaMv, formatReach, displayName, formatAmps, formatEnergy, formatPower, formatVolts, healthTone, levelTone, spreadTone,
-  type LoggedSolarEvent, type ModuleDayCells, type SolarBatteryReading, type SolarCatalog, type SolarDeviceView, type SolarModuleReading, type SolarRegistration, type SolarTotals, sheetUnanswered,
+  type LoggedSolarEvent, type ModuleDayCells, type SolarBatteryReading, type SolarCatalog, type SolarDeviceView, type SolarModuleReading, type SolarRegistration, type SolarTotals, sheetUnanswered, refusedBatteries,
 } from "../solarModel";
 import { SolarEquipment } from "../SolarEquipment";
 import { EnergyAlarmsCard, EnergyCard } from "./InvertersView";
@@ -43,6 +43,9 @@ export function BatteriesView({ t, origin, devices, totals, now, unreachable, wa
   const history = usePolled(() => (current ? solarHistory(origin, current.node_id, current.device, minutes) : Promise.resolve(null)), 15_000, `${current?.node_id}/${current?.device}/${minutes}/${origin}`);
   const alarms = usePolled(() => readEnergyAlarms(origin), 300_000, origin);
   const levels: SolarLevels = alarms.data?.settings ?? SOLAR_THRESHOLDS.levels;
+  // A message the server refuses leaves its stack old or absent with nothing said: the list of what the nodes send tells why (an operator reads it).
+  const ingest = usePolled(async () => readIngest(origin), 30_000, origin);
+  const refused = refusedBatteries(ingest.data?.topics);
   const bank = useMemo(() => bankSummary(stacks), [stacks]);
   const faults = useMemo(() => bankFaults(stacks, levels), [stacks, levels]);
   const [verifying, setVerifying] = useState<VerifyTarget | null>(null);
@@ -64,6 +67,7 @@ export function BatteriesView({ t, origin, devices, totals, now, unreachable, wa
       </div>}
     </header>
     {unreachable && <p className="solar-notice bad">{t("solarNoHistory")}</p>}
+    {refused.map(item => <p key={item.name} className="solar-notice bad" role="alert">{t("ing_refused_battery").replace("{0}", item.name).replace("{1}", item.error)}</p>)}
     <details className="bat-section" open={stacks.length === 0}>
       <summary><b>{t("bat_nodes_equipment")}</b><span className="muted">{nodeCount} {t("bat_nodes_word")} · {registrations.length} {t("bat_equipment_word")}</span></summary>
       <div className="bat-section-body">

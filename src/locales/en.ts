@@ -2475,6 +2475,7 @@ const catalogue: Record<string, string> = {
 "ing_ignored": "Fields of a newer firmware that this server ignores",
 "ing_empty": "No node has sent anything since the server started.",
 "ing_payload": "What was sent (start)",
+"ing_refused_battery": "The server refuses the readings that {0} sends, so what is shown for it is old or missing. Reason: {1}. Check that the server is up to date; the System menu shows what was sent.",
 "rec_title": "Copy of the node traffic",
 "rec_help": "The file the server writes while the option in Configuration > Security is on, for playing an incident again on the bench. It never holds orders to the nodes or fields that look like a secret.",
 "rec_off": "The copy is off. Nothing is written and the file cannot be downloaded.",
