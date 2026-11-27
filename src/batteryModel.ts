@@ -42,6 +42,15 @@ export const serialLooksRight = (catalog: BatteryCatalog, text: string): boolean
 
 export type Built = { ok: true; params: Record<string, unknown> } | { ok: false; problem: string };
 
+/** Whether an operation writes a serial number the person types: such an operation is not listed unless it is asked for. */
+export const writesTypedSerial = (spec: { params: Record<string, unknown> }): boolean => "serial" in spec.params;
+
+/** Whether, as filled in, an operation leaves the battery with another serial number or with none: the screen warns, asks for an acknowledgement and asks again before executing. */
+export function changesSerial(spec: { params: Record<string, unknown> } | undefined, form: Pick<BatteryForm, "restoreBarcode">): boolean {
+  if (!spec) return false;
+  return writesTypedSerial(spec) || ("restore_barcode" in spec.params && !form.restoreBarcode);
+}
+
 /** The values to send for an operation from what the person filled in, or the key of the sentence that says what is missing or wrong. */
 export function buildParams(catalog: BatteryCatalog, op: string, form: BatteryForm): Built {
   const spec = specOf(catalog, op);
