@@ -5990,6 +5990,7 @@ const catalogue: Record<string, string> = {
 "solx_port_noise": "字节无法读取：速率、电平或极性有误。",
 "solx_port_text": "收到可读文本，但不是预期的应答：设备类型或协议不同，或设备处于其他模式。",
 "solx_port_frames": "收到字节但从未组成完整报文：请检查速率、极性、接线或端口协议。",
+"solx_port_slave": "该控制台属于电池组中的第 {0} 号电池，它只报告自身：请将节点接到电池组第一台（主机）电池的控制台。",
 "solx_no_sheet_pill": "无资料卡",
 "solx_no_sheet": "该电池不应答其资料卡（型号、额定容量、历史）。电芯和电量可正常读取；节点每隔几分钟会再次询问。",
 "adm_relays": "代理规则开关",

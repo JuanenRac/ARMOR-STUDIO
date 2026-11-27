@@ -5828,6 +5828,7 @@ const catalogue: Record<string, string> = {
 "solx_port_noise": "Die Bytes sind unlesbar: Geschwindigkeit, Spannungspegel oder Polarität stimmen nicht.",
 "solx_port_text": "Es kommt lesbarer Text, aber nicht die erwartete Antwort: eine andere Geräteart, ein anderes Protokoll oder ein anderer Modus.",
 "solx_port_frames": "Es kommen Bytes, aber nie eine ganze Nachricht: Prüfe Geschwindigkeit, Polarität, Adern oder Protokoll des Ports.",
+"solx_port_slave": "Diese Konsole gehört zu Batterie {0} eines Stapels, die nur von sich selbst berichtet: Verbinde den Knoten mit der Konsole der ersten Batterie des Stapels (Master).",
 "solx_no_sheet_pill": "kein Datenblatt",
 "solx_no_sheet": "Diese Batterie beantwortet ihr Datenblatt nicht (Modell, Nennkapazität, Verlauf). Zellen und Ladung werden gelesen; der Knoten fragt alle paar Minuten erneut.",
 "adm_relays": "Schalter der Broker-Regeln",

@@ -5877,6 +5877,7 @@ const catalogue: Record<string, string> = {
 "solx_port_noise": "I byte sono illeggibili: velocità, livello di tensione o polarità sono errati.",
 "solx_port_text": "Arriva testo leggibile ma non la risposta attesa: altro tipo di dispositivo o protocollo, o un'altra modalità.",
 "solx_port_frames": "Arrivano byte ma mai un messaggio completo: controlla velocità, polarità, fili o protocollo della porta.",
+"solx_port_slave": "Questa console è della batteria {0} di una pila, che parla solo di sé: collega il nodo alla console della prima batteria della pila (la master).",
 "solx_no_sheet_pill": "senza scheda",
 "solx_no_sheet": "Questa batteria non risponde alla sua scheda (modello, capacità nominale, storico). Celle e carica vengono lette; il nodo la richiede ogni pochi minuti.",
 "adm_relays": "Interruttori delle regole del broker",

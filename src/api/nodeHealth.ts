@@ -39,7 +39,7 @@ export type MaintenanceWindow = { source: "node" | "operator" | "both"; reason: 
 /** What the server knows of the control state of a node (its own report, or what the orders left it in) and its maintenance window. */
 export type NodeControlView = { state: ControlState; maintenance: boolean; since_ms?: number; by?: string; until_s?: number; maintenance_until_s?: number; window?: MaintenanceWindow; source: "node" | "server" };
 /** A serial port of a solar gateway node that hears bytes and reads nothing, as the server read it back from the node's error line. */
-export type PortProblem = { port: number; cause: "flat" | "echo" | "noise" | "text" | "frames"; baud: number; rx: number; tx: number; inverted: boolean; bytes_heard: number; sample: string; said_at: string };
+export type PortProblem = { port: number; cause: "flat" | "echo" | "noise" | "text" | "frames" | "slave"; module?: number; baud: number; rx: number; tx: number; inverted: boolean; bytes_heard: number; sample: string; said_at: string };
 export type NodeHealthItem = {
   node_id: string; family: HealthFamily; firmware: string; board?: string; report: NodeHealthReport; received_at: string; stale: boolean; status: "ok" | "warning" | "stale";
   warnings: HealthWarning[]; restarts_24h: number; last_restart?: HealthRestart; control?: NodeControlView;

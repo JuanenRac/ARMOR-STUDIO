@@ -6015,6 +6015,7 @@ const catalogue: Record<string, string> = {
 "solx_port_noise": "The bytes are unreadable: the speed, the voltage level or the polarity is wrong.",
 "solx_port_text": "Readable text arrives but not the expected answer: another kind of equipment or protocol, or another mode of it.",
 "solx_port_frames": "Bytes arrive but never make a whole message: check the speed, the polarity, the wires or the protocol of the port.",
+"solx_port_slave": "This console is battery {0} of a stack, which only tells itself: connect the node to the console of the first battery of the stack (the master).",
 "solx_no_sheet_pill": "no data sheet",
 "solx_no_sheet": "This battery does not answer its data sheet (model, rated capacity, history). Its cells and charge are read; the node asks again every few minutes.",
 "adm_relays": "Switches of the broker rules",

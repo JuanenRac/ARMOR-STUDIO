@@ -5834,6 +5834,7 @@ const catalogue: Record<string, string> = {
 "solx_port_noise": "Les octets sont illisibles : la vitesse, le niveau de tension ou la polarité sont faux.",
 "solx_port_text": "Du texte lisible arrive mais pas la réponse attendue : autre type d'équipement ou protocole, ou autre mode.",
 "solx_port_frames": "Des octets arrivent mais jamais un message complet : vérifiez la vitesse, la polarité, les fils ou le protocole du port.",
+"solx_port_slave": "Cette console est celle de la batterie {0} d'une pile, qui ne parle que d'elle-même : branchez le nœud sur la console de la première batterie de la pile (la maître).",
 "solx_no_sheet_pill": "sans fiche",
 "solx_no_sheet": "Cette batterie ne répond pas à sa fiche (modèle, capacité nominale, historique). Ses cellules et sa charge sont lues ; le nœud la redemande toutes les quelques minutes.",
 "adm_relays": "Interrupteurs des règles du broker",

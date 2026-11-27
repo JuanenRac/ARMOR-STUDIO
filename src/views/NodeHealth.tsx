@@ -138,7 +138,7 @@ function PortProblems({ t, problems }: { t: Translate; problems: PortProblem[] }
   return <div className="nh-ports" data-testid="nh-ports">
     <strong>{t("solx_port_title")}</strong>
     <ul className="nh-warnings">{problems.map(item => <li key={item.port}>
-      {t(`solx_port_${item.cause}`)}
+      {t(`solx_port_${item.cause}`).replace("{0}", String(item.module ?? "?"))}
       <small className="nh-warning-why">{[String(item.port), String(item.baud), String(item.rx), String(item.tx), t(item.inverted ? "solx_port_inverted" : "solx_port_normal"), String(item.bytes_heard), item.sample || "–"]
         .reduce((text, value, index) => text.replace(`{${index}}`, value), t("solx_port_line"))}</small>
     </li>)}</ul>

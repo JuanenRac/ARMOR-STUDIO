@@ -10,7 +10,7 @@ const levels: NodeHealthLevels = { low_heap_b: 30000, low_heap_clear_b: 40000, r
 const solar: NodeHealthItem = {
   node_id: "solar-1", family: "solar", firmware: "0.7.2", received_at: new Date().toISOString(), stale: false, status: "ok", restarts_24h: 0, warnings: [],
   report: { kind: "node_health", node_id: "solar-1", timestamp_ms: 1, family: "solar", firmware: "0.7.2", uptime_s: 3_600, reset_reason: "power_on", heap_free: 142_000, heap_min: 98_000, link: "wifi", link_up: true, broker_reconnects: 1 },
-  port_problems: (["flat", "echo", "noise", "text", "frames"] as const).map((cause, index) => ({ port: index + 1, cause, baud: 115200, rx: 16, tx: 15, inverted: index === 1, bytes_heard: 230, sample: "00 00", said_at: new Date().toISOString() })),
+  port_problems: (["flat", "echo", "noise", "text", "frames", "slave"] as const).map((cause, index) => ({ port: index + 1, cause, ...(cause === "slave" ? { module: 9 } : {}), baud: 115200, rx: 16, tx: 15, inverted: index === 1, bytes_heard: 230, sample: "00 00", said_at: new Date().toISOString() })),
 };
 
 describe("a serial port of a solar node that reads nothing", () => {
