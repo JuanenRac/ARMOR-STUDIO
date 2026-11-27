@@ -34,6 +34,12 @@ export function protocolsFor(kind: "inverter" | "battery", served?: readonly Sol
   return (served && served.length > 0 ? served : SOLAR_PROTOCOLS).filter(item => item.message === kind);
 }
 
+/** A list as a person looks for it: the usual make first (Voltronic, Pylontech), the others by name, "other" and "generic" last. A new array: nothing is lost. */
+export function inSelectOrder<T>(items: readonly T[], id: (item: T) => string, name: (item: T) => string): T[] {
+  const rank = (item: T) => /^(voltronic|pi30$|pylontech)/.test(id(item)) ? 0 : /^(other|generic)/.test(id(item)) ? 2 : 1;
+  return [...items].sort((a, b) => rank(a) - rank(b) || name(a).localeCompare(name(b), "en", { numeric: true }));
+}
+
 /** The protocol a model is likely to need: by the dialect the server names for an inverter family, by the make for a battery; undefined when nothing tells (the person chooses). */
 export function likelyProtocol(kind: "inverter" | "battery", model: string, dialect: string | undefined, list: readonly SolarProtocol[]): SolarProtocol | undefined {
   if (kind === "inverter") return dialect && dialect !== "auto" ? list.find(item => item.message === "inverter" && item.dialect === dialect) : undefined;
