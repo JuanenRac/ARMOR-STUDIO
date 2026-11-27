@@ -55,6 +55,8 @@ export type SolarModuleReading = {
   counters?: Record<string, number>;
   /** What the module says about itself: its model (a stack may mix models), the versions of its board and software, its cells, the current it allows each way (amperes, positive) and the speed of its console. */
   model?: string; board_version?: string; main_soft_version?: string; soft_version?: string; cell_count?: number; max_charge_a?: number; max_discharge_a?: number; console_baud?: number;
+  /** From the console's info: the serial number (private data), the Board, the chip the node tells from them (the rules that decide which firmware fits; "unknown" when they cannot), the specification and the other versions. */
+  serial?: string; board?: string; chip?: "older" | "newer" | "unknown"; specification?: string; boot_version?: string; comm_version?: string; release_date?: string;
   /** The state of health of each cell, in cell order, and the cells (0-based) the console does not call Normal. */
   soh_counts?: number[]; soh_abnormal?: number[];
   /** The newest entry of the module's own event log, as the console prints it. */

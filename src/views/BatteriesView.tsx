@@ -7,11 +7,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { readEnergyAlarms, solarHistory } from "../api";
 import { BankPanel, FaultList } from "../BatteryBank";
 import { BatteryCharts } from "../BatteryCharts";
+import { BatterySerials } from "../BatterySerials";
 import { BatteryVerify } from "../BatteryVerify";
 import { bankFaults, blinking, isLfp, moduleFaults, type Fault } from "../solarFaults";
 import { SOLAR_THRESHOLDS, type SolarLevels } from "../solarThresholds";
 import { bankSummary, stackFigures, stackKey } from "../solarTotals";
 import type { VerifyTarget } from "../solarVerify";
+import { chipKey } from "../solarSerials";
 import type { Translate } from "../components/camera";
 import { usePolled } from "../hooks";
 import { BatteryGraphic, BatteryLogo, CellBars, SOLAR_COLOURS } from "../solarGraphics";
@@ -74,6 +76,7 @@ export function BatteriesView({ t, origin, devices, totals, now, unreachable, wa
       <FaultList t={t} faults={faults} verify={verify} choose={key => setChosen(key)} />
       <div ref={verifyBox}>{verifying && verified && <BatteryVerify key={JSON.stringify(verifying)} t={t} origin={origin} isAdmin={isAdmin} target={verifying} stack={verified} levels={levels} close={() => setVerifying(null)} />}</div>
       <BankPanel t={t} bank={bank} stacks={stacks} />
+      <BatterySerials t={t} devices={stacks} />
       <Fleet t={t} stacks={stacks} faults={faults} current={current} choose={key => setChosen(key)} />
       {current && <StackPanel t={t} origin={origin} stacks={stacks} stack={current} now={now} history={history.data?.samples ?? []} minutes={minutes} setMinutes={setMinutes} levels={levels} faults={faults} verify={verify} />}
       <details className="bat-section">
@@ -223,6 +226,13 @@ function ModuleCard({ t, module, stack, levels, verify, today, open }: { t: Tran
       {module.capacity_ah !== undefined && <Fact label={t("solarCapacity")} value={`${module.capacity_ah.toFixed(1)}${module.full_capacity_ah !== undefined ? ` / ${module.full_capacity_ah.toFixed(1)}` : ""} Ah${remaining === null ? "" : ` · ${remaining} %`}`} />}
       {today && <Fact label={t("solarCellsToday")} value={`${formatReach(today.min, t("solarCellWord"))} – ${formatReach(today.max, t("solarCellWord"))} · Δ ${deltaMv(today.delta_v)} mV`} tone={spreadTone(deltaMv(today.delta_v))} />}
       {module.model && <Fact label={t("solarModuleModel")} value={module.model} />}
+      {module.serial && <Fact label={t("solx_serial")} value={module.serial} />}
+      {module.chip && <Fact label={t("solx_chip")} value={t(chipKey(module.chip))} />}
+      {module.board && <Fact label={t("solx_board")} value={module.board} />}
+      {module.specification && <Fact label={t("solx_spec")} value={module.specification} />}
+      {module.boot_version && <Fact label={t("solx_boot")} value={module.boot_version} />}
+      {module.comm_version && <Fact label={t("solx_comm")} value={module.comm_version} />}
+      {module.release_date && <Fact label={t("solx_released")} value={module.release_date} />}
       {(module.board_version || module.main_soft_version || module.soft_version) && <Fact label={t("solarModuleFirmware")} value={[module.board_version, module.main_soft_version, module.soft_version].filter(Boolean).join(" · ")} />}
       {module.cell_count !== undefined && <Fact label={t("solarCellCount")} value={String(module.cell_count)} />}
       {(module.max_charge_a !== undefined || module.max_discharge_a !== undefined) && <Fact label={t("solarCurrentLimits")} value={`${module.max_charge_a !== undefined ? module.max_charge_a.toFixed(0) : "–"} / ${module.max_discharge_a !== undefined ? module.max_discharge_a.toFixed(0) : "–"} A`} />}
