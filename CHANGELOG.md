@@ -4,10 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.3.3] - Battery states, makers, left-out figures and a guarding node
+
 - **A refused pause of an armed panel says why:** a node that guards answers `busy_guarding`, shown in words.
 - **A battery figure that came impossible is told:** the battery shows which figures the node left out of its reading (the rest of the reading is shown as usual).
 - **Batteries say what is wrong and with which one:** a notice (High, Low), a protection or alarm (OV, UV, OC, temperature, any word not known) and a fault of the battery's electronics (SysError, cells it does not read), each with the module, the cell and the battery's own word. The fault stays in still red while it lasts, also with discreet battery alarms or a silenced battery; cells not read no longer count as the lowest of the pack.
 - **The manufacturer** of each battery, module and inverter is shown, saying when it was deduced from the protocol or model.
+
 ## [0.8.3.2] - Battery firmware campaigns, discreet battery alarms and ordered solar lists
 
 - **Battery alarms no longer turn the console into a fair:** with "once and discreet" (the default, in Batteries) a battery alarm makes no sound, voice, pop-up, notification, blinking title or red count: only a mark by Batteries and its entry in Alarms, lit again only when it gets worse or another appears. "As until now" keeps the old behaviour. A battery or one module can be silenced and unsilenced, with the list in sight. Needs a server that sends `quiet`. Tested on a computer.
