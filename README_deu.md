@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Sprache">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Sprachen">
-  <img src="https://img.shields.io/badge/Tests-1948%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-1942%20passing-2ea44f.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.8.3.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Reifegrad">
 </p>
 
 ---
 
-**Ehrlichkeitsprüfung - was heute läuft:** Studio spricht mit [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) und wird von 1948 Unit-Tests abgedeckt (Einstellungen lesen, Kameras zusammenführen, die Arithmetik der Solardiagramme, Geometrie und Prüfungen der Entwurfswerkzeuge, der Alarmansager, das Wörterbuch des Assistenten, jedes Menü in den acht Sprachen, der statische Host) sowie durch Browsertests. Es läuft im täglichen Einsatz am CM5-Testaufbau mit dem echten Server, echten IP-Kameras und einem Radarknoten auf seiner Platine; die Bilder der Hilfe entstehen mit Beispieldaten. **Nicht** bewiesen sind Livevideo und PTZ mit allen möglichen Kameras, die Menüs für Solar, Elektro, Alarmzentralen und Touchpanel mit echten Geräten (es gibt nur den Radarknoten) sowie eine formale Prüfung auf Barrierefreiheit oder Bedienbarkeit. Solange der Server nicht erreichbar ist, zeigt Studio Demodaten und sagt das in der oberen Leiste.
+**Ehrlichkeitsprüfung - was heute läuft:** Studio spricht mit [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) und wird von 1942 Unit-Tests abgedeckt (Einstellungen lesen, Kameras zusammenführen, die Arithmetik der Solardiagramme, Geometrie und Prüfungen der Entwurfswerkzeuge, der Alarmansager, das Wörterbuch des Assistenten, jedes Menü in den acht Sprachen, der statische Host) sowie durch Browsertests. Es läuft im täglichen Einsatz am CM5-Testaufbau mit dem echten Server, echten IP-Kameras und einem Radarknoten auf seiner Platine; die Bilder der Hilfe entstehen mit Beispieldaten. **Nicht** bewiesen sind Livevideo und PTZ mit allen möglichen Kameras, die Menüs für Solar, Elektro, Alarmzentralen und Touchpanel mit echten Geräten (es gibt nur den Radarknoten) sowie eine formale Prüfung auf Barrierefreiheit oder Bedienbarkeit. Solange der Server nicht erreichbar ist, zeigt Studio Demodaten und sagt das in der oberen Leiste.
 
 ---
 
@@ -41,7 +41,7 @@
 | Reifegrad | Etabliert |
 | Rolle | Bedien- und Entwurfskonsole der Familie |
 | Technik | React 19, TypeScript, Vite, Three.js, Leaflet |
-| Tests | 1948 (`npm test`, Vitest) und Browser-Tests (Playwright) |
+| Tests | 1942 (`npm test`, Vitest) und Browser-Tests (Playwright) |
 | Vertrag | Spricht nur mit ARMOR-SERVER (HTTP `/api/v1/*` mit HttpOnly-Sitzung, WebSocket `/api/v1/events`) |
 | Lauscht auf | `127.0.0.1:5178` (`tools/serve.mjs`) |
 | Läuft auf | Ein Browser; die Dateien liefert `tools/serve.mjs` oder das nginx des Containers |
@@ -59,7 +59,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Software | 🟢 | Die Konsole läuft täglich gegen den echten Server des CM5-Prüfstands. |
-| Tests | 🟢 | 1948 Unit-Tests bestehen (`npm test`) und die Browser-Tests laufen: Einstellungen, Zusammenführen der Kameras, Solardiagramme, Geometrie und Prüfungen der Designer, Alarm-Ansager, Wörterbuch des Assistenten und jedes Menü in den acht Sprachen. |
+| Tests | 🟢 | 1942 Unit-Tests bestehen (`npm test`) und die Browser-Tests laufen: Einstellungen, Zusammenführen der Kameras, Solardiagramme, Geometrie und Prüfungen der Designer, Alarm-Ansager, Wörterbuch des Assistenten und jedes Menü in den acht Sprachen. |
 | Oberfläche | 🟡 | Live-Video und PTZ sind nicht mit jeder möglichen Kamera belegt, es gab keine formale Prüfung der Barrierefreiheit oder Bedienbarkeit, und die Bilder der Hilfe entstehen mit Beispieldaten. |
 | Hardware | 🟠 | Er wird täglich mit dem echten Server, echten IP-Kameras und einem echten Radar-Knoten genutzt; die Menüs für Solar, Elektrik, Alarmzentrale und Touch-Panel warten auf echte Knoten. |
 | Sicherheit | 🟠 | Sitzungen, Rollen und die Ablehnung von Kamera-Zugangsdaten in Adressen sind durch Tests abgedeckt; es gab keine unabhängige Prüfung. |
@@ -217,7 +217,7 @@ Aufgenommen auf einem Prüfstand mit erfundenen Beispieldaten und ohne eine echt
 
 **Nur das Wetter-Menü erreicht andere Dienste.** Schriften sind lokal und sonst fragt nichts einen Dritten an. Das Wetter-Menü, und nur bei einem Konto mit gespeichertem Ort, lädt Open-Meteo (Vorhersage, Geokodierung, Luftqualität), RainViewer (Radar), EUMETSAT (Wolken) und ArcGIS (Kartenkacheln). Die Ortssuche sendet den eingegebenen Text an Open-Meteo, sobald Sie auf Suchen klicken, auch bevor ein Ort gespeichert ist. Der statische Host sendet `Content-Security-Policy: default-src 'self'`, beschränkt auf den konfigurierten Server und diese Dienste, `frame-ancestors 'none'`, `nosniff` und `no-referrer`.
 
-**Schalter.** *Konfiguration > Sicherheit* hat ein Bedienelement für jeden der 66 Schutzmechanismen, die ARMOR-SERVER einem Administrator zum Einstellen überlässt (Entschärf-PIN, Stummschalten per Sprache, Signatur des Alarmentwurfs, Zonen-Feed, Kameratunnel, Netzwerk-Logins, Warnung bei Anmeldung aus einem neuen Land, Beiseitelegen alter Elektro-Messwerte, Live-Ereignisse des Wandpanels, Gerätesperre, Verschlüsselung des Knotenspeichers und die Audiogrenzen), jeweils mit konservativem Standard; der Server hält das Absenken im Audit fest. Einzelheiten in [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). Eine unabhängige Sicherheitsprüfung gab es nicht.
+**Schalter.** *Konfiguration > Sicherheit* hat ein Bedienelement für jeden der 68 Schutzmechanismen, die ARMOR-SERVER einem Administrator zum Einstellen überlässt (Entschärf-PIN, Stummschalten per Sprache, Signatur des Alarmentwurfs, Zonen-Feed, Kameratunnel, Netzwerk-Logins, Warnung bei Anmeldung aus einem neuen Land, Beiseitelegen alter Elektro-Messwerte, Live-Ereignisse des Wandpanels, Gerätesperre, Verschlüsselung des Knotenspeichers und die Audiogrenzen), jeweils mit konservativem Standard; der Server hält das Absenken im Audit fest. Einzelheiten in [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). Eine unabhängige Sicherheitsprüfung gab es nicht.
 
 ## 🔌 Schnittstellen
 
@@ -250,7 +250,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 gegen einen Server auf 127.0.0.1:18080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # die Tabelle jeder Sprache nach einer Änderung schreiben
-npm test                                                                       # 1948 Tests
+npm test                                                                       # 1942 Tests
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # den Build ausliefern
 ```
