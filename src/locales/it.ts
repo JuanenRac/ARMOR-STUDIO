@@ -4769,6 +4769,7 @@ const catalogue: Record<string, string> = {
 "nc_refusal_busy_upload": "Il nodo sta ricevendo un caricamento. Attendi che finisca.",
 "nc_refusal_busy_slot_copy": "Il nodo sta copiando uno slot firmware. Attendi che finisca.",
 "nc_refusal_busy_battery": "Il nodo sta eseguendo un'operazione su una batteria. Attendi che finisca.",
+"nc_refusal_busy_guarding": "La centrale è inserita o suona: prima disinseriscila.",
 "nc_refusal_unavailable": "Il nodo non può eseguire questo ordine.",
 "nc_refusal_unknown": "Il nodo ha rifiutato l'ordine per un motivo che questa versione non conosce.",
 "nc_err_invalid_request": "Il server non ha accettato l'ordine: controlla il nome o la parola scritti e la durata.",

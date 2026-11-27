@@ -4887,6 +4887,7 @@ const catalogue: Record<string, string> = {
 "nc_refusal_busy_upload": "The node is receiving an upload. Wait until it finishes.",
 "nc_refusal_busy_slot_copy": "The node is copying a firmware slot. Wait until it finishes.",
 "nc_refusal_busy_battery": "The node is running a battery operation. Wait until it finishes.",
+"nc_refusal_busy_guarding": "The panel is armed or ringing: disarm it first.",
 "nc_refusal_unavailable": "The node cannot do this order.",
 "nc_refusal_unknown": "The node refused the order for a reason this version does not know.",
 "nc_err_invalid_request": "The server did not accept the order: check the name or the word typed and the length.",

@@ -764,6 +764,7 @@ const catalogue: Record<string, string> = {
 "nc_refusal_busy_upload": "O nó está a receber um envio. Espere que termine.",
 "nc_refusal_busy_slot_copy": "O nó está a copiar uma ranhura de firmware. Espere que termine.",
 "nc_refusal_busy_battery": "O nó está a fazer uma operação numa bateria. Espere que termine.",
+"nc_refusal_busy_guarding": "O painel está armado ou a tocar: desarme-o primeiro.",
 "nc_refusal_unavailable": "O nó não pode fazer esta ordem.",
 "nc_refusal_unknown": "O nó recusou a ordem por um motivo que esta versão não conhece.",
 "nc_err_invalid_request": "O servidor não aceitou a ordem: verifique o nome ou a palavra escritos e a duração.",

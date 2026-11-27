@@ -4800,6 +4800,7 @@ const catalogue: Record<string, string> = {
 "nc_refusal_busy_upload": "El nodo está recibiendo una subida. Espera a que termine.",
 "nc_refusal_busy_slot_copy": "El nodo está copiando una ranura de firmware. Espera a que termine.",
 "nc_refusal_busy_battery": "El nodo está haciendo una operación en una batería. Espera a que termine.",
+"nc_refusal_busy_guarding": "El panel está armado o sonando: desármalo antes.",
 "nc_refusal_unavailable": "El nodo no puede hacer esta orden.",
 "nc_refusal_unknown": "El nodo rechazó la orden por un motivo que esta versión no conoce.",
 "nc_err_invalid_request": "El servidor no aceptó la orden: revisa el nombre o la palabra escritos y la duración.",

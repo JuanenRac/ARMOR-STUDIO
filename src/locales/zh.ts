@@ -4865,6 +4865,7 @@ const catalogue: Record<string, string> = {
 "nc_refusal_busy_upload": "节点正在接收上传。请等待完成。",
 "nc_refusal_busy_slot_copy": "节点正在复制固件槽位。请等待完成。",
 "nc_refusal_busy_battery": "节点正在执行电池操作。请等待完成。",
+"nc_refusal_busy_guarding": "面板已布防或正在鸣响：请先撤防。",
 "nc_refusal_unavailable": "该节点无法执行此指令。",
 "nc_refusal_unknown": "节点因本版本未知的原因拒绝了该指令。",
 "nc_err_invalid_request": "服务器未接受该指令：请检查输入的名称或词语以及时长。",
