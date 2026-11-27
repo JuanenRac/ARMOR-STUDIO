@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.3.2] - Battery firmware campaigns, discreet battery alarms and ordered solar lists
+
 - **Battery alarms no longer turn the console into a fair:** with "once and discreet" (the default, in Batteries) a battery alarm makes no sound, voice, pop-up, notification, blinking title or red count: only a mark by Batteries and its entry in Alarms, lit again only when it gets worse or another appears. "As until now" keeps the old behaviour. A battery or one module can be silenced and unsilenced, with the list in sight. Needs a server that sends `quiet`. Tested on a computer.
 - **Today's widest cell gap says where it came from:** the time, module and cell, the readings left out and a button that starts the day again.
 - **The solar equipment lists are in order:** adding an inverter or a battery, the models and the protocols show Voltronic or Pylontech first, then by name, and *other* last. The same entries and values as before.
