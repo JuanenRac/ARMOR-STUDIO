@@ -12,7 +12,7 @@ import {
 } from "./api";
 import { fill } from "./FirmwarePanel";
 import {
-  buildParams, emptyForm, errorKey, isActive, limitGroupOf, operationGroups, percentOf, readLimit, scaleOf, serialLooksRight, showLimit, specOf, batteryNodes, type BatteryForm,
+  buildParams, changesSerial, emptyForm, errorKey, isActive, limitGroupOf, operationGroups, percentOf, readLimit, scaleOf, serialLooksRight, showLimit, specOf, batteryNodes, writesTypedSerial, type BatteryForm,
 } from "./batteryModel";
 
 type Translate = (key: string) => string;
@@ -63,6 +63,9 @@ export function BatteryMaintenance({ t, origin, isAdmin }: Props) {
   const [op, setOp] = useState("");
   const [form, setForm] = useState<BatteryForm>(emptyForm());
   const [serial, setSerial] = useState("");
+  const [serialOps, setSerialOps] = useState(false);   // the operations that write a serial number are listed only when asked for
+  const [acknowledged, setAcknowledged] = useState(false);
+  const [again2, setAgain2] = useState("");   // the serial number typed once more, in front of the button that executes
   const [active, setActive] = useState<BatteryOperation | null>(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
@@ -97,7 +100,7 @@ export function BatteryMaintenance({ t, origin, isAdmin }: Props) {
   }, [active, isAdmin, origin, refresh]);
 
   const catalog = info?.catalog;
-  const groups = useMemo(() => (catalog ? operationGroups(catalog) : []), [catalog]);
+  const groups = useMemo(() => (catalog ? operationGroups(catalog).map(item => ({ ...item, ops: item.ops.filter(entry => serialOps || !writesTypedSerial(specOf(catalog, entry.id) ?? { params: {} })) })).filter(item => item.ops.length > 0) : []), [catalog, serialOps]);
   const spec = catalog && op ? specOf(catalog, op) : undefined;
   const portNumber = Number(port);
   const set = <K extends keyof BatteryForm>(key: K, value: BatteryForm[K]) => setForm(current => ({ ...current, [key]: value }));
@@ -113,6 +116,7 @@ export function BatteryMaintenance({ t, origin, isAdmin }: Props) {
   const goConfirm = () => {
     const built = catalog ? buildParams(catalog, op, form) : { ok: false as const, problem: "bm_prob_choose" };
     if (!built.ok) { setMessage(t(built.problem)); return; }
+    if (changesSerial(spec, form) && !acknowledged) { setMessage(t("bm_prob_ack")); return; }
     setMessage(""); setStep("confirm");
   };
   const prepare = async () => {
@@ -123,7 +127,7 @@ export function BatteryMaintenance({ t, origin, isAdmin }: Props) {
     setBusy(true); setMessage("");
     try {
       const armed = await batteryArm(origin, { node, port: portNumber, op, params: built.params, serial: serial.trim() });
-      setActive(armed); setBusy(false);
+      setAgain2(""); setActive(armed); setBusy(false);
     } catch (error) { fail(error); }
   };
   const execute = async () => {
@@ -141,7 +145,7 @@ export function BatteryMaintenance({ t, origin, isAdmin }: Props) {
     setBusy(true); setMessage("");
     try { setActive(await batteryRestore(origin, active.id, serial.trim())); setBusy(false); } catch (error) { fail(error); }
   };
-  const again = () => { setActive(null); setStep("choose"); setForm(emptyForm()); setSerial(""); setMessage(""); void refresh(); };
+  const again = () => { setActive(null); setStep("choose"); setForm(emptyForm()); setSerial(""); setAcknowledged(false); setAgain2(""); setMessage(""); void refresh(); };
   const pick = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
@@ -194,6 +198,9 @@ export function BatteryMaintenance({ t, origin, isAdmin }: Props) {
   // ---- an operation as it stands ---------------------------------------------------------------------------------------------------------
   const operationView = (operation: BatteryOperation) => {
     const running = operation.stage === "starting" || operation.stage === "running";
+    const typed = typeof operation.params.serial === "string" ? operation.params.serial : undefined;
+    const dangerous = typed !== undefined || operation.params.restore_barcode === false;
+    const expected = typed ?? operation.battery?.serial ?? "";
     return <article className="stack-card" data-testid="battery-operation">
       <p className="eyebrow">{t("bm_step_run")}</p>
       <h3>{t(`bm_op_${operation.op}`)} · {operation.node}/{operation.port}</h3>
@@ -206,7 +213,11 @@ export function BatteryMaintenance({ t, origin, isAdmin }: Props) {
         <p className="mono">{operation.canonical}</p>
         {operation.armed_until && <p className="muted">{fill(t("bm_valid_until"), new Date(operation.armed_until).toLocaleTimeString())}</p>}
         <Pre title={t("bm_read_title")} text={operation.snapshot_before ?? ""} />
-        <div className="confirm-actions"><button className="primary" disabled={busy} onClick={() => void execute()}>{t("bm_execute")}</button><button disabled={busy} onClick={() => void stop()}>{t("bm_withdraw")}</button></div>
+        {dangerous && <>
+          <p className="login-notice" role="alert">{t("bm_serial_warning")}</p>
+          <label>{t("bm_serial_again")}<input className="mono" data-testid="serial-again" value={again2} onChange={event => setAgain2(event.target.value)} autoComplete="off" spellCheck={false} /></label>
+        </>}
+        <div className="confirm-actions"><button className="primary" disabled={busy || (dangerous && again2.trim() !== (expected || "NOSERIAL"))} onClick={() => void execute()}>{t("bm_execute")}</button><button disabled={busy} onClick={() => void stop()}>{t("bm_withdraw")}</button></div>
       </>}
       {running && <>
         <Bar percent={percentOf(operation)} />
@@ -247,15 +258,20 @@ export function BatteryMaintenance({ t, origin, isAdmin }: Props) {
           : <span className="muted"> {t("bm_node_none")}</span>}</label>
         <label>{t("bm_port")}<input type="number" min={1} max={10} value={port} onChange={event => setPort(event.target.value)} /></label>
         <p className="hint">{t("bm_port_hint")}</p>
-        <label>{t("bm_operation")}<select value={op} onChange={event => setOp(event.target.value)}>
+        <label>{t("bm_operation")}<select value={op} onChange={event => { setOp(event.target.value); setAcknowledged(false); }}>
           <option value="">—</option>
           {groups.map(item => <optgroup key={item.group} label={t(`bm_group_${item.group}`)}>{item.ops.map(entry => <option key={entry.id} value={entry.id}>{t(`bm_op_${entry.id}`)}</option>)}</optgroup>)}
         </select></label>
+        <label><input type="checkbox" data-testid="serial-ops" checked={serialOps} onChange={event => { setSerialOps(event.target.checked); if (!event.target.checked && spec && writesTypedSerial(spec)) setOp(""); }} /> {t("bm_show_serial_ops")}</label>
         {spec && <><p>{t(`bm_opd_${spec.id}`)}</p><p className="muted">{fill(t("bm_risk_is"), t(`bm_risk_${spec.risk}`))}{spec.atomic ? ` — ${t("bm_atomic_note")}` : ""}</p></>}
         <div className="confirm-actions"><button className="primary" disabled={!info?.enabled || !spec || !node} onClick={goValues}>{t("bm_next")}</button></div>
       </div>}
       {step === "values" && <>
         {values()}
+        {changesSerial(spec, form) && <>
+          <p className="login-notice" role="alert">{t("bm_serial_warning")}</p>
+          <label><input type="checkbox" data-testid="serial-ack" checked={acknowledged} onChange={event => setAcknowledged(event.target.checked)} /> {t("bm_serial_ack")}</label>
+        </>}
         <div className="confirm-actions"><button onClick={() => setStep("choose")}>{t("bm_back")}</button><button className="primary" disabled={busy} onClick={goConfirm}>{t("bm_next")}</button></div>
       </>}
       {step === "confirm" && spec && <>
