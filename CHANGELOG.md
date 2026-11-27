@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.3.1] - Say why a battery stack is not read, and the screen options
+
 - **Batteries says when the server is refusing a stack's readings:** a notice names the node and the equipment and gives the reason the server gave, instead of the stack only looking old or absent. The shared checks of the solar battery message now allow up to 512 cells balancing and 16000 A in a stack.
 - **The shared tools read the output of processes as UTF-8:** `tools/status_lights.py`, `tools/sync_manifests.py` and `tools/universal_readme_check.py` are the current copies; on Windows a character outside the code page no longer breaks a check.
 - **Serial number, chip and Board of each battery:** the details of a battery module show them with its specification and versions, and a new *Serial numbers* section of the Batteries menu lists every module and saves the list as a CSV file. The chip is the one the node tells (new, old or cannot be told). It needs a server and a solar node that carry them. Tested on a computer with invented data.
