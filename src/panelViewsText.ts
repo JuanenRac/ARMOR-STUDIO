@@ -1,5 +1,5 @@
 /**
- * Interface text of the two switches that let the wall panel read more than its summary (Configuration > Security): the check before arming and a still picture of a camera.
+ * Interface text of the switches that give the wall panel more than its summary (Configuration > Security): the check before arming, a still picture of a camera, the solar readings and the one battery operation.
  * One row per phrase: English, Spanish, German, French, Italian, Japanese, Chinese; Portuguese (of Portugal) follows in PT.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
@@ -44,6 +44,12 @@ const ROWS: Record<string, Row> = {
     "そのパネルに触れられる人は、割り当てられたカメラを見ることができます。そこから見えてよいカメラにのみオンにしてください。",
     "任何能触碰该面板的人都可以查看为其选定的摄像头。仅对允许从该处查看的摄像头开启。",
   ],
+  sec_opt_panelsolar: ["Solar readings on a wall screen", "Lecturas solares en una pantalla de pared", "Solarwerte auf einem Wandbildschirm", "Relevés solaires sur un écran mural", "Letture solari su uno schermo a muro", "壁の画面で太陽光の値を表示", "墙面屏幕上的太阳能读数"],
+  sec_opt_panelsolar_help: ["The account of a wall panel may read the batteries and inverters, cut down for a small screen. Off: it is refused them.", "La cuenta de un panel de pared puede leer las baterías y los inversores, resumidos para una pantalla pequeña. Desactivado: se le niegan.", "Das Konto eines Wandpanels darf Batterien und Wechselrichter lesen, gekürzt für einen kleinen Bildschirm. Aus: Es bekommt sie nicht.", "Le compte d'un panneau mural peut lire les batteries et les onduleurs, résumés pour un petit écran. Désactivé : ils lui sont refusés.", "L'account di un pannello a muro può leggere batterie e inverter, ridotti per un piccolo schermo. Disattivato: gli vengono negati.", "壁パネルのアカウントが、小さな画面向けに要約したバッテリーとインバーターの値を読めます。オフ：読み取りは拒否されます。", "允许墙面面板的账户读取为小屏幕精简后的电池和逆变器数据。关闭时：拒绝读取。"],
+  sec_opt_panelsolar_warn: ["Whoever can see that screen learns how much energy the house makes, uses and keeps.", "Quien pueda ver esa pantalla sabrá cuánta energía produce, gasta y guarda la casa.", "Wer den Bildschirm sieht, erfährt, wie viel Energie das Haus erzeugt, verbraucht und speichert.", "Toute personne qui voit cet écran apprend combien d'énergie la maison produit, consomme et stocke.", "Chi può vedere quello schermo sa quanta energia la casa produce, consuma e conserva.", "その画面を見られる人は、家の発電量、消費量、蓄電量を知ることができます。", "任何能看到该屏幕的人都会知道这栋房子的发电、用电和储电情况。"],
+  sec_opt_panelbattery: ["Reset battery counters from a wall screen", "Borrar contadores de batería desde una pantalla de pared", "Batteriezähler am Wandbildschirm löschen", "Effacer les compteurs d'une batterie depuis un écran mural", "Azzerare i contatori della batteria da uno schermo a muro", "壁の画面から電池カウンタを消去", "从墙面屏幕清零电池计数器"],
+  sec_opt_panelbattery_help: ["The account of a wall panel may reset the statistics counters of a battery, and nothing else, typing its PIN at every step. Writing to the batteries has to be on as well. Off: refused.", "La cuenta de un panel de pared puede borrar los contadores de estadísticas de una batería, y nada más, tecleando su PIN en cada paso. La escritura en las baterías también tiene que estar activada. Desactivado: se niega.", "Das Konto eines Wandpanels darf die Statistikzähler einer Batterie löschen, sonst nichts, mit PIN bei jedem Schritt. Das Schreiben in die Batterien muss ebenfalls an sein. Aus: verweigert.", "Le compte d'un panneau mural peut effacer les compteurs statistiques d'une batterie, et rien d'autre, avec son code à chaque étape. L'écriture dans les batteries doit aussi être activée. Désactivé : refusé.", "L'account di un pannello a muro può azzerare i contatori statistici di una batteria, e nient'altro, digitando il PIN a ogni passo. Anche la scrittura nelle batterie deve essere attiva. Disattivato: negato.", "壁パネルのアカウントは、毎回 PIN を入力して電池の統計カウンタを消去できます（それ以外は不可）。電池への書き込みもオンである必要があります。オフ：拒否されます。", "允许墙面面板的账户清零电池的统计计数器（仅此一项），每一步都要输入 PIN。电池写入也必须开启。关闭时：拒绝。"],
+  sec_opt_panelbattery_warn: ["The counters of a battery are lost for good. It has never been tried on a real battery.", "Los contadores de una batería se pierden para siempre. Nunca se ha probado en una batería real.", "Die Zähler einer Batterie gehen endgültig verloren. Es wurde nie an einer echten Batterie erprobt.", "Les compteurs d'une batterie sont perdus définitivement. Cela n'a jamais été essayé sur une vraie batterie.", "I contatori di una batteria vanno persi per sempre. Non è mai stato provato su una batteria vera.", "電池のカウンタは完全に失われます。実際の電池で試したことはありません。", "电池的计数器将永久丢失。从未在真实电池上试过。"],
 };
 
 const PT: Record<string, string> = {
@@ -53,6 +59,12 @@ const PT: Record<string, string> = {
   sec_opt_panelcamera: "Imagem da câmara no painel de parede",
   sec_opt_panelcamera_help: "A conta de um painel de parede pode ler uma imagem fixa de uma câmara (no máximo uma de dois em dois segundos por câmara, sem guardar nada) para a mostrar a pedido. Desligado: a imagem é recusada ao painel.",
   sec_opt_panelcamera_warn: "Quem puder tocar nesse painel pode ver a câmara escolhida para ele. Ligue-o apenas para uma câmara que possa ser vista a partir daí.",
+  sec_opt_panelsolar: "Leituras solares num ecrã de parede",
+  sec_opt_panelsolar_help: "A conta de um painel de parede pode ler as baterias e os inversores, resumidos para um ecrã pequeno. Desligado: são-lhe recusados.",
+  sec_opt_panelsolar_warn: "Quem puder ver esse ecrã fica a saber quanta energia a casa produz, gasta e guarda.",
+  sec_opt_panelbattery: "Apagar contadores da bateria num ecrã de parede",
+  sec_opt_panelbattery_help: "A conta de um painel de parede pode apagar os contadores estatísticos de uma bateria, e nada mais, escrevendo o PIN em cada passo. A escrita nas baterias também tem de estar ligada. Desligado: recusado.",
+  sec_opt_panelbattery_warn: "Os contadores de uma bateria perdem-se para sempre. Nunca foi experimentado numa bateria real.",
 };
 
 export const panelViewsCatalogues: RowCatalogues = { ...cataloguesFromRows(ROWS), pt: PT };

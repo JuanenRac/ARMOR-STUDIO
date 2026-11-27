@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 - **Serial number, chip and Board of each battery:** the details of a battery module show them with its specification and versions, and a new *Serial numbers* section of the Batteries menu lists every module and saves the list as a CSV file. The chip is the one the node tells (new, old or cannot be told). It needs a server and a solar node that carry them. Tested on a computer with invented data.
 - **The operations that write a serial number are not offered lightly:** *Battery maintenance* lists them only after ticking a box, warns that changing or losing the serial number changes which firmware is considered valid and can destroy the battery, asks for an acknowledgement and asks for the number once more before executing. Reading a serial number needs none of this.
+- **Two switches for a wall screen in Security:** the solar readings for the account of a wall panel and the one battery operation it may order (resetting the counters, with its PIN). Both are off until an administrator turns them on, and each asks first.
+
 ## [0.8.3.0] - Explain unreadable solar ports and silent battery data sheets
 
 - **A serial port of a solar node that reads nothing is explained:** in the health of the node, each port that hears bytes and reads none says what they look like (only zeros, the node's own question coming back, unreadable, other text or never a whole message) with its speed, pins, polarity, byte count and last bytes, and a console of a slave battery of a stack says which one it is and to connect the node to the first. It needs a server and a node that tell it.
