@@ -9,6 +9,12 @@ button.bat-row.sl-blink-fault:not(#ui) { animation: sl-fault-blink 1s ease-in-ou
   .sl-blink-fault, button.bat-row.sl-blink-fault:not(#ui) { animation: none; box-shadow: 0 0 0 2px #ff4d5e; }
 }
 
+/* A fault of a battery's own electronics stays red and still while it lasts, also when battery alarms are told discreetly or the battery is silenced (the doubled classes outweigh battery-quiet.css). */
+.bat-view.bat-view .bat-bms-fault.bat-bms-fault { border: 2px solid #ff4d5e !important; background: #2a1016 !important; }
+.bat-view.bat-view .solar-pill.bat-bms-pill.bat-bms-pill { border-color: #ff4d5e !important; color: #ffd5da !important; background: #5a1622 !important; }
+.bat-view.bat-view .bat-faults li.bms { border: 2px solid #ff4d5e !important; background: #2a1016 !important; color: #ffc9cf; }
+.bat-view.bat-view .bat-faults li.bms strong { color: #ff8d98 !important; }
+
 .bat-faults ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
 .bat-faults li { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .7rem; padding: .35rem .7rem; border: 1px solid #8a6a1c; border-radius: 10px; color: #ffe0a3; font-size: .84rem; }
 .bat-faults li.fault { border-color: #8a3540; color: #ffc9cf; }

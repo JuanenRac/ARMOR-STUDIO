@@ -1,20 +1,23 @@
 /**
  * What is wrong with a battery or a cell right now, worked out from its latest reading: voltages out of the window of its chemistry, figures that cannot be, the cells' health as the
  * console calls it, the spread of the cells, temperatures, health, and the alarm the stack raises. A fault (something is wrong) blinks; a warning only wears its colour.
+ * What the battery says of itself comes in three levels: a notice, a protection or alarm, and a fault of its electronics, which stands out in red without blinking.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
 import { SOLAR_THRESHOLDS, type SolarLevels } from "./solarThresholds";
-import { cellStats, displayName, type SolarModuleReading } from "./solarModel";
+import { cellStats, displayName, stateLevel, type SolarModuleReading } from "./solarModel";
 import { countableStacks, stackKey, type BatteryView } from "./solarTotals";
 import type { SolarDeviceView } from "./solarModel";
 
-export type FaultCode = "cell_over" | "cell_under" | "cell_implausible" | "cell_soh" | "delta_high" | "temp_high" | "temp_low" | "temp_implausible" | "health_low" | "stack_alarm" | "protecting";
+export type FaultCode = "bms_fault" | "bms_protect" | "bms_notice" | "cell_over" | "cell_under" | "cell_implausible" | "cell_soh" | "delta_high" | "temp_high" | "temp_low" | "temp_implausible" | "health_low" | "stack_alarm" | "protecting";
 export type Severity = "fault" | "warn";
 export type Fault = {
   code: FaultCode; severity: Severity; stack: string; name: string;
   /** The battery of the stack, and the cell counted from 1. */
   module?: number; cell?: number;
   value?: number; unit?: "V" | "mV" | "°C" | "%";
+  /** The battery's own words ("voltage UV"), or "0 V" for a cell it does not read. */
+  detail?: string;
   /** The stack stopped reporting: this is what it said last. */
   stale: boolean;
 };
@@ -36,17 +39,30 @@ export function cellFault(volts: number, lfp: boolean): "cell_over" | "cell_unde
   return volts > SOLAR_THRESHOLDS.lfpCellHighV ? "cell_over" : volts < SOLAR_THRESHOLDS.lfpCellLowV ? "cell_under" : null;
 }
 
-type Found = Pick<Fault, "code" | "severity" | "cell" | "value" | "unit">;
+type Found = Pick<Fault, "code" | "severity" | "cell" | "value" | "unit" | "detail">;
+
+/** What the battery itself says is wrong: the cells it does not read, and each state that is not normal, the faults of its electronics first. */
+function saidByBattery(module: SolarModuleReading): Found[] {
+  const out: Found[] = (module.cells_unread ?? []).map(index => ({ code: "bms_fault", severity: "fault", cell: index + 1, detail: "0 V" }));
+  const states = module.flags ?? (module.state === "SysError" ? [{ column: "base" as const, word: "SysError" }] : []);
+  for (const state of states) {
+    const level = stateLevel(state);
+    out.push({ code: level === 3 ? "bms_fault" : level === 2 ? "bms_protect" : "bms_notice", severity: level === 1 ? "warn" : "fault", detail: `${state.column} ${state.word}`, ...("cell" in state && state.cell !== undefined ? { cell: state.cell + 1 } : {}) });
+  }
+  const rank = (item: Found): number => (item.code === "bms_fault" ? 0 : item.code === "bms_protect" ? 1 : 2);
+  return out.sort((a, b) => rank(a) - rank(b));
+}
 
 export function moduleFaults(module: SolarModuleReading, levels: SolarLevels, lfp: boolean): Found[] {
   if (!module.present) return [];
-  const out: Found[] = [];
+  const out: Found[] = saidByBattery(module);
+  const unread = new Set(module.cells_unread ?? []);
   module.cells_v?.forEach((volts, index) => {
-    const code = cellFault(volts, lfp);
+    const code = unread.has(index) ? null : cellFault(volts, lfp);
     if (code) out.push({ code, severity: "fault", cell: index + 1, value: volts, unit: "V" });
   });
   for (const cell of module.soh_abnormal ?? []) out.push({ code: "cell_soh", severity: "fault", cell: cell + 1 });
-  const stats = cellStats(module.cells_v);
+  const stats = cellStats(module.cells_v?.filter((_, index) => !unread.has(index)));
   if (stats && stats.spreadMv > levels.cell_spread_mv) out.push({ code: "delta_high", severity: "fault", value: stats.spreadMv, unit: "mV" });
   const temperatures = [module.temperature_c, ...(module.temperatures_c ?? [])].filter((value): value is number => typeof value === "number");
   if (temperatures.length > 0) {
@@ -79,5 +95,6 @@ export function bankFaults(devices: readonly SolarDeviceView[], levels: SolarLev
 
 /** Whether something of this stack, battery or cell is a fault that is still being reported. */
 export function blinking(faults: readonly Fault[], stack: string, module?: number, cell?: number): boolean {
-  return faults.some(fault => fault.severity === "fault" && !fault.stale && fault.stack === stack && (module === undefined || fault.module === module) && (cell === undefined || fault.cell === cell));
+  // a fault of the battery's electronics is told in still red, never with a blink
+  return faults.some(fault => fault.severity === "fault" && fault.code !== "bms_fault" && !fault.stale && fault.stack === stack && (module === undefined || fault.module === module) && (cell === undefined || fault.cell === cell));
 }

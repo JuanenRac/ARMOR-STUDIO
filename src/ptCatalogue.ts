@@ -1319,6 +1319,7 @@ export const PT_CATALOGUE: Record<string, string> = {
  "alarm_solar_inverter_hot": "Um inversor está demasiado quente",
  "alarm_solar_battery_low": "A bateria solar está fraca",
  "alarm_solar_battery_alarm": "Uma bateria solar reporta um alarme",
+ "alarm_solar_battery_fault": "Uma bateria solar comunica uma falha da sua eletrónica (BMS)",
  "alarm_solar_offline": "Um dispositivo solar deixou de responder",
  "alarm_electrical_alarm": "Um contador da rede elétrica reporta um alarme",
  "alarm_electrical_voltage": "A tensão da rede está fora de gama",

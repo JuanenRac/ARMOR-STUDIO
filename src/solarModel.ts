@@ -23,6 +23,7 @@ export type SolarInverterReading = {
   units?: SolarUnitReading[];
   /** What the unit says about itself: its serial number and firmware, the energy the panels have made in all (Wh) and what it is rated for and how it is set. */
   serial?: string; firmware?: string; pv_energy_total_wh?: number;
+  manufacturer?: string; manufacturer_source?: "reported" | "deduced";
   ratings?: SolarRatingsReading;
 };
 export type SolarRatingsReading = {
@@ -61,7 +62,17 @@ export type SolarModuleReading = {
   soh_counts?: number[]; soh_abnormal?: number[];
   /** The newest entry of the module's own event log, as the console prints it. */
   last_event?: SolarEventRecord;
+  /** Who made it, and whether the equipment said it or its protocol or model tells it. */
+  manufacturer?: string; manufacturer_source?: "reported" | "deduced";
+  /** The states of the module and of its cells that are not the normal one, with the battery's own word (a cell counts from 0), and the cells (0-based) it does not read. */
+  flags?: BatteryState[]; cells_unread?: number[];
 };
+export type BatteryState = { column: "base" | "voltage" | "current" | "temperature" | "cell_voltage" | "cell_temperature" | "mosfet_temperature" | "system"; word: string; cell?: number };
+/** The level of a battery's own word: 1 a notice (High, Low and the like: not an alarm), 2 a protection or an alarm (a word never seen included), 3 a fault of its electronics. */
+export const stateLevel = (state: Pick<BatteryState, "column" | "word">): 1 | 2 | 3 => (state.word === "SysError" ? 3 : /^(High|Low|COCAlm|DOCAlm)$/.test(state.word) && state.column !== "system" ? 1 : 2);
+/** "Pylon" or "Daly (deduced)"; "" when the maker is not known (it is never made up). */
+export const makerText = (item: { manufacturer?: string; manufacturer_source?: "reported" | "deduced" }, deduced: string): string =>
+  (item.manufacturer ? `${item.manufacturer}${item.manufacturer_source === "deduced" ? ` (${deduced})` : ""}` : "");
 /** An entry of a battery's event log: the protection fields are the console's own words (a number and a mnemonic), never decoded. */
 export type SolarEventRecord = {
   index: number; time: string; voltage_v?: number; current_a?: number; temperature_c?: number; percent?: number;
@@ -89,6 +100,7 @@ export type SolarBatteryReading = {
   model?: string; capacity_ah?: number; full_capacity_ah?: number; energy_kwh?: number; cycles?: number; health_percent?: number;
   /** What a battery management system adds: its own power (negative while discharging), the cells being balanced, a protection active and the status codes of its MOSFETs. */
   power_w?: number; balancing?: number; protecting?: boolean; charge_mos?: number; discharge_mos?: number;
+  manufacturer?: string; manufacturer_source?: "reported" | "deduced";
 };
 export type SolarReading = SolarInverterReading | SolarBatteryReading;
 export type SolarKind = "inverter" | "battery";
