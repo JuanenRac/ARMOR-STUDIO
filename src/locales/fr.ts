@@ -2422,6 +2422,7 @@ const catalogue: Record<string, string> = {
 "ing_ignored": "Champs d'un firmware plus récent que ce serveur ignore",
 "ing_empty": "Aucun nœud n'a rien envoyé depuis le démarrage du serveur.",
 "ing_payload": "Ce qui a été envoyé (début)",
+"ing_refused_battery": "Le serveur refuse les mesures envoyées par {0} : ce qui est affiché est donc ancien ou absent. Motif : {1}. Vérifiez que le serveur est à jour ; le menu Système montre ce qui a été envoyé.",
 "rec_title": "Copie du trafic des nœuds",
 "rec_help": "Le fichier que le serveur écrit tant que l'option de Configuration > Sécurité est activée, pour rejouer un incident sur le banc. Il ne contient jamais d'ordres aux nœuds ni de champs qui ressemblent à un secret.",
 "rec_off": "La copie est désactivée. Rien n'est écrit et le fichier ne peut pas être téléchargé.",

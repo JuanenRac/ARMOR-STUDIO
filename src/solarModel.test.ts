@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   abnormalCells, compositionWarnings, repeatedEvents, areaOf, capacityPercent, healthTone, modelName, cellFill, cellStats, cellTone, deltaMv, formatReach, counterLines, flowSeconds, flowsOf, formatEnergy, formatPower, humanize, levelTone, nearestSample, niceScale, pathOf, seriesPoints, spreadTone, timeTicks,
-  type SolarInverterReading, type SolarSample,
+  type SolarInverterReading, type SolarSample, refusedBatteries,
 } from "./solarModel";
 
 const inverter = (patch: Partial<SolarInverterReading> = {}): SolarInverterReading => ({
@@ -166,5 +166,22 @@ describe("the health of the cells and the event log", () => {
     const entry = (power: string, battery: string, index: number) => ({ n: 1, seen_at: index, event: { index, time: "t", power_events: power, battery_events: battery } });
     expect(repeatedEvents([entry("0x2 PHV", "0x4 BVNOR", 3), entry("0x2 PHV", "0x0", 2), entry("0x0", "0x4 BVNOR", 1)])).toEqual([{ word: "BVNOR", count: 2 }, { word: "PHV", count: 2 }]);
     expect(repeatedEvents([])).toEqual([]);
+  });
+});
+
+describe("the battery messages the server refuses", () => {
+  const topic = (patch: Record<string, unknown> = {}) => ({ topic: "armor/solar/solar-1/bank-6/state", accepted: 0, rejected: 3, ignored_fields: [], last_ok_at: null, last_error: "invalid balancing", last_error_at: "2026-01-01T10:00:00.000Z", last_payload: '{"kind":"battery","node_id":"solar-1"', ...patch });
+
+  it("names the node, the equipment and the reason", () => {
+    expect(refusedBatteries([topic()])).toEqual([{ name: "solar-1 / bank-6", error: "invalid balancing" }]);
+    expect(refusedBatteries([topic({ last_ok_at: "2026-01-01T09:00:00.000Z" })])).toHaveLength(1);
+  });
+
+  it("says nothing once a later message is taken, for an inverter, for another topic or with no list", () => {
+    expect(refusedBatteries([topic({ last_ok_at: "2026-01-01T10:00:05.000Z" })])).toEqual([]);
+    expect(refusedBatteries([topic({ last_payload: '{"kind":"inverter"' })])).toEqual([]);
+    expect(refusedBatteries([topic({ topic: "armor/electrical/electrical-1/state" })])).toEqual([]);
+    expect(refusedBatteries([topic({ last_error_at: null })])).toEqual([]);
+    expect(refusedBatteries(undefined)).toEqual([]);
   });
 });

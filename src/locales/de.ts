@@ -2411,6 +2411,7 @@ const catalogue: Record<string, string> = {
 "ing_ignored": "Felder einer neueren Firmware, die dieser Server ignoriert",
 "ing_empty": "Seit dem Start des Servers hat kein Knoten etwas gesendet.",
 "ing_payload": "Gesendet (Anfang)",
+"ing_refused_battery": "Der Server weist die Messwerte ab, die {0} sendet; was dafür angezeigt wird, ist deshalb alt oder fehlt. Grund: {1}. Prüfen Sie, ob der Server aktuell ist; das Menü System zeigt, was gesendet wurde.",
 "rec_title": "Kopie des Knotenverkehrs",
 "rec_help": "Die Datei, die der Server schreibt, solange die Option unter Konfiguration > Sicherheit eingeschaltet ist, um einen Vorfall auf dem Prüfstand erneut abzuspielen. Sie enthält nie Befehle an die Knoten oder Felder, die wie ein Geheimnis aussehen.",
 "rec_off": "Die Kopie ist ausgeschaltet. Es wird nichts geschrieben und die Datei kann nicht heruntergeladen werden.",

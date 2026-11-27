@@ -551,6 +551,7 @@ const catalogue: Record<string, string> = {
 "ing_ignored": "Campos de um firmware mais recente que este servidor ignora",
 "ing_empty": "Nenhum nó enviou nada desde que o servidor arrancou.",
 "ing_payload": "O que foi enviado (início)",
+"ing_refused_battery": "O servidor recusa as leituras que {0} envia, por isso o que se vê está desatualizado ou em falta. Motivo: {1}. Verifique se o servidor está atualizado; o menu Sistema mostra o que foi enviado.",
 "rec_title": "Cópia do tráfego dos nós",
 "rec_help": "O ficheiro que o servidor escreve enquanto a opção de Configuração > Segurança estiver ligada, para reproduzir um incidente na bancada. Nunca contém ordens para os nós nem campos que pareçam um segredo.",
 "rec_off": "A cópia está desligada. Não se escreve nada e o ficheiro não pode ser descarregado.",
