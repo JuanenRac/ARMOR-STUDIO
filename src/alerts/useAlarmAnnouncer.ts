@@ -17,7 +17,7 @@ export type Popup = { id: string; alarm: Alarm; shownAt: number };
 export function freshAlarms(known: Set<string> | null, active: readonly Alarm[]): { fresh: Alarm[]; known: Set<string> } {
   const ids = new Set(active.map(alarm => alarm.id));
   if (known === null) return { fresh: [], known: ids };
-  return { fresh: active.filter(alarm => !alarm.acknowledged_at && !alarm.cleared_at && !known.has(alarm.id)).sort((a, b) => ORDER[a.severity] - ORDER[b.severity]), known: ids };
+  return { fresh: active.filter(alarm => !alarm.acknowledged_at && !alarm.cleared_at && !alarm.quiet && !known.has(alarm.id)).sort((a, b) => ORDER[a.severity] - ORDER[b.severity]), known: ids };
 }
 
 type Options = {
@@ -55,7 +55,7 @@ export function useAlarmAnnouncer(options: Options): { popups: Popup[]; dismiss:
     const { fresh, known: next } = freshAlarms(known.current, alarms.active);
     known.current = next;
     // an alarm that is no longer waiting takes its pop-up with it
-    const waiting = new Set(alarms.active.filter(alarm => !alarm.acknowledged_at && !alarm.cleared_at).map(alarm => alarm.id));
+    const waiting = new Set(alarms.active.filter(alarm => !alarm.acknowledged_at && !alarm.cleared_at && !alarm.quiet).map(alarm => alarm.id));
     setPopups(list => (list.some(item => !waiting.has(item.id)) ? list.filter(item => waiting.has(item.id)) : list));
     const settings = getAlerts();
     if (!enabled || fresh.length === 0) return;
@@ -90,7 +90,7 @@ export function useAlarmAnnouncer(options: Options): { popups: Popup[]; dismiss:
   }, [popups.length]);
 
   // the tab title blinks while something waits for a person
-  const waitingCount = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at && !alarm.cleared_at).length;
+  const waitingCount = (alarms?.active ?? []).filter(alarm => !alarm.acknowledged_at && !alarm.cleared_at && !alarm.quiet).length;
   useEffect(() => {
     if (!enabled || waitingCount === 0 || !getAlerts().blinkTitle) return;
     const original = document.title.replace(/^\(\d+\) ⚠ /, "");

@@ -27,7 +27,7 @@ export function isResting(nowMs: number, lastTouchMs: number, idleAfterS: number
 
 /** The alarms the panel lists: those raised and not cleared, the ones nobody has acknowledged first, then the oldest first. */
 export function alarmsToShow(active: readonly Alarm[] | undefined): Alarm[] {
-  return (active ?? []).filter(alarm => !alarm.cleared_at)
+  return (active ?? []).filter(alarm => !alarm.cleared_at && !alarm.quiet)
     .sort((a, b) => Number(Boolean(a.acknowledged_at)) - Number(Boolean(b.acknowledged_at)) || a.raised_at.localeCompare(b.raised_at));
 }
 

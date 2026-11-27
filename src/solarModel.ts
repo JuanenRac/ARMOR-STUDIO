@@ -99,7 +99,7 @@ export type SolarCatalog = { inverter_models: string[]; battery_models: string[]
 /** The extremes of the cells of a battery today, per module (the server's day): the lowest and highest cell with its number and the moment, and the widest gap. */
 export type CellReach = { v: number; cell: number; at: number };
 export type ModuleDayCells = { n: number; min: CellReach; max: CellReach; delta_v: number };
-export type DayCells = { date: string; modules: ModuleDayCells[]; bank_delta_v: number };
+export type DayCells = { date: string; modules: ModuleDayCells[]; bank_delta_v: number; bank?: { at: number; low: { module: number; cell: number; v: number }; high: { module: number; cell: number; v: number } }; reset_at?: number; discarded?: Array<{ at: number; module: number; cell?: number; v?: number; delta_v?: number; reason: "range" | "unconfirmed" }> };
 export type SolarDeviceView = { node_id: string; device: string; kind: SolarKind; reading: SolarReading; received_at: string; stale: boolean; example?: boolean; registered?: SolarRegistration; day_cells?: DayCells; events?: LoggedSolarEvent[] };
 
 /** How the models and connections are written (the brands are the same in every language; "other" is translated where it is shown). */

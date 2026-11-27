@@ -28,6 +28,8 @@ import type { NetworkOverview } from "../networkModel";
 import "./solar.css";
 import "./batteries.css";
 import "./battery-faults.css";
+import "./battery-quiet.css";
+import { BatteryNoticesCard, DayCellsNote, SilenceButton, isSilenced, useBatteryNotices, type Notices } from "../BatteryNotices";
 import { ExamplesBar } from "./ExamplesBar";
 
 type Props = { t: Translate; origin: string; devices: SolarDeviceView[]; waiting: SolarRegistration[]; catalog: SolarCatalog | null; reload: () => void; totals: SolarTotals | null; now: number; unreachable: boolean; network?: NetworkOverview | null; isAdmin?: boolean };
@@ -38,6 +40,8 @@ export function BatteriesView({ t, origin, devices, totals, now, unreachable, wa
   const stacks = useMemo(() => devices.filter((d): d is Battery => d.kind === "battery"), [devices]);
   const registrations = useMemo(() => [...stacks.flatMap(d => (d.registered ? [d.registered] : [])), ...waiting.filter(item => item.kind === "battery")], [stacks, waiting]);
   const [chosen, setChosen] = useState("");
+  const notices = useBatteryNotices(origin);
+  const discreet = notices.data !== null && notices.data.settings.mode !== "classic";
   const [minutes, setMinutes] = useState<number>(60);
   const current = stacks.find(item => `${item.node_id}/${item.device}` === chosen) ?? stacks[0];
   const history = usePolled(() => (current ? solarHistory(origin, current.node_id, current.device, minutes) : Promise.resolve(null)), 15_000, `${current?.node_id}/${current?.device}/${minutes}/${origin}`);
@@ -55,7 +59,7 @@ export function BatteriesView({ t, origin, devices, totals, now, unreachable, wa
   const verified = verifying ? stacks.find(item => stackKey(item) === verifying.stack) : undefined;
   const capacity = capacityPercent(bank.capacity_ah ?? undefined, bank.full_capacity_ah ?? undefined);
   const nodeCount = new Set([...devices.map(d => d.node_id), ...waiting.map(item => item.node_id)]).size;
-  return <div className="solar-view bat-view">
+  return <div className={`solar-view bat-view ${discreet || (current && isSilenced(notices, stackKey(current))) ? "bat-discreet" : ""}`}>
     <header className="solar-head" data-tour="bat-head">
       <BatteryLogo size={68} percent={totals?.soc_percent ?? 70} />
       <div className="solar-title"><p className="eyebrow">{t("navEnergy")}</p><h2>{t("batteries")}</h2><span className="muted">{t("solarHelp")}</span></div>
@@ -82,7 +86,8 @@ export function BatteriesView({ t, origin, devices, totals, now, unreachable, wa
       <BankPanel t={t} bank={bank} stacks={stacks} />
       <BatterySerials t={t} devices={stacks} />
       <Fleet t={t} stacks={stacks} faults={faults} current={current} choose={key => setChosen(key)} />
-      {current && <StackPanel t={t} origin={origin} stacks={stacks} stack={current} now={now} history={history.data?.samples ?? []} minutes={minutes} setMinutes={setMinutes} levels={levels} faults={faults} verify={verify} />}
+      {current && <StackPanel t={t} origin={origin} stacks={stacks} stack={current} now={now} history={history.data?.samples ?? []} minutes={minutes} setMinutes={setMinutes} levels={levels} faults={faults} verify={verify} notices={notices} />}
+      <BatteryNoticesCard t={t} notices={notices} />
       <details className="bat-section">
         <summary><b>{t("bat_energy_alarms")}</b></summary>
         <div className="bat-section-body"><EnergyCard t={t} origin={origin} kind="battery" /><EnergyAlarmsCard t={t} origin={origin} /></div>
@@ -135,10 +140,10 @@ function Fact({ label, value, tone }: { label: string; value: string; tone?: "ok
 
 type PanelProps = {
   t: Translate; origin: string; stacks: Battery[]; stack: Battery; now: number; history: Parameters<typeof BatteryCharts>[0]["history"]; minutes: number; setMinutes: (value: number) => void;
-  levels: SolarLevels; faults: readonly Fault[]; verify: (target: VerifyTarget) => void;
+  levels: SolarLevels; faults: readonly Fault[]; verify: (target: VerifyTarget) => void; notices: Notices;
 };
 
-function StackPanel({ t, origin, stacks, stack, now, history, minutes, setMinutes, levels, faults, verify }: PanelProps) {
+function StackPanel({ t, origin, stacks, stack, now, history, minutes, setMinutes, levels, faults, verify, notices }: PanelProps) {
   const r = stack.reading;
   const figures = stackFigures(r);
   const key = stackKey(stack);
@@ -157,6 +162,7 @@ function StackPanel({ t, origin, stacks, stack, now, history, minutes, setMinute
         {r.alarm && <span className="solar-pill bad">{t("solarAlarmOn")}</span>}
         <span className={`solar-pill ${r.state === "charging" ? "ok" : r.state === "discharging" ? "warn" : ""}`}>{stateText}</span>
         <span className="muted">{stack.stale ? t("solarStale") : `${t("solarUpdated")} ${age} s`}</span>
+        <SilenceButton t={t} notices={notices} id={key} />
       </div>
       {r.modules === 0 ? <p className="solar-notice">{t("solarNoModules")}</p> : <div className="solar-stack-top bat-summary" data-tour="bat-stack">
         <BatteryGraphic percent={r.soc_percent} state={r.state} alarm={r.alarm === true || blinking(faults, key)} />
@@ -178,6 +184,7 @@ function StackPanel({ t, origin, stacks, stack, now, history, minutes, setMinute
           {r.health_percent !== undefined && <Fact label={t("solarHealth")} value={`${r.health_percent} %`} tone={healthTone(r.health_percent)} />}
           <Fact label={t("solarModules")} value={`${r.stack.filter(module => module.present).length} / ${r.stack.length}`} />
         </dl>
+        {stack.day_cells && <DayCellsNote t={t} origin={origin} node={stack.node_id} device={stack.device} day={stack.day_cells} />}
         {held !== undefined && whole !== undefined && <div className="solar-capacity" data-tour="bat-capacity">
         <div className="solar-capacity-head"><span>{t("solarCapacity")}</span><b title={figures.fullEstimated ? t("solx_full_estimated") : undefined}>{figures.partial || figures.estimated || figures.fullEstimated ? "≈ " : ""}{held.toFixed(1)} / {whole.toFixed(1)} Ah{remaining === null ? "" : ` · ${remaining} %`}</b></div>
         <div className="solar-bar"><i style={{ width: `${remaining ?? 0}%`, background: TONE[levelTone(remaining ?? 0)] }} /></div>
@@ -190,7 +197,7 @@ function StackPanel({ t, origin, stacks, stack, now, history, minutes, setMinute
       <div className="bat-section-head"><h3>{t("solarModules")} <small>{r.stack.filter(module => module.present).length} / {r.stack.length}</small></h3>
         <span className="bat-fold"><button type="button" onClick={() => setUnfolded("all")}>{t("bat_expand")}</button><button type="button" onClick={() => setUnfolded("none")}>{t("bat_fold")}</button></span></div>
       <div className="bat-module-grid" key={unfolded ?? "keep"}>
-        {r.stack.map(module => <ModuleCard key={module.n} t={t} module={module} stack={stack} levels={levels} verify={verify} today={stack.day_cells?.modules.find(item => item.n === module.n)} open={unfolded === "all" ? true : unfolded === "none" ? false : undefined} />)}
+        {r.stack.map(module => <ModuleCard key={module.n} notices={notices} t={t} module={module} stack={stack} levels={levels} verify={verify} today={stack.day_cells?.modules.find(item => item.n === module.n)} open={unfolded === "all" ? true : unfolded === "none" ? false : undefined} />)}
       </div>
     </section>
     <BatteryCharts t={t} origin={origin} stacks={stacks} current={stack} now={now} history={history} minutes={minutes} setMinutes={setMinutes} levels={levels} />
@@ -198,7 +205,7 @@ function StackPanel({ t, origin, stacks, stack, now, history, minutes, setMinute
   </>;
 }
 
-function ModuleCard({ t, module, stack, levels, verify, today, open }: { t: Translate; module: SolarModuleReading; stack: Battery; levels: SolarLevels; verify: (target: VerifyTarget) => void; today?: ModuleDayCells; open?: boolean }) {
+function ModuleCard({ t, module, stack, levels, verify, today, open, notices }: { notices: Notices; t: Translate; module: SolarModuleReading; stack: Battery; levels: SolarLevels; verify: (target: VerifyTarget) => void; today?: ModuleDayCells; open?: boolean }) {
   const cells = cellStats(module.cells_v);
   const remaining = capacityPercent(module.capacity_ah, module.full_capacity_ah);
   if (!module.present) return <div className="bat-module absent"><div className="bat-module-sum"><b>{t("solarModule")} {module.n}</b><span className="solar-pill">{t("solarModuleAbsent")}</span></div></div>;
@@ -211,6 +218,7 @@ function ModuleCard({ t, module, stack, levels, verify, today, open }: { t: Tran
   return <details className={`bat-module ${abnormal ? "abnormal" : ""} ${faulty && !stack.stale ? "sl-blink-fault" : ""}`} open={open ?? (abnormal ? true : undefined)}>
     <summary className="bat-module-sum">
       <b>{t("solarModule")} {module.n}</b>
+      <SilenceButton t={t} notices={notices} id={`${stackKey(stack)}/${module.n}`} />
       {found.length > 0 && <span className={`solar-pill ${faulty ? "bad" : "warn"}`}><span aria-hidden="true">{faulty ? "✖" : "⚠"} </span>{t(`solx_fault_${found[0].code}`)}{found.length > 1 ? ` +${found.length - 1}` : ""}</span>}
       {module.state && <span className="solar-pill">{module.state}</span>}
       {noSheet && <span className="solar-pill warn" title={t("solx_no_sheet")}>{t("solx_no_sheet_pill")}</span>}
