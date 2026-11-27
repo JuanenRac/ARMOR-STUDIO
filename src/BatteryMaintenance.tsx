@@ -14,6 +14,7 @@ import { fill } from "./FirmwarePanel";
 import {
   buildParams, changesSerial, emptyForm, errorKey, isActive, limitGroupOf, operationGroups, percentOf, readLimit, scaleOf, serialLooksRight, showLimit, specOf, batteryNodes, writesTypedSerial, type BatteryForm,
 } from "./batteryModel";
+import { BatteryCampaign } from "./BatteryCampaign";
 
 type Translate = (key: string) => string;
 type Props = { t: Translate; origin: string; isAdmin: boolean };
@@ -190,6 +191,7 @@ export function BatteryMaintenance({ t, origin, isAdmin }: Props) {
         <label>{t("bm_image_file")}<input type="file" accept=".bin,application/octet-stream" onChange={event => void pick(event)} disabled={busy} /></label>
         {form.image && <p className="mono">{fill(t("bm_image_read"), form.image.board, form.image.version, Math.round(form.image.size / 1024))}<br />SHA-256 {form.image.sha256}</p>}
         <label><input type="checkbox" checked={form.clearEeprom} onChange={event => set("clearEeprom", event.target.checked)} /> {t("bm_clear_eeprom")}</label>
+        <label><input type="checkbox" checked={form.resume} onChange={event => set("resume", event.target.checked)} /> {t("bc_resume")}</label>
       </div>}
       {names.includes("line") && <div><p className="hint">{t("bm_expert_note")}</p><label>{t("bm_expert_line")}<input className="mono" value={form.line} maxLength={48} onChange={event => set("line", event.target.value)} autoComplete="off" spellCheck={false} /></label></div>}
     </div>;
@@ -282,6 +284,7 @@ export function BatteryMaintenance({ t, origin, isAdmin }: Props) {
         <div className="confirm-actions"><button onClick={() => setStep("values")}>{t("bm_back")}</button><button className="primary" disabled={busy || !serial.trim()} onClick={() => void prepare()}>{t("bm_prepare")}</button></div>
       </>}
     </article>}
+    <BatteryCampaign t={t} origin={origin} enabled={Boolean(info?.enabled)} />
     <article className="stack-card">
       <h3>{t("bm_history_title")}</h3>
       {history.length === 0 ? <p className="muted">{t("bm_history_empty")}</p> : <div className="scroll"><table>

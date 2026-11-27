@@ -33,6 +33,26 @@ export const batteryExecute = (origin: string, id: string, serial: string) => us
 export const batteryCancel = (origin: string, id: string) => userCall<BatteryOperation>(origin, "POST", `/api/v1/solar/battery-ops/${encodeURIComponent(id)}/cancel`, {});
 export const batteryRestore = (origin: string, id: string, serial: string) => userCall<BatteryOperation>(origin, "POST", `/api/v1/solar/battery-ops/${encodeURIComponent(id)}/restore`, { serial });
 
+// ---- a firmware campaign on a stack: one module at a time, with the console cable moved to each one ------------------------------------------------------------------------
+export type BatteryCampaignModule = {
+  number: number; serial: string; model: string; board: string; chip: "older" | "newer" | "unknown"; version?: string; version_after?: string;
+  status: "pending" | "checking" | "ready" | "updating" | "done" | "failed"; operation_id?: string; code?: string; resume?: boolean;
+};
+export type BatteryCampaign = {
+  id: string; node: string; port: number; device: string; state: "active" | "stopped" | "return_cable" | "done" | "cancelled"; current: number; stop_reason?: string;
+  modules: BatteryCampaignModule[]; image: { board: string; version: string; sha256: string; size: number }; actor: string; created_at: string; updated_at: string;
+};
+export const batteryCampaigns = (origin: string) => userCall<{ enabled: boolean; campaigns: BatteryCampaign[] }>(origin, "GET", "/api/v1/solar/battery-campaigns");
+export const batteryCampaignCreate = (origin: string, request: { node: string; port: number; device: string; image_id: string }) => userCall<BatteryCampaign>(origin, "POST", "/api/v1/solar/battery-campaigns", request);
+export function batteryCampaignStep(origin: string, id: string, step: "check" | "execute" | "retry" | "cancel" | "finish", body: Record<string, unknown>) {
+  const base = `/api/v1/solar/battery-campaigns/${encodeURIComponent(id)}`;
+  if (step === "check") return userCall<BatteryCampaign>(origin, "POST", `${base}/check`, body);
+  if (step === "execute") return userCall<BatteryCampaign>(origin, "POST", `${base}/execute`, body);
+  if (step === "retry") return userCall<BatteryCampaign>(origin, "POST", `${base}/retry`, body);
+  if (step === "cancel") return userCall<BatteryCampaign>(origin, "POST", `${base}/cancel`, body);
+  return userCall<BatteryCampaign>(origin, "POST", `${base}/finish`, body);
+}
+
 /** Hands the server a firmware image (the .bin the maker publishes); it is kept in memory for an hour and nothing is sent to a battery. */
 export async function batteryImageUpload(origin: string, file: File): Promise<BatteryImage> {
   const send = async (): Promise<Response> => timedFetch(endpoint(origin, "/api/v1/solar/battery-ops/images"), {

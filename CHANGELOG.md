@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Firmware of a whole battery stack:** *Battery maintenance* walks a stack one module at a time, with the console cable moved to each battery: the list of modules, a check that writes nothing, the serial number typed to confirm, the result of each one, a stop at the first failure that can be taken up later, and the cable returned at the end. A doubtful chip or an image that does not fit blocks it with no way to force it. The single update can be tried again on a battery left in its bootloader. Writing stays off unless turned on in the node and the server. Tested on a computer with invented data; not tried on a battery.
+
 ## [0.8.3.1] - Say why a battery stack is not read, and the screen options
 
 - **Batteries says when the server is refusing a stack's readings:** a notice names the node and the equipment and gives the reason the server gave, instead of the stack only looking old or absent. The shared checks of the solar battery message now allow up to 512 cells balancing and 16000 A in a stack.

@@ -8,10 +8,10 @@ import type { BatteryCatalog, BatteryImage, BatteryLimitGroup, BatteryOpSpec, Ba
 
 export type BatteryForm = {
   which: string; group: string; limits: Record<string, string>; protections: Record<string, "keep" | "en" | "dis">; acceptRisk: boolean; output: string; state: string;
-  label: string; restoreBarcode: boolean; clearEeprom: boolean; line: string; image: BatteryImage | null;
+  label: string; restoreBarcode: boolean; clearEeprom: boolean; resume: boolean; line: string; image: BatteryImage | null;
 };
 
-export const emptyForm = (): BatteryForm => ({ which: "event", group: "module_voltage", limits: {}, protections: {}, acceptRisk: false, output: "cfet", state: "off", label: "", restoreBarcode: true, clearEeprom: false, line: "", image: null });
+export const emptyForm = (): BatteryForm => ({ which: "event", group: "module_voltage", limits: {}, protections: {}, acceptRisk: false, output: "cfet", state: "off", label: "", restoreBarcode: true, clearEeprom: false, resume: false, line: "", image: null });
 
 export const GROUP_ORDER = ["clock", "maintenance", "soc", "limits", "outputs", "eeprom", "firmware", "expert"] as const;
 
@@ -71,6 +71,7 @@ export function buildParams(catalog: BatteryCatalog, op: string, form: BatteryFo
       case "boolean":
         if (name === "restore_barcode") params.restore_barcode = form.restoreBarcode;
         else if (name === "clear_eeprom") { if (form.clearEeprom) params.clear_eeprom = true; }
+        else if (name === "resume") { if (form.resume) params.resume = true; }
         else if (name === "accept_risk") { if (form.acceptRisk) params.accept_risk = true; }
         break;
       case "limits": {

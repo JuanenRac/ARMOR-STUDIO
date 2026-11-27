@@ -4,6 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { BatteryCatalog, BatteryOperation } from "./api/battery";
+import { campaignCodeKey } from "./BatteryCampaign";
 import { BatteryMaintenance, dynamicKeys, limitLabel } from "./BatteryMaintenance";
 import { GROUP_ORDER, batteryNodes, buildParams, emptyForm, errorKey, isActive, operationGroups, percentOf, readLimit, scaleOf, serialLooksRight, showLimit } from "./batteryModel";
 import { locales, text } from "./i18n";
@@ -50,6 +51,29 @@ describe("every sentence of the battery maintenance screen", () => {
     }
     // a code nobody wrote a sentence for falls back to the general one
     expect(errorKey("something_new", key => text("en", key) !== key)).toBe("bm_err_generic");
+  });
+});
+
+describe("the firmware campaign of a stack", () => {
+  it("has its sentences in the eight languages", () => {
+    const keys = ["bc_title", "bc_help", "bc_connect", "bc_confirm", "bc_return", "bc_stopped", "bc_resume",
+      ...["active", "stopped", "return_cable", "done", "cancelled"].map(item => `bc_state_${item}`),
+      ...["pending", "checking", "ready", "updating", "done", "failed"].map(item => `bc_module_${item}`),
+      ...["older", "newer", "unknown"].map(item => `bc_chip_${item}`)];
+    for (const locale of locales) for (const key of keys) expect(text(locale, key), `${locale} ${key}`).not.toBe(key);
+  });
+  it("says why a module is not done, with its own sentence or the one of the refusal", () => {
+    const known = (key: string) => text("en", key) !== key;
+    expect(campaignCodeKey("firmware:battery_reported_error", known)).toBe("bc_code_firmware");
+    expect(campaignCodeKey("step_failed:barcode", known)).toBe("bc_code_barcode");
+    expect(campaignCodeKey("verify:capacity_zero", known)).toBe("bc_code_capacity_zero");
+    expect(campaignCodeKey("bootloader", known)).toBe("bc_code_bootloader");
+    expect(known(campaignCodeKey("serial_mismatch", known))).toBe(true);
+    expect(known(campaignCodeKey("something_new", known))).toBe(true);
+  });
+  it("asks for a retry on a battery in its bootloader only when ticked", () => {
+    const image = { image_id: "abcdef0123456789", size: 1, crc32: 1, sha256: "", board: "US2000C", version: "3.0" };
+    expect(buildParams(fixture.ops.some(item => item.id === "firmware_update" && "resume" in item.params) ? fixture : { ...fixture, ops: fixture.ops.map(item => item.id === "firmware_update" ? { ...item, params: { ...item.params, resume: { type: "boolean" as const } } } : item) }, "firmware_update", { ...emptyForm(), image, resume: true })).toEqual({ ok: true, params: { resume: true, image_id: "abcdef0123456789" } });
   });
 });
 
