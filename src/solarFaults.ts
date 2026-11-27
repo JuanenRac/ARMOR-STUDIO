@@ -9,7 +9,7 @@ import { cellStats, displayName, stateLevel, type SolarModuleReading } from "./s
 import { countableStacks, stackKey, type BatteryView } from "./solarTotals";
 import type { SolarDeviceView } from "./solarModel";
 
-export type FaultCode = "bms_fault" | "bms_protect" | "bms_notice" | "cell_over" | "cell_under" | "cell_implausible" | "cell_soh" | "delta_high" | "temp_high" | "temp_low" | "temp_implausible" | "health_low" | "stack_alarm" | "protecting";
+export type FaultCode = "bms_fault" | "bms_protect" | "bms_notice" | "cell_over" | "cell_under" | "cell_implausible" | "cell_soh" | "delta_high" | "temp_high" | "temp_low" | "temp_implausible" | "health_low" | "stack_alarm" | "protecting" | "left_out";
 export type Severity = "fault" | "warn";
 export type Fault = {
   code: FaultCode; severity: Severity; stack: string; name: string;
@@ -56,6 +56,8 @@ function saidByBattery(module: SolarModuleReading): Found[] {
 export function moduleFaults(module: SolarModuleReading, levels: SolarLevels, lfp: boolean): Found[] {
   if (!module.present) return [];
   const out: Found[] = saidByBattery(module);
+  // figures the node read as impossible and did not send: the rest of the reading is good
+  if (module.left_out?.length) out.push({ code: "left_out", severity: "warn", detail: module.left_out.join(", ") });
   const unread = new Set(module.cells_unread ?? []);
   module.cells_v?.forEach((volts, index) => {
     const code = unread.has(index) ? null : cellFault(volts, lfp);

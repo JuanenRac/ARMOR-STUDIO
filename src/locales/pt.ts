@@ -1774,6 +1774,7 @@ const catalogue: Record<string, string> = {
 "solx_fault_bms_fault": "Falha do BMS",
 "solx_fault_bms_protect": "Proteção ou alarme",
 "solx_fault_bms_notice": "Aviso",
+"solx_fault_left_out": "Valor impossível ignorado",
 "solx_maker": "Fabricante",
 "solx_deduced": "deduzido",
 "solx_fault_cell_over": "Tensão da célula demasiado alta",

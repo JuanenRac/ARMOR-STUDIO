@@ -65,7 +65,7 @@ export type SolarModuleReading = {
   /** Who made it, and whether the equipment said it or its protocol or model tells it. */
   manufacturer?: string; manufacturer_source?: "reported" | "deduced";
   /** The states of the module and of its cells that are not the normal one, with the battery's own word (a cell counts from 0), and the cells (0-based) it does not read. */
-  flags?: BatteryState[]; cells_unread?: number[];
+  flags?: BatteryState[]; cells_unread?: number[]; left_out?: string[];
 };
 export type BatteryState = { column: "base" | "voltage" | "current" | "temperature" | "cell_voltage" | "cell_temperature" | "mosfet_temperature" | "system"; word: string; cell?: number };
 /** The level of a battery's own word: 1 a notice (High, Low and the like: not an alarm), 2 a protection or an alarm (a word never seen included), 3 a fault of its electronics. */

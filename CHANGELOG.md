@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A battery figure that came impossible is told:** the battery shows which figures the node left out of its reading (the rest of the reading is shown as usual).
 - **Batteries say what is wrong and with which one:** a notice (High, Low), a protection or alarm (OV, UV, OC, temperature, any word not known) and a fault of the battery's electronics (SysError, cells it does not read), each with the module, the cell and the battery's own word. The fault stays in still red while it lasts, also with discreet battery alarms or a silenced battery; cells not read no longer count as the lowest of the pack.
 - **The manufacturer** of each battery, module and inverter is shown, saying when it was deduced from the protocol or model.
 ## [0.8.3.2] - Battery firmware campaigns, discreet battery alarms and ordered solar lists

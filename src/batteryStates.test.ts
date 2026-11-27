@@ -34,6 +34,11 @@ describe("battery states", () => {
     expect(blinking(faults, faults[0]!.stack, 2, 4)).toBe(false);
   });
 
+  it("tells which figures came impossible and were left out", () => {
+    const found = moduleFaults({ n: 1, present: true, left_out: ["current", "cells"] }, levels, true);
+    expect(found).toEqual([{ code: "left_out", severity: "warn", detail: "current, cells" }]);
+  });
+
   it("writes the maker, says when it is deduced and never makes one up", () => {
     expect(makerText({ manufacturer: "Pylon", manufacturer_source: "reported" }, "deduced")).toBe("Pylon");
     expect(makerText({ manufacturer: "Daly", manufacturer_source: "deduced" }, "deduced")).toBe("Daly (deduced)");

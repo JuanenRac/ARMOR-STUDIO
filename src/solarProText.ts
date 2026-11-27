@@ -46,6 +46,7 @@ const rows: Record<string, Row> = {
   solx_fault_bms_fault: ["BMS fault", "Fallo del BMS", "BMS-Fehler", "Panne du BMS", "Guasto del BMS", "BMS故障", "BMS故障", "Falha do BMS"],
   solx_fault_bms_protect: ["Protection or alarm", "Protección o alarma", "Schutz oder Alarm", "Protection ou alarme", "Protezione o allarme", "保護または警報", "保护或报警", "Proteção ou alarme"],
   solx_fault_bms_notice: ["Notice", "Aviso", "Hinweis", "Avis", "Avviso", "注意", "提示", "Aviso"],
+  solx_fault_left_out: ["Impossible figure left out", "Cifra imposible descartada", "Unmöglicher Wert verworfen", "Valeur impossible écartée", "Valore impossibile scartato", "あり得ない値を除外", "已忽略不可能的数值", "Valor impossível ignorado"],
   solx_maker: ["Manufacturer", "Fabricante", "Hersteller", "Fabricant", "Produttore", "メーカー", "制造商", "Fabricante"],
   solx_deduced: ["deduced", "deducido", "abgeleitet", "déduit", "dedotto", "推定", "推断", "deduzido"],
   solx_fault_cell_over: ["Cell voltage too high", "Tensión de celda demasiado alta", "Zellspannung zu hoch", "Tension de cellule trop haute", "Tensione di cella troppo alta", "セル電圧が高すぎます", "单体电压过高", "Tensão da célula demasiado alta"],

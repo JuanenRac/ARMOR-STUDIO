@@ -6056,6 +6056,7 @@ const catalogue: Record<string, string> = {
 "solx_fault_bms_fault": "BMS fault",
 "solx_fault_bms_protect": "Protection or alarm",
 "solx_fault_bms_notice": "Notice",
+"solx_fault_left_out": "Impossible figure left out",
 "solx_maker": "Manufacturer",
 "solx_deduced": "deduced",
 "solx_fault_cell_over": "Cell voltage too high",
