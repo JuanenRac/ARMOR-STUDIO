@@ -6027,6 +6027,7 @@ const catalogue: Record<string, string> = {
 "solx_fault_bms_fault": "BMS故障",
 "solx_fault_bms_protect": "保護または警報",
 "solx_fault_bms_notice": "注意",
+"solx_fault_left_out": "あり得ない値を除外",
 "solx_maker": "メーカー",
 "solx_deduced": "推定",
 "solx_fault_cell_over": "セル電圧が高すぎます",

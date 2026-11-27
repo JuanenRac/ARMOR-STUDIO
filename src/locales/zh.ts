@@ -6031,6 +6031,7 @@ const catalogue: Record<string, string> = {
 "solx_fault_bms_fault": "BMS故障",
 "solx_fault_bms_protect": "保护或报警",
 "solx_fault_bms_notice": "提示",
+"solx_fault_left_out": "已忽略不可能的数值",
 "solx_maker": "制造商",
 "solx_deduced": "推断",
 "solx_fault_cell_over": "单体电压过高",
