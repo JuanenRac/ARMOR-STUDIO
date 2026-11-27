@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.3.0] - Explain unreadable solar ports and silent battery data sheets
+
 - **A serial port of a solar node that reads nothing is explained:** in the health of the node, each port that hears bytes and reads none says what they look like (only zeros, the node's own question coming back, unreadable, other text or never a whole message) with its speed, pins, polarity, byte count and last bytes, and a console of a slave battery of a stack says which one it is and to connect the node to the first. It needs a server and a node that tell it.
 - **A battery that does not answer its data sheet is marked:** in the Batteries menu such a module says so, instead of just showing empty fields.
 

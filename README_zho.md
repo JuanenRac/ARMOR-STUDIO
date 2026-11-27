@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-1939%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.8.2.9-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Tests-1942%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Version-0.8.3.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**诚实性检查 - 今天真正能运行的部分：** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，由 1939 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、设计器的几何与检查、报警播报器、助手的词典、八种语言的每个菜单、静态主机），并有浏览器测试。它在 CM5 测试台上日常运行，配有真实的服务器、真实的 IP 摄像头和板上的雷达节点；帮助中的图片使用示例数据制作。**尚未**证明的是：所有可能摄像头的实时视频和 PTZ、使用真实设备的太阳能、电气、报警主机和触摸屏菜单（目前只有雷达节点），以及正式的无障碍或可用性评审。当无法连接服务器时，Studio 会显示演示数据，并在顶部栏说明。
+**诚实性检查 - 今天真正能运行的部分：** Studio 与 [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) 通信，由 1942 个单元测试覆盖（设置解析、摄像头合并、太阳能图表的算术、设计器的几何与检查、报警播报器、助手的词典、八种语言的每个菜单、静态主机），并有浏览器测试。它在 CM5 测试台上日常运行，配有真实的服务器、真实的 IP 摄像头和板上的雷达节点；帮助中的图片使用示例数据制作。**尚未**证明的是：所有可能摄像头的实时视频和 PTZ、使用真实设备的太阳能、电气、报警主机和触摸屏菜单（目前只有雷达节点），以及正式的无障碍或可用性评审。当无法连接服务器时，Studio 会显示演示数据，并在顶部栏说明。
 
 ---
 
@@ -37,11 +37,11 @@
 
 | | |
 |---|---|
-| 版本 | `0.8.2.9` |
+| 版本 | `0.8.3.0` |
 | 成熟度 | 成熟 |
 | 角色 | 家族的运维与设计控制台 |
 | 技术栈 | React 19, TypeScript, Vite, Three.js, Leaflet |
-| 测试 | 1939 项（`npm test`，Vitest）和浏览器测试（Playwright） |
+| 测试 | 1942 项（`npm test`，Vitest）和浏览器测试（Playwright） |
 | 契约 | 只与 ARMOR-SERVER 通信（带 HttpOnly 会话的 HTTP `/api/v1/*`、WebSocket `/api/v1/events`） |
 | 监听地址 | `127.0.0.1:5178`（`tools/serve.mjs`） |
 | 运行位置 | 浏览器；文件由 `tools/serve.mjs` 或容器中的 nginx 提供 |
@@ -59,7 +59,7 @@
 | 领域 | 状态 | 在这里的含义 |
 |---|---|---|
 | 软件 | 🟢 | 控制台每天都对 CM5 测试台的真实服务器运行。 |
-| 测试 | 🟢 | 1939 项单元测试通过（`npm test`）并运行浏览器测试：设置、摄像头合并、光伏图表、设计器的几何与检查、报警播报、助手词典以及八种语言的每个菜单。 |
+| 测试 | 🟢 | 1942 项单元测试通过（`npm test`）并运行浏览器测试：设置、摄像头合并、光伏图表、设计器的几何与检查、报警播报、助手词典以及八种语言的每个菜单。 |
 | 界面 | 🟡 | 实时视频和云台并未对所有可能的摄像头验证过，也没有做过正式的无障碍或可用性评审，帮助中的图片使用的是示例数据。 |
 | 硬件 | 🟠 | 每天与真实服务器、真实 IP 摄像头和真实雷达节点一起使用；光伏、电气、报警面板和触摸面板菜单在等待真实节点。 |
 | 安全 | 🟠 | 会话、角色以及拒绝在地址中携带摄像头登录信息均有测试覆盖；没有经过独立审查。 |
@@ -104,6 +104,7 @@
 * **在 Studio 中查看从手机更新设备程序的状态：** 配置 > 更新 中有一张卡片，说明是否可以从手机更新设备的程序（开或关及原因）、如何开启（服务器上的 `ARMOR_CM5_UPDATE` 和助手上的 `ARMOR_MAINT_UPDATER`）、涵盖哪些程序、是否要求签名，以及审计日志的近期活动。卡片只负责显示：开关位于服务器的环境中。
 * **来自服务器的电池图表与外部控制台验证码：** 按电池和单体的图表显示 ARMOR-SERVER 记录的数据，因此不会在每次打开 Studio 时从空白开始；在房屋之外，维护控制台除密码外还要求第二因素验证码。目前仅在自动化测试中验证过。
 * **每个单体一张小图：** 单体图表还可以按相同刻度为每个单体画一张小图，勾选前不显示，由浏览器记住；故障单体会闪烁。目前仅在自动化测试中验证过。
+* **说明无法读取的端口和无应答的资料卡：** 太阳能节点的健康信息会对每个收到字节却读不出内容的串口说明其特征（只有零、节点自己的询问原样返回、无法辨认、其他设备的文字，或始终没有完整报文），并给出速率、引脚、极性和最后几个字节，还会指出电池组中从机电池的控制台；不应答资料卡的电池会明确标出。目前仅在自动化测试中验证过。
 
 ## 🧩 在 A.R.M.O.R. 中的角色
 
@@ -249,7 +250,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 连接 127.0.0.1:18080 上的服务器
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # 修改文案后写出每种语言的表
-npm test                                                                       # 1939 项
+npm test                                                                       # 1942 项
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # 提供构建
 ```

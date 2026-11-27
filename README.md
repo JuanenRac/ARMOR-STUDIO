@@ -22,14 +22,14 @@
   <img src="https://img.shields.io/badge/Language-TypeScript-3178c6.svg" alt="Language">
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-1939%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.8.2.9-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Tests-1942%20passing-2ea44f.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Version-0.8.3.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
 ---
 
-**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 1939 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary, every menu rendered in the eight languages, the static host) and by browser tests. It runs in daily use against the CM5 test bench with the real server, real IP cameras and a radar node on its board; the pictures of the Help are made with example data. What has **not** been proven is live video and PTZ against every possible camera, the solar, electrical, alarm-panel and touch-panel menus with real equipment (only the radar node exists) and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
+**Honesty check - what runs today:** Studio talks to [ARMOR-SERVER](https://github.com/JuanenRac/ARMOR-SERVER) and is covered by 1942 unit tests (settings parsing, camera merging, the arithmetic of the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary, every menu rendered in the eight languages, the static host) and by browser tests. It runs in daily use against the CM5 test bench with the real server, real IP cameras and a radar node on its board; the pictures of the Help are made with example data. What has **not** been proven is live video and PTZ against every possible camera, the solar, electrical, alarm-panel and touch-panel menus with real equipment (only the radar node exists) and a formal accessibility or usability review. While the server cannot be reached Studio shows demonstration data and says so in the top bar.
 
 ---
 
@@ -37,11 +37,11 @@
 
 | | |
 |---|---|
-| Version | `0.8.2.9` |
+| Version | `0.8.3.0` |
 | Maturity | Established |
 | Role | Operations and design console of the family |
 | Stack | React 19, TypeScript, Vite, Three.js, Leaflet |
-| Tests | 1939 (`npm test`, Vitest) and browser tests (Playwright) |
+| Tests | 1942 (`npm test`, Vitest) and browser tests (Playwright) |
 | Contract | Talks only to ARMOR-SERVER (HTTP `/api/v1/*` with an HttpOnly session, WebSocket `/api/v1/events`) |
 | Listens on | `127.0.0.1:5178` (`tools/serve.mjs`) |
 | Runs on | A browser; the files are served by `tools/serve.mjs` or by the nginx of the container |
@@ -59,7 +59,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟢 | The console runs in daily use against the real server of the CM5 test bench. |
-| Tests | 🟢 | 1939 unit tests pass (`npm test`) and the browser tests run: settings, camera merging, the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary and every menu in the eight languages. |
+| Tests | 🟢 | 1942 unit tests pass (`npm test`) and the browser tests run: settings, camera merging, the solar charts, the geometry and checks of the designers, the alarm announcer, the assistant's dictionary and every menu in the eight languages. |
 | Interface | 🟡 | Live video and PTZ are not proven against every possible camera, there has been no formal accessibility or usability review, and the pictures of the Help are made with example data. |
 | Hardware | 🟠 | It is used daily with the real server, real IP cameras and a real radar node; the solar, electrical, alarm-panel and touch-panel menus wait for real nodes. |
 | Security | 🟠 | Sessions, roles and the refusal of camera logins in addresses are covered by tests; there has been no independent review. |
@@ -104,6 +104,7 @@ Each line is one part of this repository and the light says how far it is today.
 * **Programs of the machine from the phone, shown in Studio:** Configuration > Updates has a card that says whether the programs of the machine can be updated from the phone (on or off, and why), how to turn it on (`ARMOR_CM5_UPDATE` on the server and `ARMOR_MAINT_UPDATER` on the helper), which programs it covers, whether a signature is required and the recent activity of the audit log. The card only shows: the switches live in the environment of the server.
 * **Battery charts from the server, and a code for the console from outside:** the charts by battery and cell show what ARMOR-SERVER recorded, so they do not start empty each time Studio is opened, and from outside the house the maintenance console asks for a code of the second factor besides the password. Tried only in the automated tests so far.
 * **A small chart for each cell:** the charts by cell can also draw one small chart per cell on a common scale, off until you tick it and remembered by the browser; a cell in fault blinks. Tried only in the automated tests so far.
+* **Unreadable ports and silent data sheets are explained:** the health of a solar node says, for each serial port that hears bytes and reads none, what they look like (only zeros, the node's own question coming back, unreadable, other text or never a whole message) with its speed, pins, polarity and last bytes, and names the console of a slave battery of a stack; a battery that does not answer its data sheet says so. Tried only in the automated tests.
 
 ## 🧩 Role in A.R.M.O.R.
 
@@ -249,7 +250,7 @@ npm install                                                                    #
 npm run dev                                                                    # http://127.0.0.1:5178 against a server on 127.0.0.1:18080
 npm run typecheck                                                              # tsc -b --noEmit
 npm run locales                                                                # write the table of each language after changing a phrase
-npm test                                                                       # 1939 tests
+npm test                                                                       # 1942 tests
 npm run build                                                                  # dist/
 $env:ARMOR_SERVER_ORIGIN = "http://192.168.0.180:18080"; node tools/serve.mjs  # serve the build
 ```
