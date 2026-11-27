@@ -65,6 +65,10 @@ export type SecurityOptions = {
   "panel.preflight": boolean;
   /** The account of a wall panel may read a still picture of a camera (off by default). */
   "panel.camera_view": boolean;
+  /** The account of a wall panel may read the solar equipment cut down for a small screen (off by default). */
+  "panel.solar": boolean;
+  /** The account of a wall panel may reset the counters of a battery with its PIN, while writing to batteries is on (off by default). */
+  "solar.panel_battery_ops": boolean;
   /** Devices listed as not critical are switched off when the grid draw is over the limit (off by default). */
   "electrical.load_shedding": boolean;
   /** The server works out and watches the energy balance of the house (off by default). */

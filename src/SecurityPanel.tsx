@@ -286,6 +286,8 @@ const OPTIONS: Array<{ key: OptionKey; id: string; values: Array<string | boolea
   { key: "admin.backup", id: "backup", values: [false, true], optional: true },   // off by default; on lets an administrator write a copy of the server data anywhere, so it asks first
   { key: "admin.firmware_rollout", id: "fwrollout", values: [false, true], calm: true, optional: true },   // off by default; it only makes an update gentler
   { key: "panel.preflight", id: "panelpreflight", values: [false, true], optional: true },   // off by default; on lets the account of a wall panel read the check before arming, so it asks first
+  { key: "panel.solar", id: "panelsolar", values: [false, true], optional: true },   // off by default; on lets the account of a wall screen read the solar equipment, so it asks first
+  { key: "solar.panel_battery_ops", id: "panelbattery", values: [false, true], optional: true },   // off by default; on lets the account of a wall screen reset the counters of a battery, so it asks first
   { key: "panel.camera_view", id: "panelcamera", values: [false, true], optional: true },   // off by default; on lets the account of a wall panel look at a camera, so it asks first
   { key: "electrical.load_shedding", id: "loadshed", values: [false, true], calm: true, optional: true },   // off by default; on lets the server switch off the listed devices, so it asks first
   { key: "electrical.balance", id: "balance", values: [false, true], calm: true, optional: true },   // off by default; it only reads and informs
