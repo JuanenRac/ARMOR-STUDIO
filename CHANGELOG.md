@@ -4,10 +4,11 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.3.4] - Stack, inverter and charge figures, time left and the Wi-Fi dongle switch
+
 - **How long the battery bank has left:** hours and minutes until it is full or empty at the current of now, marked as an estimate and not said while it rests or when a battery does not give its charge.
 - **The cell gap of every recorded full charge can be saved as a CSV file.**
 - **A switch to read an inverter's Wi-Fi dongle** (Security, off by default), with what it costs: the protocol has no authentication and the maker's app stops receiving data while the dongle points at the server.
-
 - **A battery stack shows what it says of itself:** state of charge and health of the whole stack, charge left and when full, modules asleep and the recommended charge and discharge limits.
 - **The energy an inverter counts itself:** panels and load of today, this month, this year and in all, with the inverter's own date.
 - **The options of an inverter** switched on and off.
@@ -16,7 +17,6 @@ All notable changes to this project are documented here.
 - **The battery as the inverter hears it:** charge, requests to charge or to stop, and limits.
 - **The cell gap of the last full charges** of each battery, to see whether it grows.
 - **The pictures of the README are retaken** from the current console, with made-up data.
-
 - **The Electrical Designer says who made a tied battery or inverter and what the battery says of itself:** a second line over the element shows the maker (saying when it was deduced) and, for a battery, a fault of its electronics, a protection or a notice, in red or amber and without blinking.
 
 ## [0.8.3.3] - Battery states, makers, left-out figures and a guarding node
