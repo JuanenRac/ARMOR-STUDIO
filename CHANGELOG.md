@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A switch to read an inverter's Wi-Fi dongle** (Security, off by default), with what it costs: the protocol has no authentication and the maker's app stops receiving data while the dongle points at the server.
+
 - **A battery stack shows what it says of itself:** state of charge and health of the whole stack, charge left and when full, modules asleep and the recommended charge and discharge limits.
 - **The energy an inverter counts itself:** panels and load of today, this month, this year and in all, with the inverter's own date.
 - **The options of an inverter** switched on and off.
