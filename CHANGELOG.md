@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The pictures of the README are retaken** from the current console, with made-up data.
+
 - **The Electrical Designer says who made a tied battery or inverter and what the battery says of itself:** a second line over the element shows the maker (saying when it was deduced) and, for a battery, a fault of its electronics, a protection or a notice, in red or amber and without blinking.
 
 ## [0.8.3.3] - Battery states, makers, left-out figures and a guarding node
