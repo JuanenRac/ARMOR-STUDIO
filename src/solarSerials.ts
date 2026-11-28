@@ -34,3 +34,10 @@ export function serialsCsv(rows: readonly SerialRow[], t: (key: string) => strin
     text(data.cycles), text(data.health_percent)])];
   return lines.map(line => line.map(csvField).join(",")).join("\r\n") + "\r\n";
 }
+
+/** Every recorded full charge of a battery stack as a CSV file, the oldest first, the times in UTC. */
+export function fullChargesCsv(charges: ReadonlyArray<{ ended_ms: number; minutes: number; mean_gap_mv: number; max_gap_mv: number }>, t: (key: string) => string): string {
+  const head = [t("sxx_full_when"), t("sxx_full_minutes"), `${t("sxx_full_mean")} (mV)`, `${t("sxx_full_max")} (mV)`];
+  const lines = [head, ...charges.map(charge => [new Date(charge.ended_ms).toISOString(), String(charge.minutes), String(charge.mean_gap_mv), String(charge.max_gap_mv)])];
+  return lines.map(line => line.map(csvField).join(",")).join("\r\n") + "\r\n";
+}

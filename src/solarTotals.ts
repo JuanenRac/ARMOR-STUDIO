@@ -124,6 +124,29 @@ export function bankSummary(devices: readonly SolarDeviceView[]): BankSummary {
   return sum;
 }
 
+// ---- how long is left -------------------------------------------------------------------------------------------------------------------
+
+/** Below this current, either way, the bank counts as resting and no time is said. */
+export const TIME_LEFT_MIN_A = 0.5;
+
+/**
+ * Hours until the bank is full (while charging) or empty (while discharging) at the current of now; null while it rests or when a figure is missing or does not cover every battery.
+ * An estimate: the current of now rarely stays as it is.
+ */
+export function timeLeft(bank: Pick<BankSummary, "capacity_ah" | "full_capacity_ah" | "current_a" | "partial">): { toFull: boolean; hours: number } | null {
+  const { capacity_ah: now, full_capacity_ah: full, current_a: current, partial } = bank;
+  if (partial || now === null || current === null || Math.abs(current) < TIME_LEFT_MIN_A) return null;
+  if (current < 0) return now > 0 ? { toFull: false, hours: now / -current } : null;
+  return full !== null && full > now ? { toFull: true, hours: (full - now) / current } : null;
+}
+
+/** "3 h 20 min", "45 min" or "> 99 h". */
+export function formatHours(hours: number): string {
+  if (hours > 99) return "> 99 h";
+  const minutes = Math.round(hours * 60), whole = Math.floor(minutes / 60);
+  return whole === 0 ? `${minutes} min` : `${whole} h ${minutes % 60} min`;
+}
+
 // ---- histories -------------------------------------------------------------------------------------------------------------------------
 
 /** The samples of a stack with the figures that follow from them: the power and the spread of the cells. */

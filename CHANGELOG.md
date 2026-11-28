@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **How long the battery bank has left:** hours and minutes until it is full or empty at the current of now, marked as an estimate and not said while it rests or when a battery does not give its charge.
+- **The cell gap of every recorded full charge can be saved as a CSV file.**
 - **A switch to read an inverter's Wi-Fi dongle** (Security, off by default), with what it costs: the protocol has no authentication and the maker's app stops receiving data while the dongle points at the server.
 
 - **A battery stack shows what it says of itself:** state of charge and health of the whole stack, charge left and when full, modules asleep and the recommended charge and discharge limits.

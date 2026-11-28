@@ -7,7 +7,7 @@ import type { Translate } from "./components/camera";
 import { fill } from "./FirmwarePanel";
 import type { Fault } from "./solarFaults";
 import { displayName, formatAmps, formatEnergy, formatPower, spreadTone } from "./solarModel";
-import { stackKey, type BankSummary, type BatteryView, type Where } from "./solarTotals";
+import { formatHours, stackKey, timeLeft, type BankSummary, type BatteryView, type Where } from "./solarTotals";
 import type { VerifyTarget } from "./solarVerify";
 
 const SHOWN = 12;
@@ -18,6 +18,7 @@ export function BankPanel({ t, bank, stacks }: { t: Translate; bank: BankSummary
     return [view ? displayName(view) : at.stack, at.module === undefined ? null : `${t("solarModule")} ${at.module}`, at.cell === undefined ? null : `${t("solarCellWord")} ${at.cell}`].filter(Boolean).join(" · ");
   };
   const about = bank.estimated || bank.partial || bank.fullEstimated ? "≈ " : "";
+  const left = timeLeft(bank);
   const fact = (label: string, value: string, note?: string, tone?: string) => <div className={`solar-fact ${tone ?? ""}`}><dt>{label}</dt><dd>{value}{note && <small>{note}</small>}</dd></div>;
   return <section className="solar-card bat-bank" data-testid="bank-summary" aria-label={t("solx_bank_title")}>
     <div className="solar-card-head"><h3>{t("solx_bank_title")}</h3></div>
@@ -30,6 +31,7 @@ export function BankPanel({ t, bank, stacks }: { t: Translate; bank: BankSummary
       {fact("kWh", bank.energy_kwh === null ? "–" : `${about}${formatEnergy(bank.energy_kwh)}`)}
       {fact(t("solx_current_total"), bank.current_a === null ? "–" : formatAmps(bank.current_a))}
       {fact(t("solarBatteryPower"), bank.power_w === null ? "–" : formatPower(bank.power_w))}
+      {left && fact(t(left.toFull ? "solx_time_full" : "solx_time_empty"), `≈ ${formatHours(left.hours)}`, t("solx_time_note"))}
       {fact(t("solx_cell_lowest"), bank.cell_min === null ? "–" : `${bank.cell_min.value.toFixed(3)} V`, bank.cell_min ? place(bank.cell_min) : undefined)}
       {fact(t("solx_cell_highest"), bank.cell_max === null ? "–" : `${bank.cell_max.value.toFixed(3)} V`, bank.cell_max ? place(bank.cell_max) : undefined)}
       {fact(t("solx_delta"), bank.delta_mv === null ? "–" : `${bank.delta_mv} mV`, undefined, bank.delta_mv === null ? undefined : spreadTone(bank.delta_mv))}
