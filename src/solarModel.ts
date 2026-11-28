@@ -8,7 +8,15 @@
 import type { SolarProtocol } from "./solarProtocols";
 
 export type SolarMode = "power_on" | "standby" | "line" | "battery" | "fault" | "power_saving" | "shutdown" | "unknown";
+export type SolarBmsSystem = {
+  modules_total?: number; modules_present?: number; modules_sleep?: number; soc_percent?: number; health_percent?: number; remaining_ah?: number; full_capacity_ah?: number;
+  charge_voltage_v?: number; discharge_voltage_v?: number; charge_current_a?: number; discharge_current_a?: number;
+};
+export type SolarEnergyCounters = { day?: string; pv_today_wh?: number; pv_month_wh?: number; pv_year_wh?: number; load_today_wh?: number; load_month_wh?: number; load_year_wh?: number; load_total_wh?: number };
+export type SolarInverterBms = { connected?: boolean; soc_percent?: number; force_charge?: boolean; stop_discharge?: boolean; stop_charge?: boolean; bulk_v?: number; float_v?: number; cutoff_v?: number; max_charge_a?: number; max_discharge_a?: number };
 export type SolarInverterReading = {
+  /** What the unit counts and says besides its readings (read only; see SolarExtras.tsx). */
+  energy?: SolarEnergyCounters; options_on?: string[]; options_off?: string[]; defaults?: SolarRatingsReading; charge_current_options_a?: number[]; ac_charge_current_options_a?: number[]; bms?: SolarInverterBms;
   kind: "inverter"; node_id: string; device: string; timestamp_ms: number; mode: SolarMode;
   grid_v: number; grid_hz: number; out_v: number; out_hz: number; out_va: number; out_w: number; load_percent: number;
   battery_v: number; battery_a: number; battery_percent: number; pv_v: number; pv_a: number; pv_w: number; heatsink_c: number;
@@ -94,6 +102,8 @@ export function refusedBatteries(topics: unknown): Array<{ name: string; error: 
 }
 
 export type SolarBatteryReading = {
+  /** What the first battery says of the whole stack. */
+  bms_system?: SolarBmsSystem;
   kind: "battery"; node_id: string; device: string; timestamp_ms: number; modules: number; stack: SolarModuleReading[];
   state?: "charging" | "discharging" | "idle"; voltage_v?: number; current_a?: number; temperature_min_c?: number; temperature_max_c?: number;
   cell_min_v?: number; cell_max_v?: number; soc_percent?: number; alarm?: boolean;

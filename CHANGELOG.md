@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A battery stack shows what it says of itself:** state of charge and health of the whole stack, charge left and when full, modules asleep and the recommended charge and discharge limits.
+- **The energy an inverter counts itself:** panels and load of today, this month, this year and in all, with the inverter's own date.
+- **The options of an inverter** switched on and off.
+- **Its factory settings**, with what is set now where it differs.
+- **The charge currents it accepts**, from the panels and from the grid.
+- **The battery as the inverter hears it:** charge, requests to charge or to stop, and limits.
+- **The cell gap of the last full charges** of each battery, to see whether it grows.
 - **The pictures of the README are retaken** from the current console, with made-up data.
 
 - **The Electrical Designer says who made a tied battery or inverter and what the battery says of itself:** a second line over the element shows the maker (saying when it was deduced) and, for a battery, a fault of its electronics, a protection or a notice, in red or amber and without blinking.
