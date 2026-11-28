@@ -15,6 +15,7 @@ import type { NetworkOverview } from "../networkModel";
 import "./solar.css";
 import "./batteries.css";
 import { ExamplesBar } from "./ExamplesBar";
+import { hasInverterExtras, InverterExtrasCards } from "../SolarExtras";
 
 type Props = { t: Translate; origin: string; devices: SolarDeviceView[]; waiting: SolarRegistration[]; catalog: SolarCatalog | null; reload: () => void; totals: SolarTotals | null; now: number; unreachable: boolean; network?: NetworkOverview | null; isAdmin?: boolean };
 type Inverter = SolarDeviceView & { reading: SolarInverterReading };
@@ -146,6 +147,7 @@ function InverterPanel({ t, inverter, now, history, minutes, setMinutes }: { t: 
         {r.warnings.length === 0 ? (r.warnings_known === false ? <span className="solar-chip" title={t("solarWarningsUnknownTip")}>{t("solarWarningsUnknown")}</span> : <span className="solar-chip ok">{t("solarNoWarnings")}</span>) : r.warnings.map(name => <span key={name} className="solar-chip bad">{humanize(name)}</span>)}
       </div>
     </section>
+    {hasInverterExtras(r) && <InverterExtrasCards t={t} reading={r} />}
     {hasUnitInfo(r) && <details className="bat-section"><summary><b>{t("solarUnitInfo")}</b></summary><div className="bat-section-body"><UnitInfoCard t={t} reading={r} /></div></details>}
     <section className="solar-card bat-history">
       <div className="solar-card-head"><h3>{t("solarHistory")}</h3>
