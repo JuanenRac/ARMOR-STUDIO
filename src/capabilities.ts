@@ -69,6 +69,8 @@ export type SecurityOptions = {
   "panel.solar": boolean;
   /** The account of a wall panel may reset the counters of a battery with its PIN, while writing to batteries is on (off by default). */
   "solar.panel_battery_ops": boolean;
+  /** The server listens for an inverter's Wi-Fi dongle and reads it (off by default). */
+  "solar.wifi_dongle": boolean;
   /** Devices listed as not critical are switched off when the grid draw is over the limit (off by default). */
   "electrical.load_shedding": boolean;
   /** The server works out and watches the energy balance of the house (off by default). */
