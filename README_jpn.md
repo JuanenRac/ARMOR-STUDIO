@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
   <img src="https://img.shields.io/badge/Tests-1942%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.8.3.3-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Version-0.8.3.4-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
@@ -37,7 +37,7 @@
 
 | | |
 |---|---|
-| バージョン | `0.8.3.3` |
+| バージョン | `0.8.3.4` |
 | 成熟度 | 確立 |
 | 役割 | ファミリーの運用・設計コンソール |
 | 技術 | React 19, TypeScript, Vite, Three.js, Leaflet |
@@ -217,7 +217,7 @@ flowchart LR
 
 **他のサービスに接続するのは天気メニューだけです。** フォントはローカルで、ほかにサードパーティへ要求するものはありません。天気メニューは、場所を保存したアカウントでのみ、Open-Meteo（予報、ジオコーディング、大気質）、RainViewer（レーダー）、EUMETSAT（雲）、ArcGIS（地図タイル）を読み込みます。場所の検索は、場所を保存する前でも、「検索」を押したときに入力した文字列を Open-Meteo に送信します。静的ホストは、設定されたサーバーとこれらのサービスに限定した `Content-Security-Policy: default-src 'self'`、`frame-ancestors 'none'`、`nosniff`、`no-referrer` を送ります。
 
-**スイッチ。** *設定 > セキュリティ* には、ARMOR-SERVER が管理者に調整を許す 68 の保護（解除 PIN、音声での消音、アラーム設計の署名、ゾーンフィード、カメラのトンネル、ネットワークのログイン、新しい国からのログイン通知、古い電気の読み取り値の除外、壁面パネルのライブイベント、デバイスロック、ノード保存領域の暗号化、音声の上限）それぞれのコントロールがあり、既定値は保守的です。下げた場合はサーバーの監査に残ります。詳細は [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md)。第三者によるセキュリティレビューはありません。
+**スイッチ。** *設定 > セキュリティ* には、ARMOR-SERVER が管理者に調整を許す 69 の保護（解除 PIN、音声での消音、アラーム設計の署名、ゾーンフィード、カメラのトンネル、ネットワークのログイン、新しい国からのログイン通知、古い電気の読み取り値の除外、壁面パネルのライブイベント、デバイスロック、ノード保存領域の暗号化、音声の上限）それぞれのコントロールがあり、既定値は保守的です。下げた場合はサーバーの監査に残ります。詳細は [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md)。第三者によるセキュリティレビューはありません。
 
 ## 🔌 インターフェース
 

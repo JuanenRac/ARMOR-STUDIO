@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Sprachen">
   <img src="https://img.shields.io/badge/Tests-1942%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.8.3.3-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Version-0.8.3.4-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Reifegrad">
 </p>
 
@@ -37,7 +37,7 @@
 
 | | |
 |---|---|
-| Version | `0.8.3.3` |
+| Version | `0.8.3.4` |
 | Reifegrad | Etabliert |
 | Rolle | Bedien- und Entwurfskonsole der Familie |
 | Technik | React 19, TypeScript, Vite, Three.js, Leaflet |
@@ -217,7 +217,7 @@ Aufgenommen auf einem Prüfstand mit erfundenen Beispieldaten und ohne eine echt
 
 **Nur das Wetter-Menü erreicht andere Dienste.** Schriften sind lokal und sonst fragt nichts einen Dritten an. Das Wetter-Menü, und nur bei einem Konto mit gespeichertem Ort, lädt Open-Meteo (Vorhersage, Geokodierung, Luftqualität), RainViewer (Radar), EUMETSAT (Wolken) und ArcGIS (Kartenkacheln). Die Ortssuche sendet den eingegebenen Text an Open-Meteo, sobald Sie auf Suchen klicken, auch bevor ein Ort gespeichert ist. Der statische Host sendet `Content-Security-Policy: default-src 'self'`, beschränkt auf den konfigurierten Server und diese Dienste, `frame-ancestors 'none'`, `nosniff` und `no-referrer`.
 
-**Schalter.** *Konfiguration > Sicherheit* hat ein Bedienelement für jeden der 68 Schutzmechanismen, die ARMOR-SERVER einem Administrator zum Einstellen überlässt (Entschärf-PIN, Stummschalten per Sprache, Signatur des Alarmentwurfs, Zonen-Feed, Kameratunnel, Netzwerk-Logins, Warnung bei Anmeldung aus einem neuen Land, Beiseitelegen alter Elektro-Messwerte, Live-Ereignisse des Wandpanels, Gerätesperre, Verschlüsselung des Knotenspeichers und die Audiogrenzen), jeweils mit konservativem Standard; der Server hält das Absenken im Audit fest. Einzelheiten in [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). Eine unabhängige Sicherheitsprüfung gab es nicht.
+**Schalter.** *Konfiguration > Sicherheit* hat ein Bedienelement für jeden der 69 Schutzmechanismen, die ARMOR-SERVER einem Administrator zum Einstellen überlässt (Entschärf-PIN, Stummschalten per Sprache, Signatur des Alarmentwurfs, Zonen-Feed, Kameratunnel, Netzwerk-Logins, Warnung bei Anmeldung aus einem neuen Land, Beiseitelegen alter Elektro-Messwerte, Live-Ereignisse des Wandpanels, Gerätesperre, Verschlüsselung des Knotenspeichers und die Audiogrenzen), jeweils mit konservativem Standard; der Server hält das Absenken im Audit fest. Einzelheiten in [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). Eine unabhängige Sicherheitsprüfung gab es nicht.
 
 ## 🔌 Schnittstellen
 

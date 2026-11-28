@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
   <img src="https://img.shields.io/badge/Tests-1942%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.8.3.3-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Version-0.8.3.4-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
@@ -37,7 +37,7 @@
 
 | | |
 |---|---|
-| Versão | `0.8.3.3` |
+| Versão | `0.8.3.4` |
 | Maturidade | Estabelecido |
 | Função | Consola de operação e desenho da família |
 | Tecnologia | React 19, TypeScript, Vite, Three.js, Leaflet |
@@ -217,7 +217,7 @@ Capturadas numa bancada de testes com dados de exemplo inventados e sem qualquer
 
 **Só o menu do Tempo chega a outros serviços.** Os tipos de letra são locais e nada mais pede algo a terceiros. O menu do Tempo, e só numa conta com um local guardado, carrega Open-Meteo (previsão, geocodificação, qualidade do ar), RainViewer (radar), EUMETSAT (nuvens) e ArcGIS (mosaicos do mapa). A pesquisa de um local envia à Open-Meteo o texto escrito ao premir Pesquisar, mesmo antes de guardar um local. O servidor estático envia `Content-Security-Policy: default-src 'self'` limitado ao servidor configurado e a esses serviços, `frame-ancestors 'none'`, `nosniff` e `no-referrer`.
 
-**Interruptores.** *Configuração > Segurança* tem um controlo para cada uma das 68 proteções que o ARMOR-SERVER deixa um administrador ajustar (PIN de desarme, silenciar por voz, assinatura do desenho de alarme, feed de zonas, túnel das câmaras, credenciais de rede, aviso de início de sessão de um novo país, pôr de parte leituras elétricas antigas, eventos em direto do painel de parede, bloqueio de dispositivo, cifra do armazenamento dos nós e os limites de áudio), cada uma com um valor predefinido conservador; o servidor deixa na auditoria que se baixe uma. Detalhes em [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). Não houve revisão de segurança independente.
+**Interruptores.** *Configuração > Segurança* tem um controlo para cada uma das 69 proteções que o ARMOR-SERVER deixa um administrador ajustar (PIN de desarme, silenciar por voz, assinatura do desenho de alarme, feed de zonas, túnel das câmaras, credenciais de rede, aviso de início de sessão de um novo país, pôr de parte leituras elétricas antigas, eventos em direto do painel de parede, bloqueio de dispositivo, cifra do armazenamento dos nós e os limites de áudio), cada uma com um valor predefinido conservador; o servidor deixa na auditoria que se baixe uma. Detalhes em [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). Não houve revisão de segurança independente.
 
 ## 🔌 Interfaces
 
