@@ -6,9 +6,11 @@
 import type { ReactNode } from "react";
 import { readFullCharges } from "./api";
 import type { Translate } from "./components/camera";
+import { downloadText } from "./download";
 import { fill } from "./FirmwarePanel";
 import { usePolled } from "./hooks";
 import { formatEnergy, ratingRows, type SolarBmsSystem, type SolarInverterReading } from "./solarModel";
+import { fullChargesCsv } from "./solarSerials";
 
 const ENERGY = ["pv_today_wh", "pv_month_wh", "pv_year_wh", "load_today_wh", "load_month_wh", "load_year_wh", "load_total_wh"] as const;
 
@@ -99,5 +101,6 @@ export function FullChargesCard({ t, origin, id }: { t: Translate; origin: strin
       <thead><tr><th>{t("sxx_full_when")}</th><th>{t("sxx_full_minutes")}</th><th>{t("sxx_full_mean")}</th><th>{t("sxx_full_max")}</th></tr></thead>
       <tbody>{charges.slice(-SHOWN).reverse().map(charge => <tr key={charge.ended_ms}><td>{new Date(charge.ended_ms).toLocaleString()}</td><td>{charge.minutes}</td><td>{charge.mean_gap_mv} mV</td><td>{charge.max_gap_mv} mV</td></tr>)}</tbody>
     </table>
+    <button type="button" onClick={() => downloadText(`armor-full-charges-${new Date().toISOString().slice(0, 10)}.csv`, `\uFEFF${fullChargesCsv(charges, t)}`, "text/csv;charset=utf-8")}>{t("sxx_full_export")}</button>
   </section>;
 }

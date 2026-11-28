@@ -6,7 +6,8 @@ import { bankFaults, blinking, cellFault, isLfp, moduleFaults } from "./solarFau
 import type { SolarBatteryReading, SolarDeviceView, SolarModuleReading, SolarSample } from "./solarModel";
 import { inSelectOrder, likelyProtocol, protocolsFor, SOLAR_PROTOCOLS } from "./solarProtocols";
 import { SOLAR_THRESHOLDS } from "./solarThresholds";
-import { bankBucketMs, bankSummary, derivedSamples, mergeBank, stackFigures } from "./solarTotals";
+import { fullChargesCsv } from "./solarSerials";
+import { bankBucketMs, bankSummary, derivedSamples, formatHours, mergeBank, stackFigures, timeLeft } from "./solarTotals";
 import { checkLive, clearingFor, parseStatCounter, verdictOf, type VerifyTarget } from "./solarVerify";
 
 const levels = SOLAR_THRESHOLDS.levels;
@@ -186,3 +187,29 @@ describe("the protocols a node speaks", () => {
   });
 });
 
+
+describe("how long the bank has left", () => {
+  const bank = { capacity_ah: 100, full_capacity_ah: 150, current_a: 25, partial: false };
+  it("says the time to full while charging and to empty while discharging", () => {
+    expect(timeLeft(bank)).toEqual({ toFull: true, hours: 2 });
+    expect(timeLeft({ ...bank, current_a: -40 })).toEqual({ toFull: false, hours: 2.5 });
+  });
+  it("says nothing while resting, full, empty or with a figure missing", () => {
+    expect(timeLeft({ ...bank, current_a: 0.4 })).toBeNull();
+    expect(timeLeft({ ...bank, current_a: null })).toBeNull();
+    expect(timeLeft({ ...bank, capacity_ah: null })).toBeNull();
+    expect(timeLeft({ ...bank, partial: true })).toBeNull();
+    expect(timeLeft({ ...bank, full_capacity_ah: null })).toBeNull();
+    expect(timeLeft({ ...bank, capacity_ah: 150 })).toBeNull();
+    expect(timeLeft({ ...bank, capacity_ah: 0, current_a: -5 })).toBeNull();
+  });
+  it("writes hours and minutes", () => {
+    expect(formatHours(0.75)).toBe("45 min");
+    expect(formatHours(3 + 1 / 3)).toBe("3 h 20 min");
+    expect(formatHours(240)).toBe("> 99 h");
+  });
+  it("saves the full charges as CSV", () => {
+    const text = fullChargesCsv([{ ended_ms: Date.parse("2026-01-01T12:00:00Z"), minutes: 30, mean_gap_mv: 12, max_gap_mv: 20 }], key => key);
+    expect(text).toBe("sxx_full_when,sxx_full_minutes,sxx_full_mean (mV),sxx_full_max (mV)\r\n2026-01-01T12:00:00.000Z,30,12,20\r\n");
+  });
+});
