@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
   <img src="https://img.shields.io/badge/Tests-1942%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.8.3.3-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Version-0.8.3.4-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturity">
 </p>
 
@@ -37,7 +37,7 @@
 
 | | |
 |---|---|
-| Version | `0.8.3.3` |
+| Version | `0.8.3.4` |
 | Maturity | Established |
 | Role | Operations and design console of the family |
 | Stack | React 19, TypeScript, Vite, Three.js, Leaflet |
@@ -217,7 +217,7 @@ Captured on a test bench with made-up sample data and no real installation behin
 
 **Only the Weather menu reaches other services.** Fonts are local stacks and nothing else asks a third party for anything. The Weather menu, and only for an account with a saved place, loads Open-Meteo (forecast, geocoding, air quality), RainViewer (radar), EUMETSAT (clouds) and ArcGIS (map tiles). A place search sends the text you typed to Open-Meteo when you press Search, even before a place is saved. The static host sends `Content-Security-Policy: default-src 'self'` limited to the configured server and those services, `frame-ancestors 'none'`, `nosniff` and `no-referrer`.
 
-**Switches.** *Configuration > Security* has a control for each of the 68 protections that ARMOR-SERVER lets an administrator tune (disarm PIN, silencing by voice, signature of the alarm design, zone feed, camera tunnel, network logins, the alert of a sign-in from a new country, setting aside old electrical readings, wall-panel live events, device lock, node storage encryption and the audio limits), with a conservative default; the server keeps lowering one in its audit. Details in [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). There has been no independent security review.
+**Switches.** *Configuration > Security* has a control for each of the 69 protections that ARMOR-SERVER lets an administrator tune (disarm PIN, silencing by voice, signature of the alarm design, zone feed, camera tunnel, network logins, the alert of a sign-in from a new country, setting aside old electrical readings, wall-panel live events, device lock, node storage encryption and the audio limits), with a conservative default; the server keeps lowering one in its audit. Details in [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). There has been no independent security review.
 
 ## 🔌 Interfaces
 

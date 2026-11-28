@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/UI-React%2019-61dafb.svg" alt="UI">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Langues">
   <img src="https://img.shields.io/badge/Tests-1942%20passing-2ea44f.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/Version-0.8.3.3-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Version-0.8.3.4-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-established-2EA44F.svg" alt="Maturité">
 </p>
 
@@ -37,7 +37,7 @@
 
 | | |
 |---|---|
-| Version | `0.8.3.3` |
+| Version | `0.8.3.4` |
 | Maturité | Établi |
 | Rôle | Console d'exploitation et de conception de la famille |
 | Technologie | React 19, TypeScript, Vite, Three.js, Leaflet |
@@ -217,7 +217,7 @@ Capturées sur un banc d'essai avec des données d'exemple fictives et sans inst
 
 **Seul le menu Météo atteint d'autres services.** Les polices sont locales et rien d'autre ne demande quoi que ce soit à un tiers. Le menu Météo, et seulement pour un compte ayant un lieu enregistré, charge Open-Meteo (prévisions, géocodage, qualité de l'air), RainViewer (radar), EUMETSAT (nuages) et ArcGIS (tuiles de carte). La recherche d'un lieu envoie à Open-Meteo le texte saisi lorsque vous cliquez sur Rechercher, même avant d'avoir enregistré un lieu. L'hôte statique envoie `Content-Security-Policy: default-src 'self'` limitée au serveur configuré et à ces services, `frame-ancestors 'none'`, `nosniff` et `no-referrer`.
 
-**Interrupteurs.** *Configuration > Sécurité* a une commande pour chacune des 68 protections qu'ARMOR-SERVER laisse régler à un administrateur (PIN de désarmement, coupure par la voix, signature de la conception d'alarme, flux de zones, tunnel des caméras, identifiants réseau, alerte de connexion depuis un nouveau pays, mise de côté des lectures électriques anciennes, événements en direct du panneau mural, verrouillage d'appareil, chiffrement du stockage des nœuds et limites audio), chacune avec un défaut prudent ; le serveur consigne dans son audit qu'on en abaisse une. Détails dans [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). Il n'y a pas eu de revue de sécurité indépendante.
+**Interrupteurs.** *Configuration > Sécurité* a une commande pour chacune des 69 protections qu'ARMOR-SERVER laisse régler à un administrateur (PIN de désarmement, coupure par la voix, signature de la conception d'alarme, flux de zones, tunnel des caméras, identifiants réseau, alerte de connexion depuis un nouveau pays, mise de côté des lectures électriques anciennes, événements en direct du panneau mural, verrouillage d'appareil, chiffrement du stockage des nœuds et limites audio), chacune avec un défaut prudent ; le serveur consigne dans son audit qu'on en abaisse une. Détails dans [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md). Il n'y a pas eu de revue de sécurité indépendante.
 
 ## 🔌 Interfaces
 
