@@ -36,6 +36,10 @@ export async function solarHistory(origin: string, node: string, device: string,
   return response.json() as Promise<{ samples: SolarSample[] }>;
 }
 
+/** The cell gap of every battery stack at each of its last full charges. */
+export type FullCharges = { batteries: Array<{ id: string; charges: Array<{ ended_ms: number; minutes: number; mean_gap_mv: number; max_gap_mv: number }> }> };
+export const readFullCharges = (origin: string) => userCall<FullCharges>(origin, "GET", "/api/v1/solar/full-charges");
+
 /** How battery alarms call for attention and which batteries are silenced (kept by the server). */
 export type NoticesState = { settings: { mode?: "once" | "classic"; forget_after_h?: number; cell_min_plausible_v?: number; cell_max_plausible_v?: number }; silenced: Array<{ id: string; since: string; by: string }> };
 export const readBatteryNotices = (origin: string) => userCall<NoticesState>(origin, "GET", "/api/v1/solar/battery-notices");

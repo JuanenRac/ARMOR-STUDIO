@@ -31,6 +31,7 @@ import "./battery-faults.css";
 import "./battery-quiet.css";
 import { BatteryNoticesCard, DayCellsNote, SilenceButton, isSilenced, useBatteryNotices, type Notices } from "../BatteryNotices";
 import { ExamplesBar } from "./ExamplesBar";
+import { BmsSystemCard, FullChargesCard } from "../SolarExtras";
 
 type Props = { t: Translate; origin: string; devices: SolarDeviceView[]; waiting: SolarRegistration[]; catalog: SolarCatalog | null; reload: () => void; totals: SolarTotals | null; now: number; unreachable: boolean; network?: NetworkOverview | null; isAdmin?: boolean };
 type Battery = SolarDeviceView & { reading: SolarBatteryReading };
@@ -193,6 +194,8 @@ function StackPanel({ t, origin, stacks, stack, now, history, minutes, setMinute
         </div>
       </div>}
     </section>
+    {r.bms_system && <BmsSystemCard t={t} system={r.bms_system} />}
+    <FullChargesCard t={t} origin={origin} id={`${stack.node_id}/${stack.device}`} />
     <Composition t={t} stack={r.stack} />
     <section className="bat-modules" aria-label={t("solarModules")}>
       <div className="bat-section-head"><h3>{t("solarModules")} <small>{r.stack.filter(module => module.present).length} / {r.stack.length}</small></h3>
