@@ -4,7 +4,8 @@ import { describe, expect, it } from "vitest";
 import { ElectricalDesigner } from "../ElectricalDesigner";
 import { locales, text, type Locale } from "../i18n";
 import type { ElectricalNodeReading } from "../api";
-import type { SolarDeviceView } from "../solarModel";
+import type { SolarBatteryReading, SolarDeviceView, SolarModuleReading } from "../solarModel";
+import { solarMark } from "./solarMark";
 import { addElement, setBinding } from "./ops";
 import { emptyDesign, housePreset } from "./presets";
 
@@ -41,6 +42,22 @@ describe("the Electrical Designer", () => {
       reading: { kind: "inverter", node_id: "casa", device: "axpert-1", timestamp_ms: 1, mode: "line", grid_v: 231, grid_hz: 50, out_v: 230, out_hz: 50, out_va: 1000, out_w: 900, load_percent: 20, battery_v: 52, battery_a: 5, battery_percent: 80, pv_v: 120, pv_a: 5, pv_w: 1960, heatsink_c: 40, ac_charging: false, pv_charging: true, load_on: true, warnings: [] } };
     expect(render("en", design, [live])).toContain("line · 1960 W");
     expect(render("en", design, [])).toContain("…");
+  });
+  it("says who made a tied battery and what it says of itself, in three levels", () => {
+    let design = addElement(emptyDesign(), "battery", 0, 0)!.design;
+    design = setBinding(design, design.elements[0].id, { solar: "casa/bank-1" });
+    const bank = (module: Partial<SolarModuleReading>, maker: Partial<SolarBatteryReading> = {}): SolarDeviceView => ({ node_id: "casa", device: "bank-1", kind: "battery", received_at: "2000-01-01T00:00:00.000Z", stale: false,
+      reading: { kind: "battery", node_id: "casa", device: "bank-1", timestamp_ms: 1, modules: 1, soc_percent: 76, voltage_v: 49.9, manufacturer: "Pylontech", manufacturer_source: "reported", ...maker, stack: [{ n: 1, present: true, ...module }] } });
+    expect(solarMark(bank({}), "deduced")).toEqual({ maker: "Pylontech", level: null });
+    expect(solarMark(bank({ flags: [{ column: "voltage", word: "High" }] }), "deduced").level).toBe("bms_notice");
+    expect(solarMark(bank({ flags: [{ column: "voltage", word: "OV" }] }), "deduced").level).toBe("bms_protect");
+    expect(solarMark(bank({ cells_unread: [3] }), "deduced").level).toBe("bms_fault");
+    expect(solarMark(bank({ state: "SysError" }), "deduced").level).toBe("bms_fault");
+    expect(solarMark(bank({}, { manufacturer: "Daly", manufacturer_source: "deduced" }), "deduced").maker).toBe("Daly (deduced)");
+    expect(solarMark(bank({ manufacturer: "Pylontech" }, { manufacturer: undefined }), "deduced").maker).toBe("Pylontech");
+    const html = render("en", design, [bank({ cells_unread: [3] })]);
+    expect(html).toContain("Pylontech · BMS fault");
+    expect(render("es", design, [bank({})])).toContain("Pylontech");
   });
   it("shows what a node measures on the element tied to one of its channels, and draws a switch it sees open as open", () => {
     let design = addElement(emptyDesign(), "e-breaker", 0, 0)!.design;

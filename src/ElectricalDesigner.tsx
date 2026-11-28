@@ -10,6 +10,7 @@ import { askConfirm } from "./askConfirm";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import type { ElectricalNodeReading } from "./api";
 import type { SolarDeviceView, SolarRegistration } from "./solarModel";
+import { solarMark } from "./electrical/solarMark";
 import { analyse, ampacity, type Issue } from "./electrical/analysis";
 import {
   CATEGORY_COLOUR, CATEGORY_ORDER, DOMAIN_COLOUR, FRAME_COLOURS, GRID, designBounds, kindDef, kindsIn, portOf, portPosition, snap, summaryOf, wirePath,
@@ -345,12 +346,28 @@ export function ElectricalDesigner({ t, design, setDesign, status, nodeIds, sola
     if (reading.kind === "inverter") return `${reading.mode} · ${Math.round(reading.pv_w)} W`;
     return `${reading.soc_percent ?? "—"} % · ${reading.voltage_v !== undefined ? reading.voltage_v.toFixed(1) : "—"} V`;
   };
+  const markOf = (element: Element) => {
+    const key = element.bind?.solar;
+    const found = key ? solarDevices.find(device => `${device.node_id}/${device.device}` === key) : undefined;
+    return found ? solarMark(found, t("solx_deduced")) : undefined;
+  };
   const liveTone = (element: Element): string => {
     const measured = channelOf(element);
     if (measured && !element.bind?.solar) return !measured.node || !measured.channel || measured.node.stale ? "off" : measured.channel.alarm ? "alarm" : "on";
     const key = element.bind?.solar;
     const found = key ? solarDevices.find(device => `${device.node_id}/${device.device}` === key) : undefined;
-    return !found ? "off" : found.stale ? "stale" : found.reading.kind === "battery" && found.reading.alarm ? "alarm" : "on";
+    if (!found) return "off";
+    if (found.stale) return "stale";
+    const level = markOf(element)?.level;
+    return level === "bms_fault" || level === "bms_protect" || (found.reading.kind === "battery" && found.reading.alarm) ? "alarm" : "on";
+  };
+  // the second line over an element tied to a solar device: who made it and, for a battery, what it says of itself (red and still, never blinking)
+  const markLine = (element: Element): { text: string; colour: string } | undefined => {
+    const mark = markOf(element);
+    if (!mark) return undefined;
+    const said = mark.level ? t(`solx_fault_${mark.level}`) : "";
+    const text = [mark.maker, said].filter(Boolean).join(" · ");
+    return text ? { text, colour: mark.level === "bms_notice" ? "#fbbf24" : mark.level ? "#f87171" : "#8fb3bc" } : undefined;
   };
 
   const electricalNodeIds = useMemo(() => [...new Set([...electricalNodes.map(item => item.node_id), ...nodeIds, ...design.elements.filter(element => element.kind === "node").map(element => String(element.props.node_id ?? "")).filter(Boolean)])].sort(), [electricalNodes, nodeIds, design]);
@@ -387,7 +404,7 @@ export function ElectricalDesigner({ t, design, setDesign, status, nodeIds, sola
     const def = kindDef(element.kind);
     if (!def) return null;
     const seen = channelOf(element)?.channel?.state;
-    const chosen = selection?.kind === "element" && selection.id === element.id, live = liveOf(element), open = seen ? seen === "open" : element.state === "open";
+    const chosen = selection?.kind === "element" && selection.id === element.id, live = liveOf(element), mark = markLine(element), open = seen ? seen === "open" : element.state === "open";
     const fullName = element.name || label(element.kind), name = fullName.length > 17 ? `${fullName.slice(0, 16)}…` : fullName, summary = summaryOf(element);
     const isBus = element.kind === "busbar-ac" || element.kind === "busbar-dc" || element.kind === "junction-ac" || element.kind === "junction-dc";
     return <g key={element.id} transform={`translate(${element.x} ${element.y})`} style={{ cursor: "grab" }} onPointerDown={event => onElementDown(event, element)} opacity={open ? 0.65 : 1}>
@@ -397,6 +414,7 @@ export function ElectricalDesigner({ t, design, setDesign, status, nodeIds, sola
       {!isBus && <text x={def.w / 2} y={def.h + 13} textAnchor="middle" fontSize={11} fontWeight={700} fill="#e2eef2" fontFamily='"Space Grotesk", "Segoe UI", system-ui, sans-serif' stroke="#060d13" strokeWidth={3} paintOrder="stroke">{name}<title>{fullName}</title></text>}
       {!isBus && summary && <text x={def.w / 2} y={def.h + 25} textAnchor="middle" fontSize={9.5} fill="#8fb3bc" fontFamily='"DM Mono", ui-monospace, Consolas, monospace' stroke="#060d13" strokeWidth={3} paintOrder="stroke">{summary}</text>}
       {isBus && <text x={def.w / 2} y={-6} textAnchor="middle" fontSize={10} fontWeight={700} fill={CATEGORY_COLOUR.distribution} fontFamily='"Space Grotesk", system-ui, sans-serif' stroke="#060d13" strokeWidth={3} paintOrder="stroke">{name}</text>}
+      {mark && <text x={def.w / 2} y={-28} textAnchor="middle" fontSize={9} fontWeight={700} fill={mark.colour} fontFamily='"DM Mono", ui-monospace, Consolas, monospace' stroke="#060d13" strokeWidth={3} paintOrder="stroke">{mark.text}</text>}
       {live && <g transform={`translate(${def.w / 2} -10)`}><rect x={-46} y={-14} width={92} height={16} rx={8} fill="#04121a" stroke={liveTone(element) === "alarm" ? "#f87171" : liveTone(element) === "on" ? "#34d399" : "#64748b"} /><text y={-2} textAnchor="middle" fontSize={9.5} fontWeight={700} fill={liveTone(element) === "on" ? "#34d399" : liveTone(element) === "alarm" ? "#f87171" : "#94a3b8"} fontFamily='"DM Mono", ui-monospace, Consolas, monospace'>{live}</text></g>}
     </g>;
   };
